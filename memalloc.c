@@ -6,38 +6,39 @@
 #define TEST_NUMBER 10
 
 int main() {
-	int test, c, success;
-	test = c = success = 0;
+	malloc(sizeof(unsigned long int));
+	// int test, c, success;
+	// test = c = success = 0;
 
-	node * root = NULL;
+	// node * root = NULL;
 
-    srand(time(NULL));
-	// INSERTION TEST 
+    // srand(time(NULL));
+	// // INSERTION TEST 
 
-	while(c++ < TEST_NUMBER)
-		insert(&root, new(rand() % 150));	
+	// while(c++ < TEST_NUMBER)
+	// 	insert(&root, new(rand() % 150));	
 
 	// PRINT TEST
 
-	printf("\n > IN ORDER -> ");
-	in(root);
+	// printf("\n > IN ORDER -> ");
+	// in(root);
 
-	printf("\n\n > PRE ORDER -> ");
-	pre(root);
+	// printf("\n\n > PRE ORDER -> ");
+	// pre(root);
 
-	printf("\n\n > POST ORDER -> ");
-	post(root);
+	// printf("\n\n > POST ORDER -> ");
+	// post(root);
 
 	// SEARCH TEST
 
-	puts("\n\n > TEST SEARCH:");
+	// puts("\n\n > TEST SEARCH:");
 
-	while(test++ < TEST_NUMBER)
-		if(search(root, test) > 0){
-	 		printf("  - %d\n", test);
-	 		success++;
-		}
+	// while(test++ < TEST_NUMBER)
+	// 	if(search(root, test) > 0){
+	//  		printf("  - %d\n", test);
+	//  		success++;
+	// 	}
 
-	printf("\n <SUCCESS> = %d <FAILED> = %d\n", success, TEST_NUMBER - success);
+	// printf("\n <SUCCESS> = %d <FAILED> = %d\n", success, TEST_NUMBER - success);
     return 0;
 }

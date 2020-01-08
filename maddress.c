@@ -76,7 +76,7 @@ void* malloc(size_t size) {
 
     no_hook = 1;
     void* return_address = real_malloc(size);
-    fprintf(stdout,"%p\n",return_address);
+    fprintf(stdout,"%p, size: %ld\n",return_address,size);
     // fflush(stdout);
     // printf("ole");
     no_hook = 0;
