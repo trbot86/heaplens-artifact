@@ -1,5 +1,4 @@
-#include <rw/tvdlist.h>
-#include <rw/cstring.h>
+#include <bits/stdc++.h>
 #include <iostream>
 
 template <class T>
@@ -62,8 +61,8 @@ int main()
   std::cout << "\nCreating a RWTValDlist with a default allocator"
             << std::endl;
 
-  RWTValDlist<RWCString> regular;
-
+//   RWTValDlist<RWCString> regular;
+    std::vector<int, my_allocator<int>>
 
   std::cout << "\nInserting " << numItems
             << " items" << std::endl;
