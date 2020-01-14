@@ -1,10 +1,13 @@
 #include "myfirstallocator.h"
 
-#define NewWithDebug new (__FILE__,__LINE__,__FUNCTION__)
+// #define new new (__FILE__,__LINE__,__FUNCTION__)
 
 int main() {
-    trackalloc<int> talloc;
     std::string* s = new std::string;
-    std::vector<int, trackalloc<int>> v(10, talloc);
+    std::vector<int> v(10);
+    int* n = new int(6);
+    dumpstatstofile("memstats");
+    delete(s);
+    delete(n);
     return 0;
 }
