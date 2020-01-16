@@ -1,6 +1,12 @@
 #include <iostream>
 #include <bits/stdc++.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <experimental/source_location>
+
+#define MAX_THREADS 1000
 
 void dumpstatstofile(const char* file);
 void* operator new (std::size_t);
@@ -29,6 +35,10 @@ struct info_t {
     size_t size;
     void* addr;
 };
+
+info_t* allArrays[MAX_THREADS];
+thread_local info_t* myArray;
+static int arrayCount = 0;
 
 template<typename T>
 struct internalalloc: std::allocator<T> {
@@ -61,4 +71,5 @@ struct internalalloc: std::allocator<T> {
     }
 };
 
-typedef std::map<void*, info_t, std::less<void*>, internalalloc<std::pair<void* const, info_t>> > track_type;
+typedef info_t** track_type;
+// typedef std::map<void*, info_t, std::less<void*>, internalalloc<std::pair<void* const, info_t>> > track_type;

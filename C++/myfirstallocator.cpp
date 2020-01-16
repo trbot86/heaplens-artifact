@@ -4,45 +4,45 @@ struct track_printer {
     track_type* track;
     track_printer (track_type* track):track(track) {}
     ~track_printer () {
-        track_type::iterator it = track->begin();
-        while(it != track->end()) {
-            std::cout << "LEAKED: " << it->first 
-            << " size: " << it->second.size << " file: " << it->second.file << " func: " << it->second.function << " line: " << it->second.line << "\n";
-            ++it;
-        }
+        #ifdef DUMPSTATS == 1
+        dumpstatstofile("memdump");
+        #endif
     }
 };
 
-track_type* get_map() {
-    static track_type *track = new (std::malloc(sizeof *track)) track_type;
-    static track_printer printer(track);
-    return track;
-}
+// track_type* get_map() {
+//     allArrays = new (std::malloc(sizeof *track * MAX_THREADS)) track_type;
+//     static track_printer printer(track);
+//     return track;
+// }
 
+//Serialise struct in an efficient manner. Bunch of writes will reorder things in file.
 void dumpstatstofile(const char* file) {
-    FILE* fp = fopen(file,"w");
-    if(fp == nullptr) {
+    int fp = open(file,O_CREAT|O_APPEND|O_RDWR,0666);
+    if(fp == -1) {
         throw std::runtime_error(std::strerror(errno));
         return;
     }
 
     track_type::iterator it = get_map()->begin();
     while(it != get_map()->end()) {
-        fprintf(fp,"addr: %p size: %zu line: %d func: %s file: %s time: %lu\n", it->second.addr, it->second.size, it->second.line, it->second.function, it->second.file, it->second.timestamp);
-        // fprintf(fp,"addr: %p size: %zu line: %d\n", it->second.addr, it->second.size, it->second.line);
+        std::cout << it->second.file << " " << it->second.line << std::endl;
+        
+        //******* FIGURE OUT DUMPING STRATEGY*************//
+        // write(fp, &(it->second.line), sizeof(unsigned int));
+        // write(fp, &(it->second.timestamp), sizeof(uint64_t));
+        // write(fp, &(it->second.size), sizeof(size_t));
+        // write(fp, &(it->second.addr), sizeof(void*));
         ++it;
     }
 
-    fclose(fp);
+    close(fp);
     return;
 }
 
 void * operator new(std::size_t size) {
     // we are required to return non-null
-    void* mem = std::malloc(size == 0?1:size);
-    if(mem == 0) {
-        throw std::bad_alloc();
-    }
+    static thread_local int it = 0;
 
     std::experimental::source_location loc = std::experimental::source_location::current();
 
@@ -55,6 +55,13 @@ void * operator new(std::size_t size) {
         size,
         mem,
     };
+    
+    if(myArray) {
+        void* mem = std::malloc(size == 0?1:size);
+        if(mem == 0) {
+            throw std::bad_alloc();
+        }
+    }
 
     (*get_map())[mem] = info;
     return mem;
