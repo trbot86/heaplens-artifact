@@ -1,50 +1,33 @@
 #include "myfirstallocator.h"
 
-struct track_printer {
-    track_type* track;
-    track_printer (track_type* track):track(track) {}
-    ~track_printer () {
-        #ifdef DUMPSTATS == 1
-        dumpstatstofile("memdump");
-        #endif
+void printstats() {
+    for(int i = 0;i < it;i++) {
+        std::cout << myArray[i];
     }
-};
-
-// track_type* get_map() {
-//     allArrays = new (std::malloc(sizeof *track * MAX_THREADS)) track_type;
-//     static track_printer printer(track);
-//     return track;
-// }
-
-//Serialise struct in an efficient manner. Bunch of writes will reorder things in file.
-void dumpstatstofile(const char* file) {
-    int fp = open(file,O_CREAT|O_APPEND|O_RDWR,0666);
-    if(fp == -1) {
-        throw std::runtime_error(std::strerror(errno));
-        return;
-    }
-
-    track_type::iterator it = get_map()->begin();
-    while(it != get_map()->end()) {
-        std::cout << it->second.file << " " << it->second.line << std::endl;
-        
-        //******* FIGURE OUT DUMPING STRATEGY*************//
-        // write(fp, &(it->second.line), sizeof(unsigned int));
-        // write(fp, &(it->second.timestamp), sizeof(uint64_t));
-        // write(fp, &(it->second.size), sizeof(size_t));
-        // write(fp, &(it->second.addr), sizeof(void*));
-        ++it;
-    }
-
-    close(fp);
-    return;
 }
 
+void dumpstatstofile(const char* file) {
+
+}
+
+/**********************
+ * 
+ * Add bound checking for number of allocations
+ * Do we need to initialize as zero first in order
+ * to know when to stop while printing?
+ * 
+ **********************/
 void * operator new(std::size_t size) {
-    // we are required to return non-null
-    static thread_local int it = 0;
+    // if(!pthread_push_flag) {
+    //     pthread_cleanup_push()
+    // }
 
     std::experimental::source_location loc = std::experimental::source_location::current();
+    
+    void* mem = std::malloc(size == 0?1:size);
+    if(mem == 0) {
+        throw std::bad_alloc();
+    }
 
     info_t info = {
         loc.file_name(),
@@ -55,22 +38,29 @@ void * operator new(std::size_t size) {
         size,
         mem,
     };
-    
-    if(myArray) {
-        void* mem = std::malloc(size == 0?1:size);
-        if(mem == 0) {
-            throw std::bad_alloc();
-        }
+
+    if(!myArray) {
+        myArray = (info_t*)malloc(MAX_TRACK*sizeof(info_t));
+        int result = __sync_fetch_and_add(&arrayCount,1);
+        allArrays[result] = myArray;
     }
 
-    (*get_map())[mem] = info;
+    /*ensure that number of allocations don't exceed the limit
+    * make a policy for dumping the existing allocations before
+    * reaching the limit
+    **/
+
+    assert(it < MAX_TRACK);
+    myArray[it++] = info;  
     return mem;
 }
 
-void operator delete(void * mem) {    
-    if(get_map()->erase(mem) == 0) {
-        // this indicates a serious bug
-        std::cerr << "bug: memory at " << mem << " wasn't allocated by us\n";
-    }
+void operator delete(void * mem) {
+
+    /*
+    *   Figure out how to elegantly call printstats (preferably with flags).
+    *   For now, just calling printstats in delete
+    * */
+    printstats();
     std::free(mem);
 }

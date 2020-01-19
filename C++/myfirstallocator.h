@@ -1,3 +1,7 @@
+
+#ifndef myfirstallocator
+#define myfirst allocator
+
 #include <iostream>
 #include <bits/stdc++.h>
 #include <sys/types.h>
@@ -7,7 +11,9 @@
 #include <experimental/source_location>
 
 #define MAX_THREADS 1000
+#define MAX_TRACK 1000
 
+void printstats();
 void dumpstatstofile(const char* file);
 void* operator new (std::size_t);
 void operator delete (void* ptr);
@@ -26,6 +32,7 @@ inline uint64_t get_server_clock() {
     return ret;
 }
 
+//COMPRESS THE DATA STRUCTURE
 struct info_t {
     const char* file;
     const char* function;
@@ -36,8 +43,31 @@ struct info_t {
     void* addr;
 };
 
+std::ostream& operator << (std::ostream& os, const info_t& info) {
+        // os << *info.file << std::endl;
+        // os << *info.function << std::endl;
+        // os << *info.type << std::endl;
+        os << info.line << std::endl;
+        os << info.timestamp << std::endl;
+        os << info.size << std::endl;
+        os << info.addr << std::endl;
+        return os;
+    }
+
+//Global array for tracking all allocations
 info_t* allArrays[MAX_THREADS];
+
+//Local array tracking a thread's allocations
 thread_local info_t* myArray;
+
+/*Iterator for individual thread allocation in
+* tracking data structure
+*/
+static thread_local int it = 0;
+
+static thread_local bool pthread_push_flag;
+
+//Keeps the total number of concurrent threads
 static int arrayCount = 0;
 
 template<typename T>
@@ -45,7 +75,6 @@ struct internalalloc: std::allocator<T> {
     typedef typename std::allocator<T>::pointer pointer;
     typedef typename std::allocator<T>::size_type size_type;
 
-    //ASK THE USE OF THIS
     template<typename U>
     struct rebind {
         typedef internalalloc<U> other;
@@ -72,4 +101,4 @@ struct internalalloc: std::allocator<T> {
 };
 
 typedef info_t** track_type;
-// typedef std::map<void*, info_t, std::less<void*>, internalalloc<std::pair<void* const, info_t>> > track_type;
+#endif
