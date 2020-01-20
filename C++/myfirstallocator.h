@@ -8,8 +8,11 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <execinfo.h>
+#include <cxxabi.h>
 #include <experimental/source_location>
 
+#define BACKTRACE_DEPTH 2
 #define MAX_THREADS 1000
 #define MAX_TRACK 1000
 
