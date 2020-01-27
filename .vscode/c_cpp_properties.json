@@ -3,7 +3,7 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**","/usr/include/c++"
+                "/usr/lib/llvm-6.0/include/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
