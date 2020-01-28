@@ -1,5 +1,7 @@
-#include <iostream>
-#include <bits/stdc++.h>
+// #include <iostream>
+#include <string>
+// #include <bits/stdc++.h>
+using namespace std;
 
 template < typename T>
 class MyClass
@@ -21,9 +23,13 @@ void func() {
 int main() {
   MyClass<int> mc;
   MyClass<double> md;
-  // mc.field = new int;
-
-  for(int i = 0;i < 10;i++) {
-    ;
-  }
+  mc.field = new int;
+  MyClass<int>* mc2 = new MyClass<int>;
+  char* arr = new char[10];
+  string* p = new (arr) string("hi");
+  int* str = (int*)(operator new (sizeof(string)));
+  malloc(sizeof(int));
+  delete mc2;
+  delete mc.field;
+  delete ([]{return new int; })();
 }

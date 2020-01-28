@@ -2,110 +2,23 @@
  *  Basic workflow:
  *  -1) Did a basic parse of the source, printed all AST nodes
  *  and their types.
- *  2) Did a search for all recordDecl nodes, made a list of
+ *  -2) Did a search for all recordDecl nodes, made a list of
  *  that and printed it.
- *  3) Looked for all new, malloc allocations and printed their
+ *  -3) Looked for all new, ****malloc**** allocations and printed their
  *  types.
  *  4) Decided the layout of the typetable data structure, and
  *  how to add to it using new, malloc parsing.
+ * 
+ *  TODO:
+ *  1) Add functionality to register new allocator/deallocator names for static analyser. (Eg. tcmalloc, jemalloc)
+ *     So that type recognition functionality is not broken when new allocators are used.
 */
-
-// #include <clang-c/Index.h>
-
-// #include <iostream>
-// #include <string>
-
-// using namespace std;
-
-// string getCursorKindName( CXCursorKind cursorKind )
-// {
-//   CXString kindName  = clang_getCursorKindSpelling( cursorKind );
-//   string result = clang_getCString( kindName );
-
-//   clang_disposeString( kindName );
-//   return result;
-// }
-
-// string getCursorSpelling( CXCursor cursor )
-// {
-//   CXString cursorSpelling = clang_getCursorSpelling( cursor );
-//   string result      = clang_getCString( cursorSpelling );
-
-//   clang_disposeString( cursorSpelling );
-//   return result;
-// }
-
-// void getScope(CXCursor pc) {
-//     CXCursorKind parentKind = clang_getCursorKind(clang_getCursorSemanticParent(pc));
-
-//     if(parentKind == CXCursor_VarDecl) {
-//       CXSourceRange range = clang_getCursorExtent(pc);
-//       CXSourceLocation loc = clang_getRangeStart(range);
-//       CXSourceLocation endloc = clang_getRangeEnd(range);
-
-//       unsigned int line, column, offset;
-//       clang_getExpansionLocation(loc, NULL, &line, &column, &offset);
-//       cout << line << " " << column << " " << offset << endl;
-//       clang_getExpansionLocation(endloc, NULL, &line, &column, &offset);
-//       cout << line << " " << column << " " << offset << endl;
-//     }
-
-//     cout << getCursorKindName(parentKind) << endl;
-// }
-
-// CXChildVisitResult visitor( CXCursor cursor, CXCursor pc, CXClientData clientData )
-// {
-//   CXSourceLocation location = clang_getCursorLocation( cursor );
-//   if( clang_Location_isFromMainFile( location ) == 0 )
-//     return CXChildVisit_Continue;
-
-//   CXCursorKind cursorKind = clang_getCursorKind( cursor );
-
-//   if(cursorKind == CXCursor_CXXNewExpr) {
-//     // clang_get
-//   }
-
-//   unsigned int curLevel  = *( reinterpret_cast<unsigned int*>( clientData ) );
-//   unsigned int nextLevel = curLevel + 1;
-
-//   std::cout << std::string( curLevel, '-' ) << " " << getCursorKindName(
-//   cursorKind ) << " (" << getCursorSpelling( cursor ) << ")\n";
-
-//   clang_visitChildren( cursor,
-//                        visitor,
-//                        &nextLevel ); 
-
-//   return CXChildVisit_Continue;
-// }
-
-// int main( int argc, char** argv )
-// {
-//   if( argc < 2 )
-//     return -1;
-
-//   const char const* args[] = {"-fno-delayed-template-parsing"};
-//   CXIndex index        = clang_createIndex( 0, 1 );
-//   CXTranslationUnit tu = clang_createTranslationUnitFromSourceFile( index, argv[1] , 1 , args, 0 , NULL);
-
-//   if( !tu )
-//     return -1;
-
-//   CXCursor rootCursor  = clang_getTranslationUnitCursor( tu );
-
-//   unsigned int treeLevel = 0;
-
-//   clang_visitChildren( rootCursor, visitor, &treeLevel );
-
-//   clang_disposeTranslationUnit( tu );
-//   clang_disposeIndex( index );
-
-//   return 0;
-// }
 
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>
-// #include <clang/AST/AST.h>
+#include <clang/AST/ExprCXX.h>
+#include <clang/AST/Type.h>
 // #include <clang/AST/ASTConsumer.h>
 // #include <clang/AST/ASTContext.h>
 // #include <clang/AST/RecursiveASTVisitor.h>
@@ -116,7 +29,6 @@
 // #include <clang/Rewrite/Core/Rewriter.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
-
 #include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
 
@@ -130,26 +42,58 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 
 set<string> typenameset;
 
-StatementMatcher LoopMatcher =
-  forStmt(hasLoopInit(declStmt(hasSingleDecl(varDecl(
-    hasInitializer(integerLiteral(equals(0)))))))).bind("forLoop");
-
 DeclarationMatcher classMatcher = 
   cxxRecordDecl().bind("class");
+
+StatementMatcher deleteMatcher =
+  cxxDeleteExpr().bind("deletecall");
+
+StatementMatcher newMatcher =
+  cxxNewExpr().bind("newcall");
+
+StatementMatcher CStyleMallocMatcher = 
+  callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray")))));
 
 class ClassnamePrinter : public MatchFinder::MatchCallback {
   public :
     virtual void run(const MatchFinder::MatchResult &Result) {
       const RecordDecl* rd = Result.Nodes.getNodeAs<clang::RecordDecl>("class");
-      
-      // ASTContext *Context = Result.Context;
-      
-      // SourceManager& sm(Context->getSourceManager());
-      
-      // if(sm.isInMainFile(sm.getExpansionLoc(rd->getLocStart()))) {
-        cout << rd->getDeclName().getAsString() << endl;
         typenameset.insert(rd->getDeclName().getAsString());
-      // }
+    }
+};
+
+class NewExprPrinter : public MatchFinder::MatchCallback {
+  public:
+    virtual void run(const MatchFinder::MatchResult &Result) {
+      const CXXNewExpr* newex = Result.Nodes.getNodeAs<clang::CXXNewExpr>("newcall");
+      QualType allocType = newex->getAllocatedType();
+      cout << "new: " << allocType.getAsString() << endl;
+    }
+};
+
+//Callback for all C-Style allocation functions
+/**
+ * Figure out how to get types:
+ * If it is a C++ project, typecasts in malloc are not compulsory.
+ * First check if typecast is there. If it's there, problem solved.
+ * If not, check the type of lhs of binary operator (if malloc is assigned to pointer)
+ * Else, check inside the malloc for sizeof() and figure out the type used.
+ * Else, throw error ¯\_(ツ)_/¯
+**/
+
+class CStyleAllocPrinter : public MatchFinder::MatchCallback {
+  public:
+    virtual void run(const MatchFinder::MatchResult &Result) {
+      const 
+    }
+};
+
+class DeleteExprPrinter : public MatchFinder::MatchCallback {
+  public:
+    virtual void run(const MatchFinder::MatchResult &Result) {
+      const CXXDeleteExpr* delex = Result.Nodes.getNodeAs<clang::CXXDeleteExpr>("deletecall");
+      QualType destroyedType = delex->getDestroyedType();
+      cout << "delete: " << destroyedType.getAsString() << endl;
     }
 };
 
@@ -160,10 +104,14 @@ int main(int argc, const char **argv) {
                  OptionsParser.getSourcePathList());
 
   ClassnamePrinter cp;
+  DeleteExprPrinter dp;
+  NewExprPrinter np;
 
   MatchFinder Finder;
   
   Finder.addMatcher(classMatcher, &cp);
+  Finder.addMatcher(deleteMatcher, &dp);
+  Finder.addMatcher(newMatcher, &np);  
 
   Tool.run(newFrontendActionFactory(&Finder).get());
   
