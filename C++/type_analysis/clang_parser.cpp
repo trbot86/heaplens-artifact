@@ -25,7 +25,7 @@
 // #include <clang/Driver/Options.h>
 // #include <clang/Frontend/ASTConsumers.h>
 // #include <clang/Frontend/CompilerInstance.h>
-// #include <clang/Frontend/FrontendActions.h>
+#include <clang/Frontend/FrontendActions.h>
 // #include <clang/Rewrite/Core/Rewriter.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
@@ -84,7 +84,7 @@ class NewExprPrinter : public MatchFinder::MatchCallback {
 class CStyleAllocPrinter : public MatchFinder::MatchCallback {
   public:
     virtual void run(const MatchFinder::MatchResult &Result) {
-      const 
+
     }
 };
 
@@ -113,7 +113,9 @@ int main(int argc, const char **argv) {
   Finder.addMatcher(deleteMatcher, &dp);
   Finder.addMatcher(newMatcher, &np);  
 
-  Tool.run(newFrontendActionFactory(&Finder).get());
+  // Tool.run(newFrontendActionFactory(&Finder).get());
+  // Tool.run(newFrontendActionFactory<SyntaxOnlyAction>().get());
+  Tool.run(newFrontendActionFactory<PreprocessOnlyAction>().get());
   
   ofstream file;
   file.open("typedump.txt");
