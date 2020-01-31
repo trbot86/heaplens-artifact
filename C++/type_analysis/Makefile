@@ -10,6 +10,9 @@ run:
 all: clang_parser.cpp
 	clang++ `llvm-config --cxxflags --ldflags` clang_parser.cpp $(CLANGLIBS2) `llvm-config --libs --system-libs` -g -o tool
 
+refactor: source_refactor.cpp
+	clang++ `llvm-config --cxxflags --ldflags` source_refactor.cpp $(CLANGLIBS2) `llvm-config --libs --system-libs` -g -o refactor
+
 visitor:
 	clang++ `llvm-config --cxxflags --ldflags` astvisitor.cpp $(CLANGLIBS2) `llvm-config --libs --system-libs` -g -o visitor
 
@@ -18,3 +21,5 @@ cursor:
 
 clean:
 	rm clang_parser.out
+	rm tool
+	rm refactor

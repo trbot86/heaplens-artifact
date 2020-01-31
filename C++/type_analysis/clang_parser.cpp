@@ -53,7 +53,7 @@ StatementMatcher newMatcher =
 
 StatementMatcher CStyleMallocMatcher = 
   callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray")))));
-
+  
 class ClassnamePrinter : public MatchFinder::MatchCallback {
   public :
     virtual void run(const MatchFinder::MatchResult &Result) {
