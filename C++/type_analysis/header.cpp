@@ -21,16 +21,20 @@ class A {
   int a;
 };
 
-template <typename T>
-void func() {
-  T* t = new T;
+// template <typename T>
+float* func() {
+  // T* t = new T;
 }
 
 int main() {
   // MyClass<int> mc;
   // MyClass<double> md;
   // mc.field = new int;
+  int f;
+  f = (unsigned long long)5;
+  // int a = (int)f;
   int* r = (int*)malloc(sizeof(int));
+  float* g = (float*)func();
   // MyClass<int>* mc2 = new MyClass<int>;
   // char* arr = new char[10];
   // string* p = new (arr) string("hi");

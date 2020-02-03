@@ -19,23 +19,20 @@
 #include <bits/stdc++.h>
 #include <clang/AST/ExprCXX.h>
 #include <clang/AST/Type.h>
-// #include <clang/AST/ASTConsumer.h>
-// #include <clang/AST/ASTContext.h>
-// #include <clang/AST/RecursiveASTVisitor.h>
-// #include <clang/Driver/Options.h>
-// #include <clang/Frontend/ASTConsumers.h>
-// #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendActions.h>
-// #include <clang/Rewrite/Core/Rewriter.h>
+#include <clang/Rewrite/Core/Rewriter.h>
+#include <clang/Basic/Diagnostic.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 #include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
 
+
 using namespace std;
 using namespace llvm;
 using namespace clang;
 using namespace clang::ast_matchers;
+using namespace clang::driver;
 using namespace clang::tooling;
 
 static llvm::cl::OptionCategory MyToolCategory("my-tool options");
@@ -52,8 +49,9 @@ StatementMatcher newMatcher =
   cxxNewExpr().bind("newcall");
 
 StatementMatcher CStyleMallocMatcher = 
-  // callExpr(implicitCastExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray"))).bind("alloccall"))));
-  callExpr(has(implicitCastExpr().bind("cast")), callee(functionDecl(hasName("malloc"))));
+  // declRefExpr(hasDeclaration(functionDecl(hasName("malloc"))))
+  // explicitCastExpr(isExpansionInMainFile(), hasDescendant(callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray"))))).bind("callex"))).bind("castex");
+  explicitCastExpr(isExpansionInMainFile(), hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName("malloc"))))));
 
 class ClassnamePrinter : public MatchFinder::MatchCallback {
   public :
@@ -84,12 +82,29 @@ class NewExprPrinter : public MatchFinder::MatchCallback {
 
 class CStyleAllocPrinter : public MatchFinder::MatchCallback {
   public:
+    CStyleAllocPrinter(Rewriter &Rewrite) : Rewrite(Rewrite) {}
+
     virtual void run(const MatchFinder::MatchResult &Result) {
-      const CallExpr* callex = Result.Nodes.getNodeAs<CallExpr>("alloccall");
-      const ImplicitCastExpr* castex = Result.Nodes.getNodeAs<ImplicitCastExpr>("cast");
-      cout << "malloc\n";
-      // cout << castex->getType().getAsString() << endl;
+      ASTContext* context = Result.Context;
+
+      // const CallExpr* callex = Result.Nodes.getNodeAs<CallExpr>("callex");
+      // const ExplicitCastExpr* castex = Result.Nodes.getNodeAs<ExplicitCastExpr>("castex");
+      const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
+      
+      Rewrite.InsertText(mnode->getLocStart(), "<typeinserted>", true, true);
+
+      //Print various metadata
+      /*cout << castex->getCastKindName() << endl;
+        cout << castex->getSubExprAsWritten()->getType().getAsString() << endl;
+        cout << castex->getTypeInfoAsWritten()->getType().getAsString() << endl;
+        SourceLocation sl = castex->getLocStart();
+        sl.dump(context->getSourceManager());
+      */
+
     }
+  
+  private:
+    Rewriter &Rewrite;
 };
 
 class DeleteExprPrinter : public MatchFinder::MatchCallback {
