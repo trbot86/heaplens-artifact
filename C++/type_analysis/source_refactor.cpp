@@ -9,6 +9,10 @@
  *  4) Decided the layout of the typetable data structure, and
  *  how to add to it using new, malloc parsing.
  * 
+ *  Matchers:
+ *  match any malloc with sizeof inside as argument
+ *  callExpr(callee(functionDecl(hasName("malloc"))), has(sizeOfExpr(hasType(qualType()))))
+ * 
  *  TODO:
  *  1) Add functionality to register new allocator/deallocator names for static analyser. (Eg. tcmalloc, jemalloc)
  *     So that type recognition functionality is not broken when new allocators are used.

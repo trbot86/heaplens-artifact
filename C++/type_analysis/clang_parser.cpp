@@ -113,9 +113,9 @@ int main(int argc, const char **argv) {
   Finder.addMatcher(deleteMatcher, &dp);
   Finder.addMatcher(newMatcher, &np);  
 
-  // Tool.run(newFrontendActionFactory(&Finder).get());
+  Tool.run(newFrontendActionFactory(&Finder).get());
   // Tool.run(newFrontendActionFactory<SyntaxOnlyAction>().get());
-  Tool.run(newFrontendActionFactory<PreprocessOnlyAction>().get());
+  // Tool.run(newFrontendActionFactory<PreprocessOnlyAction>().get());
   
   ofstream file;
   file.open("typedump.txt");

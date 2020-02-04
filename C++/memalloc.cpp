@@ -1,8 +1,10 @@
 #include <iostream>
 #include <bits/stdc++.h>
 #include <thread>
-// #define new new (__FILE__,__LINE__,__FUNCTION__)
+
 using namespace std;
+
+
 
 struct algo {
     int a;
@@ -10,7 +12,7 @@ struct algo {
 };
 
 void alloc1(void) {
-    // for(int i = 0;i < 1001;i++)
+    for(int i = 0;i < 1001;i++)
     int* n = new int(4);
 }
 
