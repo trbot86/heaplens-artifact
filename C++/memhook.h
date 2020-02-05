@@ -1,8 +1,9 @@
-
-#ifndef memhook
-#define memhook
+// mention Curtis Bartley
+#ifndef memhook_H_
+#define memhook_H_
 
 #include <iostream>
+#include <new>
 #include <typeinfo>
 #include <typeindex>
 #include <bits/stdc++.h>
@@ -21,10 +22,39 @@
 
 using namespace std;
 
+class MemStamp
+{
+    public:
+        char const * const filename;
+        int const lineNum;
+    public:
+        MemStamp(char const *filename, int lineNum)
+            : filename(filename), lineNum(lineNum) { }
+        ~MemStamp() { }
+};
+
+
+//COMPRESS THE DATA STRUCTURE
+struct info_t {
+    const char *file;
+    // const char *function;
+    // const type_index tindex;
+    const char *typeName;
+    unsigned int line;
+    uint64_t timestamp;
+    size_t size;
+    void* addr;
+};
+
 void printstats();
-void dumpstatstofile(const char* file);
-void* operator new (size_t);
-void operator delete (void* ptr);
+void dumpstatstofile(const char *file);
+void insertType(void *p, const MemStamp &stamp, const char *typeName);
+
+template <class T>
+inline T* operator * (const MemStamp &stamp, T *p) {
+    insertType(p, stamp, typeid(p).name());
+    return p;
+}
 
 inline uint64_t get_server_clock() {
 #if defined(__i386__)
@@ -40,37 +70,6 @@ inline uint64_t get_server_clock() {
     return ret;
 }
 
-//COMPRESS THE DATA STRUCTURE
-struct info_t {
-    const char* file;
-    const char* function;
-    const type_index tindex;
-    unsigned int line;
-    uint64_t timestamp;
-    size_t size;
-    void* addr;
-};
-
-ostream& operator << (ostream& os, const info_t& info) {
-        // os << *info.file << endl;
-        // os << *info.function << endl;
-        os << type_names[info.tindex] << endl;
-        os << info.line << endl;
-        os << info.timestamp << endl;
-        os << info.size << endl;
-        os << info.addr << endl;
-        return os;
-    }
-
-//Global map for storing type_index to type name string information
-unordered_map<type_index, string> type_names;
-
-//Global array for tracking all allocations
-info_t* allArrays[MAX_THREADS];
-
-//Local array tracking a thread's allocations
-thread_local info_t* myArray;
-
 /*Iterator for individual thread allocation in
 * tracking data structure
 */
@@ -81,35 +80,8 @@ static thread_local bool pthread_push_flag;
 //Keeps the total number of concurrent threads
 static int arrayCount = 0;
 
-template<typename T>
-struct internalalloc: allocator<T> {
-    typedef typename allocator<T>::pointer pointer;
-    typedef typename allocator<T>::size_type size_type;
-
-    template<typename U>
-    struct rebind {
-        typedef internalalloc<U> other;
-    };
-
-    //STANDARD CONSTRUCTOR
-    internalalloc() {}
-
-    //TEMPLATIZED COPY CONSTRUCTOR
-    template<typename U>
-    internalalloc(internalalloc<U> const& u): allocator<T>(u) {}
-
-    pointer allocate(size_type size, allocator<void>::const_pointer = 0) {
-        void* ptr = malloc(size*sizeof(T));
-        if(ptr == 0) {
-            throw bad_alloc();
-        }
-        return static_cast<pointer>(ptr);
-    }
-
-    void deallocate(pointer p, size_type) {
-        free(p);
-    }
-};
-
 typedef info_t** track_type;
-#endif
+#define SIFTER_NEW MemStamp(__FILE__, __LINE__) * new
+#define new SIFTER_NEW
+
+#endif  

@@ -2,9 +2,9 @@
 #include <bits/stdc++.h>
 #include <thread>
 
+#include "memhook.h"
+
 using namespace std;
-
-
 
 struct algo {
     int a;
@@ -21,8 +21,10 @@ void alloc2(void) {
 }
 
 int main() {
-    string* s = new string;
+    new string;
     algo* al;
+    string *s = new string;
     al = (algo*)malloc(sizeof(algo));
+    delete s;
     return 0;
 }
