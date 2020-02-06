@@ -8,9 +8,9 @@ info_t* allArrays[MAX_THREADS];
 thread_local info_t* myArray;
 
 ostream& operator << (ostream& os, const info_t& info) {
-        // os << *info.file << endl;
+        os << info.file << endl;
         // os << *info.function << endl;
-        os << info.typeName << endl;
+        os << info.tindex.name() << endl;
         os << info.line << endl;
         os << info.timestamp << endl;
         os << info.size << endl;
@@ -25,19 +25,36 @@ void printstats() {
 }
 
 /***********************
- * Does periodic dumping of info_t structs to the disk
+ * Does periodic dumping of info_t structs to the disk.
+ * 
+ * 1) First demangle all the type names and store them in the type_name map
+ * 2) Store the info_t struct with the type name in disk
  * TODO:
  * Implement DMA operation to store info_t array into disk
  ***********************/
 
 void dumpstatstofile(const char* file) {
+    for(int i = 0;i < it;i++) {
+        if(!tmap.count(myArray[i].tindex)) {
+            tmap[myArray[i].tindex] = myArray[i].tindex.name();
+        }
+    }
 
+    ofstream myfile;
+    myfile.open(file);
+    
+    for(int i = 0;i < it;i++) {
+        myfile << myArray[i] << endl;
+    }
+
+    myfile.close();
 }
 
-void insertType(void *p, const MemStamp &stamp, const char *typeName) {
+void insertType(void *p, const MemStamp &stamp,const type_index tindex) {
     myArray[it].file = stamp.filename;
     myArray[it].line = stamp.lineNum;
-    myArray[it].typeName = typeName;
+    // myArray[it].typeName = typeName;
+    myArray[it].tindex = tindex;
     it++;
 }
 
@@ -108,10 +125,11 @@ void operator delete(void * mem) {
     *   For now, just calling printstats in delete
     * */
     printstats();
+    dumpstatstofile("info_t_dump.txt");
     free(mem);
 }
 
 void operator delete[](void *mem) {
-    printstats();
+    // printstats();
     free(mem);
 }

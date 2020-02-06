@@ -25,7 +25,7 @@ int main() {
     algo* al;
     string *s = new string;
     new float(5.00);
-    al = (algo*)malloc(sizeof(algo));
+    al = (algo*)malloc<struct algo *>(sizeof(algo));
     delete s;
     return 0;
 }

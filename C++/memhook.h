@@ -13,7 +13,6 @@
 #include <unistd.h>
 #include <execinfo.h>
 #include <cxxabi.h>
-#include <experimental/source_location>
 
 #define BACKTRACE_DEPTH 2
 #define MAX_THREADS 1000
@@ -36,10 +35,9 @@ class MemStamp
 
 //COMPRESS THE DATA STRUCTURE
 struct info_t {
-    const char *file;
+    string file;
     // const char *function;
-    // const type_index tindex;
-    const char *typeName;
+    type_index tindex;
     unsigned int line;
     uint64_t timestamp;
     size_t size;
@@ -48,12 +46,22 @@ struct info_t {
 
 void printstats();
 void dumpstatstofile(const char *file);
-void insertType(void *p, const MemStamp &stamp, const char *typeName);
+void insertType(void *p, const MemStamp &stamp, const type_index);
+template <typename T> T malloc(size_t size);
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
-    insertType(p, stamp, typeid(p).name());
+    insertType(p, stamp, type_index(typeid(T)));
     return p;
+}
+
+template <typename T>
+T malloc(size_t size) {
+    cout << "templated malloc called\n";
+    T ptr = (T)std::malloc(size);
+    if(ptr == NULL) throw bad_alloc();
+
+    return ptr;
 }
 
 inline uint64_t get_server_clock() {
@@ -81,6 +89,11 @@ static thread_local bool pthread_push_flag;
 static int arrayCount = 0;
 
 typedef info_t** track_type;
+
+typedef map<type_index, const char*> type_map;
+
+static type_map tmap;
+
 #define SIFTER_NEW MemStamp(__FILE__, __LINE__) * new
 #define new SIFTER_NEW
 
