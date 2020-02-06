@@ -1,3 +1,17 @@
+We suggest use of bear for making compilation database json file. This will help the source_refactor tool to
+make use of compilation information for large projects to use it in its own parsing procedure.
+
+Usage: bear <compilation command>
+Eg. bear make
+
+testrun.sh will compile the source_refactor tool, run that tool on $1 and dump the refactored code in $2 file.
+It will then compile $2 with memhook library which contains the runtime memory allocation analysis code.
+a.out is the executable which is generated.
+
+TODO:
+-- Integrate the source_refactor tool and memhook with large projects.
+-- ****URGENT**** Add perioding dumping policy, compression of info_t struct
+
 List of file uses:
 memhook.* : The main hook containing the overloaded alloc, dealloc calls with integrated tracking support.
 memalloc.cpp : test file

@@ -36,8 +36,6 @@
 #include <clang/AST/Type.h>
 #include <clang/Basic/Diagnostic.h>
 
-
-
 using namespace std;
 using namespace llvm;
 using namespace clang;
@@ -183,6 +181,17 @@ private:
   Rewriter TheRewriter;
 };
 
+void typedump(char* filename) {
+  ofstream file;
+  file.open(filename);
+
+  for(auto i = typenameset.begin();i != typenameset.end();++i) {
+    file << *i << endl;
+  }
+
+  file.close();
+}
+
 int main(int argc, const char **argv) {
   CommonOptionsParser OptionsParser(argc, argv, MatcherSampleCategory);
   
@@ -204,13 +213,6 @@ int main(int argc, const char **argv) {
   // Tool.run(newFrontendActionFactory(&Finder).get());
   Tool.run(newFrontendActionFactory<MyFrontendAction>().get());
   
-  ofstream file;
-  file.open("typedump.txt");
-
-  for(auto i = typenameset.begin();i != typenameset.end();++i) {
-    file << *i << endl;
-  }
-
-  file.close();
+  // typedump("typedump.txt");
   return 0;
 }
