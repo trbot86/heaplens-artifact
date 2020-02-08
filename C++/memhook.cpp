@@ -2,14 +2,13 @@
 #undef new
 
 //Global array for tracking all allocations
-info_t* allArrays[MAX_THREADS];
+info_t allArrays[MAX_THREADS][MAX_TRACK];
 
 //Local array tracking a thread's allocations
-thread_local info_t* myArray;
+thread_local info_t* myArray = nullptr;
 
-ostream& operator << (ostream& os, const info_t& info) {
+ostream& operator << (ostream& os, info_t& info) {
         os << info.file << endl;
-        // os << *info.function << endl;
         os << info.tindex.name() << endl;
         os << info.line << endl;
         os << info.timestamp << endl;
@@ -33,29 +32,53 @@ void printstats() {
  * Implement DMA operation to store info_t array into disk
  ***********************/
 
+void dumpfilemappingtofile(const char* file) {
+    ofstream myfile(file, ios_base::out | ios_base::app);
+
+    for(filename_map::iterator it = fmap.begin();it != fmap.end(); ++it) {
+        myfile << (*it).first;
+        myfile << (*it).second;
+        cout << (*it).first;
+    }
+}
+
+void dumpentirestatstofile(const char* file) {
+    for(int j = 0;j <= arrayCount;j++) {
+    for(int i = 0;i < MAX_TRACK;i++) {
+        if(!fmap.count((void*)allArrays[j][i].file) && allArrays[j][i].file) {
+            fmap[(void*)allArrays[j][i].file] = string(allArrays[j][i].file);
+        }
+    }
+    }
+
+    ofstream myfile(file, ios_base::out | ios_base::app);
+    
+    for(int i = 0;i < arrayCount;i++) {
+        myfile.write(reinterpret_cast<char*>(allArrays[i]), MAX_TRACK*sizeof(info_t));
+    }
+}
+
 void dumpstatstofile(const char* file) {
     for(int i = 0;i < it;i++) {
-        if(!tmap.count(myArray[i].tindex)) {
-            tmap[myArray[i].tindex] = myArray[i].tindex.name();
+        if(!fmap.count((void*)myArray[i].file)) {
+            fmap[(void*)myArray[i].file] = *myArray[i].file;
         }
     }
 
-    ofstream myfile;
-    myfile.open(file);
-    
-    for(int i = 0;i < it;i++) {
-        myfile << myArray[i] << endl;
-    }
-
-    myfile.close();
+    ofstream myfile (file, ios_base::out | ios_base::app);
+    myfile.write(reinterpret_cast<char*>(myArray), MAX_TRACK*sizeof(info_t));
 }
 
 void insertType(void *p, const MemStamp &stamp,const type_index tindex) {
     myArray[it].file = stamp.filename;
     myArray[it].line = stamp.lineNum;
-    // myArray[it].typeName = typeName;
     myArray[it].tindex = tindex;
-    it++;
+    
+    it = (it+1)%MAX_TRACK;
+    
+    // if(!it) {
+    //     dumpstatstofile("info_t_dump.txt");
+    // }
 }
 
 /**********************
@@ -74,9 +97,8 @@ void * operator new(size_t size) {
     }
 
     if(!myArray) {
-        myArray = (info_t*)malloc(MAX_TRACK*sizeof(info_t));
         int result = __sync_fetch_and_add(&arrayCount,1);
-        allArrays[result] = myArray;
+        myArray = allArrays[result];
     }
 
     /*ensure that number of allocations don't exceed the limit
@@ -100,9 +122,8 @@ void *operator new[] (size_t size) {
     }
 
     if(!myArray) {
-        myArray = (info_t*)malloc(MAX_TRACK*sizeof(info_t));
         int result = __sync_fetch_and_add(&arrayCount,1);
-        allArrays[result] = myArray;
+        myArray = allArrays[result];
     }
 
     /*ensure that number of allocations don't exceed the limit
@@ -119,17 +140,9 @@ void *operator new[] (size_t size) {
 }
 
 void operator delete(void * mem) {
-
-    /*
-    *   Figure out how to elegantly call printstats (preferably with flags).
-    *   For now, just calling printstats in delete
-    * */
-    printstats();
-    dumpstatstofile("info_t_dump.txt");
     free(mem);
 }
 
 void operator delete[](void *mem) {
-    // printstats();
     free(mem);
 }

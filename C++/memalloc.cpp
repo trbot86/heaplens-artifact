@@ -12,7 +12,7 @@ struct algo {
 };
 
 void alloc1(void) {
-    for(int i = 0;i < 1001;i++)
+    for(int i = 0;i < 1;i++)
     int* n = new int(4);
 }
 
@@ -21,11 +21,12 @@ void alloc2(void) {
 }
 
 int main() {
-    new string;
-    algo* al;
-    string *s = new string;
-    new float(5.00);
-    al = (algo*)malloc(sizeof(algo));
-    delete s;
+    thread t1(alloc1);
+    thread t2(alloc2);
+
+    t1.join();
+    t2.join();
+    dumpentirestatstofile("info_t_dump.txt");
+    dumpfilemappingtofile("filemap.txt");
     return 0;
 }

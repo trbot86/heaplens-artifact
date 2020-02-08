@@ -1,135 +1,65 @@
 #include <iostream>
 #include <thread>
+#include <string>
+#include <atomic>
 #include <cstdlib>
+#include <chrono>
 #include <unistd.h>
+#include <typeindex>
 #include <experimental/source_location>
 #include <execinfo.h>
 #include <cxxabi.h>
+#include <bits/stdc++.h>
 
-#define FUNC 2
+#define MAX_THREADS 1000
+#define MAX_ALLOCS 1000
+#define PADDING_BYTES 64
 
-// void* operator new (std::size_t size) __attribute__((always_inline));
-void atexit_handler();
-// void printstacktrace(FILE* fd = stderr);
-
-void atexit_handler() {
-    std::cout << "exit_handler_called " << std::endl;
-}
+using namespace std;
 
 struct info_t {
+    string file;
+    string type_name;
     unsigned int line;
     uint64_t timestamp;
     size_t size;
     void* addr;
 };
 
-void thread_call_handler() {
-    std::cout << std::this_thread::get_id() << " :thread" << std::endl;
-    for(int i = 0;i < 2;i++) {
-        sleep(1);
-    }
-}
+info_t info[MAX_THREADS*MAX_ALLOCS];
 
-void testfunc() {
-    int* n = new int(6);
-    return;
-}
-
-static inline void print_stacktrace(FILE *out = stderr, unsigned int max_frames = 63)
-{
-    fprintf(out, "stack trace:\n");
-
-    // storage array for stack trace address data
-    void* addrlist[max_frames+1];
-
-    // retrieve current stack addresses
-    int addrlen = backtrace(addrlist, sizeof(addrlist) / sizeof(void*));
-
-    if (addrlen == 0) {
-	fprintf(out, "  <empty, possibly corrupt>\n");
-	return;
-    }
-
-    // resolve addresses into strings containing "filename(function+address)",
-    // this array must be free()-ed
-    char** symbollist = backtrace_symbols(addrlist, addrlen);
-
-    // allocate string which will be filled with the demangled function name
-    size_t funcnamesize = 256;
-    char* funcname = (char*)malloc(funcnamesize);
-
-    // iterate over the returned symbol lines. skip the first, it is the
-    // address of this function.
-    for (int i = 1; i < addrlen; i++)
-    {
-	char *begin_name = 0, *begin_offset = 0, *end_offset = 0;
-
-	// find parentheses and +address offset surrounding the mangled name:
-	// ./module(function+0x15c) [0x8048a6d]
-	for (char *p = symbollist[i]; *p; ++p)
-	{
-	    if (*p == '(')
-		begin_name = p;
-	    else if (*p == '+')
-		begin_offset = p;
-	    else if (*p == ')' && begin_offset) {
-		end_offset = p;
-		break;
-	    }
+void init_info(info_t *i) {
+	auto thread_local start = chrono::high_resolution_clock::now();
+	for(int k = 0;k < 10000;k++) {
+		
 	}
-
-	if (begin_name && begin_offset && end_offset
-	    && begin_name < begin_offset)
-	{
-	    *begin_name++ = '\0';
-	    *begin_offset++ = '\0';
-	    *end_offset = '\0';
-
-	    // mangled name is now in [begin_name, begin_offset) and caller
-	    // offset in [begin_offset, end_offset). now apply
-	    // __cxa_demangle():
-
-	    int status;
-	    char* ret = abi::__cxa_demangle(begin_name,
-					    funcname, &funcnamesize, &status);
-	    if (status == 0) {
-		funcname = ret; // use possibly realloc()-ed string
-		fprintf(out, "  %s : %s+%s\n",
-			symbollist[i], funcname, begin_offset);
-	    }
-	    else {
-		// demangling failed. Output function name as a C function with
-		// no arguments.
-		fprintf(out, "  %s : %s()+%s\n",
-			symbollist[i], begin_name, begin_offset);
-	    }
-	}
-	else
-	{
-	    // couldn't parse the line? print the whole line.
-	    fprintf(out, "  %s\n", symbollist[i]);
-	}
-    }
-
-    free(funcname);
-    free(symbollist);
+	auto thread_local end = chrono::high_resolution_clock::now();
+	cout << chrono::duration_cast<chrono::microseconds>(end - start).count() << endl;
 }
 
-void* operator new (std::size_t size) {
-    // print_stacktrace();
-    // std::experimental::source_location loc = std::experimental::source_location::current();
-    // std::cout << loc.line() << std::endl;
-    return std::malloc(size);
-}
+atomic<info_t*> current_offset(info);
 
-template <typename T>
-void* malloc(size_t size) {
-    std::cout << "malloc called " << typeid(T).name() << std::endl;
-    return (T*)std::malloc(size);
+thread_local int offset;
+
+void spawn_thread() {
+	thread t(init_info, current_offset.fetch_add(1));
+	t.join();
 }
 
 int main() {
-malloc (sizeof(int));
+
+// for(int i = 0;i < 2;i++) {
+// 	spawn_thread();
+// }
+
+// chrono::high_resolution_clock::now();
+
+ifstream is("info_t_dump.txt", ios_base::in);
+info_t inf;
+
+getline(is, inf.file, '\0');
+cout << inf.file << endl;
+// cout << inf.type_name << endl;
 
 return 0;
 }
