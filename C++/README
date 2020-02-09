@@ -19,3 +19,6 @@ type_analysis:
     clang_parser.cpp : parses test file to collect all record names (i.e. class, struct and union names).
     source_refactor.cpp : parses test file to replace alloc, dealloc calls with respective templated versions.
         memhook.* will later use the templated functions to log type information.
+
+Compilation command for main logger:
+g++ memalloc.cpp memhook.cpp -Wall -pthread -g -o a.out

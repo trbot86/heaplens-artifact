@@ -1,6 +1,6 @@
 // mention Curtis Bartley
-#ifndef memhook_H_
-#define memhook_H_
+#ifndef memhook_H
+#define memhook_H
 
 #include <iostream>
 #include <new>
@@ -45,11 +45,32 @@ struct info_t {
     info_t() : file(nullptr), tindex(typeid(void)), line(0), timestamp(0), size(0), addr(nullptr) {}
 };
 
+/*Iterator for individual thread allocation in
+* tracking data structure
+*/
+static thread_local int it = 0;
+
+//Keeps the total number of concurrent threads
+static int arrayCount = 0;
+
+typedef info_t** track_type;
+
+typedef map<type_index, const char*> type_map;
+
+static type_map tmap;
+
+//Global array for tracking all allocations
+static info_t** allArrays;
+
+//Local array tracking a thread's allocations
+thread_local static info_t* myArray;
+
+inline uint64_t get_server_clock();
 void printstats();
-void dumpfilemappingtofile(const char* file);
 void dumpentirestatstofile(const char* file);
 void dumpstatstofile(const char *file);
 void insertType(void *p, const MemStamp &stamp, const type_index);
+void insert_info(size_t size, void* ptr, type_index tindex);
 template <typename T> T malloc(size_t size);
 
 template <class T>
@@ -59,44 +80,14 @@ inline T* operator * (const MemStamp &stamp, T *p) {
 }
 
 template <typename T>
-T malloc(size_t size) {
+T malloc(size_t size) {    
     T ptr = (T)std::malloc(size);
     if(ptr == NULL) throw bad_alloc();
 
+    insert_info(size, ptr, type_index(typeid(T)));
+
     return ptr;
 }
-
-inline uint64_t get_server_clock() {
-#if defined(__i386__)
-    uint64_t ret;
-    __asm__ __volatile__("rdtsc" : "=A" (ret));
-#elif defined(__x86_64__)
-    unsigned hi, lo;
-    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    uint64_t ret = ( (uint64_t)lo)|( ((uint64_t)hi)<<32 );
-#else 
-    #error Must support RDTSC instruction! Sorry...
-#endif
-    return ret;
-}
-
-/*Iterator for individual thread allocation in
-* tracking data structure
-*/
-static thread_local int it = 0;
-
-static thread_local bool pthread_push_flag;
-
-//Keeps the total number of concurrent threads
-static int arrayCount = 0;
-
-typedef info_t** track_type;
-
-typedef map<type_index, const char*> type_map;
-typedef map<void*, string> filename_map;
-
-static filename_map fmap;
-static type_map tmap;
 
 #define SIFTER_NEW MemStamp(__FILE__, __LINE__) * new
 #define new SIFTER_NEW
