@@ -22,7 +22,7 @@ ostream& operator << (ostream& os, info_t& info) {
         os << info.timestamp << endl;
         os << info.size << endl;
         os << info.addr << endl;
-        // os << pthread_self() << endl;
+        os << info.typeofop << endl;
         return os;
 }
 
@@ -43,21 +43,36 @@ void printstats() {
 
 void dumpentirestatstofile(const char* file) {
     ofstream myfile(file, ios_base::out | ios_base::app);
-    int j = 0, status;
+    ofstream filemap("filemap", ios_base::out | ios_base::app);
+    ofstream typemap("typemap", ios_base::out | ios_base::app);
+
+    int status;
     char* demangled_name;
 
-    for(int i = 0;i <= arrayCount;i++) {
-        j = 0;
-        while(allArrays[i][j].addr != nullptr) {
-            if(!tmap.count(allArrays[i][j].tindex)) {
-                demangled_name = abi::__cxa_demangle(allArrays[i][j].tindex.name(), 0, 0, &status);
-                tmap[allArrays[i][j].tindex] = demangled_name;
-            }
+    for(int i = 0;i <= MAX_TRACK*MAX_THREADS;i++) {
+        if(allArrays[i].addr == nullptr) i++;
+        
+        if(allArrays[i].typeofop && !tmap.count(allArrays[i].tindex)) {
+            demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
+            tmap[allArrays[i].tindex] = demangled_name;
+        }
 
-            myfile << allArrays[i][j];
-            j++;
+        if(allArrays[i].file && !fset.count(allArrays[i].file)) {
+            fset.insert(allArrays[i].file);
         }
     }
+
+    for(auto i = fset.begin();i != fset.end();i++) {
+        filemap.write(*i, sizeof(char*));
+        filemap.write(*i, sizeof(*i));
+    }
+
+    for(auto i = tmap.begin();i != tmap.end();i++) {
+        typemap.write((char*)&(*i).first, sizeof(type_index));
+        typemap.write((*i).second, sizeof((*i).second));
+    }
+
+    myfile.write(reinterpret_cast<char const*>(allArrays), MAX_THREADS*MAX_TRACK*sizeof(info_t));
 }
 
 void dumpstatstofile(const char* file) {
@@ -73,32 +88,24 @@ void dumpstatstofile(const char* file) {
     }
 }
 
-void insertType(void *p, const MemStamp &stamp,const type_index tindex) {
+void insert_type(void *p, const MemStamp &stamp,const type_index tindex) {
     if(it < MAX_TRACK) {
         myArray[it].file = stamp.filename;
         myArray[it].line = stamp.lineNum;
         myArray[it].tindex = tindex;
         it++;
     }
-
-    // it = (it+1)%MAX_TRACK;
-    
-    // if(!it) {
-    //     dumpstatstofile("info_t_dump.txt");
-    // }
 }
 
+//Helper for malloc
 void insert_info(size_t size, void* ptr, type_index tindex) {
     if(!allArrays) {
-        allArrays = (info_t**)malloc(MAX_THREADS*sizeof(info_t*));
-        for(int i = 0;i < MAX_THREADS;i++) {
-            allArrays[i] = (info_t*)malloc(MAX_TRACK*sizeof(info_t));
-        }
+        allArrays = (info_t*)malloc(MAX_THREADS*MAX_TRACK*sizeof(info_t));
     }
 
     if(!myArray) {
         int result = __sync_fetch_and_add(&arrayCount,1);
-        myArray = allArrays[result];
+        myArray = allArrays + MAX_TRACK*result;
     }
     
     if(it < MAX_TRACK) {
@@ -106,6 +113,7 @@ void insert_info(size_t size, void* ptr, type_index tindex) {
         myArray[it].timestamp = get_server_clock();
         myArray[it].size = size;
         myArray[it].addr = ptr;
+        myArray[it].typeofop = true;
     }
 }
 
@@ -125,15 +133,12 @@ void * operator new(size_t size) {
     }
 
     if(!allArrays) {
-        allArrays = (info_t**)malloc(MAX_THREADS*sizeof(info_t*));
-        for(int i = 0;i < MAX_THREADS;i++) {
-            allArrays[i] = (info_t*)malloc(MAX_TRACK*sizeof(info_t));
-        }
+        allArrays = (info_t*)malloc(MAX_THREADS*MAX_TRACK*sizeof(info_t));
     }
 
     if(!myArray) {
         int result = __sync_fetch_and_add(&arrayCount,1);
-        myArray = allArrays[result];
+        myArray = allArrays + MAX_TRACK*result;
     }
 
     /*ensure that number of allocations don't exceed the limit
@@ -145,6 +150,7 @@ void * operator new(size_t size) {
         myArray[it].timestamp = get_server_clock();
         myArray[it].size = size;
         myArray[it].addr = mem;
+        myArray[it].typeofop = true;
     }
 
     return mem;
@@ -158,15 +164,12 @@ void *operator new[] (size_t size) {
     }
 
     if(!allArrays) {
-        allArrays = (info_t**)malloc(MAX_THREADS*sizeof(info_t*));
-        for(int i = 0;i < MAX_THREADS;i++) {
-            allArrays[i] = (info_t*)malloc(MAX_TRACK*sizeof(info_t));
-        }
+        allArrays = (info_t*)malloc(MAX_THREADS*MAX_TRACK*sizeof(info_t));
     }
 
     if(!myArray) {
         int result = __sync_fetch_and_add(&arrayCount,1);
-        myArray = allArrays[result];
+        myArray = allArrays + MAX_TRACK*result;
     }
 
     /*ensure that number of allocations don't exceed the limit
@@ -178,15 +181,46 @@ void *operator new[] (size_t size) {
         myArray[it].timestamp = get_server_clock();
         myArray[it].size = size;
         myArray[it].addr = mem;
+        myArray[it].typeofop = true;
     }
 
     return mem;
 }
 
 void operator delete(void * mem) {
+    if(!allArrays) {
+        allArrays = (info_t*)malloc(MAX_THREADS*MAX_TRACK*sizeof(info_t));
+    }
+
+    if(!myArray) {
+        int result = __sync_fetch_and_add(&arrayCount,1);
+        myArray = allArrays + MAX_TRACK*result;
+    }
+    
+    if(it < MAX_TRACK) {
+        myArray[it].timestamp = get_server_clock();
+        myArray[it].addr = mem;
+        myArray[it].typeofop = false;
+    }
+
     free(mem);
 }
 
 void operator delete[](void *mem) {
+    if(!allArrays) {
+        allArrays = (info_t*)malloc(MAX_THREADS*MAX_TRACK*sizeof(info_t));
+    }
+
+    if(!myArray) {
+        int result = __sync_fetch_and_add(&arrayCount,1);
+        myArray = allArrays + MAX_TRACK*result;
+    }
+
+    if(it < MAX_TRACK) {
+        myArray[it].timestamp = get_server_clock();
+        myArray[it].addr = mem;
+        myArray[it].typeofop = false;
+    }
+
     free(mem);
 }

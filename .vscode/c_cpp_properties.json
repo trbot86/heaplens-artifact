@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "/usr/lib/llvm-6.0/include/"
+                "/usr/lib/llvm-6.0/include/",
+                "/usr/lib/x86_64-linux-gnu/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
