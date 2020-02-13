@@ -29,6 +29,6 @@ int main() {
 
     malloc<int*>(sizeof(int));
 
-    dumpentirestatstofile("info_t_dump.txt");
+    // dumpentirestatstofile("info_t_dump.txt");
     return 0;
 }

@@ -69,8 +69,10 @@ static info_t* allArrays;
 thread_local static info_t* myArray;
 
 inline uint64_t get_server_clock();
+__attribute__ ((constructor)) void allocArray();
+__attribute__ ((destructor)) void dumpentirestatstofile2();
 void printstats();
-void dumpentirestatstofile(const char* file);
+// void dumpentirestatstofile(const char* file);
 void dumpstatstofile(const char *file);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);

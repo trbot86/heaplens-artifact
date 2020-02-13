@@ -11,7 +11,7 @@
 #include <cxxabi.h>
 #include <bits/stdc++.h>
 
-#define MAX_THREADS 1000
+#define MAX_THREADS 5
 #define MAX_ALLOCS 1000
 #define PADDING_BYTES 64
 
@@ -26,7 +26,35 @@ struct info_t {
     void* addr;
 };
 
+struct slot {
+	bool occupied;
+	thread::id id;
+	int offset;
+};
+
 info_t info[MAX_THREADS*MAX_ALLOCS];
+thread_local int iter = 0;
+slot sarr[MAX_THREADS];
+
+__attribute__ ((destructor)) void cleanup();
+
+void cleanup() {
+	sarr[iter].occupied = false;
+}
+
+int get_slot(thread::id id) {
+	bool desired = false;
+	while(true) {
+		while(sarr[iter].occupied) iter = (iter+1)%MAX_THREADS;
+		if(__sync_bool_compare_and_swap(&sarr[iter].occupied, false, true)) {
+			cout << iter << endl;
+			sarr[iter].id = id;
+			return sarr[iter].offset;
+		}
+		iter = (iter+1)%MAX_THREADS;
+	}
+	// sleep(5);
+}
 
 void init_info(info_t *i) {
 	auto thread_local start = chrono::high_resolution_clock::now();
@@ -42,24 +70,23 @@ atomic<info_t*> current_offset(info);
 thread_local int offset;
 
 void spawn_thread() {
-	thread t(init_info, current_offset.fetch_add(1));
+	thread t(get_slot, t.get_id());
 	t.join();
 }
 
 int main() {
 
-// for(int i = 0;i < 2;i++) {
-// 	spawn_thread();
-// }
+for(int i = 0;i < 10;i++) {
+	spawn_thread();
+}
 
 // chrono::high_resolution_clock::now();
 
-ifstream is("info_t_dump.txt", ios_base::in);
-info_t inf;
+// ifstream is("info_t_dump.txt", ios_base::in);
+// info_t inf;
 
-getline(is, inf.file, '\0');
-cout << inf.file << endl;
+// getline(is, inf.file, '\0');
+// cout << inf.file << endl;
 // cout << inf.type_name << endl;
-
 return 0;
 }
