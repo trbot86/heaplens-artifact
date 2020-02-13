@@ -27,7 +27,7 @@ int main() {
     // t1.join();
     // t2.join();
 
-    malloc<int*>(sizeof(int));
+    (int*)malloc(sizeof(int));
 
     // dumpentirestatstofile("info_t_dump.txt");
     return 0;

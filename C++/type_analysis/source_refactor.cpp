@@ -59,7 +59,7 @@ StatementMatcher newMatcher =
 StatementMatcher CStyleMallocMatcher = 
   // declRefExpr(hasDeclaration(functionDecl(hasName("malloc"))))
   // explicitCastExpr(isExpansionInMainFile(), hasDescendant(callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray"))))).bind("callex"))).bind("castex");
-  explicitCastExpr(isExpansionInMainFile(), hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName("malloc")))).bind("malloc"))).bind("castex");
+  explicitCastExpr(hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName("malloc")))).bind("malloc"))).bind("castex");
 
 class ClassnamePrinter : public MatchFinder::MatchCallback {
   public :

@@ -11,7 +11,7 @@
 #include <cxxabi.h>
 #include <bits/stdc++.h>
 
-#define MAX_THREADS 5
+#define MAX_THREADS 3
 #define MAX_ALLOCS 1000
 #define PADDING_BYTES 64
 
@@ -27,66 +27,100 @@ struct info_t {
 };
 
 struct slot {
-	bool occupied;
+	volatile bool occupied;
 	thread::id id;
 	int offset;
 };
+
+void on_thread_exit(std::function<void()> func)
+{
+  class ThreadExiter
+  {
+    std::stack<std::function<void()>> exit_funcs;
+  public:
+    ThreadExiter() = default;
+    ThreadExiter(ThreadExiter const&) = delete;
+    void operator=(ThreadExiter const&) = delete;
+    ~ThreadExiter()
+    {
+      while(!exit_funcs.empty())
+      {
+        exit_funcs.top()();
+        exit_funcs.pop();
+      }
+    }
+    void add(std::function<void()> func)
+    {
+      exit_funcs.push(std::move(func));
+    }   
+  };
+
+  thread_local ThreadExiter exiter;
+  exiter.add(std::move(func));
+}
 
 info_t info[MAX_THREADS*MAX_ALLOCS];
 thread_local int iter = 0;
 slot sarr[MAX_THREADS];
 
-__attribute__ ((destructor)) void cleanup();
+atomic<info_t*> current_offset(info);
+
+thread_local int offset;
+
+__attribute__ ((constructor)) void setup();
+
+void setup() {
+	printf("called constructor");
+}
 
 void cleanup() {
+	sleep(2);
 	sarr[iter].occupied = false;
 }
 
 int get_slot(thread::id id) {
-	bool desired = false;
 	while(true) {
-		while(sarr[iter].occupied) iter = (iter+1)%MAX_THREADS;
+		while(sarr[iter].occupied) {
+			// cout << "while" << endl;
+			iter = (iter+1)%MAX_THREADS;
+		}
+		
 		if(__sync_bool_compare_and_swap(&sarr[iter].occupied, false, true)) {
 			cout << iter << endl;
 			sarr[iter].id = id;
 			return sarr[iter].offset;
 		}
+		cout << "failed\n";
 		iter = (iter+1)%MAX_THREADS;
 	}
-	// sleep(5);
 }
-
-void init_info(info_t *i) {
-	auto thread_local start = chrono::high_resolution_clock::now();
-	for(int k = 0;k < 10000;k++) {
-		
-	}
-	auto thread_local end = chrono::high_resolution_clock::now();
-	cout << chrono::duration_cast<chrono::microseconds>(end - start).count() << endl;
-}
-
-atomic<info_t*> current_offset(info);
-
-thread_local int offset;
 
 void spawn_thread() {
-	thread t(get_slot, t.get_id());
-	t.join();
+	// pthread_cleanup_push(cleanup, nullptr);
+	function<void()> f = cleanup;
+	on_thread_exit(f);
+	get_slot(this_thread::get_id());
+	// pthread_cleanup_pop(true);
 }
 
 int main() {
 
-for(int i = 0;i < 10;i++) {
-	spawn_thread();
-}
+// for(int i = 0;i < 10;i++) {
+// 	thread t(spawn_thread);
+// 	// t.join();
+// }
 
-// chrono::high_resolution_clock::now();
+thread t1(spawn_thread);
+thread t2(spawn_thread);
+thread t3(spawn_thread);
+thread t4(spawn_thread);
+thread t5(spawn_thread);
 
-// ifstream is("info_t_dump.txt", ios_base::in);
-// info_t inf;
+t1.join();
+t2.join();
+t3.join();
+t4.join();
+t5.join();
 
-// getline(is, inf.file, '\0');
-// cout << inf.file << endl;
-// cout << inf.type_name << endl;
 return 0;
 }

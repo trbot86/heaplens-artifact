@@ -22,6 +22,33 @@
 
 using namespace std;
 
+void on_thread_exit(std::function<void()> func)
+{
+  class ThreadExiter
+  {
+    std::stack<std::function<void()>> exit_funcs;
+  public:
+    ThreadExiter() = default;
+    ThreadExiter(ThreadExiter const&) = delete;
+    void operator=(ThreadExiter const&) = delete;
+    ~ThreadExiter()
+    {
+      while(!exit_funcs.empty())
+      {
+        exit_funcs.top()();
+        exit_funcs.pop();
+      }
+    }
+    void add(std::function<void()> func)
+    {
+      exit_funcs.push(std::move(func));
+    }   
+  };
+
+  thread_local ThreadExiter exiter;
+  exiter.add(std::move(func));
+}
+
 class MemStamp
 {
     public:
