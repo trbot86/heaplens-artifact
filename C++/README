@@ -1,8 +1,6 @@
-We suggest use of bear for making compilation database json file. This will help the source_refactor tool to
-make use of compilation information for large projects to use it in its own parsing procedure.
-
-Usage: bear <compilation command>
-Eg. bear make
+sifter/include contains the headers which have to be included in the main file of your project. sifter/lib contains the .so for libmemhook which may be copied
+into your project folder. libmemhook.so must be linked with your project. You may choose to run refactor tool in type_analysis/ to
+change the malloc calls but it holds no guarantees for correct use as it is highly syntax dependant.
 
 testrun.sh will compile the source_refactor tool, run that tool on $1 and dump the refactored code in $2 file.
 It will then compile $2 with memhook library which contains the runtime memory allocation analysis code.

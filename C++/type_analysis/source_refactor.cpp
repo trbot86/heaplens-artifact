@@ -100,7 +100,7 @@ class CStyleAllocPrinter : public MatchFinder::MatchCallback {
       const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
       
       Rewrite.InsertTextAfterToken(mnode->getLocStart(), "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
-
+      Rewrite.overwriteChangedFiles();
       //Print various metadata
       // cout << "malloc" << endl;
       /*cout << castex->getCastKindName() << endl;
