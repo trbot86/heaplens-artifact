@@ -2,6 +2,8 @@
 #undef new
 #undef malloc
 
+slot *sarr = nullptr;
+
 inline uint64_t get_server_clock() {
 #if defined(__i386__)
     uint64_t ret;
@@ -18,6 +20,24 @@ inline uint64_t get_server_clock() {
 
 void allocArray() {
     allArrays = (info_t*)malloc(MAX_THREADS*MAX_TRACK*sizeof(info_t));
+    sarr = (slot*)malloc(MAX_THREADS*sizeof(slot));
+}
+
+int get_slot(thread::id id) {
+	while(true) {
+		while(sarr[it].occupied) {
+			// cout << "while" << endl;
+			it = (it+1)%MAX_THREADS;
+		}
+		
+		if(__sync_bool_compare_and_swap(&sarr[it].occupied, false, true)) {
+			cout << it << endl;
+			sarr[it].id = id;
+			return sarr[it].offset;
+		}
+		cout << "failed\n";
+		it = (it+1)%MAX_THREADS;
+	}
 }
 
 ostream& operator << (ostream& os, info_t& info) {
@@ -139,10 +159,6 @@ void insert_info(size_t size, void* ptr, type_index tindex) {
     }
 }
 
-int get_slot() {
-    
-}
-
 /**********************
  * TODO:
  * Add bound checking for number of allocations
@@ -159,7 +175,7 @@ void * operator new(size_t size) {
     }
 
     if(!myArray) {
-        int result = __sync_fetch_and_add(&arrayCount,1);
+        int result = get_slot(this_thread::get_id());
         myArray = allArrays + MAX_TRACK*result;
     }
 

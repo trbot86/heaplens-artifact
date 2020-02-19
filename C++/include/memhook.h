@@ -49,6 +49,12 @@ void on_thread_exit(std::function<void()> func)
   exiter.add(std::move(func));
 }
 
+struct slot {
+	volatile bool occupied;
+	thread::id id;
+	int offset;
+};
+
 class MemStamp
 {
     public:
@@ -94,6 +100,8 @@ static info_t* allArrays;
 
 //Local array tracking a thread's allocations
 thread_local static info_t* myArray;
+
+slot sarr[MAX_THREADS];
 
 inline uint64_t get_server_clock();
 __attribute__ ((constructor)) void allocArray();

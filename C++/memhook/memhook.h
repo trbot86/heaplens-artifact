@@ -22,32 +22,11 @@
 
 using namespace std;
 
-void on_thread_exit(std::function<void()> func)
-{
-  class ThreadExiter
-  {
-    std::stack<std::function<void()>> exit_funcs;
-  public:
-    ThreadExiter() = default;
-    ThreadExiter(ThreadExiter const&) = delete;
-    void operator=(ThreadExiter const&) = delete;
-    ~ThreadExiter()
-    {
-      while(!exit_funcs.empty())
-      {
-        exit_funcs.top()();
-        exit_funcs.pop();
-      }
-    }
-    void add(std::function<void()> func)
-    {
-      exit_funcs.push(std::move(func));
-    }   
-  };
-
-  thread_local ThreadExiter exiter;
-  exiter.add(std::move(func));
-}
+struct slot {
+	volatile bool occupied;
+	thread::id id;
+	int offset;
+};
 
 class MemStamp
 {
@@ -78,6 +57,30 @@ struct info_t {
 */
 static thread_local int it = 0;
 
+extern slot *sarr;
+
+class ThreadExiter
+  {
+    // std::stack<std::function<void()>> exit_funcs;
+  public:
+    ThreadExiter() = default;
+    ThreadExiter(ThreadExiter const&) = delete;
+    void operator=(ThreadExiter const&) = delete;
+    ~ThreadExiter()
+    {
+      // while(!exit_funcs.empty())
+      // {
+      //   exit_funcs.top()();
+      //   exit_funcs.pop();
+      // }
+      sarr[it].occupied = false;
+    }
+    void add(std::function<void()> func)
+    {
+      // exit_funcs.push(std::move(func));
+    }   
+  };
+
 //Keeps the total number of concurrent threads
 static int arrayCount = 0;
 
@@ -95,10 +98,13 @@ static info_t* allArrays;
 //Local array tracking a thread's allocations
 thread_local static info_t* myArray;
 
+thread_local static ThreadExiter exiter;
+
 inline uint64_t get_server_clock();
 __attribute__ ((constructor)) void allocArray();
 __attribute__ ((destructor)) void dumpentirestatstofile2();
 void printstats();
+int get_slot(thread::id id);
 // void dumpentirestatstofile(const char* file);
 void dumpstatstofile(const char *file);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
