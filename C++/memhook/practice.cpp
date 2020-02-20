@@ -52,7 +52,7 @@ class ThreadExiter
     }   
   };
 
-thread_local ThreadExiter te __attribute__((used)) = {};
+thread_local ThreadExiter te;
 info_t info[MAX_THREADS*MAX_ALLOCS];
 thread_local int iter = 0;
 slot sarr[MAX_THREADS];
@@ -62,6 +62,10 @@ atomic<info_t*> current_offset(info);
 thread_local int offset;
 
 __attribute__ ((constructor)) void setup();
+
+void onexit(void* arg) {
+  cout << "thread exit\n";
+}
 
 void setup() {
   // exiter.add();
@@ -96,6 +100,7 @@ void spawn_thread() {
 	// on_thread_exit(f);
 	// get_slot(this_thread::get_id());
 	// pthread_cleanup_pop(true);
+   __cxxabiv1::__cxa_thread_atexit(onexit,nullptr,);
 }
 
 int main() {

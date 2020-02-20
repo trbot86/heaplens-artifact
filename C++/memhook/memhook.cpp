@@ -33,7 +33,7 @@ int get_slot(thread::id id) {
 		if(__sync_bool_compare_and_swap(&sarr[iter].occupied, false, true)) {
 			cout << iter << endl;
 			sarr[iter].id = id;
-            it = sarr[iter].offset;
+            it = sarr[iter].offset / MAX_TRACK;
 			return iter;
 		}
 		cout << "failed\n";
@@ -42,11 +42,12 @@ int get_slot(thread::id id) {
 }
 
 ostream& operator << (ostream& os, info_t& info) {
-        if(info.file)
+        if(info.file) {
             os << info.file << endl;
+            os << tmap[info.tindex] << endl;
+        }
         else
             os << "empty" << endl;
-        os << tmap[info.tindex] << endl;
         os << info.line << endl;
         os << info.timestamp << endl;
         os << info.size << endl;
@@ -81,7 +82,7 @@ void dumpentirestatstofile() {
     for(int i = 0;i < MAX_TRACK*MAX_THREADS;i++) {
         while(allArrays[i].addr == nullptr) i++;
         
-        if(allArrays[i].typeofop && !tmap.count(allArrays[i].tindex)) {
+        if(allArrays[i].file && allArrays[i].typeofop && !tmap.count(allArrays[i].tindex)) {
             demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
             tmap[allArrays[i].tindex] = demangled_name;
         }
@@ -113,7 +114,7 @@ void dumpentirestatstofile2() {
 
     for(int i = 0;i < MAX_TRACK*MAX_THREADS;i++) {
         if(allArrays[i].addr == nullptr) continue;
-        else if(allArrays[i].typeofop && !tmap.count(allArrays[i].tindex)) {
+        else if(allArrays[i].file && allArrays[i].typeofop && !tmap.count(allArrays[i].tindex)) {
             demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
             tmap[allArrays[i].tindex] = demangled_name;
         }
@@ -169,6 +170,11 @@ void insert_info(size_t size, void* ptr, type_index tindex) {
  **********************/
 void * operator new(size_t size) {
     
+    if(!setup) {
+        exiter.add();
+        setup = true;
+    }
+
     void* mem = malloc(size == 0?1:size);
     
     if(mem == 0) {

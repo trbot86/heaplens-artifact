@@ -75,10 +75,11 @@ class ThreadExiter
       //   exit_funcs.top()();
       //   exit_funcs.pop();
       // }
+      cout << "ThreadExiter dtor\n";
       sarr[it].occupied = false;
       sarr[it].offset = it;
     }
-    void add(std::function<void()> func)
+    void add()
     {
       // exit_funcs.push(std::move(func));
     }   
@@ -86,6 +87,8 @@ class ThreadExiter
 
 //Keeps the total number of concurrent threads
 static int arrayCount = 0;
+
+thread_local static bool setup = false;
 
 typedef map<type_index, const char*> type_map;
 
