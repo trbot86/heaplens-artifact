@@ -15,7 +15,7 @@
 #include <cxxabi.h>
 
 #define BACKTRACE_DEPTH 2
-#define MAX_THREADS 1
+#define MAX_THREADS 2
 #define MAX_TRACK 1
 #define MAX_TYPE_LENGTH 1000
 #define PADDING 64
@@ -52,6 +52,8 @@ struct info_t {
     info_t() : file(nullptr), tindex(typeid(void)), line(0), timestamp(0), size(0), addr(nullptr) {}
 };
 
+static thread_local int iter = 0;
+
 /*Iterator for individual thread allocation in
 * tracking data structure
 */
@@ -74,6 +76,7 @@ class ThreadExiter
       //   exit_funcs.pop();
       // }
       sarr[it].occupied = false;
+      sarr[it].offset = it;
     }
     void add(std::function<void()> func)
     {

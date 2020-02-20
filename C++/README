@@ -20,3 +20,9 @@ type_analysis:
 
 Compilation command for main logger:
 g++ memalloc.cpp memhook.cpp -Wall -pthread -g -o a.out
+
+NOTE:
+
+Always keep MAX_THREADS > 1 as it is highly likely that the parent thread will get slot first,
+and will never give up the only slot if MAX_THREADS = 1 as it is the last thread to exit, resulting in infinite loop for
+child threads.

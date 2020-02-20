@@ -25,18 +25,19 @@ void allocArray() {
 
 int get_slot(thread::id id) {
 	while(true) {
-		while(sarr[it].occupied) {
+		while(sarr[iter].occupied) {
 			// cout << "while" << endl;
-			it = (it+1)%MAX_THREADS;
+			iter = (iter+1)%MAX_THREADS;
 		}
 		
-		if(__sync_bool_compare_and_swap(&sarr[it].occupied, false, true)) {
-			cout << it << endl;
-			sarr[it].id = id;
-			return sarr[it].offset;
+		if(__sync_bool_compare_and_swap(&sarr[iter].occupied, false, true)) {
+			cout << iter << endl;
+			sarr[iter].id = id;
+            it = sarr[iter].offset;
+			return iter;
 		}
 		cout << "failed\n";
-		it = (it+1)%MAX_THREADS;
+		iter = (iter+1)%MAX_THREADS;
 	}
 }
 
@@ -104,15 +105,15 @@ void dumpentirestatstofile() {
 }
 
 void dumpentirestatstofile2() {
+    it = INT_MAX;
     ofstream myfile("info_t_dump.txt", ios_base::out | ios_base::app);
 
     int status;
     char* demangled_name;
 
     for(int i = 0;i < MAX_TRACK*MAX_THREADS;i++) {
-        while(allArrays[i].addr == nullptr) i++;
-        
-        if(allArrays[i].typeofop && !tmap.count(allArrays[i].tindex)) {
+        if(allArrays[i].addr == nullptr) continue;
+        else if(allArrays[i].typeofop && !tmap.count(allArrays[i].tindex)) {
             demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
             tmap[allArrays[i].tindex] = demangled_name;
         }
@@ -146,7 +147,7 @@ void insert_type(void *p, const MemStamp &stamp,const type_index tindex) {
 //Helper for malloc
 void insert_info(size_t size, void* ptr, type_index tindex) {
     if(!myArray) {
-        int result = __sync_fetch_and_add(&arrayCount,1);
+        int result = get_slot(this_thread::get_id());
         myArray = allArrays + MAX_TRACK*result;
     }
     
@@ -202,7 +203,7 @@ void *operator new[] (size_t size) {
     }
 
     if(!myArray) {
-        int result = __sync_fetch_and_add(&arrayCount,1);
+        int result = get_slot(this_thread::get_id());
         myArray = allArrays + MAX_TRACK*result;
     }
 
@@ -223,7 +224,7 @@ void *operator new[] (size_t size) {
 
 void operator delete(void * mem) {
     if(!myArray) {
-        int result = __sync_fetch_and_add(&arrayCount,1);
+        int result = get_slot(this_thread::get_id());
         myArray = allArrays + MAX_TRACK*result;
     }
     
@@ -238,7 +239,7 @@ void operator delete(void * mem) {
 
 void operator delete[](void *mem) {
     if(!myArray) {
-        int result = __sync_fetch_and_add(&arrayCount,1);
+        int result = get_slot(this_thread::get_id());
         myArray = allArrays + MAX_TRACK*result;
     }
 

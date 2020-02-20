@@ -32,33 +32,27 @@ struct slot {
 	int offset;
 };
 
-void on_thread_exit(std::function<void()> func)
-{
-  class ThreadExiter
+class ThreadExiter
   {
-    std::stack<std::function<void()>> exit_funcs;
   public:
-    ThreadExiter() = default;
+    int a;
+    ThreadExiter() {
+      cout << "thread Exiter ctor\n";
+    }
+
     ThreadExiter(ThreadExiter const&) = delete;
     void operator=(ThreadExiter const&) = delete;
     ~ThreadExiter()
     {
-      while(!exit_funcs.empty())
-      {
-        exit_funcs.top()();
-        exit_funcs.pop();
-      }
+      cout << "Destructor called\n";
     }
-    void add(std::function<void()> func)
+    void add()
     {
-      exit_funcs.push(std::move(func));
+      // exit_funcs.push(std::move(func));
     }   
   };
 
-  thread_local ThreadExiter exiter;
-  exiter.add(std::move(func));
-}
-
+thread_local ThreadExiter te __attribute__((used)) = {};
 info_t info[MAX_THREADS*MAX_ALLOCS];
 thread_local int iter = 0;
 slot sarr[MAX_THREADS];
@@ -70,7 +64,7 @@ thread_local int offset;
 __attribute__ ((constructor)) void setup();
 
 void setup() {
-	printf("called constructor");
+  // exiter.add();
 }
 
 void cleanup() {
@@ -96,31 +90,33 @@ int get_slot(thread::id id) {
 }
 
 void spawn_thread() {
-	// pthread_cleanup_push(cleanup, nullptr);
-	function<void()> f = cleanup;
-	on_thread_exit(f);
-	get_slot(this_thread::get_id());
+	// exiter.add();
+  // pthread_cleanup_push(cleanup, nullptr);
+	// function<void()> f = cleanup;
+	// on_thread_exit(f);
+	// get_slot(this_thread::get_id());
 	// pthread_cleanup_pop(true);
 }
 
 int main() {
-
+// thread_local unique_ptr<ThreadExiter> te (new ThreadExiter()) ;
 // for(int i = 0;i < 10;i++) {
 // 	thread t(spawn_thread);
 // 	// t.join();
 // }
 
+// delete te;
 thread t1(spawn_thread);
-thread t2(spawn_thread);
-thread t3(spawn_thread);
-thread t4(spawn_thread);
-thread t5(spawn_thread);
+// thread t2(spawn_thread);
+// thread t3(spawn_thread);
+// thread t4(spawn_thread);
+// thread t5(spawn_thread);
 
 t1.join();
-t2.join();
-t3.join();
-t4.join();
-t5.join();
+// t2.join();
+// t3.join();
+// t4.join();
+// t5.join();
 
 return 0;
 }

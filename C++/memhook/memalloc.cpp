@@ -1,5 +1,6 @@
 #include <iostream>
 #include <bits/stdc++.h>
+#include <unistd.h>
 #include <thread>
 
 #include "memhook.h"
@@ -12,7 +13,9 @@ struct algo {
 };
 
 void alloc1(void) {
-    // for(int i = 0;i < 1;i++)
+    for(int i = 0;i < 1;i++) {
+        sleep(1);
+    }
     int* n = new int(4);
 }
 
@@ -21,13 +24,13 @@ void alloc2(void) {
 }
 
 int main() {
-    // thread t1(alloc1);
-    // thread t2(alloc2);
+    thread t1(alloc1);
+    thread t2(alloc2);
 // unsigned long* p = new unsigned long(6);
-    // t1.join();
-    // t2.join();
+    t1.join();
+    t2.join();
 
-    (int*)malloc(sizeof(int));
+    // (int*)malloc(sizeof(int));
 
     // dumpentirestatstofile("info_t_dump.txt");
     return 0;
