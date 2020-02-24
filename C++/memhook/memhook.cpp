@@ -33,7 +33,7 @@ int get_slot(thread::id id) {
 		if(__sync_bool_compare_and_swap(&sarr[iter].occupied, false, true)) {
 			cout << iter << endl;
 			sarr[iter].id = id;
-            it = sarr[iter].offset / MAX_TRACK;
+            it = sarr[iter].offset;
 			return iter;
 		}
 		cout << "failed\n";
@@ -202,6 +202,11 @@ void * operator new(size_t size) {
 }
 
 void *operator new[] (size_t size) {
+    if(!setup) {
+        exiter.add();
+        setup = true;
+    }
+
     void* mem = malloc(size == 0?1:size);
     
     if(mem == 0) {
@@ -229,6 +234,11 @@ void *operator new[] (size_t size) {
 }
 
 void operator delete(void * mem) {
+    if(!setup) {
+        exiter.add();
+        setup = true;
+    }
+
     if(!myArray) {
         int result = get_slot(this_thread::get_id());
         myArray = allArrays + MAX_TRACK*result;
@@ -244,6 +254,11 @@ void operator delete(void * mem) {
 }
 
 void operator delete[](void *mem) {
+    if(!setup) {
+        exiter.add();
+        setup = true;
+    }
+    
     if(!myArray) {
         int result = get_slot(this_thread::get_id());
         myArray = allArrays + MAX_TRACK*result;

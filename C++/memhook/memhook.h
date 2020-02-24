@@ -76,8 +76,8 @@ class ThreadExiter
       //   exit_funcs.pop();
       // }
       cout << "ThreadExiter dtor\n";
-      sarr[it].occupied = false;
-      sarr[it].offset = it;
+      sarr[iter].offset = it++;
+      sarr[iter].occupied = false;
     }
     void add()
     {
