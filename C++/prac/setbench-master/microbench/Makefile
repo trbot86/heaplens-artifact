@@ -42,7 +42,7 @@ FLAGS += -DUSE_TREE_STATS
 #FLAGS += -Wno-format
 FLAGS += $(xargs)
 
-LDFLAGS += -L../lib
+LDFLAGS += -L../lib -Wl,-rpath=../lib
 LDFLAGS += -I./ -I../ `find ../common -type d | sed s/^/-I/`
 LDFLAGS += -lpthread -lmemhook
 LDFLAGS += -ldl
