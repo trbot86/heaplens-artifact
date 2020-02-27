@@ -1,0 +1,84 @@
+\hypertarget{blockbag_8h}{}\section{common/recordmgr/blockbag.h File Reference}
+\label{blockbag_8h}\index{common/recordmgr/blockbag.\+h@{common/recordmgr/blockbag.\+h}}
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include \char`\"{}blockpool.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}plaf.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}lockfreeblockbag.\+h\char`\"{}}\newline
+Include dependency graph for blockbag.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{blockbag_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{blockbag_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classblockpool}{blockpool$<$ T $>$}
+\item 
+class \hyperlink{classblockbag}{blockbag$<$ T $>$}
+\item 
+class \hyperlink{classblock}{block$<$ T $>$}
+\item 
+class \hyperlink{classblock}{block$<$ T $>$}
+\item 
+class \hyperlink{classblockbag__iterator}{blockbag\+\_\+iterator$<$ T $>$}
+\item 
+class \hyperlink{classblockbag}{blockbag$<$ T $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{blockbag_8h_a719e4c3dd08c6c7d38b9a13c38d2ba66}{B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E\+\_\+\+D\+E\+S\+I\+R\+E\+D\+\_\+\+B\+Y\+T\+ES}~512
+\item 
+\#define \hyperlink{blockbag_8h_ad51ded0bbd705f02f73fc60c0b721ced}{B\+L\+O\+C\+K\+\_\+\+S\+I\+ZE}~(\hyperlink{blockbag_8h_a719e4c3dd08c6c7d38b9a13c38d2ba66}{B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E\+\_\+\+D\+E\+S\+I\+R\+E\+D\+\_\+\+B\+Y\+T\+ES}/sizeof(T$\ast$)-\/3$\ast$sizeof(size\+\_\+t))
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T $>$ }\\bool \hyperlink{blockbag_8h_a7dcbd9f40112fc1377969c0e4bfa960b}{operator==} (const \hyperlink{classblockbag__iterator}{blockbag\+\_\+iterator}$<$ T $>$ \&a, const \hyperlink{classblockbag__iterator}{blockbag\+\_\+iterator}$<$ T $>$ \&b)
+\item 
+{\footnotesize template$<$typename T $>$ }\\bool \hyperlink{blockbag_8h_a5f454332e817e3673b8ed3a682db83e3}{operator!=} (const \hyperlink{classblockbag__iterator}{blockbag\+\_\+iterator}$<$ T $>$ \&a, const \hyperlink{classblockbag__iterator}{blockbag\+\_\+iterator}$<$ T $>$ \&b)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{blockbag_8h_ad51ded0bbd705f02f73fc60c0b721ced}\label{blockbag_8h_ad51ded0bbd705f02f73fc60c0b721ced}} 
+\index{blockbag.\+h@{blockbag.\+h}!B\+L\+O\+C\+K\+\_\+\+S\+I\+ZE@{B\+L\+O\+C\+K\+\_\+\+S\+I\+ZE}}
+\index{B\+L\+O\+C\+K\+\_\+\+S\+I\+ZE@{B\+L\+O\+C\+K\+\_\+\+S\+I\+ZE}!blockbag.\+h@{blockbag.\+h}}
+\subsubsection{\texorpdfstring{B\+L\+O\+C\+K\+\_\+\+S\+I\+ZE}{BLOCK\_SIZE}}
+{\footnotesize\ttfamily \#define B\+L\+O\+C\+K\+\_\+\+S\+I\+ZE~(\hyperlink{blockbag_8h_a719e4c3dd08c6c7d38b9a13c38d2ba66}{B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E\+\_\+\+D\+E\+S\+I\+R\+E\+D\+\_\+\+B\+Y\+T\+ES}/sizeof(T$\ast$)-\/3$\ast$sizeof(size\+\_\+t))}
+
+\mbox{\Hypertarget{blockbag_8h_a719e4c3dd08c6c7d38b9a13c38d2ba66}\label{blockbag_8h_a719e4c3dd08c6c7d38b9a13c38d2ba66}} 
+\index{blockbag.\+h@{blockbag.\+h}!B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E\+\_\+\+D\+E\+S\+I\+R\+E\+D\+\_\+\+B\+Y\+T\+ES@{B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E\+\_\+\+D\+E\+S\+I\+R\+E\+D\+\_\+\+B\+Y\+T\+ES}}
+\index{B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E\+\_\+\+D\+E\+S\+I\+R\+E\+D\+\_\+\+B\+Y\+T\+ES@{B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E\+\_\+\+D\+E\+S\+I\+R\+E\+D\+\_\+\+B\+Y\+T\+ES}!blockbag.\+h@{blockbag.\+h}}
+\subsubsection{\texorpdfstring{B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E\+\_\+\+D\+E\+S\+I\+R\+E\+D\+\_\+\+B\+Y\+T\+ES}{BLOCK\_SIZE\_DESIRED\_BYTES}}
+{\footnotesize\ttfamily \#define B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E\+\_\+\+D\+E\+S\+I\+R\+E\+D\+\_\+\+B\+Y\+T\+ES~512}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{blockbag_8h_a5f454332e817e3673b8ed3a682db83e3}\label{blockbag_8h_a5f454332e817e3673b8ed3a682db83e3}} 
+\index{blockbag.\+h@{blockbag.\+h}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!blockbag.\+h@{blockbag.\+h}}
+\subsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+bool operator!= (\begin{DoxyParamCaption}\item[{const \hyperlink{classblockbag__iterator}{blockbag\+\_\+iterator}$<$ T $>$ \&}]{a,  }\item[{const \hyperlink{classblockbag__iterator}{blockbag\+\_\+iterator}$<$ T $>$ \&}]{b }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{blockbag_8h_a7dcbd9f40112fc1377969c0e4bfa960b}\label{blockbag_8h_a7dcbd9f40112fc1377969c0e4bfa960b}} 
+\index{blockbag.\+h@{blockbag.\+h}!operator==@{operator==}}
+\index{operator==@{operator==}!blockbag.\+h@{blockbag.\+h}}
+\subsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+bool operator== (\begin{DoxyParamCaption}\item[{const \hyperlink{classblockbag__iterator}{blockbag\+\_\+iterator}$<$ T $>$ \&}]{a,  }\item[{const \hyperlink{classblockbag__iterator}{blockbag\+\_\+iterator}$<$ T $>$ \&}]{b }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+

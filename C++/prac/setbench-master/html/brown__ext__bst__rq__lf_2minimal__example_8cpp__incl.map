@@ -1,0 +1,31 @@
+<map id="ds/brown_ext_bst_rq_lf/minimal_example.cpp" name="ds/brown_ext_bst_rq_lf/minimal_example.cpp">
+<area shape="rect" id="node5" href="$brown__ext__bst__rq__lf_2adapter_8h.html" title="adapter.h" alt="" coords="182,95,258,121"/>
+<area shape="rect" id="node6" href="$errors_8h.html" title="errors.h" alt="" coords="333,326,400,353"/>
+<area shape="rect" id="node9" href="$random__fnv1a_8h.html" title="random_fnv1a.h" alt="" coords="43,169,157,196"/>
+<area shape="rect" id="node11" href="$bst__impl_8h.html" title="bst_impl.h" alt="" coords="2744,169,2827,196"/>
+<area shape="rect" id="node10" href="$plaf_8h.html" title="plaf.h" alt="" coords="1083,796,1138,823"/>
+<area shape="rect" id="node22" href="$descriptors_8h.html" title="descriptors.h" alt="" coords="3013,408,3110,435"/>
+<area shape="rect" id="node23" href="$record__manager_8h.html" title="record_manager.h" alt="" coords="2317,244,2443,271"/>
+<area shape="rect" id="node45" href="$scxrecord_8h.html" title="scxrecord.h" alt="" coords="3099,326,3189,353"/>
+<area shape="rect" id="node47" href="$node_8h.html" title="node.h" alt="" coords="3311,244,3372,271"/>
+<area shape="rect" id="node48" href="$rq__provider_8h.html" title="rq_provider.h" alt="" coords="3531,326,3629,353"/>
+<area shape="rect" id="node50" href="$descriptors__impl_8h.html" title="descriptors_impl.h" alt="" coords="2924,244,3052,271"/>
+<area shape="rect" id="node25" href="$globals_8h.html" title="globals.h" alt="" coords="2535,647,2609,673"/>
+<area shape="rect" id="node27" href="$record__manager__single__type_8h.html" title="record_manager_single\l_type.h" alt="" coords="1706,319,1862,360"/>
+<area shape="rect" id="node26" href="$debugprinting_8h.html" title="debugprinting.h" alt="" coords="3091,721,3202,748"/>
+<area shape="rect" id="node30" href="$debug__info_8h.html" title="debug_info.h" alt="" coords="644,721,740,748"/>
+<area shape="rect" id="node31" href="$recovery__manager_8h.html" title="recovery_manager.h" alt="" coords="2202,572,2342,599"/>
+<area shape="rect" id="node32" href="$allocator__interface_8h.html" title="allocator_interface.h" alt="" coords="796,647,935,673"/>
+<area shape="rect" id="node33" href="$allocator__bump_8h.html" title="allocator_bump.h" alt="" coords="1245,572,1366,599"/>
+<area shape="rect" id="node34" href="$allocator__new_8h.html" title="allocator_new.h" alt="" coords="1085,490,1198,517"/>
+<area shape="rect" id="node35" href="$pool__interface_8h.html" title="pool_interface.h" alt="" coords="660,572,775,599"/>
+<area shape="rect" id="node36" href="$allocator__once_8h.html" title="allocator_once.h" alt="" coords="1052,572,1169,599"/>
+<area shape="rect" id="node37" href="$pool__none_8h.html" title="pool_none.h" alt="" coords="671,490,763,517"/>
+<area shape="rect" id="node38" href="$pool__perthread__and__shared_8h.html" title="pool_perthread_and\l_shared.h" alt="" coords="2418,483,2553,524"/>
+<area shape="rect" id="node39" href="$reclaimer__interface_8h.html" title="reclaimer_interface.h" alt="" coords="1781,490,1923,517"/>
+<area shape="rect" id="node40" href="$reclaimer__none_8h.html" title="reclaimer_none.h" alt="" coords="1429,408,1550,435"/>
+<area shape="rect" id="node41" href="$reclaimer__ebr__tree_8h.html" title="reclaimer_ebr_tree.h" alt="" coords="1661,408,1801,435"/>
+<area shape="rect" id="node42" href="$reclaimer__ebr__token_8h.html" title="reclaimer_ebr_token.h" alt="" coords="1877,408,2027,435"/>
+<area shape="rect" id="node43" href="$reclaimer__debra_8h.html" title="reclaimer_debra.h" alt="" coords="2052,408,2177,435"/>
+<area shape="rect" id="node49" href="$rq__unsafe_8h.html" title="rq_unsafe.h" alt="" coords="3535,408,3625,435"/>
+</map>

@@ -1,0 +1,297 @@
+\hypertarget{classreclaimer__debracap}{}\section{reclaimer\+\_\+debracap$<$ T, Pool $>$ Class Template Reference}
+\label{classreclaimer__debracap}\index{reclaimer\+\_\+debracap$<$ T, Pool $>$@{reclaimer\+\_\+debracap$<$ T, Pool $>$}}
+
+
+{\ttfamily \#include $<$reclaimer\+\_\+debracap.\+h$>$}
+
+
+
+Inheritance diagram for reclaimer\+\_\+debracap$<$ T, Pool $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{classreclaimer__debracap__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for reclaimer\+\_\+debracap$<$ T, Pool $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classreclaimer__debracap__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classreclaimer__debracap_1_1BagRotator}{Bag\+Rotator}
+\item 
+class \hyperlink{classreclaimer__debracap_1_1BagRotator_3_01First_00_01Rest_8_8_8_01_4}{Bag\+Rotator$<$ First, Rest... $>$}
+\item 
+struct \hyperlink{structreclaimer__debracap_1_1rebind}{rebind}
+\item 
+struct \hyperlink{structreclaimer__debracap_1_1rebind2}{rebind2}
+\item 
+class \hyperlink{classreclaimer__debracap_1_1ThreadData}{Thread\+Data}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classreclaimer__debracap_a4682c2d23e5b59f4e4e036865e903b3b}{get\+Safe\+Blockbags} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, \hyperlink{classblockbag}{blockbag}$<$ T $>$ $\ast$$\ast$bags)
+\item 
+long long \hyperlink{classreclaimer__debracap_a2315cce188568d1b2e7b5809a943b7a6}{get\+Size\+In\+Nodes} ()
+\item 
+std\+::string \hyperlink{classreclaimer__debracap_ad005056c2b7740bb2172efeae2369434}{get\+Details\+String} ()
+\item 
+std\+::string \hyperlink{classreclaimer__debracap_adb2070ff175d8131d7da92820c5d2de7}{get\+Size\+String} ()
+\item 
+bool \hyperlink{classreclaimer__debracap_a7d248af33f59e0154df2bf21f7889bc8}{is\+Quiescent} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__debracap_a5304ffe3a8227e5b77275ded7a742d5d}{rotate\+Epoch\+Bags} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+{\footnotesize template$<$typename First , typename... Rest$>$ }\\bool \hyperlink{classreclaimer__debracap_a2052d4c9d165157e85c75230a3a8e584}{start\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, void $\ast$const $\ast$const reclaimers, const int num\+Reclaimers, const bool read\+Only=false)
+\item 
+void \hyperlink{classreclaimer__debracap_af290e3cb806e6b4a7325defc2311ad62}{end\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__debracap_acfe29401909be4a5a34bf4ba4978d90b}{retire} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$p)
+\item 
+void \hyperlink{classreclaimer__debracap_a42e33db09c07092c58669f718a6d6776}{debug\+Print\+Status} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__debracap_a6574a166b572ccd201fdcaacf4afa907}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__debracap_a8b73562e6d000dd9445a08891d3a56ec}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+\hyperlink{classreclaimer__debracap_a3528489fe624bf72f5b6ebae79279fd4}{reclaimer\+\_\+debracap} (const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes}, Pool $\ast$\+\_\+pool, \hyperlink{classdebugInfo}{debug\+Info} $\ast$const \+\_\+debug, \hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const \+\_\+recovery\+Mgr=N\+U\+LL)
+\item 
+\hyperlink{classreclaimer__debracap_a9a4d64ab713bce63d26ce2e4e97302b7}{$\sim$reclaimer\+\_\+debracap} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \hyperlink{classreclaimer__debracap_a1b4f8e3613dfeb9721395d3bdd4a3415}{quiescence\+Is\+Per\+Record\+Type} ()
+\item 
+static bool \hyperlink{classreclaimer__debracap_ae838602ad578a26512441a15dee0abcf}{is\+Protected} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+static bool \hyperlink{classreclaimer__debracap_a7b3ddb400b86fe1311c102bb4fcdea6a}{is\+Q\+Protected} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+static bool \hyperlink{classreclaimer__debracap_a282205dc0800fb9dc45e13233f20b413}{protect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj, \hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type} not\+Retired\+Callback, \hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg} callback\+Arg, bool memory\+Barrier=true)
+\item 
+static void \hyperlink{classreclaimer__debracap_a76838aa9f38af9c481a21e42e6014abc}{unprotect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+static bool \hyperlink{classreclaimer__debracap_a26d500d9aa320c997b1424bc500de4dd}{q\+Protect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj, \hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type} not\+Retired\+Callback, \hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg} callback\+Arg, bool memory\+Barrier=true)
+\item 
+static void \hyperlink{classreclaimer__debracap_a479f0c88f9895fef9d15e6ffb1a41ea4}{q\+Unprotect\+All} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+static bool \hyperlink{classreclaimer__debracap_a5eb191745230a47bb6ff640dd58e3a11}{should\+Help} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classreclaimer__debracap_a558831a56d3365af4684bd49307a75cc}{P\+AD}
+\item 
+\hyperlink{classreclaimer__debracap_1_1ThreadData}{Thread\+Data} \hyperlink{classreclaimer__debracap_a3850a9ce45071232e789ea24d8c0c9df}{thread\+Data} \mbox{[}\hyperlink{plaf_8h_ac1585a3455dd3e33e877e588be9e466b}{M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+D\+S\+\_\+\+P\+O\+W2}\mbox{]}
+\item 
+volatile long \hyperlink{classreclaimer__debracap_ad3bcf7f4ebbdbcab522af7f5b0447cb5}{epoch}
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T = void, class Pool = pool\+\_\+interface$<$\+T$>$$>$\newline
+class reclaimer\+\_\+debracap$<$ T, Pool $>$}
+
+C++ record manager implementation (P\+O\+DC 2015) by Trevor Brown.
+
+Copyright (C) 2015 Trevor Brown 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classreclaimer__debracap_a3528489fe624bf72f5b6ebae79279fd4}\label{classreclaimer__debracap_a3528489fe624bf72f5b6ebae79279fd4}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{reclaimer\+\_\+debracap()}{reclaimer\_debracap()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::\hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap} (\begin{DoxyParamCaption}\item[{const int}]{num\+Processes,  }\item[{Pool $\ast$}]{\+\_\+pool,  }\item[{\hyperlink{classdebugInfo}{debug\+Info} $\ast$const}]{\+\_\+debug,  }\item[{\hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const}]{\+\_\+recovery\+Mgr = {\ttfamily NULL} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a9a4d64ab713bce63d26ce2e4e97302b7}\label{classreclaimer__debracap_a9a4d64ab713bce63d26ce2e4e97302b7}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!````~reclaimer\+\_\+debracap@{$\sim$reclaimer\+\_\+debracap}}
+\index{````~reclaimer\+\_\+debracap@{$\sim$reclaimer\+\_\+debracap}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{$\sim$reclaimer\+\_\+debracap()}{~reclaimer\_debracap()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::$\sim$\hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classreclaimer__debracap_a42e33db09c07092c58669f718a6d6776}\label{classreclaimer__debracap_a42e33db09c07092c58669f718a6d6776}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!debug\+Print\+Status@{debug\+Print\+Status}}
+\index{debug\+Print\+Status@{debug\+Print\+Status}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{debug\+Print\+Status()}{debugPrintStatus()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::debug\+Print\+Status (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a8b73562e6d000dd9445a08891d3a56ec}\label{classreclaimer__debracap_a8b73562e6d000dd9445a08891d3a56ec}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_af290e3cb806e6b4a7325defc2311ad62}\label{classreclaimer__debracap_af290e3cb806e6b4a7325defc2311ad62}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!end\+Op@{end\+Op}}
+\index{end\+Op@{end\+Op}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{end\+Op()}{endOp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::end\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_ad005056c2b7740bb2172efeae2369434}\label{classreclaimer__debracap_ad005056c2b7740bb2172efeae2369434}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!get\+Details\+String@{get\+Details\+String}}
+\index{get\+Details\+String@{get\+Details\+String}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{get\+Details\+String()}{getDetailsString()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+std\+::string \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::get\+Details\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a4682c2d23e5b59f4e4e036865e903b3b}\label{classreclaimer__debracap_a4682c2d23e5b59f4e4e036865e903b3b}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!get\+Safe\+Blockbags@{get\+Safe\+Blockbags}}
+\index{get\+Safe\+Blockbags@{get\+Safe\+Blockbags}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{get\+Safe\+Blockbags()}{getSafeBlockbags()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::get\+Safe\+Blockbags (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{\hyperlink{classblockbag}{blockbag}$<$ T $>$ $\ast$$\ast$}]{bags }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a2315cce188568d1b2e7b5809a943b7a6}\label{classreclaimer__debracap_a2315cce188568d1b2e7b5809a943b7a6}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}}
+\index{get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{get\+Size\+In\+Nodes()}{getSizeInNodes()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+long long \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::get\+Size\+In\+Nodes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_adb2070ff175d8131d7da92820c5d2de7}\label{classreclaimer__debracap_adb2070ff175d8131d7da92820c5d2de7}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!get\+Size\+String@{get\+Size\+String}}
+\index{get\+Size\+String@{get\+Size\+String}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{get\+Size\+String()}{getSizeString()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+std\+::string \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::get\+Size\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a6574a166b572ccd201fdcaacf4afa907}\label{classreclaimer__debracap_a6574a166b572ccd201fdcaacf4afa907}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_ae838602ad578a26512441a15dee0abcf}\label{classreclaimer__debracap_ae838602ad578a26512441a15dee0abcf}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!is\+Protected@{is\+Protected}}
+\index{is\+Protected@{is\+Protected}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{is\+Protected()}{isProtected()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::is\+Protected (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a7b3ddb400b86fe1311c102bb4fcdea6a}\label{classreclaimer__debracap_a7b3ddb400b86fe1311c102bb4fcdea6a}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!is\+Q\+Protected@{is\+Q\+Protected}}
+\index{is\+Q\+Protected@{is\+Q\+Protected}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{is\+Q\+Protected()}{isQProtected()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::is\+Q\+Protected (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a7d248af33f59e0154df2bf21f7889bc8}\label{classreclaimer__debracap_a7d248af33f59e0154df2bf21f7889bc8}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!is\+Quiescent@{is\+Quiescent}}
+\index{is\+Quiescent@{is\+Quiescent}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{is\+Quiescent()}{isQuiescent()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+bool \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::is\+Quiescent (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a282205dc0800fb9dc45e13233f20b413}\label{classreclaimer__debracap_a282205dc0800fb9dc45e13233f20b413}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!protect@{protect}}
+\index{protect@{protect}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{protect()}{protect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::protect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj,  }\item[{\hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type}}]{not\+Retired\+Callback,  }\item[{\hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg}}]{callback\+Arg,  }\item[{bool}]{memory\+Barrier = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a26d500d9aa320c997b1424bc500de4dd}\label{classreclaimer__debracap_a26d500d9aa320c997b1424bc500de4dd}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!q\+Protect@{q\+Protect}}
+\index{q\+Protect@{q\+Protect}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{q\+Protect()}{qProtect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::q\+Protect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj,  }\item[{\hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type}}]{not\+Retired\+Callback,  }\item[{\hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg}}]{callback\+Arg,  }\item[{bool}]{memory\+Barrier = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a1b4f8e3613dfeb9721395d3bdd4a3415}\label{classreclaimer__debracap_a1b4f8e3613dfeb9721395d3bdd4a3415}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!quiescence\+Is\+Per\+Record\+Type@{quiescence\+Is\+Per\+Record\+Type}}
+\index{quiescence\+Is\+Per\+Record\+Type@{quiescence\+Is\+Per\+Record\+Type}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{quiescence\+Is\+Per\+Record\+Type()}{quiescenceIsPerRecordType()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::quiescence\+Is\+Per\+Record\+Type (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a479f0c88f9895fef9d15e6ffb1a41ea4}\label{classreclaimer__debracap_a479f0c88f9895fef9d15e6ffb1a41ea4}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!q\+Unprotect\+All@{q\+Unprotect\+All}}
+\index{q\+Unprotect\+All@{q\+Unprotect\+All}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{q\+Unprotect\+All()}{qUnprotectAll()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static void \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::q\+Unprotect\+All (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_acfe29401909be4a5a34bf4ba4978d90b}\label{classreclaimer__debracap_acfe29401909be4a5a34bf4ba4978d90b}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!retire@{retire}}
+\index{retire@{retire}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{retire()}{retire()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::retire (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$}]{p }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a5304ffe3a8227e5b77275ded7a742d5d}\label{classreclaimer__debracap_a5304ffe3a8227e5b77275ded7a742d5d}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!rotate\+Epoch\+Bags@{rotate\+Epoch\+Bags}}
+\index{rotate\+Epoch\+Bags@{rotate\+Epoch\+Bags}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{rotate\+Epoch\+Bags()}{rotateEpochBags()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::rotate\+Epoch\+Bags (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a5eb191745230a47bb6ff640dd58e3a11}\label{classreclaimer__debracap_a5eb191745230a47bb6ff640dd58e3a11}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!should\+Help@{should\+Help}}
+\index{should\+Help@{should\+Help}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{should\+Help()}{shouldHelp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::should\+Help (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a2052d4c9d165157e85c75230a3a8e584}\label{classreclaimer__debracap_a2052d4c9d165157e85c75230a3a8e584}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!start\+Op@{start\+Op}}
+\index{start\+Op@{start\+Op}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{start\+Op()}{startOp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+template$<$typename First , typename... Rest$>$ \\
+bool \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::start\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{void $\ast$const $\ast$const}]{reclaimers,  }\item[{const int}]{num\+Reclaimers,  }\item[{const bool}]{read\+Only = {\ttfamily false} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a76838aa9f38af9c481a21e42e6014abc}\label{classreclaimer__debracap_a76838aa9f38af9c481a21e42e6014abc}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!unprotect@{unprotect}}
+\index{unprotect@{unprotect}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{unprotect()}{unprotect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static void \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::unprotect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classreclaimer__debracap_ad3bcf7f4ebbdbcab522af7f5b0447cb5}\label{classreclaimer__debracap_ad3bcf7f4ebbdbcab522af7f5b0447cb5}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!epoch@{epoch}}
+\index{epoch@{epoch}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{epoch}{epoch}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+volatile long \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::epoch\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a558831a56d3365af4684bd49307a75cc}\label{classreclaimer__debracap_a558831a56d3365af4684bd49307a75cc}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!P\+AD@{P\+AD}}
+\index{P\+AD@{P\+AD}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{P\+AD}{PAD}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::P\+AD\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_a3850a9ce45071232e789ea24d8c0c9df}\label{classreclaimer__debracap_a3850a9ce45071232e789ea24d8c0c9df}} 
+\index{reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}!thread\+Data@{thread\+Data}}
+\index{thread\+Data@{thread\+Data}!reclaimer\+\_\+debracap@{reclaimer\+\_\+debracap}}
+\subsubsection{\texorpdfstring{thread\+Data}{threadData}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__debracap_1_1ThreadData}{Thread\+Data} \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::thread\+Data\mbox{[}\hyperlink{plaf_8h_ac1585a3455dd3e33e877e588be9e466b}{M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+D\+S\+\_\+\+P\+O\+W2}\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/recordmgr/\hyperlink{reclaimer__debracap_8h}{reclaimer\+\_\+debracap.\+h}\end{DoxyCompactItemize}

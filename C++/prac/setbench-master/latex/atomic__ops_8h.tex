@@ -1,0 +1,83 @@
+\hypertarget{atomic__ops_8h}{}\section{common/atomic\+\_\+ops/atomic\+\_\+ops.h File Reference}
+\label{atomic__ops_8h}\index{common/atomic\+\_\+ops/atomic\+\_\+ops.\+h@{common/atomic\+\_\+ops/atomic\+\_\+ops.\+h}}
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}atomic\+\_\+ops/generalize.\+h\char`\"{}}\newline
+Include dependency graph for atomic\+\_\+ops.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{atomic__ops_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{atomic__ops_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}~size\+\_\+t
+\item 
+\#define \hyperlink{atomic__ops_8h_af0f8642b332396baef4793e7ce825759}{A\+O\+\_\+\+T\+S\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ER}~(\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t})\hyperlink{test__and__set__t__is__char_8h_a35258ee13bc817d0b8eb62f4695c4a3e}{A\+O\+\_\+\+T\+S\+\_\+\+C\+L\+E\+AR}
+\item 
+\#define \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE}~static
+\item 
+\#define \hyperlink{atomic__ops_8h_a8e2f9a0a3aec4e9f6b260934826819ee}{A\+O\+\_\+compiler\+\_\+barrier}()~asm(\char`\"{}\char`\"{})
+\item 
+\#define \hyperlink{atomic__ops_8h_a4e2e59fc7419c7cf7acc602a1e31bec5}{A\+O\+\_\+\+T\+S\+\_\+T}~\hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t}
+\item 
+\#define \hyperlink{atomic__ops_8h_a0eeae1602a0dd91543138c7b92a1bb3b}{A\+O\+\_\+T}~\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}
+\item 
+\#define \hyperlink{atomic__ops_8h_af9641fdea742ed560eb463b359a1a662}{A\+O\+\_\+\+T\+S\+\_\+\+V\+AL}~\hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{atomic__ops_8h_a8e2f9a0a3aec4e9f6b260934826819ee}\label{atomic__ops_8h_a8e2f9a0a3aec4e9f6b260934826819ee}} 
+\index{atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}!A\+O\+\_\+compiler\+\_\+barrier@{A\+O\+\_\+compiler\+\_\+barrier}}
+\index{A\+O\+\_\+compiler\+\_\+barrier@{A\+O\+\_\+compiler\+\_\+barrier}!atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compiler\+\_\+barrier}{AO\_compiler\_barrier}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+compiler\+\_\+barrier(\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})~asm(\char`\"{}\char`\"{})}
+
+\mbox{\Hypertarget{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}\label{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}} 
+\index{atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}!A\+O\+\_\+\+I\+N\+L\+I\+NE@{A\+O\+\_\+\+I\+N\+L\+I\+NE}}
+\index{A\+O\+\_\+\+I\+N\+L\+I\+NE@{A\+O\+\_\+\+I\+N\+L\+I\+NE}!atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+I\+N\+L\+I\+NE}{AO\_INLINE}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+I\+N\+L\+I\+NE~static}
+
+\mbox{\Hypertarget{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}\label{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}} 
+\index{atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}!A\+O\+\_\+t@{A\+O\+\_\+t}}
+\index{A\+O\+\_\+t@{A\+O\+\_\+t}!atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+t}{AO\_t}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+t~size\+\_\+t}
+
+\mbox{\Hypertarget{atomic__ops_8h_a0eeae1602a0dd91543138c7b92a1bb3b}\label{atomic__ops_8h_a0eeae1602a0dd91543138c7b92a1bb3b}} 
+\index{atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}!A\+O\+\_\+T@{A\+O\+\_\+T}}
+\index{A\+O\+\_\+T@{A\+O\+\_\+T}!atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+T}{AO\_T}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+T~\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}
+
+\mbox{\Hypertarget{atomic__ops_8h_af0f8642b332396baef4793e7ce825759}\label{atomic__ops_8h_af0f8642b332396baef4793e7ce825759}} 
+\index{atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}!A\+O\+\_\+\+T\+S\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ER@{A\+O\+\_\+\+T\+S\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ER}}
+\index{A\+O\+\_\+\+T\+S\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ER@{A\+O\+\_\+\+T\+S\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ER}!atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+T\+S\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ER}{AO\_TS\_INITIALIZER}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+T\+S\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ER~(\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t})\hyperlink{test__and__set__t__is__char_8h_a35258ee13bc817d0b8eb62f4695c4a3e}{A\+O\+\_\+\+T\+S\+\_\+\+C\+L\+E\+AR}}
+
+\mbox{\Hypertarget{atomic__ops_8h_a4e2e59fc7419c7cf7acc602a1e31bec5}\label{atomic__ops_8h_a4e2e59fc7419c7cf7acc602a1e31bec5}} 
+\index{atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}!A\+O\+\_\+\+T\+S\+\_\+T@{A\+O\+\_\+\+T\+S\+\_\+T}}
+\index{A\+O\+\_\+\+T\+S\+\_\+T@{A\+O\+\_\+\+T\+S\+\_\+T}!atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+T\+S\+\_\+T}{AO\_TS\_T}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+T\+S\+\_\+T~\hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t}}
+
+\mbox{\Hypertarget{atomic__ops_8h_af9641fdea742ed560eb463b359a1a662}\label{atomic__ops_8h_af9641fdea742ed560eb463b359a1a662}} 
+\index{atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}!A\+O\+\_\+\+T\+S\+\_\+\+V\+AL@{A\+O\+\_\+\+T\+S\+\_\+\+V\+AL}}
+\index{A\+O\+\_\+\+T\+S\+\_\+\+V\+AL@{A\+O\+\_\+\+T\+S\+\_\+\+V\+AL}!atomic\+\_\+ops.\+h@{atomic\+\_\+ops.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+T\+S\+\_\+\+V\+AL}{AO\_TS\_VAL}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+T\+S\+\_\+\+V\+AL~\hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t}}
+

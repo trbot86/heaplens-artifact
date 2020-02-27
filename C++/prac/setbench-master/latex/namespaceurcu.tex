@@ -1,0 +1,118 @@
+\hypertarget{namespaceurcu}{}\section{urcu Namespace Reference}
+\label{namespaceurcu}\index{urcu@{urcu}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespaceurcu_ae71ce69710f4a5bcb4bfc31df8ee85b8}{init} (const int num\+Threads)
+\item 
+void \hyperlink{namespaceurcu_a4c5c060c1f3a160b1eeb3be3c3f98695}{deinit} (const int num\+Threads)
+\item 
+void \hyperlink{namespaceurcu_ac3f9e7761be4b1daf2603bc8c8a4c205}{read\+Lock} ()
+\item 
+void \hyperlink{namespaceurcu_a1d3b27b2ee4acc50da4a0577f18b6ab9}{read\+Unlock} ()
+\item 
+void \hyperlink{namespaceurcu_a92fb7548f9a8dbd5e1d8a4dbfb79cfdc}{synchronize} ()
+\item 
+void \hyperlink{namespaceurcu_a49bcb7fc416b2a8a251c8d33cf5a360e}{register\+Thread} (int id)
+\item 
+void \hyperlink{namespaceurcu_a05c52d5621cdd270fae5652f85bde20b}{unregister\+Thread} ()
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{namespaceurcu_a2b3af723db3f4d2181361fdf3b1ca01b}{threads}
+\item 
+volatile char \hyperlink{namespaceurcu_aad16bc4b7e272ecbaa3c34be47d807e9}{padding0} \mbox{[}256\mbox{]}
+\item 
+\hyperlink{urcu_8h_ac2bcfc00b81eeb475f88cc3573dab80c}{rcu\+\_\+node} $\ast$$\ast$ \hyperlink{namespaceurcu_ac8ddff08c7aa9fc363ae6b0017bf0cc0}{urcu\+\_\+table}
+\item 
+volatile char \hyperlink{namespaceurcu_acb27bb6447087498d8ee235c7d018c56}{padding1} \mbox{[}256\mbox{]}
+\item 
+\+\_\+\+\_\+thread long $\ast$ \hyperlink{namespaceurcu_a15a6e6706adc428b9a16ee6170f73835}{times}
+\item 
+\+\_\+\+\_\+thread int \hyperlink{namespaceurcu_a536341e353c82c078bc510ca0144dd58}{i}
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{namespaceurcu_a4c5c060c1f3a160b1eeb3be3c3f98695}\label{namespaceurcu_a4c5c060c1f3a160b1eeb3be3c3f98695}} 
+\index{urcu@{urcu}!deinit@{deinit}}
+\index{deinit@{deinit}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{deinit()}{deinit()}}
+{\footnotesize\ttfamily void urcu\+::deinit (\begin{DoxyParamCaption}\item[{const int}]{num\+Threads }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceurcu_ae71ce69710f4a5bcb4bfc31df8ee85b8}\label{namespaceurcu_ae71ce69710f4a5bcb4bfc31df8ee85b8}} 
+\index{urcu@{urcu}!init@{init}}
+\index{init@{init}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily void urcu\+::init (\begin{DoxyParamCaption}\item[{const int}]{num\+Threads }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceurcu_ac3f9e7761be4b1daf2603bc8c8a4c205}\label{namespaceurcu_ac3f9e7761be4b1daf2603bc8c8a4c205}} 
+\index{urcu@{urcu}!read\+Lock@{read\+Lock}}
+\index{read\+Lock@{read\+Lock}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{read\+Lock()}{readLock()}}
+{\footnotesize\ttfamily void urcu\+::read\+Lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceurcu_a1d3b27b2ee4acc50da4a0577f18b6ab9}\label{namespaceurcu_a1d3b27b2ee4acc50da4a0577f18b6ab9}} 
+\index{urcu@{urcu}!read\+Unlock@{read\+Unlock}}
+\index{read\+Unlock@{read\+Unlock}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{read\+Unlock()}{readUnlock()}}
+{\footnotesize\ttfamily void urcu\+::read\+Unlock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceurcu_a49bcb7fc416b2a8a251c8d33cf5a360e}\label{namespaceurcu_a49bcb7fc416b2a8a251c8d33cf5a360e}} 
+\index{urcu@{urcu}!register\+Thread@{register\+Thread}}
+\index{register\+Thread@{register\+Thread}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{register\+Thread()}{registerThread()}}
+{\footnotesize\ttfamily void urcu\+::register\+Thread (\begin{DoxyParamCaption}\item[{int}]{id }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceurcu_a92fb7548f9a8dbd5e1d8a4dbfb79cfdc}\label{namespaceurcu_a92fb7548f9a8dbd5e1d8a4dbfb79cfdc}} 
+\index{urcu@{urcu}!synchronize@{synchronize}}
+\index{synchronize@{synchronize}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{synchronize()}{synchronize()}}
+{\footnotesize\ttfamily void urcu\+::synchronize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceurcu_a05c52d5621cdd270fae5652f85bde20b}\label{namespaceurcu_a05c52d5621cdd270fae5652f85bde20b}} 
+\index{urcu@{urcu}!unregister\+Thread@{unregister\+Thread}}
+\index{unregister\+Thread@{unregister\+Thread}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{unregister\+Thread()}{unregisterThread()}}
+{\footnotesize\ttfamily void urcu\+::unregister\+Thread (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{namespaceurcu_a536341e353c82c078bc510ca0144dd58}\label{namespaceurcu_a536341e353c82c078bc510ca0144dd58}} 
+\index{urcu@{urcu}!i@{i}}
+\index{i@{i}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{i}{i}}
+{\footnotesize\ttfamily \+\_\+\+\_\+thread int urcu\+::i}
+
+\mbox{\Hypertarget{namespaceurcu_aad16bc4b7e272ecbaa3c34be47d807e9}\label{namespaceurcu_aad16bc4b7e272ecbaa3c34be47d807e9}} 
+\index{urcu@{urcu}!padding0@{padding0}}
+\index{padding0@{padding0}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{padding0}{padding0}}
+{\footnotesize\ttfamily volatile char urcu\+::padding0\mbox{[}256\mbox{]}}
+
+\mbox{\Hypertarget{namespaceurcu_acb27bb6447087498d8ee235c7d018c56}\label{namespaceurcu_acb27bb6447087498d8ee235c7d018c56}} 
+\index{urcu@{urcu}!padding1@{padding1}}
+\index{padding1@{padding1}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{padding1}{padding1}}
+{\footnotesize\ttfamily volatile char urcu\+::padding1\mbox{[}256\mbox{]}}
+
+\mbox{\Hypertarget{namespaceurcu_a2b3af723db3f4d2181361fdf3b1ca01b}\label{namespaceurcu_a2b3af723db3f4d2181361fdf3b1ca01b}} 
+\index{urcu@{urcu}!threads@{threads}}
+\index{threads@{threads}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{threads}{threads}}
+{\footnotesize\ttfamily int urcu\+::threads}
+
+\mbox{\Hypertarget{namespaceurcu_a15a6e6706adc428b9a16ee6170f73835}\label{namespaceurcu_a15a6e6706adc428b9a16ee6170f73835}} 
+\index{urcu@{urcu}!times@{times}}
+\index{times@{times}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{times}{times}}
+{\footnotesize\ttfamily \+\_\+\+\_\+thread long$\ast$ urcu\+::times}
+
+\mbox{\Hypertarget{namespaceurcu_ac8ddff08c7aa9fc363ae6b0017bf0cc0}\label{namespaceurcu_ac8ddff08c7aa9fc363ae6b0017bf0cc0}} 
+\index{urcu@{urcu}!urcu\+\_\+table@{urcu\+\_\+table}}
+\index{urcu\+\_\+table@{urcu\+\_\+table}!urcu@{urcu}}
+\subsubsection{\texorpdfstring{urcu\+\_\+table}{urcu\_table}}
+{\footnotesize\ttfamily \hyperlink{urcu_8h_ac2bcfc00b81eeb475f88cc3573dab80c}{rcu\+\_\+node}$\ast$$\ast$ urcu\+::urcu\+\_\+table}
+

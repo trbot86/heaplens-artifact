@@ -1,0 +1,143 @@
+\hypertarget{classABTreeKCAS}{}\section{A\+B\+Tree\+K\+C\+AS$<$ Record\+Manager, K, V, D\+E\+G\+R\+EE, Compare $>$ Class Template Reference}
+\label{classABTreeKCAS}\index{A\+B\+Tree\+K\+C\+A\+S$<$ Record\+Manager, K, V, D\+E\+G\+R\+E\+E, Compare $>$@{A\+B\+Tree\+K\+C\+A\+S$<$ Record\+Manager, K, V, D\+E\+G\+R\+E\+E, Compare $>$}}
+
+
+{\ttfamily \#include $<$abtree\+\_\+kcas.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classABTreeKCAS_a6aa4cca674313f303c0474e024bf2107}{A\+B\+Tree\+K\+C\+AS} (const int \+\_\+num\+Threads, const K any\+Key, const K \+\_\+max\+Key)
+\item 
+\hyperlink{classABTreeKCAS_adb05d6d43ab65e753362a01f3efaedd5}{$\sim$\+A\+B\+Tree\+K\+C\+AS} ()
+\item 
+bool \hyperlink{classABTreeKCAS_a620f11222c176da04b8ee4293805e4af}{contains} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&key)
+\item 
+V \hyperlink{classABTreeKCAS_a094f81e654a86f774925b0e9d268a778}{try\+Insert} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&key, const V \&value)
+\item 
+V \hyperlink{classABTreeKCAS_aec66944edfa684a080be76910cc5ca56}{try\+Erase} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&key)
+\item 
+V \hyperlink{classABTreeKCAS_aa1c24f0116a4a83ef37fd75a2b129d94}{find} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&key)
+\item 
+void \hyperlink{classABTreeKCAS_affa4e717faf0e06819819c6c20c548c9}{print\+Debugging\+Details} ()
+\item 
+\hyperlink{classNode}{Node}$<$ K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE} $>$ $\ast$ \hyperlink{classABTreeKCAS_afdec82be1b5a8694c04e242549e4dff3}{get\+Root} ()
+\item 
+void \hyperlink{classABTreeKCAS_a4cf7b4d16d93940cc660a636a86e2601}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classABTreeKCAS_a62ba1b3a6bfdf69807cfaa58b4de4f00}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+bool \hyperlink{classABTreeKCAS_a78a291f570e7f05dd4890722fd1861e1}{validate} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+volatile char \hyperlink{classABTreeKCAS_ab9a66f57523ef0e2fa3f0956b648b820}{padding0} \mbox{[}\hyperlink{skiplist_8h_a88585c3499d8f870798f19b81a3f41c9}{P\+A\+D\+D\+I\+N\+G\+\_\+\+B\+Y\+T\+ES}\mbox{]}
+\item 
+void $\ast$const \hyperlink{classABTreeKCAS_aa5896145408e8cc48a7dd620741a8f5d}{N\+O\+\_\+\+V\+A\+L\+UE}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classABTreeKCAS_a6aa4cca674313f303c0474e024bf2107}\label{classABTreeKCAS_a6aa4cca674313f303c0474e024bf2107}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{A\+B\+Tree\+K\+C\+A\+S()}{ABTreeKCAS()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+\hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::\hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS} (\begin{DoxyParamCaption}\item[{const int}]{\+\_\+num\+Threads,  }\item[{const K}]{any\+Key,  }\item[{const K}]{\+\_\+max\+Key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classABTreeKCAS_adb05d6d43ab65e753362a01f3efaedd5}\label{classABTreeKCAS_adb05d6d43ab65e753362a01f3efaedd5}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!````~A\+B\+Tree\+K\+C\+AS@{$\sim$\+A\+B\+Tree\+K\+C\+AS}}
+\index{````~A\+B\+Tree\+K\+C\+AS@{$\sim$\+A\+B\+Tree\+K\+C\+AS}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{$\sim$\+A\+B\+Tree\+K\+C\+A\+S()}{~ABTreeKCAS()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+\hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::$\sim$\hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classABTreeKCAS_a620f11222c176da04b8ee4293805e4af}\label{classABTreeKCAS_a620f11222c176da04b8ee4293805e4af}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!contains@{contains}}
+\index{contains@{contains}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{contains()}{contains()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+bool \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::contains (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{key }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classABTreeKCAS_a62ba1b3a6bfdf69807cfaa58b4de4f00}\label{classABTreeKCAS_a62ba1b3a6bfdf69807cfaa58b4de4f00}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+void \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classABTreeKCAS_aa1c24f0116a4a83ef37fd75a2b129d94}\label{classABTreeKCAS_aa1c24f0116a4a83ef37fd75a2b129d94}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!find@{find}}
+\index{find@{find}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{find()}{find()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+V \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::find (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classABTreeKCAS_afdec82be1b5a8694c04e242549e4dff3}\label{classABTreeKCAS_afdec82be1b5a8694c04e242549e4dff3}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!get\+Root@{get\+Root}}
+\index{get\+Root@{get\+Root}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{get\+Root()}{getRoot()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+\hyperlink{classNode}{Node}$<$ K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE} $>$ $\ast$ \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::get\+Root (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classABTreeKCAS_a4cf7b4d16d93940cc660a636a86e2601}\label{classABTreeKCAS_a4cf7b4d16d93940cc660a636a86e2601}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+void \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classABTreeKCAS_affa4e717faf0e06819819c6c20c548c9}\label{classABTreeKCAS_affa4e717faf0e06819819c6c20c548c9}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!print\+Debugging\+Details@{print\+Debugging\+Details}}
+\index{print\+Debugging\+Details@{print\+Debugging\+Details}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{print\+Debugging\+Details()}{printDebuggingDetails()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+void \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::print\+Debugging\+Details (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classABTreeKCAS_aec66944edfa684a080be76910cc5ca56}\label{classABTreeKCAS_aec66944edfa684a080be76910cc5ca56}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!try\+Erase@{try\+Erase}}
+\index{try\+Erase@{try\+Erase}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{try\+Erase()}{tryErase()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+V \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::try\+Erase (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classABTreeKCAS_a094f81e654a86f774925b0e9d268a778}\label{classABTreeKCAS_a094f81e654a86f774925b0e9d268a778}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!try\+Insert@{try\+Insert}}
+\index{try\+Insert@{try\+Insert}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{try\+Insert()}{tryInsert()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+V \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::try\+Insert (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{key,  }\item[{const V \&}]{value }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classABTreeKCAS_a78a291f570e7f05dd4890722fd1861e1}\label{classABTreeKCAS_a78a291f570e7f05dd4890722fd1861e1}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!validate@{validate}}
+\index{validate@{validate}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+bool \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::validate (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classABTreeKCAS_aa5896145408e8cc48a7dd620741a8f5d}\label{classABTreeKCAS_aa5896145408e8cc48a7dd620741a8f5d}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!N\+O\+\_\+\+V\+A\+L\+UE@{N\+O\+\_\+\+V\+A\+L\+UE}}
+\index{N\+O\+\_\+\+V\+A\+L\+UE@{N\+O\+\_\+\+V\+A\+L\+UE}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{N\+O\+\_\+\+V\+A\+L\+UE}{NO\_VALUE}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+void$\ast$ const \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::N\+O\+\_\+\+V\+A\+L\+UE}
+
+\mbox{\Hypertarget{classABTreeKCAS_ab9a66f57523ef0e2fa3f0956b648b820}\label{classABTreeKCAS_ab9a66f57523ef0e2fa3f0956b648b820}} 
+\index{A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}!padding0@{padding0}}
+\index{padding0@{padding0}!A\+B\+Tree\+K\+C\+AS@{A\+B\+Tree\+K\+C\+AS}}
+\subsubsection{\texorpdfstring{padding0}{padding0}}
+{\footnotesize\ttfamily template$<$class Record\+Manager , typename K , typename V , int D\+E\+G\+R\+EE, class Compare $>$ \\
+volatile char \hyperlink{classABTreeKCAS}{A\+B\+Tree\+K\+C\+AS}$<$ Record\+Manager, K, V, \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, Compare $>$\+::padding0\mbox{[}\hyperlink{skiplist_8h_a88585c3499d8f870798f19b81a3f41c9}{P\+A\+D\+D\+I\+N\+G\+\_\+\+B\+Y\+T\+ES}\mbox{]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/brown\+\_\+sigouin\+\_\+abtree\+\_\+kcas/\hyperlink{abtree__kcas_8h}{abtree\+\_\+kcas.\+h}\end{DoxyCompactItemize}

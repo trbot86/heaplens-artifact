@@ -1,0 +1,151 @@
+\hypertarget{classAtomicArrayList}{}\section{Atomic\+Array\+List$<$ T $>$ Class Template Reference}
+\label{classAtomicArrayList}\index{Atomic\+Array\+List$<$ T $>$@{Atomic\+Array\+List$<$ T $>$}}
+
+
+{\ttfamily \#include $<$arraylist.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classAtomicArrayList_a0eff0d932ebe8b70dbe405688b8419f4}{Atomic\+Array\+List} (const int \+\_\+capacity)
+\item 
+\hyperlink{classAtomicArrayList_a21884144e433db89fb1120cd8e40a2c6}{$\sim$\+Atomic\+Array\+List} ()
+\item 
+T $\ast$ \hyperlink{classAtomicArrayList_ad8d99fc200487d2fe318538037937090}{get} (const int ix)
+\item 
+int \hyperlink{classAtomicArrayList_ab180e7e26cfa160e1ea31c0c911da51e}{size} ()
+\item 
+void \hyperlink{classAtomicArrayList_aa8b53ecb83b2565ec0b62e5681c29eb8}{add} (T $\ast$const obj)
+\item 
+void \hyperlink{classAtomicArrayList_aaa93ef37c8605757e36dfbeaf46bcc20}{erase} (const int ix)
+\item 
+void \hyperlink{classAtomicArrayList_a742e41c76b857c5f6950f47a827524a2}{erase} (T $\ast$const obj)
+\item 
+int \hyperlink{classAtomicArrayList_a5ec8d715f9d33bb1a997cd8b2d71abb7}{get\+Index} (T $\ast$const obj)
+\item 
+bool \hyperlink{classAtomicArrayList_ae85b1f8c002815f4e7306b845cba23ea}{contains} (T $\ast$const obj)
+\item 
+void \hyperlink{classAtomicArrayList_a5369a041e550e8c1c180f2a2f2aa406a}{clear} ()
+\item 
+bool \hyperlink{classAtomicArrayList_a12841c46537a754e9fd5b4cbd32c3d68}{is\+Full} ()
+\item 
+bool \hyperlink{classAtomicArrayList_aa783ae1f37a2ce221e7309dc482770ad}{is\+Empty} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const int \hyperlink{classAtomicArrayList_a2efa86441dbc7ef4d36ed772fb352a71}{capacity}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$\newline
+class Atomic\+Array\+List$<$ T $>$}
+
+C++ record manager implementation (P\+O\+DC 2015) by Trevor Brown.
+
+Copyright (C) 2015 Trevor Brown 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classAtomicArrayList_a0eff0d932ebe8b70dbe405688b8419f4}\label{classAtomicArrayList_a0eff0d932ebe8b70dbe405688b8419f4}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{Atomic\+Array\+List()}{AtomicArrayList()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::\hyperlink{classAtomicArrayList}{Atomic\+Array\+List} (\begin{DoxyParamCaption}\item[{const int}]{\+\_\+capacity }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_a21884144e433db89fb1120cd8e40a2c6}\label{classAtomicArrayList_a21884144e433db89fb1120cd8e40a2c6}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!````~Atomic\+Array\+List@{$\sim$\+Atomic\+Array\+List}}
+\index{````~Atomic\+Array\+List@{$\sim$\+Atomic\+Array\+List}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{$\sim$\+Atomic\+Array\+List()}{~AtomicArrayList()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::$\sim$\hyperlink{classAtomicArrayList}{Atomic\+Array\+List} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classAtomicArrayList_aa8b53ecb83b2565ec0b62e5681c29eb8}\label{classAtomicArrayList_aa8b53ecb83b2565ec0b62e5681c29eb8}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!add@{add}}
+\index{add@{add}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::add (\begin{DoxyParamCaption}\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_a5369a041e550e8c1c180f2a2f2aa406a}\label{classAtomicArrayList_a5369a041e550e8c1c180f2a2f2aa406a}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!clear@{clear}}
+\index{clear@{clear}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_ae85b1f8c002815f4e7306b845cba23ea}\label{classAtomicArrayList_ae85b1f8c002815f4e7306b845cba23ea}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!contains@{contains}}
+\index{contains@{contains}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{contains()}{contains()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+bool \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::contains (\begin{DoxyParamCaption}\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_aaa93ef37c8605757e36dfbeaf46bcc20}\label{classAtomicArrayList_aaa93ef37c8605757e36dfbeaf46bcc20}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!erase@{erase}}
+\index{erase@{erase}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{erase()}{erase()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::erase (\begin{DoxyParamCaption}\item[{const int}]{ix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_a742e41c76b857c5f6950f47a827524a2}\label{classAtomicArrayList_a742e41c76b857c5f6950f47a827524a2}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!erase@{erase}}
+\index{erase@{erase}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{erase()}{erase()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::erase (\begin{DoxyParamCaption}\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_ad8d99fc200487d2fe318538037937090}\label{classAtomicArrayList_ad8d99fc200487d2fe318538037937090}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!get@{get}}
+\index{get@{get}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+T$\ast$ \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::get (\begin{DoxyParamCaption}\item[{const int}]{ix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_a5ec8d715f9d33bb1a997cd8b2d71abb7}\label{classAtomicArrayList_a5ec8d715f9d33bb1a997cd8b2d71abb7}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!get\+Index@{get\+Index}}
+\index{get\+Index@{get\+Index}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{get\+Index()}{getIndex()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+int \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::get\+Index (\begin{DoxyParamCaption}\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_aa783ae1f37a2ce221e7309dc482770ad}\label{classAtomicArrayList_aa783ae1f37a2ce221e7309dc482770ad}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!is\+Empty@{is\+Empty}}
+\index{is\+Empty@{is\+Empty}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{is\+Empty()}{isEmpty()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+bool \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::is\+Empty (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_a12841c46537a754e9fd5b4cbd32c3d68}\label{classAtomicArrayList_a12841c46537a754e9fd5b4cbd32c3d68}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!is\+Full@{is\+Full}}
+\index{is\+Full@{is\+Full}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{is\+Full()}{isFull()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+bool \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::is\+Full (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classAtomicArrayList_ab180e7e26cfa160e1ea31c0c911da51e}\label{classAtomicArrayList_ab180e7e26cfa160e1ea31c0c911da51e}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!size@{size}}
+\index{size@{size}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+int \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classAtomicArrayList_a2efa86441dbc7ef4d36ed772fb352a71}\label{classAtomicArrayList_a2efa86441dbc7ef4d36ed772fb352a71}} 
+\index{Atomic\+Array\+List@{Atomic\+Array\+List}!capacity@{capacity}}
+\index{capacity@{capacity}!Atomic\+Array\+List@{Atomic\+Array\+List}}
+\subsubsection{\texorpdfstring{capacity}{capacity}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+const int \hyperlink{classAtomicArrayList}{Atomic\+Array\+List}$<$ T $>$\+::capacity}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/recordmgr/\hyperlink{arraylist_8h}{arraylist.\+h}\end{DoxyCompactItemize}

@@ -1,0 +1,528 @@
+\hypertarget{kcas__reuse__htm__impl_8h}{}\section{common/kcas/kcas\+\_\+reuse\+\_\+htm\+\_\+impl.h File Reference}
+\label{kcas__reuse__htm__impl_8h}\index{common/kcas/kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{common/kcas/kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$cstring$>$}\newline
+{\ttfamily \#include $<$immintrin.\+h$>$}\newline
+{\ttfamily \#include $<$thread$>$}\newline
+Include dependency graph for kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{kcas__reuse__htm__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{kcas__reuse__htm__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classTIDGenerator}{T\+I\+D\+Generator}
+\item 
+struct \hyperlink{structrdcssdesc__t}{rdcssdesc\+\_\+t}
+\item 
+struct \hyperlink{structkcasentry__t}{kcasentry\+\_\+t}
+\item 
+class \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t$<$ M\+A\+X\+\_\+\+K $>$}
+\item 
+class \hyperlink{classKCASHTM}{K\+C\+A\+S\+H\+T\+M$<$ M\+A\+X\+\_\+\+K $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a6bd312b05b209f8fce93c657186bbeb0}{B\+O\+O\+L\+\_\+\+C\+AS}~\+\_\+\+\_\+sync\+\_\+bool\+\_\+compare\+\_\+and\+\_\+swap
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_aa7387507d9deee458fc9668893079a5f}{V\+A\+L\+\_\+\+C\+AS}~\+\_\+\+\_\+sync\+\_\+val\+\_\+compare\+\_\+and\+\_\+swap
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_af8c689d47cb009242ec174b4e6305d54}{W\+I\+D\+T\+H\+\_\+\+S\+EQ}~48
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}~14
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a95444ce25f4d0a2711f4407cb99e28c5}{M\+A\+S\+K\+\_\+\+S\+EQ}~((uintptr\+\_\+t)((1\+L\+L$<$$<$\+W\+I\+D\+T\+H\+\_\+\+S\+E\+Q)-\/1)$<$$<$\+O\+F\+F\+S\+E\+T\+\_\+\+S\+E\+Q) /$\ast$ cast to avoid signed bit shifting $\ast$/
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{U\+N\+P\+A\+C\+K\+\_\+\+S\+EQ}(tagptr\+Or\+Seqbits)~(((uintptr\+\_\+t)(tagptr\+Or\+Seqbits))$>$$>$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ})
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a42d8f729d19e4e4f9a11f5d2f0ebd6d8}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+U\+S\+ER}~0
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_afc658e344718431ddb4336743d1aa833}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID}~3
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a61a985e276e620c7d24997edec424cf8}{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+U\+S\+ER}~((1$<$$<$\hyperlink{kcas__reuse__impl_8h_afc658e344718431ddb4336743d1aa833}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID})-\/1) /$\ast$ assumes T\+ID is next \hyperlink{scxrecord_8h_a0657af583030a13da27c9e6d5ec40aa4}{field} after U\+S\+ER $\ast$/
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_ae040bd6ea3d1ce7145e3aab6395dbb48}{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID}~(((1$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ})-\/1)\&($\sim$(\hyperlink{kcas__reuse__impl_8h_a61a985e276e620c7d24997edec424cf8}{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+U\+S\+ER})))
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a7d7b4fa8ff329a61456256f432ec80e6}{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+T\+ID}(tagptr)~((int) ((((\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) (tagptr))\&\hyperlink{kcas__reuse__impl_8h_ae040bd6ea3d1ce7145e3aab6395dbb48}{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID})$>$$>$\hyperlink{kcas__reuse__impl_8h_afc658e344718431ddb4336743d1aa833}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID}))
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_aa612148b06ee2120b842bc58000ecc96}{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+P\+TR}(desc\+Array,  tagptr)~(\&(desc\+Array)\mbox{[}\hyperlink{kcas__reuse__impl_8h_a7d7b4fa8ff329a61456256f432ec80e6}{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+T\+ID}((tagptr))\mbox{]})
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a09292a23fc4557618071576f7a9c7292}{T\+A\+G\+P\+T\+R\+\_\+\+N\+EW}(\hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid},  seq\+Bits,  user\+Bits)~((\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) (((\hyperlink{kcas__reuse__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{U\+N\+P\+A\+C\+K\+\_\+\+S\+EQ}(seq\+Bits))$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}) $\vert$ ((\hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})$<$$<$\hyperlink{kcas__reuse__impl_8h_afc658e344718431ddb4336743d1aa833}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID}) $\vert$ (\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) (user\+Bits)$<$$<$\hyperlink{kcas__reuse__impl_8h_a42d8f729d19e4e4f9a11f5d2f0ebd6d8}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+U\+S\+ER}))
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_ab35d1739985ea729f8a7f51427354dbc}{L\+A\+S\+T\+\_\+\+T\+ID}~(\hyperlink{kcas__reuse__impl_8h_ae040bd6ea3d1ce7145e3aab6395dbb48}{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID}$>$$>$\hyperlink{kcas__reuse__impl_8h_afc658e344718431ddb4336743d1aa833}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID})
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_acab04f92bc9c2cce09ba5f6099ff02d5}{T\+A\+G\+P\+T\+R\+\_\+\+S\+T\+A\+T\+I\+C\+\_\+\+D\+E\+SC}(id)~((\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) \hyperlink{kcas__reuse__impl_8h_a09292a23fc4557618071576f7a9c7292}{T\+A\+G\+P\+T\+R\+\_\+\+N\+EW}(\hyperlink{kcas__reuse__impl_8h_ab35d1739985ea729f8a7f51427354dbc}{L\+A\+S\+T\+\_\+\+T\+ID}-\/1-\/id, 0))
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_ab818bdd1ba41d2a9df7f9d4f582dd160}{T\+A\+G\+P\+T\+R\+\_\+\+D\+U\+M\+M\+Y\+\_\+\+D\+E\+SC}(id)~((\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) \hyperlink{kcas__reuse__impl_8h_a09292a23fc4557618071576f7a9c7292}{T\+A\+G\+P\+T\+R\+\_\+\+N\+EW}(\hyperlink{kcas__reuse__impl_8h_ab35d1739985ea729f8a7f51427354dbc}{L\+A\+S\+T\+\_\+\+T\+ID}, id$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}))
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a0d1e6460951f8c965551f121ebd9730c}{comma}~,
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a326a5566d56db108787f1544e173d5dc}{S\+E\+Q\+B\+I\+T\+S\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+F\+I\+E\+LD}(seq\+Bits,  mask,  offset)~((((\hyperlink{kcas__reuse__htm__impl_8h_a997daf56279be481f5c4294647725689}{seqbits\+\_\+t}) (seq\+Bits))\&(mask))$>$$>$(offset))
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_aee7e6149a4fb3880b5c403147201e534}{S\+E\+Q\+B\+I\+T\+S\+\_\+\+C\+A\+S\+\_\+\+F\+I\+E\+LD}(success\+Bit,  fld\+Seq\+Bits,  snap\+Seq\+Bits,  oldval,  val,  mask,  offset)
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_ad070db09873af8bb4670248e5d31c3c0}{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+F\+I\+E\+LD}(fld\+Seq\+Bits,  snap\+Seq\+Bits,  val,  mask,  offset)
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a81fc0a9867792a74b225745978fa8450}{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+B\+IT}(fld\+Seq\+Bits,  snap\+Seq\+Bits,  mask)
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_ab7d0645d0a890428e979b7caea3bae6c}{D\+E\+S\+C\+\_\+\+S\+N\+A\+P\+S\+H\+OT}(desc\+Type,  desc\+Array,  desc\+Dest,  tagptr,  sz)
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_aa444c135013fbafd47054c299c7ed1d7}{D\+E\+S\+C\+\_\+\+R\+E\+A\+D\+\_\+\+F\+I\+E\+LD}(success\+Bit,  fld\+Seq\+Bits,  tagptr,  mask,  offset)
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a5f0b918f155e4eeb32a96b29c219e410}{D\+E\+S\+C\+\_\+\+N\+EW}(desc\+Array,  macro\+\_\+seq\+Bits\+New,  \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a33e3eb771fac10e71e7f6ffd521779d3}{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ED}(desc\+Array,  \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})~(desc\+Array)\mbox{[}(\hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})\mbox{]}.seq\+Bits += (1$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ});
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a8b69438c704b3b5d6fd28a1838bf6e14}{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+\_\+\+A\+LL}(desc\+Array,  macro\+\_\+seq\+Bits\+New)
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a22868433cf4300ce32f000ed8c8dd76c}{kcastagptr\+\_\+t}~uintptr\+\_\+t
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_aae2452099fa4312e7ea48c986dcadfd8}{rdcsstagptr\+\_\+t}~uintptr\+\_\+t
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a9a742371dcbdf5e852097073a03e9a09}{rdcssptr\+\_\+t}~\hyperlink{structrdcssdesc__t}{rdcssdesc\+\_\+t}$\ast$
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a5bbc81d391bfd6b4288a0d33f105a0b2}{kcasptr\+\_\+t}~\hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$\hyperlink{skiplist_8h_a17681fc241567944ff9f0c062af6b7bf}{M\+A\+X\+\_\+\+K\+C\+AS}$>$$\ast$
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a038015b999541209744d41de50c9885e}{R\+D\+C\+S\+S\+\_\+\+T\+A\+G\+B\+IT}~0x1
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a636a1f6fdaa98ac9b838143e9af5704f}{K\+C\+A\+S\+\_\+\+T\+A\+G\+B\+IT}~0x2
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a66ed72b1fde7249826ab8e825dd94b61}{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+U\+N\+D\+E\+C\+I\+D\+ED}~0
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a62583da7023324bdf6c8426ef7f07d95}{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+S\+U\+C\+C\+E\+E\+D\+ED}~4
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a9afe459b8a5e37c1821e790bde6463ba}{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+F\+A\+I\+L\+ED}~8
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_aed57ca4a1dc4eb34cd1996cce5f7b197}{K\+C\+A\+S\+\_\+\+L\+E\+F\+T\+S\+H\+I\+FT}~2
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a10f6493935ebad2cca6764a58ebd08b7}{H\+T\+M\+\_\+\+R\+E\+A\+D\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+OR}~20
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a92e1dd3c2e3380eef5cc814bac2772a3}{H\+T\+M\+\_\+\+B\+A\+D\+\_\+\+O\+L\+D\+\_\+\+V\+AL}~30
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_aecf13b8dc783db2202ca5c34fe117fc3}{M\+A\+X\+\_\+\+R\+E\+T\+R\+I\+ES}~5
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a6089afddf2f1b26c22642c0c18188b84}{K\+C\+A\+S\+\_\+\+M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+DS}~500
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_ae79e31f9663ebf39224c292618da8ac1}{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+S\+T\+A\+TE}~0
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_ac5171ddfdac7c4f4b85d6694a0fa4e06}{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+M\+A\+S\+K\+\_\+\+S\+T\+A\+TE}~0xf
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_a25bc6d8bc74b65814601e19ac109275d}{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW}(seq\+Bits)
+\item 
+\#define \hyperlink{kcas__reuse__htm__impl_8h_ab86889a3475716b9d270c0d7c493be59}{R\+D\+C\+S\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW}(seq\+Bits)~(((seq\+Bits)\&\hyperlink{kcas__reuse__impl_8h_a95444ce25f4d0a2711f4407cb99e28c5}{M\+A\+S\+K\+\_\+\+S\+EQ})+(1$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}))
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef intptr\+\_\+t \hyperlink{kcas__reuse__htm__impl_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}
+\item 
+typedef intptr\+\_\+t \hyperlink{kcas__reuse__htm__impl_8h_a997daf56279be481f5c4294647725689}{seqbits\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+void $\ast$volatile \hyperlink{kcas__reuse__htm__impl_8h_a450854542d4b89e92eee8baccf3990f2}{thread\+\_\+ids} \mbox{[}\hyperlink{kcas__reuse__impl_8h_a6089afddf2f1b26c22642c0c18188b84}{K\+C\+A\+S\+\_\+\+M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+DS}\mbox{]} = \{\}
+\item 
+thread\+\_\+local \hyperlink{classTIDGenerator}{T\+I\+D\+Generator} \hyperlink{kcas__reuse__htm__impl_8h_af6be76a55e3af6769042304400c38853}{kcas\+\_\+tid}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a6bd312b05b209f8fce93c657186bbeb0}\label{kcas__reuse__htm__impl_8h_a6bd312b05b209f8fce93c657186bbeb0}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!B\+O\+O\+L\+\_\+\+C\+AS@{B\+O\+O\+L\+\_\+\+C\+AS}}
+\index{B\+O\+O\+L\+\_\+\+C\+AS@{B\+O\+O\+L\+\_\+\+C\+AS}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{B\+O\+O\+L\+\_\+\+C\+AS}{BOOL\_CAS}}
+{\footnotesize\ttfamily \#define B\+O\+O\+L\+\_\+\+C\+AS~\+\_\+\+\_\+sync\+\_\+bool\+\_\+compare\+\_\+and\+\_\+swap}
+
+Note\+: this algorithm supports a limited number of threads (print L\+A\+S\+T\+\_\+\+T\+ID to see how many). It should be several thousand, at least. The alg can be tweaked to support more. \mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a0d1e6460951f8c965551f121ebd9730c}\label{kcas__reuse__htm__impl_8h_a0d1e6460951f8c965551f121ebd9730c}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!comma@{comma}}
+\index{comma@{comma}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{comma}{comma}}
+{\footnotesize\ttfamily \#define comma~,}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a8b69438c704b3b5d6fd28a1838bf6e14}\label{kcas__reuse__htm__impl_8h_a8b69438c704b3b5d6fd28a1838bf6e14}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+\_\+\+A\+LL@{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+\_\+\+A\+LL}}
+\index{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+\_\+\+A\+LL@{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+\_\+\+A\+LL}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+\_\+\+A\+LL}{DESC\_INIT\_ALL}}
+{\footnotesize\ttfamily \#define D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+\_\+\+A\+LL(\begin{DoxyParamCaption}\item[{}]{desc\+Array,  }\item[{}]{macro\+\_\+seq\+Bits\+New }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\{ \(\backslash\)
+    for (\textcolor{keywordtype}{int} \hyperlink{namespaceurcu_a536341e353c82c078bc510ca0144dd58}{i}=0;\hyperlink{namespaceurcu_a536341e353c82c078bc510ca0144dd58}{i}<(\hyperlink{kcas__reuse__htm__impl_8h_ab35d1739985ea729f8a7f51427354dbc}{LAST\_TID}-1);++\hyperlink{namespaceurcu_a536341e353c82c078bc510ca0144dd58}{i}) \{ \(\backslash\)
+        (descArray)[\hyperlink{namespaceurcu_a536341e353c82c078bc510ca0144dd58}{i}].seqBits = macro\_seqBitsNew(0); \(\backslash\)
+    \} \(\backslash\)
+\}
+\end{DoxyCode}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a33e3eb771fac10e71e7f6ffd521779d3}\label{kcas__reuse__htm__impl_8h_a33e3eb771fac10e71e7f6ffd521779d3}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ED@{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ED}}
+\index{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ED@{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ED}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ED}{DESC\_INITIALIZED}}
+{\footnotesize\ttfamily \#define D\+E\+S\+C\+\_\+\+I\+N\+I\+T\+I\+A\+L\+I\+Z\+ED(\begin{DoxyParamCaption}\item[{}]{desc\+Array,  }\item[{}]{\hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid} }\end{DoxyParamCaption})~(desc\+Array)\mbox{[}(\hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})\mbox{]}.seq\+Bits += (1$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ});}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a5f0b918f155e4eeb32a96b29c219e410}\label{kcas__reuse__htm__impl_8h_a5f0b918f155e4eeb32a96b29c219e410}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!D\+E\+S\+C\+\_\+\+N\+EW@{D\+E\+S\+C\+\_\+\+N\+EW}}
+\index{D\+E\+S\+C\+\_\+\+N\+EW@{D\+E\+S\+C\+\_\+\+N\+EW}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{D\+E\+S\+C\+\_\+\+N\+EW}{DESC\_NEW}}
+{\footnotesize\ttfamily \#define D\+E\+S\+C\+\_\+\+N\+EW(\begin{DoxyParamCaption}\item[{}]{desc\+Array,  }\item[{}]{macro\+\_\+seq\+Bits\+New,  }\item[{}]{\hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid} }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+&(descArray)[(\hyperlink{global_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})]; \{ \textcolor{comment}{/* note: only the process invoking this following macro can change the sequence# 
+      */} \(\backslash\)
+    seqbits\_t \_\_v = (descArray)[(\hyperlink{global_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})].seqBits; \(\backslash\)
+    (descArray)[(\hyperlink{global_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})].seqBits = macro\_seqBitsNew(\_\_v); \(\backslash\)
+    \textcolor{comment}{/*\_\_sync\_synchronize();*/} \(\backslash\)
+\}
+\end{DoxyCode}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_aa444c135013fbafd47054c299c7ed1d7}\label{kcas__reuse__htm__impl_8h_aa444c135013fbafd47054c299c7ed1d7}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!D\+E\+S\+C\+\_\+\+R\+E\+A\+D\+\_\+\+F\+I\+E\+LD@{D\+E\+S\+C\+\_\+\+R\+E\+A\+D\+\_\+\+F\+I\+E\+LD}}
+\index{D\+E\+S\+C\+\_\+\+R\+E\+A\+D\+\_\+\+F\+I\+E\+LD@{D\+E\+S\+C\+\_\+\+R\+E\+A\+D\+\_\+\+F\+I\+E\+LD}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{D\+E\+S\+C\+\_\+\+R\+E\+A\+D\+\_\+\+F\+I\+E\+LD}{DESC\_READ\_FIELD}}
+{\footnotesize\ttfamily \#define D\+E\+S\+C\+\_\+\+R\+E\+A\+D\+\_\+\+F\+I\+E\+LD(\begin{DoxyParamCaption}\item[{}]{success\+Bit,  }\item[{}]{fld\+Seq\+Bits,  }\item[{}]{tagptr,  }\item[{}]{mask,  }\item[{}]{offset }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(\{ \(\backslash\)
+    seqbits\_t \_\_seqBits = (fldSeqBits); \(\backslash\)
+    successBit = (\_\_seqBits & \hyperlink{kcas__reuse__htm__impl_8h_a95444ce25f4d0a2711f4407cb99e28c5}{MASK\_SEQ}) == ((tagptr) & \hyperlink{kcas__reuse__htm__impl_8h_a95444ce25f4d0a2711f4407cb99e28c5}{MASK\_SEQ}); \(\backslash\)
+    SEQBITS\_UNPACK\_FIELD(\_\_seqBits, (mask), (offset)); \(\backslash\)
+\})
+\end{DoxyCode}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_ab7d0645d0a890428e979b7caea3bae6c}\label{kcas__reuse__htm__impl_8h_ab7d0645d0a890428e979b7caea3bae6c}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!D\+E\+S\+C\+\_\+\+S\+N\+A\+P\+S\+H\+OT@{D\+E\+S\+C\+\_\+\+S\+N\+A\+P\+S\+H\+OT}}
+\index{D\+E\+S\+C\+\_\+\+S\+N\+A\+P\+S\+H\+OT@{D\+E\+S\+C\+\_\+\+S\+N\+A\+P\+S\+H\+OT}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{D\+E\+S\+C\+\_\+\+S\+N\+A\+P\+S\+H\+OT}{DESC\_SNAPSHOT}}
+{\footnotesize\ttfamily \#define D\+E\+S\+C\+\_\+\+S\+N\+A\+P\+S\+H\+OT(\begin{DoxyParamCaption}\item[{}]{desc\+Type,  }\item[{}]{desc\+Array,  }\item[{}]{desc\+Dest,  }\item[{}]{tagptr,  }\item[{}]{sz }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(\{ \(\backslash\)
+    descType *\_\_src = \hyperlink{kcas__reuse__htm__impl_8h_aa612148b06ee2120b842bc58000ecc96}{TAGPTR\_UNPACK\_PTR}((descArray), (tagptr)); \(\backslash\)
+    memcpy((descDest), \_\_src, (sz)); \(\backslash\)
+    \_\_asm\_\_ \_\_volatile\_\_ (\textcolor{stringliteral}{""}:::\textcolor{stringliteral}{"memory"}); \textcolor{comment}{/* prevent compiler from reordering read of \_\_src->seqBits before
+       (at least the reading portion of) the memcpy */} \(\backslash\)
+    (\hyperlink{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{UNPACK\_SEQ}(\_\_src->seqBits) == \hyperlink{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{UNPACK\_SEQ}((tagptr))); \(\backslash\)
+\})
+\end{DoxyCode}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a92e1dd3c2e3380eef5cc814bac2772a3}\label{kcas__reuse__htm__impl_8h_a92e1dd3c2e3380eef5cc814bac2772a3}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!H\+T\+M\+\_\+\+B\+A\+D\+\_\+\+O\+L\+D\+\_\+\+V\+AL@{H\+T\+M\+\_\+\+B\+A\+D\+\_\+\+O\+L\+D\+\_\+\+V\+AL}}
+\index{H\+T\+M\+\_\+\+B\+A\+D\+\_\+\+O\+L\+D\+\_\+\+V\+AL@{H\+T\+M\+\_\+\+B\+A\+D\+\_\+\+O\+L\+D\+\_\+\+V\+AL}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{H\+T\+M\+\_\+\+B\+A\+D\+\_\+\+O\+L\+D\+\_\+\+V\+AL}{HTM\_BAD\_OLD\_VAL}}
+{\footnotesize\ttfamily \#define H\+T\+M\+\_\+\+B\+A\+D\+\_\+\+O\+L\+D\+\_\+\+V\+AL~30}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a10f6493935ebad2cca6764a58ebd08b7}\label{kcas__reuse__htm__impl_8h_a10f6493935ebad2cca6764a58ebd08b7}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!H\+T\+M\+\_\+\+R\+E\+A\+D\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+OR@{H\+T\+M\+\_\+\+R\+E\+A\+D\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+OR}}
+\index{H\+T\+M\+\_\+\+R\+E\+A\+D\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+OR@{H\+T\+M\+\_\+\+R\+E\+A\+D\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+OR}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{H\+T\+M\+\_\+\+R\+E\+A\+D\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+OR}{HTM\_READ\_DESCRIPTOR}}
+{\footnotesize\ttfamily \#define H\+T\+M\+\_\+\+R\+E\+A\+D\+\_\+\+D\+E\+S\+C\+R\+I\+P\+T\+OR~20}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_aed57ca4a1dc4eb34cd1996cce5f7b197}\label{kcas__reuse__htm__impl_8h_aed57ca4a1dc4eb34cd1996cce5f7b197}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!K\+C\+A\+S\+\_\+\+L\+E\+F\+T\+S\+H\+I\+FT@{K\+C\+A\+S\+\_\+\+L\+E\+F\+T\+S\+H\+I\+FT}}
+\index{K\+C\+A\+S\+\_\+\+L\+E\+F\+T\+S\+H\+I\+FT@{K\+C\+A\+S\+\_\+\+L\+E\+F\+T\+S\+H\+I\+FT}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{K\+C\+A\+S\+\_\+\+L\+E\+F\+T\+S\+H\+I\+FT}{KCAS\_LEFTSHIFT}}
+{\footnotesize\ttfamily \#define K\+C\+A\+S\+\_\+\+L\+E\+F\+T\+S\+H\+I\+FT~2}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a6089afddf2f1b26c22642c0c18188b84}\label{kcas__reuse__htm__impl_8h_a6089afddf2f1b26c22642c0c18188b84}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!K\+C\+A\+S\+\_\+\+M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+DS@{K\+C\+A\+S\+\_\+\+M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+DS}}
+\index{K\+C\+A\+S\+\_\+\+M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+DS@{K\+C\+A\+S\+\_\+\+M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+DS}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{K\+C\+A\+S\+\_\+\+M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+DS}{KCAS\_MAX\_THREADS}}
+{\footnotesize\ttfamily \#define K\+C\+A\+S\+\_\+\+M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+DS~500}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_ac5171ddfdac7c4f4b85d6694a0fa4e06}\label{kcas__reuse__htm__impl_8h_ac5171ddfdac7c4f4b85d6694a0fa4e06}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+M\+A\+S\+K\+\_\+\+S\+T\+A\+TE@{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+M\+A\+S\+K\+\_\+\+S\+T\+A\+TE}}
+\index{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+M\+A\+S\+K\+\_\+\+S\+T\+A\+TE@{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+M\+A\+S\+K\+\_\+\+S\+T\+A\+TE}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+M\+A\+S\+K\+\_\+\+S\+T\+A\+TE}{KCAS\_SEQBITS\_MASK\_STATE}}
+{\footnotesize\ttfamily \#define K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+M\+A\+S\+K\+\_\+\+S\+T\+A\+TE~0xf}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a25bc6d8bc74b65814601e19ac109275d}\label{kcas__reuse__htm__impl_8h_a25bc6d8bc74b65814601e19ac109275d}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW@{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW}}
+\index{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW@{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW}{KCAS\_SEQBITS\_NEW}}
+{\footnotesize\ttfamily \#define K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW(\begin{DoxyParamCaption}\item[{}]{seq\+Bits }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+((((seqBits)&\hyperlink{kcas__reuse__htm__impl_8h_a95444ce25f4d0a2711f4407cb99e28c5}{MASK\_SEQ})+(1<<\hyperlink{kcas__reuse__htm__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{OFFSET\_SEQ})) \(\backslash\)
+        | (\hyperlink{kcas__reuse__htm__impl_8h_a66ed72b1fde7249826ab8e825dd94b61}{KCAS\_STATE\_UNDECIDED}<<\hyperlink{kcas__reuse__htm__impl_8h_ae79e31f9663ebf39224c292618da8ac1}{KCAS\_SEQBITS\_OFFSET\_STATE}))
+\end{DoxyCode}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_ae79e31f9663ebf39224c292618da8ac1}\label{kcas__reuse__htm__impl_8h_ae79e31f9663ebf39224c292618da8ac1}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+S\+T\+A\+TE@{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+S\+T\+A\+TE}}
+\index{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+S\+T\+A\+TE@{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+S\+T\+A\+TE}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+S\+T\+A\+TE}{KCAS\_SEQBITS\_OFFSET\_STATE}}
+{\footnotesize\ttfamily \#define K\+C\+A\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+S\+T\+A\+TE~0}
+
+Data definitions \mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a9afe459b8a5e37c1821e790bde6463ba}\label{kcas__reuse__htm__impl_8h_a9afe459b8a5e37c1821e790bde6463ba}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+F\+A\+I\+L\+ED@{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+F\+A\+I\+L\+ED}}
+\index{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+F\+A\+I\+L\+ED@{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+F\+A\+I\+L\+ED}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+F\+A\+I\+L\+ED}{KCAS\_STATE\_FAILED}}
+{\footnotesize\ttfamily \#define K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+F\+A\+I\+L\+ED~8}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a62583da7023324bdf6c8426ef7f07d95}\label{kcas__reuse__htm__impl_8h_a62583da7023324bdf6c8426ef7f07d95}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+S\+U\+C\+C\+E\+E\+D\+ED@{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+S\+U\+C\+C\+E\+E\+D\+ED}}
+\index{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+S\+U\+C\+C\+E\+E\+D\+ED@{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+S\+U\+C\+C\+E\+E\+D\+ED}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+S\+U\+C\+C\+E\+E\+D\+ED}{KCAS\_STATE\_SUCCEEDED}}
+{\footnotesize\ttfamily \#define K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+S\+U\+C\+C\+E\+E\+D\+ED~4}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a66ed72b1fde7249826ab8e825dd94b61}\label{kcas__reuse__htm__impl_8h_a66ed72b1fde7249826ab8e825dd94b61}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+U\+N\+D\+E\+C\+I\+D\+ED@{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+U\+N\+D\+E\+C\+I\+D\+ED}}
+\index{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+U\+N\+D\+E\+C\+I\+D\+ED@{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+U\+N\+D\+E\+C\+I\+D\+ED}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+U\+N\+D\+E\+C\+I\+D\+ED}{KCAS\_STATE\_UNDECIDED}}
+{\footnotesize\ttfamily \#define K\+C\+A\+S\+\_\+\+S\+T\+A\+T\+E\+\_\+\+U\+N\+D\+E\+C\+I\+D\+ED~0}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a636a1f6fdaa98ac9b838143e9af5704f}\label{kcas__reuse__htm__impl_8h_a636a1f6fdaa98ac9b838143e9af5704f}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!K\+C\+A\+S\+\_\+\+T\+A\+G\+B\+IT@{K\+C\+A\+S\+\_\+\+T\+A\+G\+B\+IT}}
+\index{K\+C\+A\+S\+\_\+\+T\+A\+G\+B\+IT@{K\+C\+A\+S\+\_\+\+T\+A\+G\+B\+IT}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{K\+C\+A\+S\+\_\+\+T\+A\+G\+B\+IT}{KCAS\_TAGBIT}}
+{\footnotesize\ttfamily \#define K\+C\+A\+S\+\_\+\+T\+A\+G\+B\+IT~0x2}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a5bbc81d391bfd6b4288a0d33f105a0b2}\label{kcas__reuse__htm__impl_8h_a5bbc81d391bfd6b4288a0d33f105a0b2}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!kcasptr\+\_\+t@{kcasptr\+\_\+t}}
+\index{kcasptr\+\_\+t@{kcasptr\+\_\+t}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{kcasptr\+\_\+t}{kcasptr\_t}}
+{\footnotesize\ttfamily \#define kcasptr\+\_\+t~\hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$\hyperlink{skiplist_8h_a17681fc241567944ff9f0c062af6b7bf}{M\+A\+X\+\_\+\+K\+C\+AS}$>$$\ast$}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a22868433cf4300ce32f000ed8c8dd76c}\label{kcas__reuse__htm__impl_8h_a22868433cf4300ce32f000ed8c8dd76c}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!kcastagptr\+\_\+t@{kcastagptr\+\_\+t}}
+\index{kcastagptr\+\_\+t@{kcastagptr\+\_\+t}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{kcastagptr\+\_\+t}{kcastagptr\_t}}
+{\footnotesize\ttfamily \#define kcastagptr\+\_\+t~uintptr\+\_\+t}
+
+K\+C\+AS implementation \mbox{\Hypertarget{kcas__reuse__htm__impl_8h_ab35d1739985ea729f8a7f51427354dbc}\label{kcas__reuse__htm__impl_8h_ab35d1739985ea729f8a7f51427354dbc}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!L\+A\+S\+T\+\_\+\+T\+ID@{L\+A\+S\+T\+\_\+\+T\+ID}}
+\index{L\+A\+S\+T\+\_\+\+T\+ID@{L\+A\+S\+T\+\_\+\+T\+ID}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{L\+A\+S\+T\+\_\+\+T\+ID}{LAST\_TID}}
+{\footnotesize\ttfamily \#define L\+A\+S\+T\+\_\+\+T\+ID~(\hyperlink{kcas__reuse__impl_8h_ae040bd6ea3d1ce7145e3aab6395dbb48}{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID}$>$$>$\hyperlink{kcas__reuse__impl_8h_afc658e344718431ddb4336743d1aa833}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID})}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a95444ce25f4d0a2711f4407cb99e28c5}\label{kcas__reuse__htm__impl_8h_a95444ce25f4d0a2711f4407cb99e28c5}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!M\+A\+S\+K\+\_\+\+S\+EQ@{M\+A\+S\+K\+\_\+\+S\+EQ}}
+\index{M\+A\+S\+K\+\_\+\+S\+EQ@{M\+A\+S\+K\+\_\+\+S\+EQ}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+S\+K\+\_\+\+S\+EQ}{MASK\_SEQ}}
+{\footnotesize\ttfamily \#define M\+A\+S\+K\+\_\+\+S\+EQ~((uintptr\+\_\+t)((1\+L\+L$<$$<$\+W\+I\+D\+T\+H\+\_\+\+S\+E\+Q)-\/1)$<$$<$\+O\+F\+F\+S\+E\+T\+\_\+\+S\+E\+Q) /$\ast$ cast to avoid signed bit shifting $\ast$/}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_aecf13b8dc783db2202ca5c34fe117fc3}\label{kcas__reuse__htm__impl_8h_aecf13b8dc783db2202ca5c34fe117fc3}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!M\+A\+X\+\_\+\+R\+E\+T\+R\+I\+ES@{M\+A\+X\+\_\+\+R\+E\+T\+R\+I\+ES}}
+\index{M\+A\+X\+\_\+\+R\+E\+T\+R\+I\+ES@{M\+A\+X\+\_\+\+R\+E\+T\+R\+I\+ES}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+R\+E\+T\+R\+I\+ES}{MAX\_RETRIES}}
+{\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+R\+E\+T\+R\+I\+ES~5}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}\label{kcas__reuse__htm__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ@{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}}
+\index{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ@{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}{OFFSET\_SEQ}}
+{\footnotesize\ttfamily \#define O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ~14}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_ab86889a3475716b9d270c0d7c493be59}\label{kcas__reuse__htm__impl_8h_ab86889a3475716b9d270c0d7c493be59}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!R\+D\+C\+S\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW@{R\+D\+C\+S\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW}}
+\index{R\+D\+C\+S\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW@{R\+D\+C\+S\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{R\+D\+C\+S\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW}{RDCSS\_SEQBITS\_NEW}}
+{\footnotesize\ttfamily \#define R\+D\+C\+S\+S\+\_\+\+S\+E\+Q\+B\+I\+T\+S\+\_\+\+N\+EW(\begin{DoxyParamCaption}\item[{}]{seq\+Bits }\end{DoxyParamCaption})~(((seq\+Bits)\&\hyperlink{kcas__reuse__impl_8h_a95444ce25f4d0a2711f4407cb99e28c5}{M\+A\+S\+K\+\_\+\+S\+EQ})+(1$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}))}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a038015b999541209744d41de50c9885e}\label{kcas__reuse__htm__impl_8h_a038015b999541209744d41de50c9885e}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!R\+D\+C\+S\+S\+\_\+\+T\+A\+G\+B\+IT@{R\+D\+C\+S\+S\+\_\+\+T\+A\+G\+B\+IT}}
+\index{R\+D\+C\+S\+S\+\_\+\+T\+A\+G\+B\+IT@{R\+D\+C\+S\+S\+\_\+\+T\+A\+G\+B\+IT}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{R\+D\+C\+S\+S\+\_\+\+T\+A\+G\+B\+IT}{RDCSS\_TAGBIT}}
+{\footnotesize\ttfamily \#define R\+D\+C\+S\+S\+\_\+\+T\+A\+G\+B\+IT~0x1}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a9a742371dcbdf5e852097073a03e9a09}\label{kcas__reuse__htm__impl_8h_a9a742371dcbdf5e852097073a03e9a09}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!rdcssptr\+\_\+t@{rdcssptr\+\_\+t}}
+\index{rdcssptr\+\_\+t@{rdcssptr\+\_\+t}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{rdcssptr\+\_\+t}{rdcssptr\_t}}
+{\footnotesize\ttfamily \#define rdcssptr\+\_\+t~\hyperlink{structrdcssdesc__t}{rdcssdesc\+\_\+t}$\ast$}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_aae2452099fa4312e7ea48c986dcadfd8}\label{kcas__reuse__htm__impl_8h_aae2452099fa4312e7ea48c986dcadfd8}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!rdcsstagptr\+\_\+t@{rdcsstagptr\+\_\+t}}
+\index{rdcsstagptr\+\_\+t@{rdcsstagptr\+\_\+t}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{rdcsstagptr\+\_\+t}{rdcsstagptr\_t}}
+{\footnotesize\ttfamily \#define rdcsstagptr\+\_\+t~uintptr\+\_\+t}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_aee7e6149a4fb3880b5c403147201e534}\label{kcas__reuse__htm__impl_8h_aee7e6149a4fb3880b5c403147201e534}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!S\+E\+Q\+B\+I\+T\+S\+\_\+\+C\+A\+S\+\_\+\+F\+I\+E\+LD@{S\+E\+Q\+B\+I\+T\+S\+\_\+\+C\+A\+S\+\_\+\+F\+I\+E\+LD}}
+\index{S\+E\+Q\+B\+I\+T\+S\+\_\+\+C\+A\+S\+\_\+\+F\+I\+E\+LD@{S\+E\+Q\+B\+I\+T\+S\+\_\+\+C\+A\+S\+\_\+\+F\+I\+E\+LD}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+Q\+B\+I\+T\+S\+\_\+\+C\+A\+S\+\_\+\+F\+I\+E\+LD}{SEQBITS\_CAS\_FIELD}}
+{\footnotesize\ttfamily \#define S\+E\+Q\+B\+I\+T\+S\+\_\+\+C\+A\+S\+\_\+\+F\+I\+E\+LD(\begin{DoxyParamCaption}\item[{}]{success\+Bit,  }\item[{}]{fld\+Seq\+Bits,  }\item[{}]{snap\+Seq\+Bits,  }\item[{}]{oldval,  }\item[{}]{val,  }\item[{}]{mask,  }\item[{}]{offset }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\{ \(\backslash\)
+    seqbits\_t \_\_v = (fldSeqBits); \(\backslash\)
+    while (1) \{ \(\backslash\)
+        if (\hyperlink{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{UNPACK\_SEQ}(\_\_v) != \hyperlink{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{UNPACK\_SEQ}((snapSeqBits))) \{ \(\backslash\)
+            (successBit) = \textcolor{keyword}{false}; \(\backslash\)
+            break; \(\backslash\)
+        \} \(\backslash\)
+        if ((successBit) = \_\_sync\_bool\_compare\_and\_swap(&(fldSeqBits), \(\backslash\)
+                (\_\_v & ~(mask)) | (oldval), \(\backslash\)
+                (\_\_v & ~(mask)) | ((val)<<(offset)))) \{ \(\backslash\)
+            break; \(\backslash\)
+        \} \(\backslash\)
+        \_\_v = (fldSeqBits); \(\backslash\)
+        if (\hyperlink{kcas__reuse__htm__impl_8h_a326a5566d56db108787f1544e173d5dc}{SEQBITS\_UNPACK\_FIELD}(\_\_v, (mask), (offset)) != (oldval)) \{ \(\backslash\)
+            (successBit) = \textcolor{keyword}{false}; \(\backslash\)
+            break; \(\backslash\)
+        \} \(\backslash\)
+    \} \(\backslash\)
+\}
+\end{DoxyCode}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a326a5566d56db108787f1544e173d5dc}\label{kcas__reuse__htm__impl_8h_a326a5566d56db108787f1544e173d5dc}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!S\+E\+Q\+B\+I\+T\+S\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+F\+I\+E\+LD@{S\+E\+Q\+B\+I\+T\+S\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+F\+I\+E\+LD}}
+\index{S\+E\+Q\+B\+I\+T\+S\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+F\+I\+E\+LD@{S\+E\+Q\+B\+I\+T\+S\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+F\+I\+E\+LD}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+Q\+B\+I\+T\+S\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+F\+I\+E\+LD}{SEQBITS\_UNPACK\_FIELD}}
+{\footnotesize\ttfamily \#define S\+E\+Q\+B\+I\+T\+S\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+F\+I\+E\+LD(\begin{DoxyParamCaption}\item[{}]{seq\+Bits,  }\item[{}]{mask,  }\item[{}]{offset }\end{DoxyParamCaption})~((((\hyperlink{kcas__reuse__htm__impl_8h_a997daf56279be481f5c4294647725689}{seqbits\+\_\+t}) (seq\+Bits))\&(mask))$>$$>$(offset))}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a81fc0a9867792a74b225745978fa8450}\label{kcas__reuse__htm__impl_8h_a81fc0a9867792a74b225745978fa8450}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+B\+IT@{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+B\+IT}}
+\index{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+B\+IT@{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+B\+IT}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+B\+IT}{SEQBITS\_WRITE\_BIT}}
+{\footnotesize\ttfamily \#define S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+B\+IT(\begin{DoxyParamCaption}\item[{}]{fld\+Seq\+Bits,  }\item[{}]{snap\+Seq\+Bits,  }\item[{}]{mask }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\{ \(\backslash\)
+    seqbits\_t \_\_v = (fldSeqBits); \(\backslash\)
+    while (\hyperlink{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{UNPACK\_SEQ}(\_\_v) == \hyperlink{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{UNPACK\_SEQ}((snapSeqBits)) \(\backslash\)
+            && !(\_\_v&(mask)) \(\backslash\)
+            && !\_\_sync\_bool\_compare\_and\_swap(&(fldSeqBits), \_\_v, (\_\_v|(mask)))) \{ \(\backslash\)
+        \_\_v = (fldSeqBits); \(\backslash\)
+    \} \(\backslash\)
+\}
+\end{DoxyCode}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_ad070db09873af8bb4670248e5d31c3c0}\label{kcas__reuse__htm__impl_8h_ad070db09873af8bb4670248e5d31c3c0}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+F\+I\+E\+LD@{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+F\+I\+E\+LD}}
+\index{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+F\+I\+E\+LD@{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+F\+I\+E\+LD}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+F\+I\+E\+LD}{SEQBITS\_WRITE\_FIELD}}
+{\footnotesize\ttfamily \#define S\+E\+Q\+B\+I\+T\+S\+\_\+\+W\+R\+I\+T\+E\+\_\+\+F\+I\+E\+LD(\begin{DoxyParamCaption}\item[{}]{fld\+Seq\+Bits,  }\item[{}]{snap\+Seq\+Bits,  }\item[{}]{val,  }\item[{}]{mask,  }\item[{}]{offset }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\{ \(\backslash\)
+    seqbits\_t \_\_v = (fldSeqBits); \(\backslash\)
+    while (\hyperlink{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{UNPACK\_SEQ}(\_\_v) == \hyperlink{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{UNPACK\_SEQ}((snapSeqBits)) \(\backslash\)
+            && \hyperlink{kcas__reuse__htm__impl_8h_a326a5566d56db108787f1544e173d5dc}{SEQBITS\_UNPACK\_FIELD}(\_\_v, (mask), (offset)) != (val) \(\backslash\)
+            && !\_\_sync\_bool\_compare\_and\_swap(&(fldSeqBits), \_\_v, \(\backslash\)
+                    (\_\_v & ~(mask)) | ((val)<<(offset)))) \{ \(\backslash\)
+        \_\_v = (fldSeqBits); \(\backslash\)
+    \} \(\backslash\)
+\}
+\end{DoxyCode}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_ab818bdd1ba41d2a9df7f9d4f582dd160}\label{kcas__reuse__htm__impl_8h_ab818bdd1ba41d2a9df7f9d4f582dd160}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!T\+A\+G\+P\+T\+R\+\_\+\+D\+U\+M\+M\+Y\+\_\+\+D\+E\+SC@{T\+A\+G\+P\+T\+R\+\_\+\+D\+U\+M\+M\+Y\+\_\+\+D\+E\+SC}}
+\index{T\+A\+G\+P\+T\+R\+\_\+\+D\+U\+M\+M\+Y\+\_\+\+D\+E\+SC@{T\+A\+G\+P\+T\+R\+\_\+\+D\+U\+M\+M\+Y\+\_\+\+D\+E\+SC}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{T\+A\+G\+P\+T\+R\+\_\+\+D\+U\+M\+M\+Y\+\_\+\+D\+E\+SC}{TAGPTR\_DUMMY\_DESC}}
+{\footnotesize\ttfamily \#define T\+A\+G\+P\+T\+R\+\_\+\+D\+U\+M\+M\+Y\+\_\+\+D\+E\+SC(\begin{DoxyParamCaption}\item[{}]{id }\end{DoxyParamCaption})~((\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) \hyperlink{kcas__reuse__impl_8h_a09292a23fc4557618071576f7a9c7292}{T\+A\+G\+P\+T\+R\+\_\+\+N\+EW}(\hyperlink{kcas__reuse__impl_8h_ab35d1739985ea729f8a7f51427354dbc}{L\+A\+S\+T\+\_\+\+T\+ID}, id$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}))}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_ae040bd6ea3d1ce7145e3aab6395dbb48}\label{kcas__reuse__htm__impl_8h_ae040bd6ea3d1ce7145e3aab6395dbb48}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID@{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID}}
+\index{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID@{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID}{TAGPTR\_MASK\_TID}}
+{\footnotesize\ttfamily \#define T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID~(((1$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ})-\/1)\&($\sim$(\hyperlink{kcas__reuse__impl_8h_a61a985e276e620c7d24997edec424cf8}{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+U\+S\+ER})))}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a61a985e276e620c7d24997edec424cf8}\label{kcas__reuse__htm__impl_8h_a61a985e276e620c7d24997edec424cf8}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+U\+S\+ER@{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+U\+S\+ER}}
+\index{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+U\+S\+ER@{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+U\+S\+ER}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+U\+S\+ER}{TAGPTR\_MASK\_USER}}
+{\footnotesize\ttfamily \#define T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+U\+S\+ER~((1$<$$<$\hyperlink{kcas__reuse__impl_8h_afc658e344718431ddb4336743d1aa833}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID})-\/1) /$\ast$ assumes T\+ID is next \hyperlink{scxrecord_8h_a0657af583030a13da27c9e6d5ec40aa4}{field} after U\+S\+ER $\ast$/}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a09292a23fc4557618071576f7a9c7292}\label{kcas__reuse__htm__impl_8h_a09292a23fc4557618071576f7a9c7292}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!T\+A\+G\+P\+T\+R\+\_\+\+N\+EW@{T\+A\+G\+P\+T\+R\+\_\+\+N\+EW}}
+\index{T\+A\+G\+P\+T\+R\+\_\+\+N\+EW@{T\+A\+G\+P\+T\+R\+\_\+\+N\+EW}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{T\+A\+G\+P\+T\+R\+\_\+\+N\+EW}{TAGPTR\_NEW}}
+{\footnotesize\ttfamily \#define T\+A\+G\+P\+T\+R\+\_\+\+N\+EW(\begin{DoxyParamCaption}\item[{}]{\hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid},  }\item[{}]{seq\+Bits,  }\item[{}]{user\+Bits }\end{DoxyParamCaption})~((\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) (((\hyperlink{kcas__reuse__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}{U\+N\+P\+A\+C\+K\+\_\+\+S\+EQ}(seq\+Bits))$<$$<$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ}) $\vert$ ((\hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})$<$$<$\hyperlink{kcas__reuse__impl_8h_afc658e344718431ddb4336743d1aa833}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID}) $\vert$ (\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) (user\+Bits)$<$$<$\hyperlink{kcas__reuse__impl_8h_a42d8f729d19e4e4f9a11f5d2f0ebd6d8}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+U\+S\+ER}))}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_afc658e344718431ddb4336743d1aa833}\label{kcas__reuse__htm__impl_8h_afc658e344718431ddb4336743d1aa833}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID@{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID}}
+\index{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID@{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID}{TAGPTR\_OFFSET\_TID}}
+{\footnotesize\ttfamily \#define T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID~3}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a42d8f729d19e4e4f9a11f5d2f0ebd6d8}\label{kcas__reuse__htm__impl_8h_a42d8f729d19e4e4f9a11f5d2f0ebd6d8}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+U\+S\+ER@{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+U\+S\+ER}}
+\index{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+U\+S\+ER@{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+U\+S\+ER}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+U\+S\+ER}{TAGPTR\_OFFSET\_USER}}
+{\footnotesize\ttfamily \#define T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+U\+S\+ER~0}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_acab04f92bc9c2cce09ba5f6099ff02d5}\label{kcas__reuse__htm__impl_8h_acab04f92bc9c2cce09ba5f6099ff02d5}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!T\+A\+G\+P\+T\+R\+\_\+\+S\+T\+A\+T\+I\+C\+\_\+\+D\+E\+SC@{T\+A\+G\+P\+T\+R\+\_\+\+S\+T\+A\+T\+I\+C\+\_\+\+D\+E\+SC}}
+\index{T\+A\+G\+P\+T\+R\+\_\+\+S\+T\+A\+T\+I\+C\+\_\+\+D\+E\+SC@{T\+A\+G\+P\+T\+R\+\_\+\+S\+T\+A\+T\+I\+C\+\_\+\+D\+E\+SC}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{T\+A\+G\+P\+T\+R\+\_\+\+S\+T\+A\+T\+I\+C\+\_\+\+D\+E\+SC}{TAGPTR\_STATIC\_DESC}}
+{\footnotesize\ttfamily \#define T\+A\+G\+P\+T\+R\+\_\+\+S\+T\+A\+T\+I\+C\+\_\+\+D\+E\+SC(\begin{DoxyParamCaption}\item[{}]{id }\end{DoxyParamCaption})~((\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) \hyperlink{kcas__reuse__impl_8h_a09292a23fc4557618071576f7a9c7292}{T\+A\+G\+P\+T\+R\+\_\+\+N\+EW}(\hyperlink{kcas__reuse__impl_8h_ab35d1739985ea729f8a7f51427354dbc}{L\+A\+S\+T\+\_\+\+T\+ID}-\/1-\/id, 0))}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_aa612148b06ee2120b842bc58000ecc96}\label{kcas__reuse__htm__impl_8h_aa612148b06ee2120b842bc58000ecc96}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+P\+TR@{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+P\+TR}}
+\index{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+P\+TR@{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+P\+TR}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+P\+TR}{TAGPTR\_UNPACK\_PTR}}
+{\footnotesize\ttfamily \#define T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+P\+TR(\begin{DoxyParamCaption}\item[{}]{desc\+Array,  }\item[{}]{tagptr }\end{DoxyParamCaption})~(\&(desc\+Array)\mbox{[}\hyperlink{kcas__reuse__impl_8h_a7d7b4fa8ff329a61456256f432ec80e6}{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+T\+ID}((tagptr))\mbox{]})}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a7d7b4fa8ff329a61456256f432ec80e6}\label{kcas__reuse__htm__impl_8h_a7d7b4fa8ff329a61456256f432ec80e6}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+T\+ID@{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+T\+ID}}
+\index{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+T\+ID@{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+T\+ID}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+T\+ID}{TAGPTR\_UNPACK\_TID}}
+{\footnotesize\ttfamily \#define T\+A\+G\+P\+T\+R\+\_\+\+U\+N\+P\+A\+C\+K\+\_\+\+T\+ID(\begin{DoxyParamCaption}\item[{}]{tagptr }\end{DoxyParamCaption})~((int) ((((\hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}) (tagptr))\&\hyperlink{kcas__reuse__impl_8h_ae040bd6ea3d1ce7145e3aab6395dbb48}{T\+A\+G\+P\+T\+R\+\_\+\+M\+A\+S\+K\+\_\+\+T\+ID})$>$$>$\hyperlink{kcas__reuse__impl_8h_afc658e344718431ddb4336743d1aa833}{T\+A\+G\+P\+T\+R\+\_\+\+O\+F\+F\+S\+E\+T\+\_\+\+T\+ID}))}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}\label{kcas__reuse__htm__impl_8h_a516c0a6bd46e52280bb058dc9e28de5a}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!U\+N\+P\+A\+C\+K\+\_\+\+S\+EQ@{U\+N\+P\+A\+C\+K\+\_\+\+S\+EQ}}
+\index{U\+N\+P\+A\+C\+K\+\_\+\+S\+EQ@{U\+N\+P\+A\+C\+K\+\_\+\+S\+EQ}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{U\+N\+P\+A\+C\+K\+\_\+\+S\+EQ}{UNPACK\_SEQ}}
+{\footnotesize\ttfamily \#define U\+N\+P\+A\+C\+K\+\_\+\+S\+EQ(\begin{DoxyParamCaption}\item[{}]{tagptr\+Or\+Seqbits }\end{DoxyParamCaption})~(((uintptr\+\_\+t)(tagptr\+Or\+Seqbits))$>$$>$\hyperlink{kcas__reuse__impl_8h_a130b75bf0ec168f61b83eb0662d75c3d}{O\+F\+F\+S\+E\+T\+\_\+\+S\+EQ})}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_aa7387507d9deee458fc9668893079a5f}\label{kcas__reuse__htm__impl_8h_aa7387507d9deee458fc9668893079a5f}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!V\+A\+L\+\_\+\+C\+AS@{V\+A\+L\+\_\+\+C\+AS}}
+\index{V\+A\+L\+\_\+\+C\+AS@{V\+A\+L\+\_\+\+C\+AS}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{V\+A\+L\+\_\+\+C\+AS}{VAL\_CAS}}
+{\footnotesize\ttfamily \#define V\+A\+L\+\_\+\+C\+AS~\+\_\+\+\_\+sync\+\_\+val\+\_\+compare\+\_\+and\+\_\+swap}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_af8c689d47cb009242ec174b4e6305d54}\label{kcas__reuse__htm__impl_8h_af8c689d47cb009242ec174b4e6305d54}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!W\+I\+D\+T\+H\+\_\+\+S\+EQ@{W\+I\+D\+T\+H\+\_\+\+S\+EQ}}
+\index{W\+I\+D\+T\+H\+\_\+\+S\+EQ@{W\+I\+D\+T\+H\+\_\+\+S\+EQ}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{W\+I\+D\+T\+H\+\_\+\+S\+EQ}{WIDTH\_SEQ}}
+{\footnotesize\ttfamily \#define W\+I\+D\+T\+H\+\_\+\+S\+EQ~48}
+
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a997daf56279be481f5c4294647725689}\label{kcas__reuse__htm__impl_8h_a997daf56279be481f5c4294647725689}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!seqbits\+\_\+t@{seqbits\+\_\+t}}
+\index{seqbits\+\_\+t@{seqbits\+\_\+t}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{seqbits\+\_\+t}{seqbits\_t}}
+{\footnotesize\ttfamily typedef intptr\+\_\+t \hyperlink{kcas__reuse__htm__impl_8h_a997daf56279be481f5c4294647725689}{seqbits\+\_\+t}}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_afd8a7b57046ed96897cda907f17737a7}\label{kcas__reuse__htm__impl_8h_afd8a7b57046ed96897cda907f17737a7}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!tagptr\+\_\+t@{tagptr\+\_\+t}}
+\index{tagptr\+\_\+t@{tagptr\+\_\+t}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{tagptr\+\_\+t}{tagptr\_t}}
+{\footnotesize\ttfamily typedef intptr\+\_\+t \hyperlink{descriptors_8h_afd8a7b57046ed96897cda907f17737a7}{tagptr\+\_\+t}}
+
+Descriptor reuse macros seqbits\+\_\+t corresponds to the seq\+Bits field of the descriptor. it contains the mutable fields of the descriptor and a sequence number. the width, offset and mask for the sequence number is defined below. this sequence number width, offset and mask are also shared by tagptr\+\_\+t.
+
+in particular, for any tagptr\+\_\+t x and seqbits\+\_\+t y, the sequence numbers in x and y are equal iff x\&M\+A\+S\+K\+\_\+\+S\+EQ == y\&M\+A\+S\+K\+\_\+\+S\+EQ (despite differing types).
+
+tagptr\+\_\+t consists of a triple $<$seq, tid, testbit$>$. these three fields are defined by the T\+A\+G\+P\+T\+R\+\_\+ macros below. 
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_af6be76a55e3af6769042304400c38853}\label{kcas__reuse__htm__impl_8h_af6be76a55e3af6769042304400c38853}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!kcas\+\_\+tid@{kcas\+\_\+tid}}
+\index{kcas\+\_\+tid@{kcas\+\_\+tid}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{kcas\+\_\+tid}{kcas\_tid}}
+{\footnotesize\ttfamily thread\+\_\+local \hyperlink{classTIDGenerator}{T\+I\+D\+Generator} kcas\+\_\+tid}
+
+\mbox{\Hypertarget{kcas__reuse__htm__impl_8h_a450854542d4b89e92eee8baccf3990f2}\label{kcas__reuse__htm__impl_8h_a450854542d4b89e92eee8baccf3990f2}} 
+\index{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}!thread\+\_\+ids@{thread\+\_\+ids}}
+\index{thread\+\_\+ids@{thread\+\_\+ids}!kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h@{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{thread\+\_\+ids}{thread\_ids}}
+{\footnotesize\ttfamily void$\ast$ volatile thread\+\_\+ids\mbox{[}\hyperlink{kcas__reuse__impl_8h_a6089afddf2f1b26c22642c0c18188b84}{K\+C\+A\+S\+\_\+\+M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+DS}\mbox{]} = \{\}}
+

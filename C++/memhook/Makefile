@@ -8,6 +8,9 @@ all:
 link:
 	$(CC) memhook.cpp memalloc.cpp -pthread -Wall -g -o b.out
 
+prac:
+	$(CC) a.cpp -I./ -L./ -Wl,-rpath=./ -pthread -lmemhook -g -o a.out
+
 install:
 	cp libmemhook.so ../lib/
 	cp memhook.h ../include

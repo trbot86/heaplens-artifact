@@ -1,0 +1,101 @@
+\hypertarget{classdrachsler}{}\section{drachsler$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$ Class Template Reference}
+\label{classdrachsler}\index{drachsler$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$@{drachsler$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$}}
+
+
+{\ttfamily \#include $<$drachsler\+\_\+impl.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classdrachsler_ae88b80491328980a365741f26c2c1d82}{drachsler} (const int \+\_\+\+N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS, const skey\+\_\+t \&\+\_\+\+K\+E\+Y\+\_\+\+M\+IN, const skey\+\_\+t \&\+\_\+\+K\+E\+Y\+\_\+\+M\+AX, const sval\+\_\+t \&\+\_\+\+V\+A\+L\+U\+E\+\_\+\+R\+E\+S\+E\+R\+V\+ED, unsigned int id)
+\item 
+\hyperlink{classdrachsler_aa0986d5204a354bdb28827955c9897e9}{$\sim$drachsler} ()
+\item 
+void \hyperlink{classdrachsler_a5b779dc3d1eb620b4e91189b3409ce1b}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classdrachsler_a9f2a70d4fa52ccc1057f00ef1e68ee29}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+sval\+\_\+t \hyperlink{classdrachsler_abc170bf0d3bf7dc4013ec9206d11eaec}{bst\+\_\+contains} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t k)
+\item 
+sval\+\_\+t \hyperlink{classdrachsler_aa3ac36b65117e6a719eafa17a7aa487f}{bst\+\_\+insert} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t k, sval\+\_\+t \hyperlink{reclaimer__ebr__tree__q_8h_acd3c1c4d280aac729e9fdb520dc99f20}{v}, bool only\+If\+Absent=true)
+\item 
+sval\+\_\+t \hyperlink{classdrachsler_adc53a3bc2cdb6511253e3bd2a0b77c52}{bst\+\_\+remove} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key)
+\item 
+\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$ \hyperlink{classdrachsler_a4b411071d0df1797510d590a034a66d0}{get\+\_\+root} ()
+\item 
+Rec\+Mgr $\ast$ \hyperlink{classdrachsler_a11f6ed9e888d2d5328fd97e9c0901d70}{debug\+Get\+Rec\+Mgr} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classdrachsler_ae88b80491328980a365741f26c2c1d82}\label{classdrachsler_ae88b80491328980a365741f26c2c1d82}} 
+\index{drachsler@{drachsler}!drachsler@{drachsler}}
+\index{drachsler@{drachsler}!drachsler@{drachsler}}
+\subsubsection{\texorpdfstring{drachsler()}{drachsler()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classdrachsler}{drachsler}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::\hyperlink{classdrachsler}{drachsler} (\begin{DoxyParamCaption}\item[{const int}]{\+\_\+\+N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS,  }\item[{const skey\+\_\+t \&}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+IN,  }\item[{const skey\+\_\+t \&}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+AX,  }\item[{const sval\+\_\+t \&}]{\+\_\+\+V\+A\+L\+U\+E\+\_\+\+R\+E\+S\+E\+R\+V\+ED,  }\item[{unsigned int}]{id }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classdrachsler_aa0986d5204a354bdb28827955c9897e9}\label{classdrachsler_aa0986d5204a354bdb28827955c9897e9}} 
+\index{drachsler@{drachsler}!````~drachsler@{$\sim$drachsler}}
+\index{````~drachsler@{$\sim$drachsler}!drachsler@{drachsler}}
+\subsubsection{\texorpdfstring{$\sim$drachsler()}{~drachsler()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classdrachsler}{drachsler}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::$\sim$\hyperlink{classdrachsler}{drachsler} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classdrachsler_abc170bf0d3bf7dc4013ec9206d11eaec}\label{classdrachsler_abc170bf0d3bf7dc4013ec9206d11eaec}} 
+\index{drachsler@{drachsler}!bst\+\_\+contains@{bst\+\_\+contains}}
+\index{bst\+\_\+contains@{bst\+\_\+contains}!drachsler@{drachsler}}
+\subsubsection{\texorpdfstring{bst\+\_\+contains()}{bst\_contains()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classdrachsler}{drachsler}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::bst\+\_\+contains (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{k }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classdrachsler_aa3ac36b65117e6a719eafa17a7aa487f}\label{classdrachsler_aa3ac36b65117e6a719eafa17a7aa487f}} 
+\index{drachsler@{drachsler}!bst\+\_\+insert@{bst\+\_\+insert}}
+\index{bst\+\_\+insert@{bst\+\_\+insert}!drachsler@{drachsler}}
+\subsubsection{\texorpdfstring{bst\+\_\+insert()}{bst\_insert()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classdrachsler}{drachsler}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::bst\+\_\+insert (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{k,  }\item[{sval\+\_\+t}]{v,  }\item[{bool}]{only\+If\+Absent = {\ttfamily true} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classdrachsler_adc53a3bc2cdb6511253e3bd2a0b77c52}\label{classdrachsler_adc53a3bc2cdb6511253e3bd2a0b77c52}} 
+\index{drachsler@{drachsler}!bst\+\_\+remove@{bst\+\_\+remove}}
+\index{bst\+\_\+remove@{bst\+\_\+remove}!drachsler@{drachsler}}
+\subsubsection{\texorpdfstring{bst\+\_\+remove()}{bst\_remove()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classdrachsler}{drachsler}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::bst\+\_\+remove (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classdrachsler_a11f6ed9e888d2d5328fd97e9c0901d70}\label{classdrachsler_a11f6ed9e888d2d5328fd97e9c0901d70}} 
+\index{drachsler@{drachsler}!debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}}
+\index{debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}!drachsler@{drachsler}}
+\subsubsection{\texorpdfstring{debug\+Get\+Rec\+Mgr()}{debugGetRecMgr()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+Rec\+Mgr$\ast$ \hyperlink{classdrachsler}{drachsler}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::debug\+Get\+Rec\+Mgr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classdrachsler_a9f2a70d4fa52ccc1057f00ef1e68ee29}\label{classdrachsler_a9f2a70d4fa52ccc1057f00ef1e68ee29}} 
+\index{drachsler@{drachsler}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!drachsler@{drachsler}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classdrachsler}{drachsler}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classdrachsler_a4b411071d0df1797510d590a034a66d0}\label{classdrachsler_a4b411071d0df1797510d590a034a66d0}} 
+\index{drachsler@{drachsler}!get\+\_\+root@{get\+\_\+root}}
+\index{get\+\_\+root@{get\+\_\+root}!drachsler@{drachsler}}
+\subsubsection{\texorpdfstring{get\+\_\+root()}{get\_root()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$$\ast$ \hyperlink{classdrachsler}{drachsler}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+\_\+root (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classdrachsler_a5b779dc3d1eb620b4e91189b3409ce1b}\label{classdrachsler_a5b779dc3d1eb620b4e91189b3409ce1b}} 
+\index{drachsler@{drachsler}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!drachsler@{drachsler}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classdrachsler}{drachsler}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/drachsler\+\_\+pext\+\_\+bst\+\_\+lock/\hyperlink{drachsler__impl_8h}{drachsler\+\_\+impl.\+h}\end{DoxyCompactItemize}

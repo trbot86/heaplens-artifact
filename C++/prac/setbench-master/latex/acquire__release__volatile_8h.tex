@@ -1,0 +1,62 @@
+\hypertarget{acquire__release__volatile_8h}{}\section{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/acquire\+\_\+release\+\_\+volatile.h File Reference}
+\label{acquire__release__volatile_8h}\index{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/acquire\+\_\+release\+\_\+volatile.\+h@{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/acquire\+\_\+release\+\_\+volatile.\+h}}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{acquire__release__volatile_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{acquire__release__volatile_8h_a4b3b5ac83b6c7730e8376c8b5c0a6f01}{A\+O\+\_\+\+G\+C\+C\+\_\+\+B\+A\+R\+R\+I\+ER}()
+\item 
+\#define \hyperlink{acquire__release__volatile_8h_a29328d5664268a40645ea9d2f82c8bef}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}
+\item 
+\#define \hyperlink{acquire__release__volatile_8h_a58f98c6b42d593762336829dcf86d058}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+release}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{acquire__release__volatile_8h_a38908e49c95fafba077fbeb130f0d930}{A\+O\+\_\+load\+\_\+acquire} (const volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$p)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void \hyperlink{acquire__release__volatile_8h_a5a48a48680fe8ac93029366b77457181}{A\+O\+\_\+store\+\_\+release} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$p, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} val)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{acquire__release__volatile_8h_a4b3b5ac83b6c7730e8376c8b5c0a6f01}\label{acquire__release__volatile_8h_a4b3b5ac83b6c7730e8376c8b5c0a6f01}} 
+\index{acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}!A\+O\+\_\+\+G\+C\+C\+\_\+\+B\+A\+R\+R\+I\+ER@{A\+O\+\_\+\+G\+C\+C\+\_\+\+B\+A\+R\+R\+I\+ER}}
+\index{A\+O\+\_\+\+G\+C\+C\+\_\+\+B\+A\+R\+R\+I\+ER@{A\+O\+\_\+\+G\+C\+C\+\_\+\+B\+A\+R\+R\+I\+ER}!acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+G\+C\+C\+\_\+\+B\+A\+R\+R\+I\+ER}{AO\_GCC\_BARRIER}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+G\+C\+C\+\_\+\+B\+A\+R\+R\+I\+ER(\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acquire__release__volatile_8h_a29328d5664268a40645ea9d2f82c8bef}\label{acquire__release__volatile_8h_a29328d5664268a40645ea9d2f82c8bef}} 
+\index{acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}!acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}{AO\_HAVE\_load\_acquire}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}
+
+\mbox{\Hypertarget{acquire__release__volatile_8h_a58f98c6b42d593762336829dcf86d058}\label{acquire__release__volatile_8h_a58f98c6b42d593762336829dcf86d058}} 
+\index{acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+release}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+release}!acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+release}{AO\_HAVE\_store\_release}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+release}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{acquire__release__volatile_8h_a38908e49c95fafba077fbeb130f0d930}\label{acquire__release__volatile_8h_a38908e49c95fafba077fbeb130f0d930}} 
+\index{acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}!A\+O\+\_\+load\+\_\+acquire@{A\+O\+\_\+load\+\_\+acquire}}
+\index{A\+O\+\_\+load\+\_\+acquire@{A\+O\+\_\+load\+\_\+acquire}!acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+load\+\_\+acquire()}{AO\_load\_acquire()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+load\+\_\+acquire (\begin{DoxyParamCaption}\item[{const volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{p }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{acquire__release__volatile_8h_a5a48a48680fe8ac93029366b77457181}\label{acquire__release__volatile_8h_a5a48a48680fe8ac93029366b77457181}} 
+\index{acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}!A\+O\+\_\+store\+\_\+release@{A\+O\+\_\+store\+\_\+release}}
+\index{A\+O\+\_\+store\+\_\+release@{A\+O\+\_\+store\+\_\+release}!acquire\+\_\+release\+\_\+volatile.\+h@{acquire\+\_\+release\+\_\+volatile.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+store\+\_\+release()}{AO\_store\_release()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void A\+O\+\_\+store\+\_\+release (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{p,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{val }\end{DoxyParamCaption})}
+

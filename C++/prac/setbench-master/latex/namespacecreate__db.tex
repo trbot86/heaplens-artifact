@@ -1,0 +1,162 @@
+\hypertarget{namespacecreate__db}{}\section{create\+\_\+db Namespace Reference}
+\label{namespacecreate__db}\index{create\+\_\+db@{create\+\_\+db}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacecreate__db_a0db532a727d6ffe9852f154e5d148a06}{process\+\_\+chunk} (start\+\_\+ix)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+string \hyperlink{namespacecreate__db_a3627484d56c47b0a96fdb9ff199694df}{D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME} = \char`\"{}results.\+db\char`\"{}
+\item 
+int \hyperlink{namespacecreate__db_a2da1873dcc0f1772f769b24a8afb0cc9}{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS} = 4
+\item 
+int \hyperlink{namespacecreate__db_af0cf695fe45d12d416c1722b2fd80b0c}{P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE} = 100
+\item 
+list \hyperlink{namespacecreate__db_af3656325d8df791e2e0e62165f52e0d0}{columns}
+\item 
+\hyperlink{namespacecreate__db_a28aa7edc413f11b3b8aa50029c43c98f}{ignore\+\_\+warnings\+\_\+on} = set(\mbox{[}\char`\"{}\char`\"{}\mbox{]})
+\item 
+\hyperlink{namespacecreate__db_acaffbe61c8fe2c0d0db0765f1d0a2b24}{conn} = sqlite3.\+connect(\hyperlink{namespacecreate__db_a3627484d56c47b0a96fdb9ff199694df}{D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME})
+\begin{DoxyCompactList}\small\item\em try to remove old database try\+: res = check\+\_\+output(\char`\"{}rm \char`\"{} + D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME, shell=True) except Called\+Process\+Error, e\+: print D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME + \char`\"{} not found\char`\"{} \end{DoxyCompactList}\item 
+\hyperlink{namespacecreate__db_a8caadce67a98b8a3d859ceae2775bf63}{cursor} = conn.\+cursor()
+\item 
+string \hyperlink{namespacecreate__db_a753b199ce11002d6f6c93550a6bf31ec}{create\+\_\+table\+\_\+string} = \char`\"{}C\+R\+E\+A\+TE T\+A\+B\+LE \hyperlink{namespacecreate__db_a7926ceddf2e86e190ed055e87168b4d5}{results} (\char`\"{}
+\item 
+bool \hyperlink{namespacecreate__db_a4335e951e2857562798d08f99d34703c}{first} = True
+\item 
+string \hyperlink{namespacecreate__db_a3618610b83bddd5732bbdb1707b93c54}{prefix} = \textquotesingle{}\textquotesingle{}
+\item 
+\hyperlink{namespacecreate__db_aa349dd30992f59754d744dd90a252664}{res} = check\+\_\+output(\char`\"{}ls data/step$\ast$\char`\"{}, shell=True)
+\item 
+\hyperlink{namespacecreate__db_ae907838b4f6feec6455ce38eba8a26fe}{files} = res.\+strip().split(\char`\"{}\textbackslash{}n\char`\"{})
+\item 
+\hyperlink{namespacecreate__db_a08369a5d92b58607a6d7b5f2c5412e7e}{pool} = Thread\+Pool(\hyperlink{namespacecreate__db_a2da1873dcc0f1772f769b24a8afb0cc9}{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS})
+\item 
+int \hyperlink{namespacecreate__db_aa299b331ef2c005b58a6f17618a9ea8e}{startix} = 0
+\item 
+\hyperlink{namespacecreate__db_a293646c9cd089d3131426e96b401b18e}{endix} = len(\hyperlink{namespacecreate__db_ae907838b4f6feec6455ce38eba8a26fe}{files})
+\item 
+\hyperlink{namespacecreate__db_a7926ceddf2e86e190ed055e87168b4d5}{results} = pool.\+map(\hyperlink{namespacecreate__db_a0db532a727d6ffe9852f154e5d148a06}{process\+\_\+chunk}, range(\hyperlink{namespacecreate__db_aa299b331ef2c005b58a6f17618a9ea8e}{startix}, \hyperlink{namespacecreate__db_a293646c9cd089d3131426e96b401b18e}{endix}, \hyperlink{namespacecreate__db_af0cf695fe45d12d416c1722b2fd80b0c}{P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE}))
+\item 
+int \hyperlink{namespacecreate__db_af3731854a38e468a950476abf08b486e}{k} = 0
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{namespacecreate__db_a0db532a727d6ffe9852f154e5d148a06}\label{namespacecreate__db_a0db532a727d6ffe9852f154e5d148a06}} 
+\index{create\+\_\+db@{create\+\_\+db}!process\+\_\+chunk@{process\+\_\+chunk}}
+\index{process\+\_\+chunk@{process\+\_\+chunk}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{process\+\_\+chunk()}{process\_chunk()}}
+{\footnotesize\ttfamily def create\+\_\+db.\+process\+\_\+chunk (\begin{DoxyParamCaption}\item[{}]{start\+\_\+ix }\end{DoxyParamCaption})}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{namespacecreate__db_af3656325d8df791e2e0e62165f52e0d0}\label{namespacecreate__db_af3656325d8df791e2e0e62165f52e0d0}} 
+\index{create\+\_\+db@{create\+\_\+db}!columns@{columns}}
+\index{columns@{columns}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{columns}{columns}}
+{\footnotesize\ttfamily list create\+\_\+db.\+columns}
+
+\mbox{\Hypertarget{namespacecreate__db_acaffbe61c8fe2c0d0db0765f1d0a2b24}\label{namespacecreate__db_acaffbe61c8fe2c0d0db0765f1d0a2b24}} 
+\index{create\+\_\+db@{create\+\_\+db}!conn@{conn}}
+\index{conn@{conn}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{conn}{conn}}
+{\footnotesize\ttfamily create\+\_\+db.\+conn = sqlite3.\+connect(\hyperlink{namespacecreate__db_a3627484d56c47b0a96fdb9ff199694df}{D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME})}
+
+
+
+try to remove old database try\+: res = check\+\_\+output(\char`\"{}rm \char`\"{} + D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME, shell=True) except Called\+Process\+Error, e\+: print D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME + \char`\"{} not found\char`\"{} 
+
+\mbox{\Hypertarget{namespacecreate__db_a753b199ce11002d6f6c93550a6bf31ec}\label{namespacecreate__db_a753b199ce11002d6f6c93550a6bf31ec}} 
+\index{create\+\_\+db@{create\+\_\+db}!create\+\_\+table\+\_\+string@{create\+\_\+table\+\_\+string}}
+\index{create\+\_\+table\+\_\+string@{create\+\_\+table\+\_\+string}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{create\+\_\+table\+\_\+string}{create\_table\_string}}
+{\footnotesize\ttfamily string create\+\_\+db.\+create\+\_\+table\+\_\+string = \char`\"{}C\+R\+E\+A\+TE T\+A\+B\+LE \hyperlink{namespacecreate__db_a7926ceddf2e86e190ed055e87168b4d5}{results} (\char`\"{}}
+
+\mbox{\Hypertarget{namespacecreate__db_a8caadce67a98b8a3d859ceae2775bf63}\label{namespacecreate__db_a8caadce67a98b8a3d859ceae2775bf63}} 
+\index{create\+\_\+db@{create\+\_\+db}!cursor@{cursor}}
+\index{cursor@{cursor}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{cursor}{cursor}}
+{\footnotesize\ttfamily create\+\_\+db.\+cursor = conn.\+cursor()}
+
+\mbox{\Hypertarget{namespacecreate__db_a3627484d56c47b0a96fdb9ff199694df}\label{namespacecreate__db_a3627484d56c47b0a96fdb9ff199694df}} 
+\index{create\+\_\+db@{create\+\_\+db}!D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME@{D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME}}
+\index{D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME@{D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME}{DB\_FILENAME}}
+{\footnotesize\ttfamily string create\+\_\+db.\+D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME = \char`\"{}results.\+db\char`\"{}}
+
+\mbox{\Hypertarget{namespacecreate__db_a293646c9cd089d3131426e96b401b18e}\label{namespacecreate__db_a293646c9cd089d3131426e96b401b18e}} 
+\index{create\+\_\+db@{create\+\_\+db}!endix@{endix}}
+\index{endix@{endix}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{endix}{endix}}
+{\footnotesize\ttfamily create\+\_\+db.\+endix = len(\hyperlink{namespacecreate__db_ae907838b4f6feec6455ce38eba8a26fe}{files})}
+
+\mbox{\Hypertarget{namespacecreate__db_ae907838b4f6feec6455ce38eba8a26fe}\label{namespacecreate__db_ae907838b4f6feec6455ce38eba8a26fe}} 
+\index{create\+\_\+db@{create\+\_\+db}!files@{files}}
+\index{files@{files}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{files}{files}}
+{\footnotesize\ttfamily create\+\_\+db.\+files = res.\+strip().split(\char`\"{}\textbackslash{}n\char`\"{})}
+
+\mbox{\Hypertarget{namespacecreate__db_a4335e951e2857562798d08f99d34703c}\label{namespacecreate__db_a4335e951e2857562798d08f99d34703c}} 
+\index{create\+\_\+db@{create\+\_\+db}!first@{first}}
+\index{first@{first}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{first}{first}}
+{\footnotesize\ttfamily bool create\+\_\+db.\+first = True}
+
+\mbox{\Hypertarget{namespacecreate__db_a28aa7edc413f11b3b8aa50029c43c98f}\label{namespacecreate__db_a28aa7edc413f11b3b8aa50029c43c98f}} 
+\index{create\+\_\+db@{create\+\_\+db}!ignore\+\_\+warnings\+\_\+on@{ignore\+\_\+warnings\+\_\+on}}
+\index{ignore\+\_\+warnings\+\_\+on@{ignore\+\_\+warnings\+\_\+on}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{ignore\+\_\+warnings\+\_\+on}{ignore\_warnings\_on}}
+{\footnotesize\ttfamily create\+\_\+db.\+ignore\+\_\+warnings\+\_\+on = set(\mbox{[}\char`\"{}\char`\"{}\mbox{]})}
+
+\mbox{\Hypertarget{namespacecreate__db_af3731854a38e468a950476abf08b486e}\label{namespacecreate__db_af3731854a38e468a950476abf08b486e}} 
+\index{create\+\_\+db@{create\+\_\+db}!k@{k}}
+\index{k@{k}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{k}{k}}
+{\footnotesize\ttfamily int create\+\_\+db.\+k = 0}
+
+\mbox{\Hypertarget{namespacecreate__db_a2da1873dcc0f1772f769b24a8afb0cc9}\label{namespacecreate__db_a2da1873dcc0f1772f769b24a8afb0cc9}} 
+\index{create\+\_\+db@{create\+\_\+db}!N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS@{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS}}
+\index{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS@{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS}{NUM\_PROCESSORS}}
+{\footnotesize\ttfamily int create\+\_\+db.\+N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS = 4}
+
+\mbox{\Hypertarget{namespacecreate__db_af0cf695fe45d12d416c1722b2fd80b0c}\label{namespacecreate__db_af0cf695fe45d12d416c1722b2fd80b0c}} 
+\index{create\+\_\+db@{create\+\_\+db}!P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE@{P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE}}
+\index{P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE@{P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE}{PARALLEL\_CHUNK\_SIZE}}
+{\footnotesize\ttfamily int create\+\_\+db.\+P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE = 100}
+
+\mbox{\Hypertarget{namespacecreate__db_a08369a5d92b58607a6d7b5f2c5412e7e}\label{namespacecreate__db_a08369a5d92b58607a6d7b5f2c5412e7e}} 
+\index{create\+\_\+db@{create\+\_\+db}!pool@{pool}}
+\index{pool@{pool}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{pool}{pool}}
+{\footnotesize\ttfamily create\+\_\+db.\+pool = Thread\+Pool(\hyperlink{namespacecreate__db_a2da1873dcc0f1772f769b24a8afb0cc9}{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS})}
+
+\mbox{\Hypertarget{namespacecreate__db_a3618610b83bddd5732bbdb1707b93c54}\label{namespacecreate__db_a3618610b83bddd5732bbdb1707b93c54}} 
+\index{create\+\_\+db@{create\+\_\+db}!prefix@{prefix}}
+\index{prefix@{prefix}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{prefix}{prefix}}
+{\footnotesize\ttfamily string create\+\_\+db.\+prefix = \textquotesingle{}\textquotesingle{}}
+
+\mbox{\Hypertarget{namespacecreate__db_aa349dd30992f59754d744dd90a252664}\label{namespacecreate__db_aa349dd30992f59754d744dd90a252664}} 
+\index{create\+\_\+db@{create\+\_\+db}!res@{res}}
+\index{res@{res}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{res}{res}}
+{\footnotesize\ttfamily create\+\_\+db.\+res = check\+\_\+output(\char`\"{}ls data/step$\ast$\char`\"{}, shell=True)}
+
+\mbox{\Hypertarget{namespacecreate__db_a7926ceddf2e86e190ed055e87168b4d5}\label{namespacecreate__db_a7926ceddf2e86e190ed055e87168b4d5}} 
+\index{create\+\_\+db@{create\+\_\+db}!results@{results}}
+\index{results@{results}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{results}{results}}
+{\footnotesize\ttfamily create\+\_\+db.\+results = pool.\+map(\hyperlink{namespacecreate__db_a0db532a727d6ffe9852f154e5d148a06}{process\+\_\+chunk}, range(\hyperlink{namespacecreate__db_aa299b331ef2c005b58a6f17618a9ea8e}{startix}, \hyperlink{namespacecreate__db_a293646c9cd089d3131426e96b401b18e}{endix}, \hyperlink{namespacecreate__db_af0cf695fe45d12d416c1722b2fd80b0c}{P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE}))}
+
+\mbox{\Hypertarget{namespacecreate__db_aa299b331ef2c005b58a6f17618a9ea8e}\label{namespacecreate__db_aa299b331ef2c005b58a6f17618a9ea8e}} 
+\index{create\+\_\+db@{create\+\_\+db}!startix@{startix}}
+\index{startix@{startix}!create\+\_\+db@{create\+\_\+db}}
+\subsubsection{\texorpdfstring{startix}{startix}}
+{\footnotesize\ttfamily int create\+\_\+db.\+startix = 0}
+

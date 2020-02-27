@@ -1,0 +1,155 @@
+\hypertarget{structbslack__ns_1_1SCXRecord}{}\section{bslack\+\_\+ns\+:\+:S\+C\+X\+Record$<$ D\+E\+G\+R\+EE, K $>$ Struct Template Reference}
+\label{structbslack__ns_1_1SCXRecord}\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record$<$ D\+E\+G\+R\+E\+E, K $>$@{bslack\+\_\+ns\+::\+S\+C\+X\+Record$<$ D\+E\+G\+R\+E\+E, K $>$}}
+
+
+{\ttfamily \#include $<$bslack\+\_\+impl.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>char \hyperlink{structbslack__ns_1_1SCXRecord_aa16b6644e2f456ed9330846ebc7b0804}{bytes} \mbox{[}2 $\ast$\hyperlink{plaf_8h_a9492d3f4847aa8514510373df7ad0e73}{PREFETCH\_SIZE\_BYTES}\mbox{]}\\
+\}; \\
+
+\end{tabbing}\item 
+volatile \hyperlink{descriptors_8h_a8a5af2749482b19d7515054489efca22}{mutables\+\_\+t} \hyperlink{structbslack__ns_1_1SCXRecord_a4f87f09ecacb6e4975eeb32910f465c1}{mutables}
+\item 
+int \hyperlink{structbslack__ns_1_1SCXRecord_a04288a3a72e815697f4cdbf6d3a172ea}{number\+Of\+Nodes}
+\item 
+int \hyperlink{structbslack__ns_1_1SCXRecord_a377c265c0af0fdeb3fbb87c5fd38e353}{number\+Of\+Nodes\+To\+Freeze}
+\item 
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{structbslack__ns_1_1SCXRecord_a98126575762cd26f08cbb6cb0177e36e}{new\+Node}
+\item 
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$volatile $\ast$ \hyperlink{structbslack__ns_1_1SCXRecord_a04936965dc1749be6b03408ac7207003}{field}
+\item 
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{structbslack__ns_1_1SCXRecord_a58efb08f62fc4f1256180880bbc8ca5f}{nodes} \mbox{[}\hyperlink{classbslack__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}
+\item 
+\hyperlink{structbslack__ns_1_1SCXRecord}{S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{structbslack__ns_1_1SCXRecord_a27987fb8ada803ab5a247431b419f5a3}{scx\+Ptrs\+Seen} \mbox{[}\hyperlink{classbslack__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}
+\item 
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{structbslack__ns_1_1SCXRecord_aa7c02cda2c28c6bb0f9104163073462e}{inserted\+Nodes} \mbox{[}\hyperlink{classbslack__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}
+\item 
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{structbslack__ns_1_1SCXRecord_a1a64afaf954a475278a0400bd8fe45c3}{deleted\+Nodes} \mbox{[}\hyperlink{classbslack__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const int \hyperlink{structbslack__ns_1_1SCXRecord_a9c79774eb447ccf468b1422272ed17ef}{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS} = 0
+\item 
+static const int \hyperlink{structbslack__ns_1_1SCXRecord_add6be2636d8e0da7cbef46457ba9d5a0}{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED} = 1
+\item 
+static const int \hyperlink{structbslack__ns_1_1SCXRecord_add0428c9ceca3a9b0366ebf51127e888}{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED} = 2
+\item 
+static const int \hyperlink{structbslack__ns_1_1SCXRecord_aca1833c75f8ede1572771c4d4f6776ab}{size} = sizeof(c)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_aaf961181507d82c1e35d31993c33ba8d}\label{structbslack__ns_1_1SCXRecord_aaf961181507d82c1e35d31993c33ba8d}} 
+\subsubsection{\texorpdfstring{"@72}{@72}}
+{\footnotesize\ttfamily union \{ ... \} }
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_aa16b6644e2f456ed9330846ebc7b0804}\label{structbslack__ns_1_1SCXRecord_aa16b6644e2f456ed9330846ebc7b0804}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!bytes@{bytes}}
+\index{bytes@{bytes}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{bytes}{bytes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+char \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::bytes\mbox{[}2 $\ast$\hyperlink{plaf_8h_a9492d3f4847aa8514510373df7ad0e73}{P\+R\+E\+F\+E\+T\+C\+H\+\_\+\+S\+I\+Z\+E\+\_\+\+B\+Y\+T\+ES}\mbox{]}}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_a1a64afaf954a475278a0400bd8fe45c3}\label{structbslack__ns_1_1SCXRecord_a1a64afaf954a475278a0400bd8fe45c3}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!deleted\+Nodes@{deleted\+Nodes}}
+\index{deleted\+Nodes@{deleted\+Nodes}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{deleted\+Nodes}{deletedNodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::deleted\+Nodes\mbox{[}\hyperlink{classbslack__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_a04936965dc1749be6b03408ac7207003}\label{structbslack__ns_1_1SCXRecord_a04936965dc1749be6b03408ac7207003}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!field@{field}}
+\index{field@{field}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{field}{field}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ volatile$\ast$ \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::field}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_aa7c02cda2c28c6bb0f9104163073462e}\label{structbslack__ns_1_1SCXRecord_aa7c02cda2c28c6bb0f9104163073462e}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!inserted\+Nodes@{inserted\+Nodes}}
+\index{inserted\+Nodes@{inserted\+Nodes}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{inserted\+Nodes}{insertedNodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::inserted\+Nodes\mbox{[}\hyperlink{classbslack__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_a4f87f09ecacb6e4975eeb32910f465c1}\label{structbslack__ns_1_1SCXRecord_a4f87f09ecacb6e4975eeb32910f465c1}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!mutables@{mutables}}
+\index{mutables@{mutables}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{mutables}{mutables}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+volatile \hyperlink{descriptors_8h_a8a5af2749482b19d7515054489efca22}{mutables\+\_\+t} \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::mutables}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_a98126575762cd26f08cbb6cb0177e36e}\label{structbslack__ns_1_1SCXRecord_a98126575762cd26f08cbb6cb0177e36e}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!new\+Node@{new\+Node}}
+\index{new\+Node@{new\+Node}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{new\+Node}{newNode}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::new\+Node}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_a58efb08f62fc4f1256180880bbc8ca5f}\label{structbslack__ns_1_1SCXRecord_a58efb08f62fc4f1256180880bbc8ca5f}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!nodes@{nodes}}
+\index{nodes@{nodes}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{nodes}{nodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structbslack__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::nodes\mbox{[}\hyperlink{classbslack__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_a04288a3a72e815697f4cdbf6d3a172ea}\label{structbslack__ns_1_1SCXRecord_a04288a3a72e815697f4cdbf6d3a172ea}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!number\+Of\+Nodes@{number\+Of\+Nodes}}
+\index{number\+Of\+Nodes@{number\+Of\+Nodes}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{number\+Of\+Nodes}{numberOfNodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+int \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::number\+Of\+Nodes}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_a377c265c0af0fdeb3fbb87c5fd38e353}\label{structbslack__ns_1_1SCXRecord_a377c265c0af0fdeb3fbb87c5fd38e353}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!number\+Of\+Nodes\+To\+Freeze@{number\+Of\+Nodes\+To\+Freeze}}
+\index{number\+Of\+Nodes\+To\+Freeze@{number\+Of\+Nodes\+To\+Freeze}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{number\+Of\+Nodes\+To\+Freeze}{numberOfNodesToFreeze}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+int \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::number\+Of\+Nodes\+To\+Freeze}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_a27987fb8ada803ab5a247431b419f5a3}\label{structbslack__ns_1_1SCXRecord_a27987fb8ada803ab5a247431b419f5a3}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!scx\+Ptrs\+Seen@{scx\+Ptrs\+Seen}}
+\index{scx\+Ptrs\+Seen@{scx\+Ptrs\+Seen}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{scx\+Ptrs\+Seen}{scxPtrsSeen}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structbslack__ns_1_1SCXRecord}{S\+C\+X\+Record}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::scx\+Ptrs\+Seen\mbox{[}\hyperlink{classbslack__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_aca1833c75f8ede1572771c4d4f6776ab}\label{structbslack__ns_1_1SCXRecord_aca1833c75f8ede1572771c4d4f6776ab}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!size@{size}}
+\index{size@{size}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+const int \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::size = sizeof(c)\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_add0428c9ceca3a9b0366ebf51127e888}\label{structbslack__ns_1_1SCXRecord_add0428c9ceca3a9b0366ebf51127e888}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED}}
+\index{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED}{STATE\_ABORTED}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+const int \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED = 2\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_add6be2636d8e0da7cbef46457ba9d5a0}\label{structbslack__ns_1_1SCXRecord_add6be2636d8e0da7cbef46457ba9d5a0}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED}}
+\index{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED}{STATE\_COMMITTED}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+const int \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED = 1\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{structbslack__ns_1_1SCXRecord_a9c79774eb447ccf468b1422272ed17ef}\label{structbslack__ns_1_1SCXRecord_a9c79774eb447ccf468b1422272ed17ef}} 
+\index{bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}!S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS@{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS}}
+\index{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS@{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS}!bslack\+\_\+ns\+::\+S\+C\+X\+Record@{bslack\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS}{STATE\_INPROGRESS}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+const int \hyperlink{structbslack__ns_1_1SCXRecord}{bslack\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS = 0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/brown\+\_\+ext\+\_\+bslack\+\_\+rq\+\_\+lf/\hyperlink{bslack__impl_8h}{bslack\+\_\+impl.\+h}\end{DoxyCompactItemize}

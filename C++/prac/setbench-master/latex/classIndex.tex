@@ -1,0 +1,221 @@
+\hypertarget{classIndex}{}\section{Index Class Reference}
+\label{classIndex}\index{Index@{Index}}
+
+
+{\ttfamily \#include $<$index\+\_\+adapter.\+h$>$}
+
+
+
+Inheritance diagram for Index\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=146pt]{classIndex__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Index\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=159pt]{classIndex__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classIndex_a76b7ed4e9cb0b1540264567f84896032}{$\sim$\+Index} ()
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classIndex_a1328ba545ab4ef6750a742f0de084d79}{init} (uint64\+\_\+t part\+\_\+cnt, \hyperlink{classtable__t}{table\+\_\+t} $\ast$\hyperlink{classindex__base_abb51a82fc0bf85a82aa83376d111641f}{table})
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classIndex_a2266050deae0c62e0b90e7d60fd70f35}{index\+\_\+insert} (\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} key, \hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} new\+Item, int part\+\_\+id=-\/1)
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classIndex_abb1666dd897887f22d8e4dc92966b207}{index\+\_\+read} (\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} key, \hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$item, int part\+\_\+id=-\/1, int thd\+\_\+id=0)
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classIndex_a5e3d8773117cba2f8dc644185d560a0c}{index\+\_\+range\+\_\+query} (\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} low, \hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} high, \hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} $\ast$result\+Keys, \hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$result\+Values, int $\ast$num\+Results, int part\+\_\+id=-\/1)
+\item 
+void \hyperlink{classIndex_a6a509df225912ffea8547fa0daa57d8c}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classIndex_a62ecc92aa23b7292ea6735ff9ac21c80}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+size\+\_\+t \hyperlink{classIndex_ad70e606faaf0a67b690275b8f8ca5d5f}{get\+Node\+Size} ()
+\item 
+size\+\_\+t \hyperlink{classIndex_a0e0b37468dc2b549208da43466a68a94}{get\+Descriptor\+Size} ()
+\item 
+void \hyperlink{classIndex_ab300e132e8a12e3334003227a2e3f618}{print\+\_\+stats} ()
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classIndex_a9f14dfc7c370a32604d91af76907f6c6}{init} (uint64\+\_\+t bucket\+\_\+cnt, int part\+\_\+cnt)
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classIndex_a92819c544e6ac6af5a2d4aa03a61a351}{init} (int part\+\_\+cnt, \hyperlink{classtable__t}{table\+\_\+t} $\ast$\hyperlink{classindex__base_abb51a82fc0bf85a82aa83376d111641f}{table}, uint64\+\_\+t bucket\+\_\+cnt)
+\item 
+bool \hyperlink{classIndex_a43908d9915fe59437d20a82324bcda61}{index\+\_\+exist} (\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} key)
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classIndex_a03544bdceed7feb756712086fb239de1}{index\+\_\+insert} (\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} key, \hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} item, int part\+\_\+id=-\/1)
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classIndex_ab930b74f611f4704fa1fb9a8bb9f57f8}{index\+\_\+read} (\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} key, \hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$item, int part\+\_\+id=-\/1)
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classIndex_abb1666dd897887f22d8e4dc92966b207}{index\+\_\+read} (\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} key, \hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$item, int part\+\_\+id=-\/1, int thd\+\_\+id=0)
+\item 
+void \hyperlink{classIndex_a6a509df225912ffea8547fa0daa57d8c}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classIndex_a62ecc92aa23b7292ea6735ff9ac21c80}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Define index data structure and record manager types Create an adapter class for the D\+Bx1000 index interface 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classIndex_a76b7ed4e9cb0b1540264567f84896032}\label{classIndex_a76b7ed4e9cb0b1540264567f84896032}} 
+\index{Index@{Index}!````~Index@{$\sim$\+Index}}
+\index{````~Index@{$\sim$\+Index}!Index@{Index}}
+\subsubsection{\texorpdfstring{$\sim$\+Index()}{~Index()}}
+{\footnotesize\ttfamily Index\+::$\sim$\+Index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classIndex_a62ecc92aa23b7292ea6735ff9ac21c80}\label{classIndex_a62ecc92aa23b7292ea6735ff9ac21c80}} 
+\index{Index@{Index}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!Index@{Index}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Index\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classIndex_a62ecc92aa23b7292ea6735ff9ac21c80}\label{classIndex_a62ecc92aa23b7292ea6735ff9ac21c80}} 
+\index{Index@{Index}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!Index@{Index}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Index\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classIndex_a0e0b37468dc2b549208da43466a68a94}\label{classIndex_a0e0b37468dc2b549208da43466a68a94}} 
+\index{Index@{Index}!get\+Descriptor\+Size@{get\+Descriptor\+Size}}
+\index{get\+Descriptor\+Size@{get\+Descriptor\+Size}!Index@{Index}}
+\subsubsection{\texorpdfstring{get\+Descriptor\+Size()}{getDescriptorSize()}}
+{\footnotesize\ttfamily size\+\_\+t Index\+::get\+Descriptor\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \hyperlink{classindex__base_a0050e83a568a2905c54c81d7515f4085}{index\+\_\+base}.
+
+\mbox{\Hypertarget{classIndex_ad70e606faaf0a67b690275b8f8ca5d5f}\label{classIndex_ad70e606faaf0a67b690275b8f8ca5d5f}} 
+\index{Index@{Index}!get\+Node\+Size@{get\+Node\+Size}}
+\index{get\+Node\+Size@{get\+Node\+Size}!Index@{Index}}
+\subsubsection{\texorpdfstring{get\+Node\+Size()}{getNodeSize()}}
+{\footnotesize\ttfamily size\+\_\+t Index\+::get\+Node\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \hyperlink{classindex__base_ab8bfe46c64ea1ab3c596c46f0b76064e}{index\+\_\+base}.
+
+\mbox{\Hypertarget{classIndex_a43908d9915fe59437d20a82324bcda61}\label{classIndex_a43908d9915fe59437d20a82324bcda61}} 
+\index{Index@{Index}!index\+\_\+exist@{index\+\_\+exist}}
+\index{index\+\_\+exist@{index\+\_\+exist}!Index@{Index}}
+\subsubsection{\texorpdfstring{index\+\_\+exist()}{index\_exist()}}
+{\footnotesize\ttfamily bool Index\+::index\+\_\+exist (\begin{DoxyParamCaption}\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classIndex_a03544bdceed7feb756712086fb239de1}\label{classIndex_a03544bdceed7feb756712086fb239de1}} 
+\index{Index@{Index}!index\+\_\+insert@{index\+\_\+insert}}
+\index{index\+\_\+insert@{index\+\_\+insert}!Index@{Index}}
+\subsubsection{\texorpdfstring{index\+\_\+insert()}{index\_insert()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Index\+::index\+\_\+insert (\begin{DoxyParamCaption}\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{key,  }\item[{\hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE}}]{item,  }\item[{int}]{part\+\_\+id = {\ttfamily -\/1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \hyperlink{classindex__base_a819b2cb7cbc7c740381e64d4c9023745}{index\+\_\+base}.
+
+\mbox{\Hypertarget{classIndex_a2266050deae0c62e0b90e7d60fd70f35}\label{classIndex_a2266050deae0c62e0b90e7d60fd70f35}} 
+\index{Index@{Index}!index\+\_\+insert@{index\+\_\+insert}}
+\index{index\+\_\+insert@{index\+\_\+insert}!Index@{Index}}
+\subsubsection{\texorpdfstring{index\+\_\+insert()}{index\_insert()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Index\+::index\+\_\+insert (\begin{DoxyParamCaption}\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{key,  }\item[{\hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE}}]{new\+Item,  }\item[{int}]{part\+\_\+id = {\ttfamily -\/1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \hyperlink{classindex__base_a819b2cb7cbc7c740381e64d4c9023745}{index\+\_\+base}.
+
+\mbox{\Hypertarget{classIndex_a5e3d8773117cba2f8dc644185d560a0c}\label{classIndex_a5e3d8773117cba2f8dc644185d560a0c}} 
+\index{Index@{Index}!index\+\_\+range\+\_\+query@{index\+\_\+range\+\_\+query}}
+\index{index\+\_\+range\+\_\+query@{index\+\_\+range\+\_\+query}!Index@{Index}}
+\subsubsection{\texorpdfstring{index\+\_\+range\+\_\+query()}{index\_range\_query()}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Index\+::index\+\_\+range\+\_\+query (\begin{DoxyParamCaption}\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{low,  }\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{high,  }\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} $\ast$}]{result\+Keys,  }\item[{\hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$}]{result\+Values,  }\item[{int $\ast$}]{num\+Results,  }\item[{int}]{part\+\_\+id = {\ttfamily -\/1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classIndex_ab930b74f611f4704fa1fb9a8bb9f57f8}\label{classIndex_ab930b74f611f4704fa1fb9a8bb9f57f8}} 
+\index{Index@{Index}!index\+\_\+read@{index\+\_\+read}}
+\index{index\+\_\+read@{index\+\_\+read}!Index@{Index}}
+\subsubsection{\texorpdfstring{index\+\_\+read()}{index\_read()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Index\+::index\+\_\+read (\begin{DoxyParamCaption}\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{key,  }\item[{\hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$}]{item,  }\item[{int}]{part\+\_\+id = {\ttfamily -\/1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \hyperlink{classindex__base_a044a748df8945a60af8ab815b555960a}{index\+\_\+base}.
+
+\mbox{\Hypertarget{classIndex_abb1666dd897887f22d8e4dc92966b207}\label{classIndex_abb1666dd897887f22d8e4dc92966b207}} 
+\index{Index@{Index}!index\+\_\+read@{index\+\_\+read}}
+\index{index\+\_\+read@{index\+\_\+read}!Index@{Index}}
+\subsubsection{\texorpdfstring{index\+\_\+read()}{index\_read()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Index\+::index\+\_\+read (\begin{DoxyParamCaption}\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{key,  }\item[{\hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$}]{item,  }\item[{int}]{part\+\_\+id = {\ttfamily -\/1},  }\item[{int}]{thd\+\_\+id = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \hyperlink{classindex__base_ae63072105f55821091506f1a6557dd1c}{index\+\_\+base}.
+
+\mbox{\Hypertarget{classIndex_abb1666dd897887f22d8e4dc92966b207}\label{classIndex_abb1666dd897887f22d8e4dc92966b207}} 
+\index{Index@{Index}!index\+\_\+read@{index\+\_\+read}}
+\index{index\+\_\+read@{index\+\_\+read}!Index@{Index}}
+\subsubsection{\texorpdfstring{index\+\_\+read()}{index\_read()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Index\+::index\+\_\+read (\begin{DoxyParamCaption}\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{key,  }\item[{\hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$}]{item,  }\item[{int}]{part\+\_\+id = {\ttfamily -\/1},  }\item[{int}]{thd\+\_\+id = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \hyperlink{classindex__base_ae63072105f55821091506f1a6557dd1c}{index\+\_\+base}.
+
+\mbox{\Hypertarget{classIndex_a9f14dfc7c370a32604d91af76907f6c6}\label{classIndex_a9f14dfc7c370a32604d91af76907f6c6}} 
+\index{Index@{Index}!init@{init}}
+\index{init@{init}!Index@{Index}}
+\subsubsection{\texorpdfstring{init()}{init()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Index\+::init (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{bucket\+\_\+cnt,  }\item[{int}]{part\+\_\+cnt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classIndex_a92819c544e6ac6af5a2d4aa03a61a351}\label{classIndex_a92819c544e6ac6af5a2d4aa03a61a351}} 
+\index{Index@{Index}!init@{init}}
+\index{init@{init}!Index@{Index}}
+\subsubsection{\texorpdfstring{init()}{init()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Index\+::init (\begin{DoxyParamCaption}\item[{int}]{part\+\_\+cnt,  }\item[{\hyperlink{classtable__t}{table\+\_\+t} $\ast$}]{table,  }\item[{uint64\+\_\+t}]{bucket\+\_\+cnt }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classIndex_a1328ba545ab4ef6750a742f0de084d79}\label{classIndex_a1328ba545ab4ef6750a742f0de084d79}} 
+\index{Index@{Index}!init@{init}}
+\index{init@{init}!Index@{Index}}
+\subsubsection{\texorpdfstring{init()}{init()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Index\+::init (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{part\+\_\+cnt,  }\item[{\hyperlink{classtable__t}{table\+\_\+t} $\ast$}]{table }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classIndex_a6a509df225912ffea8547fa0daa57d8c}\label{classIndex_a6a509df225912ffea8547fa0daa57d8c}} 
+\index{Index@{Index}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!Index@{Index}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Index\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classIndex_a6a509df225912ffea8547fa0daa57d8c}\label{classIndex_a6a509df225912ffea8547fa0daa57d8c}} 
+\index{Index@{Index}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!Index@{Index}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Index\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classIndex_ab300e132e8a12e3334003227a2e3f618}\label{classIndex_ab300e132e8a12e3334003227a2e3f618}} 
+\index{Index@{Index}!print\+\_\+stats@{print\+\_\+stats}}
+\index{print\+\_\+stats@{print\+\_\+stats}!Index@{Index}}
+\subsubsection{\texorpdfstring{print\+\_\+stats()}{print\_stats()}}
+{\footnotesize\ttfamily void Index\+::print\+\_\+stats (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \hyperlink{classindex__base_a2515fc45e7ca43a9914c0410a9b663c8}{index\+\_\+base}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+macrobench/storage/index/\hyperlink{index__adapter_8h}{index\+\_\+adapter.\+h}\item 
+macrobench/storage/index/\hyperlink{index__hash_8h}{index\+\_\+hash.\+h}\end{DoxyCompactItemize}

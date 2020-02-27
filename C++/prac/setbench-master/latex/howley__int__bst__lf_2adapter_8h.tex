@@ -1,0 +1,42 @@
+\hypertarget{howley__int__bst__lf_2adapter_8h}{}\section{ds/howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.h File Reference}
+\label{howley__int__bst__lf_2adapter_8h}\index{ds/howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h@{ds/howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h}}
+{\ttfamily \#include $<$csignal$>$}\newline
+{\ttfamily \#include \char`\"{}errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}random\+\_\+fnv1a.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}howley\+\_\+impl.\+h\char`\"{}}\newline
+Include dependency graph for adapter.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{howley__int__bst__lf_2adapter_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classds__adapter}{ds\+\_\+adapter$<$ K, V, Reclaim, Alloc, Pool $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{howley__int__bst__lf_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}~\hyperlink{classrecord__manager}{record\+\_\+manager}$<$Reclaim, Alloc, Pool, \hyperlink{structnode__t}{node\+\_\+t}$<$K,V$>$, \hyperlink{unionoperation__t}{operation\+\_\+t}$<$K,V$>$$>$
+\item 
+\#define \hyperlink{howley__int__bst__lf_2adapter_8h_a8c510cbe2f8c9555fac68275cc2aeb7b}{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}~\hyperlink{classhowley}{howley}$<$K, V, \hyperlink{sigouin__skip__list__kcas_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}$>$
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{howley__int__bst__lf_2adapter_8h_a8c510cbe2f8c9555fac68275cc2aeb7b}\label{howley__int__bst__lf_2adapter_8h_a8c510cbe2f8c9555fac68275cc2aeb7b}} 
+\index{howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h@{howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h}!D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T@{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}}
+\index{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T@{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}!howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h@{howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h}}
+\subsubsection{\texorpdfstring{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}{DATA\_STRUCTURE\_T}}
+{\footnotesize\ttfamily \#define D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T~\hyperlink{classhowley}{howley}$<$K, V, \hyperlink{sigouin__skip__list__kcas_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}$>$}
+
+\mbox{\Hypertarget{howley__int__bst__lf_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}\label{howley__int__bst__lf_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}} 
+\index{howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h@{howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h}!R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T@{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}}
+\index{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T@{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}!howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h@{howley\+\_\+int\+\_\+bst\+\_\+lf/adapter.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}{RECORD\_MANAGER\_T}}
+{\footnotesize\ttfamily \#define R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T~\hyperlink{classrecord__manager}{record\+\_\+manager}$<$Reclaim, Alloc, Pool, \hyperlink{structnode__t}{node\+\_\+t}$<$K,V$>$, \hyperlink{unionoperation__t}{operation\+\_\+t}$<$K,V$>$$>$}
+
+Implementation of the internal lock-\/free B\+ST of Howley et al. This is a heavily modified version of the A\+S\+C\+Y\+L\+IB implementation. (See copyright notice in howley.\+h) The modifications are copyrighted (consistent with the original license) by Maya Arbel-\/\+Raviv and Trevor Brown, 2018. 

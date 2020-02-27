@@ -1,0 +1,299 @@
+\hypertarget{classreclaimer__interface}{}\section{reclaimer\+\_\+interface$<$ T, Pool $>$ Class Template Reference}
+\label{classreclaimer__interface}\index{reclaimer\+\_\+interface$<$ T, Pool $>$@{reclaimer\+\_\+interface$<$ T, Pool $>$}}
+
+
+{\ttfamily \#include $<$reclaimer\+\_\+interface.\+h$>$}
+
+
+
+Inheritance diagram for reclaimer\+\_\+interface$<$ T, Pool $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classreclaimer__interface__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for reclaimer\+\_\+interface$<$ T, Pool $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classreclaimer__interface__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structreclaimer__interface_1_1rebind}{rebind}
+\item 
+struct \hyperlink{structreclaimer__interface_1_1rebind2}{rebind2}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+long long \hyperlink{classreclaimer__interface_aff9a466872ab7972a27e817c7d776936}{get\+Size\+In\+Nodes} ()
+\item 
+std\+::string \hyperlink{classreclaimer__interface_a949bf6cedb35e2bb0b853b0b7ef7b03e}{get\+Size\+String} ()
+\item 
+std\+::string \hyperlink{classreclaimer__interface_ada48535c0c82904eb0bbe3491e52eca7}{get\+Details\+String} ()
+\item 
+bool \hyperlink{classreclaimer__interface_ad459569f628d48ad8f953de155277937}{is\+Protected} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+bool \hyperlink{classreclaimer__interface_adca271430185d90a3a1c7aea22d8bb0c}{is\+Q\+Protected} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+bool \hyperlink{classreclaimer__interface_acdac11080a38f7d5b6e60007d9b620cf}{protect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$obj, \hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type} not\+Retired\+Callback, \hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg} callback\+Arg, bool memory\+Barrier=true)
+\item 
+void \hyperlink{classreclaimer__interface_acdeb54332a2edeee70ee37581017ec0b}{unprotect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$obj)
+\item 
+bool \hyperlink{classreclaimer__interface_ae017ea119e3bc36949107124babf3888}{q\+Protect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$obj, \hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type} not\+Retired\+Callback, \hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg} callback\+Arg, bool memory\+Barrier=true)
+\item 
+void \hyperlink{classreclaimer__interface_a0893dc3706f43bfeb5572808bba6b92a}{q\+Unprotect\+All} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__interface_a913e054b17192c9c905469a19eb7dbd4}{end\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+bool \hyperlink{classreclaimer__interface_a99471b7a8f06a80d81896e269ea63cc9}{start\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, void $\ast$const $\ast$const reclaimers, const int num\+Reclaimers, const bool read\+Only=false)
+\item 
+void \hyperlink{classreclaimer__interface_aa3a2771a4002d59cf81ef86921d499ca}{rotate\+Epoch\+Bags} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__interface_a0ef47251c6a7fbd543354b88db8aa309}{retire} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$p)
+\item 
+void \hyperlink{classreclaimer__interface_a0fa3f1bddb187e68931f0792fbba812c}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__interface_a18e0cfdbf69e359ceab660df99ef4d4a}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__interface_aa8cd8a18adb4da97d35e60c139dfc4fb}{debug\+Print\+Status} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+\hyperlink{classreclaimer__interface_a63ff07ec643f85a3c2b8152183f37882}{reclaimer\+\_\+interface} (const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes}, Pool $\ast$\+\_\+pool, \hyperlink{classdebugInfo}{debug\+Info} $\ast$const \+\_\+debug, \hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const \+\_\+recovery\+Mgr=N\+U\+LL)
+\item 
+\hyperlink{classreclaimer__interface_aef907bda3f068a00c9a15f0d51962930}{$\sim$reclaimer\+\_\+interface} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \hyperlink{classreclaimer__interface_a3b93587337b561201d7fa8ab36f64d9d}{quiescence\+Is\+Per\+Record\+Type} ()
+\item 
+static bool \hyperlink{classreclaimer__interface_af20ec23a47f79d303a18551fd8706f2d}{should\+Help} ()
+\item 
+static bool \hyperlink{classreclaimer__interface_a965d5fd618ce50fb9a5db0d6e4a8dc9e}{supports\+Crash\+Recovery} ()
+\item 
+static bool \hyperlink{classreclaimer__interface_a8434d6efc52667ddd3c6738733c79db8}{is\+Quiescent} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classreclaimer__interface_a105497cdc18f0306f5a612c86afa0fa6}{P\+AD}
+\item 
+\hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$ $>$ $\ast$ \hyperlink{classreclaimer__interface_a7c9cff5fa3884b5318210f0dedb987e9}{recovery\+Mgr}
+\item 
+\hyperlink{classdebugInfo}{debug\+Info} $\ast$const \hyperlink{classreclaimer__interface_a617bf5436d7217b303ac65e57709618b}{debug}
+\item 
+const int \hyperlink{classreclaimer__interface_a6f3f1b6d104d2e4fa44d6183a6f6a2a5}{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}
+\item 
+Pool $\ast$ \hyperlink{classreclaimer__interface_a5ca8f53aca95e5fb296cd0dfcd87d90f}{pool}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classreclaimer__interface_a63ff07ec643f85a3c2b8152183f37882}\label{classreclaimer__interface_a63ff07ec643f85a3c2b8152183f37882}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{reclaimer\+\_\+interface()}{reclaimer\_interface()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::\hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface} (\begin{DoxyParamCaption}\item[{const int}]{num\+Processes,  }\item[{Pool $\ast$}]{\+\_\+pool,  }\item[{\hyperlink{classdebugInfo}{debug\+Info} $\ast$const}]{\+\_\+debug,  }\item[{\hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const}]{\+\_\+recovery\+Mgr = {\ttfamily NULL} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_aef907bda3f068a00c9a15f0d51962930}\label{classreclaimer__interface_aef907bda3f068a00c9a15f0d51962930}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!````~reclaimer\+\_\+interface@{$\sim$reclaimer\+\_\+interface}}
+\index{````~reclaimer\+\_\+interface@{$\sim$reclaimer\+\_\+interface}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{$\sim$reclaimer\+\_\+interface()}{~reclaimer\_interface()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::$\sim$\hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classreclaimer__interface_aa8cd8a18adb4da97d35e60c139dfc4fb}\label{classreclaimer__interface_aa8cd8a18adb4da97d35e60c139dfc4fb}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!debug\+Print\+Status@{debug\+Print\+Status}}
+\index{debug\+Print\+Status@{debug\+Print\+Status}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{debug\+Print\+Status()}{debugPrintStatus()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::debug\+Print\+Status (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classreclaimer__interface_a18e0cfdbf69e359ceab660df99ef4d4a}\label{classreclaimer__interface_a18e0cfdbf69e359ceab660df99ef4d4a}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_a913e054b17192c9c905469a19eb7dbd4}\label{classreclaimer__interface_a913e054b17192c9c905469a19eb7dbd4}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!end\+Op@{end\+Op}}
+\index{end\+Op@{end\+Op}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{end\+Op()}{endOp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::end\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+end\+Op$<$\+T$>$ must be idempotent, and must unprotect all objects protected by calls to protect\+Object$<$\+T$>$. it must N\+OT unprotect any object protected by a call to protect\+Object\+Even\+After\+Restart. \mbox{\Hypertarget{classreclaimer__interface_ada48535c0c82904eb0bbe3491e52eca7}\label{classreclaimer__interface_ada48535c0c82904eb0bbe3491e52eca7}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!get\+Details\+String@{get\+Details\+String}}
+\index{get\+Details\+String@{get\+Details\+String}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{get\+Details\+String()}{getDetailsString()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+std\+::string \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::get\+Details\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_aff9a466872ab7972a27e817c7d776936}\label{classreclaimer__interface_aff9a466872ab7972a27e817c7d776936}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}}
+\index{get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{get\+Size\+In\+Nodes()}{getSizeInNodes()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+long long \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::get\+Size\+In\+Nodes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_a949bf6cedb35e2bb0b853b0b7ef7b03e}\label{classreclaimer__interface_a949bf6cedb35e2bb0b853b0b7ef7b03e}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!get\+Size\+String@{get\+Size\+String}}
+\index{get\+Size\+String@{get\+Size\+String}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{get\+Size\+String()}{getSizeString()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+std\+::string \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::get\+Size\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_a0fa3f1bddb187e68931f0792fbba812c}\label{classreclaimer__interface_a0fa3f1bddb187e68931f0792fbba812c}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_ad459569f628d48ad8f953de155277937}\label{classreclaimer__interface_ad459569f628d48ad8f953de155277937}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!is\+Protected@{is\+Protected}}
+\index{is\+Protected@{is\+Protected}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{is\+Protected()}{isProtected()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+bool \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::is\+Protected (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_adca271430185d90a3a1c7aea22d8bb0c}\label{classreclaimer__interface_adca271430185d90a3a1c7aea22d8bb0c}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!is\+Q\+Protected@{is\+Q\+Protected}}
+\index{is\+Q\+Protected@{is\+Q\+Protected}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{is\+Q\+Protected()}{isQProtected()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+bool \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::is\+Q\+Protected (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_a8434d6efc52667ddd3c6738733c79db8}\label{classreclaimer__interface_a8434d6efc52667ddd3c6738733c79db8}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!is\+Quiescent@{is\+Quiescent}}
+\index{is\+Quiescent@{is\+Quiescent}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{is\+Quiescent()}{isQuiescent()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::is\+Quiescent (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_acdac11080a38f7d5b6e60007d9b620cf}\label{classreclaimer__interface_acdac11080a38f7d5b6e60007d9b620cf}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!protect@{protect}}
+\index{protect@{protect}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{protect()}{protect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+bool \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::protect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$}]{obj,  }\item[{\hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type}}]{not\+Retired\+Callback,  }\item[{\hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg}}]{callback\+Arg,  }\item[{bool}]{memory\+Barrier = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_ae017ea119e3bc36949107124babf3888}\label{classreclaimer__interface_ae017ea119e3bc36949107124babf3888}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!q\+Protect@{q\+Protect}}
+\index{q\+Protect@{q\+Protect}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{q\+Protect()}{qProtect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+bool \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::q\+Protect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$}]{obj,  }\item[{\hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type}}]{not\+Retired\+Callback,  }\item[{\hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg}}]{callback\+Arg,  }\item[{bool}]{memory\+Barrier = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_a3b93587337b561201d7fa8ab36f64d9d}\label{classreclaimer__interface_a3b93587337b561201d7fa8ab36f64d9d}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!quiescence\+Is\+Per\+Record\+Type@{quiescence\+Is\+Per\+Record\+Type}}
+\index{quiescence\+Is\+Per\+Record\+Type@{quiescence\+Is\+Per\+Record\+Type}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{quiescence\+Is\+Per\+Record\+Type()}{quiescenceIsPerRecordType()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::quiescence\+Is\+Per\+Record\+Type (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_a0893dc3706f43bfeb5572808bba6b92a}\label{classreclaimer__interface_a0893dc3706f43bfeb5572808bba6b92a}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!q\+Unprotect\+All@{q\+Unprotect\+All}}
+\index{q\+Unprotect\+All@{q\+Unprotect\+All}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{q\+Unprotect\+All()}{qUnprotectAll()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::q\+Unprotect\+All (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_a0ef47251c6a7fbd543354b88db8aa309}\label{classreclaimer__interface_a0ef47251c6a7fbd543354b88db8aa309}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!retire@{retire}}
+\index{retire@{retire}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{retire()}{retire()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::retire (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$}]{p }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_aa3a2771a4002d59cf81ef86921d499ca}\label{classreclaimer__interface_aa3a2771a4002d59cf81ef86921d499ca}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!rotate\+Epoch\+Bags@{rotate\+Epoch\+Bags}}
+\index{rotate\+Epoch\+Bags@{rotate\+Epoch\+Bags}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{rotate\+Epoch\+Bags()}{rotateEpochBags()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::rotate\+Epoch\+Bags (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_af20ec23a47f79d303a18551fd8706f2d}\label{classreclaimer__interface_af20ec23a47f79d303a18551fd8706f2d}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!should\+Help@{should\+Help}}
+\index{should\+Help@{should\+Help}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{should\+Help()}{shouldHelp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::should\+Help (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_a99471b7a8f06a80d81896e269ea63cc9}\label{classreclaimer__interface_a99471b7a8f06a80d81896e269ea63cc9}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!start\+Op@{start\+Op}}
+\index{start\+Op@{start\+Op}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{start\+Op()}{startOp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+bool \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::start\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{void $\ast$const $\ast$const}]{reclaimers,  }\item[{const int}]{num\+Reclaimers,  }\item[{const bool}]{read\+Only = {\ttfamily false} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_a965d5fd618ce50fb9a5db0d6e4a8dc9e}\label{classreclaimer__interface_a965d5fd618ce50fb9a5db0d6e4a8dc9e}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!supports\+Crash\+Recovery@{supports\+Crash\+Recovery}}
+\index{supports\+Crash\+Recovery@{supports\+Crash\+Recovery}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{supports\+Crash\+Recovery()}{supportsCrashRecovery()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::supports\+Crash\+Recovery (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__interface_acdeb54332a2edeee70ee37581017ec0b}\label{classreclaimer__interface_acdeb54332a2edeee70ee37581017ec0b}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!unprotect@{unprotect}}
+\index{unprotect@{unprotect}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{unprotect()}{unprotect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::unprotect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classreclaimer__interface_a617bf5436d7217b303ac65e57709618b}\label{classreclaimer__interface_a617bf5436d7217b303ac65e57709618b}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!debug@{debug}}
+\index{debug@{debug}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{debug}{debug}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classdebugInfo}{debug\+Info}$\ast$ const \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::debug}
+
+\mbox{\Hypertarget{classreclaimer__interface_a6f3f1b6d104d2e4fa44d6183a6f6a2a5}\label{classreclaimer__interface_a6f3f1b6d104d2e4fa44d6183a6f6a2a5}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES@{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}}
+\index{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES@{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}{NUM\_PROCESSES}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+const int \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}
+
+\mbox{\Hypertarget{classreclaimer__interface_a105497cdc18f0306f5a612c86afa0fa6}\label{classreclaimer__interface_a105497cdc18f0306f5a612c86afa0fa6}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!P\+AD@{P\+AD}}
+\index{P\+AD@{P\+AD}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{P\+AD}{PAD}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::P\+AD}
+
+\mbox{\Hypertarget{classreclaimer__interface_a5ca8f53aca95e5fb296cd0dfcd87d90f}\label{classreclaimer__interface_a5ca8f53aca95e5fb296cd0dfcd87d90f}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!pool@{pool}}
+\index{pool@{pool}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{pool}{pool}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+Pool$\ast$ \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::pool}
+
+\mbox{\Hypertarget{classreclaimer__interface_a7c9cff5fa3884b5318210f0dedb987e9}\label{classreclaimer__interface_a7c9cff5fa3884b5318210f0dedb987e9}} 
+\index{reclaimer\+\_\+interface@{reclaimer\+\_\+interface}!recovery\+Mgr@{recovery\+Mgr}}
+\index{recovery\+Mgr@{recovery\+Mgr}!reclaimer\+\_\+interface@{reclaimer\+\_\+interface}}
+\subsubsection{\texorpdfstring{recovery\+Mgr}{recoveryMgr}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$void $\ast$$>$$\ast$ \hyperlink{classreclaimer__interface}{reclaimer\+\_\+interface}$<$ T, Pool $>$\+::recovery\+Mgr}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/recordmgr/\hyperlink{reclaimer__interface_8h}{reclaimer\+\_\+interface.\+h}\end{DoxyCompactItemize}

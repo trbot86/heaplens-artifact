@@ -1,0 +1,154 @@
+\hypertarget{classSnapCollector}{}\section{Snap\+Collector$<$ Node\+Type, K $>$ Class Template Reference}
+\label{classSnapCollector}\index{Snap\+Collector$<$ Node\+Type, K $>$@{Snap\+Collector$<$ Node\+Type, K $>$}}
+
+
+{\ttfamily \#include $<$snapcollector.\+h$>$}
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classSnapCollector_1_1NodeWrapper}{Node\+Wrapper}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Record\+Manager $>$ }\\void \hyperlink{classSnapCollector_ab94abbe542a7e33a212e8247b96197b5}{init} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes}, Record\+Manager $\ast$const recmgr, const K \+\_\+\+K\+E\+Y\+\_\+\+M\+IN, const K \+\_\+\+K\+E\+Y\+\_\+\+M\+AX)
+\item 
+\hyperlink{classSnapCollector_afe44bffcd16d6f6cd54c313be9703e52}{$\sim$\+Snap\+Collector} ()
+\item 
+{\footnotesize template$<$typename Record\+Manager $>$ }\\void \hyperlink{classSnapCollector_a9060f1d38be8915ad5e0139bc518bab4}{retire} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, Record\+Manager $\ast$recmgr)
+\item 
+{\footnotesize template$<$typename Record\+Manager $>$ }\\Node\+Type $\ast$ \hyperlink{classSnapCollector_aab421d45e780e447bb9b5b872fa368f9}{Add\+Node} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, Node\+Type $\ast$node, K key, Record\+Manager $\ast$recmgr)
+\item 
+{\footnotesize template$<$typename Record\+Manager $>$ }\\void \hyperlink{classSnapCollector_a99bf72a5b736cc82ce4c64e0fd76d15e}{Report} (int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, Node\+Type $\ast$\hyperlink{classNode}{Node}, \hyperlink{reportitem_8h_ae4f179a72db5cca021a37ec4c6fe4c68}{Report\+Type} t, K key, Record\+Manager $\ast$recmgr)
+\item 
+bool \hyperlink{classSnapCollector_a6140fe1b63009ac107881faaf43c09da}{Is\+Active} ()
+\item 
+{\footnotesize template$<$typename Record\+Manager $>$ }\\void \hyperlink{classSnapCollector_a53b4976ed927e14a99bb52993ffd5a2b}{Block\+Further\+Pointers} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, Record\+Manager $\ast$recmgr)
+\item 
+void \hyperlink{classSnapCollector_a56d824c8e580ccb9422edcef9a26e636}{Deactivate} (pthread\+\_\+rwlock\+\_\+t $\ast$const rwlock, volatile long long $\ast$timestamp, long long $\ast$\hyperlink{rq__unsafe_8h_a643fd1eef8dbd00706b939b113a76394}{rq\+\_\+lin\+\_\+time})
+\item 
+void \hyperlink{classSnapCollector_a0848f9cf2e792a241809d9ff23a24bab}{Block\+Further\+Reports} ()
+\item 
+{\footnotesize template$<$typename Record\+Manager $>$ }\\void \hyperlink{classSnapCollector_a8c2b96dd6ec25eb4abfdc0c1ba2abc29}{Prepare} (int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, Record\+Manager $\ast$recmgr)
+\item 
+Node\+Type $\ast$ \hyperlink{classSnapCollector_afbc67dba82450f2d89099b0614c83804}{Get\+Next} (int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classSnapCollector_a1e71ab6f1d3af03e0042459d31a98b95}{P\+AD}
+\item 
+int \hyperlink{classSnapCollector_a8c45790cee8b96758a8e98d7d7c8faf7}{N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classSnapCollector_afe44bffcd16d6f6cd54c313be9703e52}\label{classSnapCollector_afe44bffcd16d6f6cd54c313be9703e52}} 
+\index{Snap\+Collector@{Snap\+Collector}!````~Snap\+Collector@{$\sim$\+Snap\+Collector}}
+\index{````~Snap\+Collector@{$\sim$\+Snap\+Collector}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{$\sim$\+Snap\+Collector()}{~SnapCollector()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+\hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::$\sim$\hyperlink{classSnapCollector}{Snap\+Collector} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classSnapCollector_aab421d45e780e447bb9b5b872fa368f9}\label{classSnapCollector_aab421d45e780e447bb9b5b872fa368f9}} 
+\index{Snap\+Collector@{Snap\+Collector}!Add\+Node@{Add\+Node}}
+\index{Add\+Node@{Add\+Node}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{Add\+Node()}{AddNode()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+template$<$typename Record\+Manager $>$ \\
+Node\+Type$\ast$ \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::Add\+Node (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{Node\+Type $\ast$}]{node,  }\item[{K}]{key,  }\item[{Record\+Manager $\ast$}]{recmgr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classSnapCollector_a53b4976ed927e14a99bb52993ffd5a2b}\label{classSnapCollector_a53b4976ed927e14a99bb52993ffd5a2b}} 
+\index{Snap\+Collector@{Snap\+Collector}!Block\+Further\+Pointers@{Block\+Further\+Pointers}}
+\index{Block\+Further\+Pointers@{Block\+Further\+Pointers}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{Block\+Further\+Pointers()}{BlockFurtherPointers()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+template$<$typename Record\+Manager $>$ \\
+void \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::Block\+Further\+Pointers (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{Record\+Manager $\ast$}]{recmgr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classSnapCollector_a0848f9cf2e792a241809d9ff23a24bab}\label{classSnapCollector_a0848f9cf2e792a241809d9ff23a24bab}} 
+\index{Snap\+Collector@{Snap\+Collector}!Block\+Further\+Reports@{Block\+Further\+Reports}}
+\index{Block\+Further\+Reports@{Block\+Further\+Reports}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{Block\+Further\+Reports()}{BlockFurtherReports()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+void \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::Block\+Further\+Reports (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classSnapCollector_a56d824c8e580ccb9422edcef9a26e636}\label{classSnapCollector_a56d824c8e580ccb9422edcef9a26e636}} 
+\index{Snap\+Collector@{Snap\+Collector}!Deactivate@{Deactivate}}
+\index{Deactivate@{Deactivate}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{Deactivate()}{Deactivate()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+void \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::Deactivate (\begin{DoxyParamCaption}\item[{pthread\+\_\+rwlock\+\_\+t $\ast$const}]{rwlock,  }\item[{volatile long long $\ast$}]{timestamp,  }\item[{long long $\ast$}]{rq\+\_\+lin\+\_\+time }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+note\+: the parameters are used for the timestamping mechanism of the test harness. they are N\+OT inherently needed by the snap collector. \mbox{\Hypertarget{classSnapCollector_afbc67dba82450f2d89099b0614c83804}\label{classSnapCollector_afbc67dba82450f2d89099b0614c83804}} 
+\index{Snap\+Collector@{Snap\+Collector}!Get\+Next@{Get\+Next}}
+\index{Get\+Next@{Get\+Next}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{Get\+Next()}{GetNext()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+Node\+Type$\ast$ \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::Get\+Next (\begin{DoxyParamCaption}\item[{int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classSnapCollector_ab94abbe542a7e33a212e8247b96197b5}\label{classSnapCollector_ab94abbe542a7e33a212e8247b96197b5}} 
+\index{Snap\+Collector@{Snap\+Collector}!init@{init}}
+\index{init@{init}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+template$<$typename Record\+Manager $>$ \\
+void \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::init (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const int}]{num\+Processes,  }\item[{Record\+Manager $\ast$const}]{recmgr,  }\item[{const K}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+IN,  }\item[{const K}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+AX }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classSnapCollector_a6140fe1b63009ac107881faaf43c09da}\label{classSnapCollector_a6140fe1b63009ac107881faaf43c09da}} 
+\index{Snap\+Collector@{Snap\+Collector}!Is\+Active@{Is\+Active}}
+\index{Is\+Active@{Is\+Active}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{Is\+Active()}{IsActive()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+bool \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::Is\+Active (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classSnapCollector_a8c2b96dd6ec25eb4abfdc0c1ba2abc29}\label{classSnapCollector_a8c2b96dd6ec25eb4abfdc0c1ba2abc29}} 
+\index{Snap\+Collector@{Snap\+Collector}!Prepare@{Prepare}}
+\index{Prepare@{Prepare}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{Prepare()}{Prepare()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+template$<$typename Record\+Manager $>$ \\
+void \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::Prepare (\begin{DoxyParamCaption}\item[{int}]{tid,  }\item[{Record\+Manager $\ast$}]{recmgr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classSnapCollector_a99bf72a5b736cc82ce4c64e0fd76d15e}\label{classSnapCollector_a99bf72a5b736cc82ce4c64e0fd76d15e}} 
+\index{Snap\+Collector@{Snap\+Collector}!Report@{Report}}
+\index{Report@{Report}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{Report()}{Report()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+template$<$typename Record\+Manager $>$ \\
+void \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::Report (\begin{DoxyParamCaption}\item[{int}]{tid,  }\item[{Node\+Type $\ast$}]{Node,  }\item[{\hyperlink{reportitem_8h_ae4f179a72db5cca021a37ec4c6fe4c68}{Report\+Type}}]{t,  }\item[{K}]{key,  }\item[{Record\+Manager $\ast$}]{recmgr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classSnapCollector_a9060f1d38be8915ad5e0139bc518bab4}\label{classSnapCollector_a9060f1d38be8915ad5e0139bc518bab4}} 
+\index{Snap\+Collector@{Snap\+Collector}!retire@{retire}}
+\index{retire@{retire}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{retire()}{retire()}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+template$<$typename Record\+Manager $>$ \\
+void \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::retire (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{Record\+Manager $\ast$}]{recmgr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classSnapCollector_a8c45790cee8b96758a8e98d7d7c8faf7}\label{classSnapCollector_a8c45790cee8b96758a8e98d7d7c8faf7}} 
+\index{Snap\+Collector@{Snap\+Collector}!N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS@{N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS}}
+\index{N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS@{N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS}{NUM\_THREADS}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+int \hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS}
+
+\mbox{\Hypertarget{classSnapCollector_a1e71ab6f1d3af03e0042459d31a98b95}\label{classSnapCollector_a1e71ab6f1d3af03e0042459d31a98b95}} 
+\index{Snap\+Collector@{Snap\+Collector}!P\+AD@{P\+AD}}
+\index{P\+AD@{P\+AD}!Snap\+Collector@{Snap\+Collector}}
+\subsubsection{\texorpdfstring{P\+AD}{PAD}}
+{\footnotesize\ttfamily template$<$typename Node\+Type, typename K$>$ \\
+\hyperlink{classSnapCollector}{Snap\+Collector}$<$ Node\+Type, K $>$\+::P\+AD}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/rq/snapcollector/\hyperlink{snapcollector_8h}{snapcollector.\+h}\end{DoxyCompactItemize}

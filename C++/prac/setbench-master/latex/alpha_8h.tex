@@ -1,0 +1,80 @@
+\hypertarget{alpha_8h}{}\section{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/alpha.h File Reference}
+\label{alpha_8h}\index{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/alpha.\+h@{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/alpha.\+h}}
+{\ttfamily \#include \char`\"{}../atomic\+\_\+load\+\_\+store.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../test\+\_\+and\+\_\+set\+\_\+t\+\_\+is\+\_\+ao\+\_\+t.\+h\char`\"{}}\newline
+Include dependency graph for alpha.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=314pt]{alpha_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{alpha_8h_ab65316d98c499c612122d64bc69bf5fa}{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}
+\item 
+\#define \hyperlink{alpha_8h_a3904dc699d6a6d6e771a93aa66aeb805}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}
+\item 
+\#define \hyperlink{alpha_8h_a7c6d0c7c0585da4d8cd259df2423b82f}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}
+\item 
+\#define \hyperlink{alpha_8h_a0c5d9cf68a56bfa9e267db0f2795811c}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void \hyperlink{alpha_8h_afe3a6778eacc82252ba138fc9a157b04}{A\+O\+\_\+nop\+\_\+full} (void)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void \hyperlink{alpha_8h_a4a8d4664cca4161a554167b152c66772}{A\+O\+\_\+nop\+\_\+write} (void)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{alpha_8h_a2e1cdaa59eda3ac15129d16951295698}{A\+O\+\_\+compare\+\_\+and\+\_\+swap} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{alpha_8h_a0c5d9cf68a56bfa9e267db0f2795811c}\label{alpha_8h_a0c5d9cf68a56bfa9e267db0f2795811c}} 
+\index{alpha.\+h@{alpha.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}!alpha.\+h@{alpha.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}{AO\_HAVE\_compare\_and\_swap}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}
+
+\mbox{\Hypertarget{alpha_8h_a3904dc699d6a6d6e771a93aa66aeb805}\label{alpha_8h_a3904dc699d6a6d6e771a93aa66aeb805}} 
+\index{alpha.\+h@{alpha.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}!alpha.\+h@{alpha.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}{AO\_HAVE\_nop\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}
+
+\mbox{\Hypertarget{alpha_8h_a7c6d0c7c0585da4d8cd259df2423b82f}\label{alpha_8h_a7c6d0c7c0585da4d8cd259df2423b82f}} 
+\index{alpha.\+h@{alpha.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}!alpha.\+h@{alpha.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}{AO\_HAVE\_nop\_write}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}
+
+\mbox{\Hypertarget{alpha_8h_ab65316d98c499c612122d64bc69bf5fa}\label{alpha_8h_ab65316d98c499c612122d64bc69bf5fa}} 
+\index{alpha.\+h@{alpha.\+h}!A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG@{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}}
+\index{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG@{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}!alpha.\+h@{alpha.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}{AO\_NO\_DD\_ORDERING}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{alpha_8h_a2e1cdaa59eda3ac15129d16951295698}\label{alpha_8h_a2e1cdaa59eda3ac15129d16951295698}} 
+\index{alpha.\+h@{alpha.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+compare\+\_\+and\+\_\+swap}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+compare\+\_\+and\+\_\+swap}!alpha.\+h@{alpha.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap()}{AO\_compare\_and\_swap()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{alpha_8h_afe3a6778eacc82252ba138fc9a157b04}\label{alpha_8h_afe3a6778eacc82252ba138fc9a157b04}} 
+\index{alpha.\+h@{alpha.\+h}!A\+O\+\_\+nop\+\_\+full@{A\+O\+\_\+nop\+\_\+full}}
+\index{A\+O\+\_\+nop\+\_\+full@{A\+O\+\_\+nop\+\_\+full}!alpha.\+h@{alpha.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+nop\+\_\+full()}{AO\_nop\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void A\+O\+\_\+nop\+\_\+full (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{alpha_8h_a4a8d4664cca4161a554167b152c66772}\label{alpha_8h_a4a8d4664cca4161a554167b152c66772}} 
+\index{alpha.\+h@{alpha.\+h}!A\+O\+\_\+nop\+\_\+write@{A\+O\+\_\+nop\+\_\+write}}
+\index{A\+O\+\_\+nop\+\_\+write@{A\+O\+\_\+nop\+\_\+write}!alpha.\+h@{alpha.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+nop\+\_\+write()}{AO\_nop\_write()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void A\+O\+\_\+nop\+\_\+write (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+

@@ -1,0 +1,493 @@
+\hypertarget{classbst__ns_1_1SCXRecord}{}\section{bst\+\_\+ns\+:\+:S\+C\+X\+Record$<$ K, V $>$ Class Template Reference}
+\label{classbst__ns_1_1SCXRecord}\index{bst\+\_\+ns\+::\+S\+C\+X\+Record$<$ K, V $>$@{bst\+\_\+ns\+::\+S\+C\+X\+Record$<$ K, V $>$}}
+
+
+{\ttfamily \#include $<$scxrecord.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+template$<$class K , class V $>$ \begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>volatile \hyperlink{descriptors_8h_a8a5af2749482b19d7515054489efca22}{mutables\_t} \hyperlink{classbst__ns_1_1SCXRecord_ad707acfc8bceec490ba56fa95d4b5352}{mutables}\\
+\>\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$ \hyperlink{classbst__ns_1_1SCXRecord_adb045921444e7bc3c1dc3c3581752289}{newNode}\\
+\>\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$volatile $\ast$ \hyperlink{classbst__ns_1_1SCXRecord_a539ffffd648f59666ebab5bc1cae180f}{field}\\
+\>int \hyperlink{classbst__ns_1_1SCXRecord_acf9f5e7aa42c757fa9ed66f19052d06f}{numberOfNodes}\\
+\>int \hyperlink{classbst__ns_1_1SCXRecord_a68ee06be0281625a027f71fae2786643}{numberOfNodesToFreeze}\\
+\>\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$ \hyperlink{classbst__ns_1_1SCXRecord_a91ee309565cb07b7eca41b7aa9a26d39}{nodes} \mbox{[}\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{MAX\_NODES}\mbox{]}\\
+\>\hyperlink{classbst__ns_1_1SCXRecord}{SCXRecord}$<$ K, V $>$ $\ast$ \hyperlink{classbst__ns_1_1SCXRecord_ae3cd3a3c2108475b0929db86ee8f2887}{scxRecordsSeen} \mbox{[}\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{MAX\_NODES}\mbox{]}\\
+\>\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$ \hyperlink{classbst__ns_1_1SCXRecord_ad168d1132cbd02e63917cb601faa082f}{insertedNodes} \mbox{[}\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{MAX\_NODES}+1\mbox{]}\\
+\>\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$ \hyperlink{classbst__ns_1_1SCXRecord_a58674d554b988380986ffac69a7e2103}{deletedNodes} \mbox{[}\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{MAX\_NODES}+1\mbox{]}\\
+\} \hyperlink{classbst__ns_1_1SCXRecord_aba7f726f71e45d8972a309cdf0dc265e}{\_\_attribute\_\_} ((packed)) c\\
+
+\end{tabbing}\item 
+\hyperlink{classbst__ns_1_1SCXRecord_a49f921666ea148854d5b3c7fcb060d7a}{S\+C\+X\+Record} ()
+\item 
+\hyperlink{classbst__ns_1_1SCXRecord_a0d59d4c65b6963f463029d761aaf414c}{S\+C\+X\+Record} (const \hyperlink{classbst__ns_1_1SCXRecord}{S\+C\+X\+Record}$<$ K, V $>$ \&op)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classbst__ns_1_1SCXRecord_aab91d9999057a9ca058de5947bfc0af1}{P\+AD}
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a06dcb8bed28b088f6dbf7cd15991dfd1}{T\+Y\+P\+E\+\_\+\+F\+I\+ND} = -\/1
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_afc069eba9ed16a5ffdbc9f5a3e33eb8c}{T\+Y\+P\+E\+\_\+\+I\+NS} = 0
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_afbd455b4d9c688123649bd661056bf3f}{T\+Y\+P\+E\+\_\+\+D\+EL} = 1
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a185f400e57364087d1656d9bbba4fd9f}{T\+Y\+P\+E\+\_\+\+B\+LK} = 2
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a9f2946ea296a3289d770646458eecfa2}{T\+Y\+P\+E\+\_\+\+R\+B1} = 3
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a7d90066fb5fa026bc88a01cc2675059b}{T\+Y\+P\+E\+\_\+\+R\+B2} = 4
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_ace5436c6cbba73c8c17529f7f605c0b2}{T\+Y\+P\+E\+\_\+\+P\+U\+SH} = 5
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a2ec4ce153055e8e0577e08ee9020e1f9}{T\+Y\+P\+E\+\_\+\+W1} = 6
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a9a88e3ff30eabbebc01d1480cc6dbdf6}{T\+Y\+P\+E\+\_\+\+W2} = 7
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a0a88774d83c15e2dc231df16d4cd907b}{T\+Y\+P\+E\+\_\+\+W3} = 8
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_ab928d1cabbcaa459855b883e3438fc92}{T\+Y\+P\+E\+\_\+\+W4} = 9
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_afc98c244e075bd350fcbdbe6c01e94bf}{T\+Y\+P\+E\+\_\+\+W5} = 10
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_af57222b8f4c33530d611c619b103c1d7}{T\+Y\+P\+E\+\_\+\+W6} = 11
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_ab0d4f9a6d76b1be804061d809673e41a}{T\+Y\+P\+E\+\_\+\+W7} = 12
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_af5e2449e308553f3140c58def43ab54d}{T\+Y\+P\+E\+\_\+\+D\+B\+L1} = 13
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_af6dbccddc5b03de4b10e183a38413e64}{T\+Y\+P\+E\+\_\+\+D\+B\+L2} = 14
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_aa4a75da85c7799d8cb287d08811209e9}{T\+Y\+P\+E\+\_\+\+D\+B\+L3} = 15
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a2115276d4de941cd0dcf0222ea65e5cb}{T\+Y\+P\+E\+\_\+\+D\+B\+L4} = 16
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a89eeec55147c741763245f2b5c695770}{T\+Y\+P\+E\+\_\+\+R\+B1\+S\+YM} = 17
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_af48a81834a9a03a2dfc5156dee2ee950}{T\+Y\+P\+E\+\_\+\+R\+B2\+S\+YM} = 18
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a18340cd31d82e3ec79fb292011e5bdbe}{T\+Y\+P\+E\+\_\+\+P\+U\+S\+H\+S\+YM} = 19
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_af40b97d91dcb961dde9013019da49538}{T\+Y\+P\+E\+\_\+\+W1\+S\+YM} = 20
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_ab690bec0dc75b97fa6a1d260d86b2ab9}{T\+Y\+P\+E\+\_\+\+W2\+S\+YM} = 21
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a917e0d386b53b9eaff39d33bd2a37f4b}{T\+Y\+P\+E\+\_\+\+W3\+S\+YM} = 22
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a48f56e548914970234daf233bb953e5a}{T\+Y\+P\+E\+\_\+\+W4\+S\+YM} = 23
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_aa4f915da3d1bdcf1b63e11be59031ac7}{T\+Y\+P\+E\+\_\+\+W5\+S\+YM} = 24
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a4e010c66b666b160b2fb177cb9573a90}{T\+Y\+P\+E\+\_\+\+W6\+S\+YM} = 25
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_ad1a27e48ecafa960328de582204dce0e}{T\+Y\+P\+E\+\_\+\+W7\+S\+YM} = 26
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a4f900214380d262fa03d1092e2ea4b8a}{T\+Y\+P\+E\+\_\+\+D\+B\+L1\+S\+YM} = 27
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a17f2e28caa171d59bb58af0b3b92e2e9}{T\+Y\+P\+E\+\_\+\+D\+B\+L2\+S\+YM} = 28
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a4e876202e1b5929f982b946287be7690}{T\+Y\+P\+E\+\_\+\+D\+B\+L3\+S\+YM} = 29
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a6e62cd8c43c2dd8c583bf101094aed03}{T\+Y\+P\+E\+\_\+\+D\+B\+L4\+S\+YM} = 30
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a1c9436563626cacffd1fece60cfac30a}{T\+Y\+P\+E\+\_\+\+R\+E\+P\+L\+A\+CE} = 31
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a0e23ae4d646e889a457df7df143bc95a}{T\+Y\+P\+E\+\_\+\+N\+O\+OP} = 32
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a0122c12a08e3656845100691fa27d664}{N\+U\+M\+\_\+\+O\+F\+\_\+\+O\+P\+\_\+\+T\+Y\+P\+ES} = 33
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a9223099c087943bb82aa625e66068fa8}{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS} = 0
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a2302bf603882e8a59aa206d18ad4541a}{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED} = 1
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a820a1803ba1c69acf94b32eb04a4d167}{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED} = 2
+\item 
+static const int \hyperlink{classbst__ns_1_1SCXRecord_a13d0068348b61415f312e0e648c7dd2b}{size} = sizeof(c)
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a49f921666ea148854d5b3c7fcb060d7a}\label{classbst__ns_1_1SCXRecord_a49f921666ea148854d5b3c7fcb060d7a}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!S\+C\+X\+Record@{S\+C\+X\+Record}}
+\index{S\+C\+X\+Record@{S\+C\+X\+Record}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+C\+X\+Record()}{SCXRecord()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+\hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::\hyperlink{classbst__ns_1_1SCXRecord}{S\+C\+X\+Record} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a0d59d4c65b6963f463029d761aaf414c}\label{classbst__ns_1_1SCXRecord_a0d59d4c65b6963f463029d761aaf414c}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!S\+C\+X\+Record@{S\+C\+X\+Record}}
+\index{S\+C\+X\+Record@{S\+C\+X\+Record}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+C\+X\+Record()}{SCXRecord()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+\hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::\hyperlink{classbst__ns_1_1SCXRecord}{S\+C\+X\+Record} (\begin{DoxyParamCaption}\item[{const \hyperlink{classbst__ns_1_1SCXRecord}{S\+C\+X\+Record}$<$ K, V $>$ \&}]{op }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_aba7f726f71e45d8972a309cdf0dc265e}\label{classbst__ns_1_1SCXRecord_aba7f726f71e45d8972a309cdf0dc265e}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+attribute\+\_\+\+\_\+()}{\_\_attribute\_\_()}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+template$<$class K , class V $>$ \\
+struct bst\+\_\+ns\+::\+S\+C\+X\+Record\+::@74 \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::\+\_\+\+\_\+attribute\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{(packed)}]{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a58674d554b988380986ffac69a7e2103}\label{classbst__ns_1_1SCXRecord_a58674d554b988380986ffac69a7e2103}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!deleted\+Nodes@{deleted\+Nodes}}
+\index{deleted\+Nodes@{deleted\+Nodes}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{deleted\+Nodes}{deletedNodes}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+\hyperlink{classbst__ns_1_1Node}{Node}$<$K,V$>$$\ast$ \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::deleted\+Nodes\mbox{[}\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a539ffffd648f59666ebab5bc1cae180f}\label{classbst__ns_1_1SCXRecord_a539ffffd648f59666ebab5bc1cae180f}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!field@{field}}
+\index{field@{field}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{field}{field}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+\hyperlink{classbst__ns_1_1Node}{Node}$<$K,V$>$$\ast$ volatile$\ast$ \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::field}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_ad168d1132cbd02e63917cb601faa082f}\label{classbst__ns_1_1SCXRecord_ad168d1132cbd02e63917cb601faa082f}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!inserted\+Nodes@{inserted\+Nodes}}
+\index{inserted\+Nodes@{inserted\+Nodes}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{inserted\+Nodes}{insertedNodes}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+\hyperlink{classbst__ns_1_1Node}{Node}$<$K,V$>$$\ast$ \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::inserted\+Nodes\mbox{[}\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_ad707acfc8bceec490ba56fa95d4b5352}\label{classbst__ns_1_1SCXRecord_ad707acfc8bceec490ba56fa95d4b5352}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!mutables@{mutables}}
+\index{mutables@{mutables}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{mutables}{mutables}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+volatile \hyperlink{descriptors_8h_a8a5af2749482b19d7515054489efca22}{mutables\+\_\+t} \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::mutables}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_adb045921444e7bc3c1dc3c3581752289}\label{classbst__ns_1_1SCXRecord_adb045921444e7bc3c1dc3c3581752289}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!new\+Node@{new\+Node}}
+\index{new\+Node@{new\+Node}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{new\+Node}{newNode}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+\hyperlink{classbst__ns_1_1Node}{Node}$<$K,V$>$$\ast$ \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::new\+Node}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a91ee309565cb07b7eca41b7aa9a26d39}\label{classbst__ns_1_1SCXRecord_a91ee309565cb07b7eca41b7aa9a26d39}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!nodes@{nodes}}
+\index{nodes@{nodes}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{nodes}{nodes}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+\hyperlink{classbst__ns_1_1Node}{Node}$<$K,V$>$$\ast$ \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::nodes\mbox{[}\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a0122c12a08e3656845100691fa27d664}\label{classbst__ns_1_1SCXRecord_a0122c12a08e3656845100691fa27d664}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!N\+U\+M\+\_\+\+O\+F\+\_\+\+O\+P\+\_\+\+T\+Y\+P\+ES@{N\+U\+M\+\_\+\+O\+F\+\_\+\+O\+P\+\_\+\+T\+Y\+P\+ES}}
+\index{N\+U\+M\+\_\+\+O\+F\+\_\+\+O\+P\+\_\+\+T\+Y\+P\+ES@{N\+U\+M\+\_\+\+O\+F\+\_\+\+O\+P\+\_\+\+T\+Y\+P\+ES}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{N\+U\+M\+\_\+\+O\+F\+\_\+\+O\+P\+\_\+\+T\+Y\+P\+ES}{NUM\_OF\_OP\_TYPES}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::N\+U\+M\+\_\+\+O\+F\+\_\+\+O\+P\+\_\+\+T\+Y\+P\+ES = 33\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_acf9f5e7aa42c757fa9ed66f19052d06f}\label{classbst__ns_1_1SCXRecord_acf9f5e7aa42c757fa9ed66f19052d06f}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!number\+Of\+Nodes@{number\+Of\+Nodes}}
+\index{number\+Of\+Nodes@{number\+Of\+Nodes}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{number\+Of\+Nodes}{numberOfNodes}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::number\+Of\+Nodes}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a68ee06be0281625a027f71fae2786643}\label{classbst__ns_1_1SCXRecord_a68ee06be0281625a027f71fae2786643}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!number\+Of\+Nodes\+To\+Freeze@{number\+Of\+Nodes\+To\+Freeze}}
+\index{number\+Of\+Nodes\+To\+Freeze@{number\+Of\+Nodes\+To\+Freeze}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{number\+Of\+Nodes\+To\+Freeze}{numberOfNodesToFreeze}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::number\+Of\+Nodes\+To\+Freeze}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_aab91d9999057a9ca058de5947bfc0af1}\label{classbst__ns_1_1SCXRecord_aab91d9999057a9ca058de5947bfc0af1}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!P\+AD@{P\+AD}}
+\index{P\+AD@{P\+AD}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{P\+AD}{PAD}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+\hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::P\+AD}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_ae3cd3a3c2108475b0929db86ee8f2887}\label{classbst__ns_1_1SCXRecord_ae3cd3a3c2108475b0929db86ee8f2887}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!scx\+Records\+Seen@{scx\+Records\+Seen}}
+\index{scx\+Records\+Seen@{scx\+Records\+Seen}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{scx\+Records\+Seen}{scxRecordsSeen}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+\hyperlink{classbst__ns_1_1SCXRecord}{S\+C\+X\+Record}$<$K,V$>$$\ast$ \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::scx\+Records\+Seen\mbox{[}\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a13d0068348b61415f312e0e648c7dd2b}\label{classbst__ns_1_1SCXRecord_a13d0068348b61415f312e0e648c7dd2b}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!size@{size}}
+\index{size@{size}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::size = sizeof(c)\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a820a1803ba1c69acf94b32eb04a4d167}\label{classbst__ns_1_1SCXRecord_a820a1803ba1c69acf94b32eb04a4d167}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED}}
+\index{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED}{STATE\_ABORTED}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED = 2\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a2302bf603882e8a59aa206d18ad4541a}\label{classbst__ns_1_1SCXRecord_a2302bf603882e8a59aa206d18ad4541a}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED}}
+\index{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED}{STATE\_COMMITTED}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED = 1\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a9223099c087943bb82aa625e66068fa8}\label{classbst__ns_1_1SCXRecord_a9223099c087943bb82aa625e66068fa8}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS@{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS}}
+\index{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS@{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS}{STATE\_INPROGRESS}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS = 0\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a185f400e57364087d1656d9bbba4fd9f}\label{classbst__ns_1_1SCXRecord_a185f400e57364087d1656d9bbba4fd9f}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+B\+LK@{T\+Y\+P\+E\+\_\+\+B\+LK}}
+\index{T\+Y\+P\+E\+\_\+\+B\+LK@{T\+Y\+P\+E\+\_\+\+B\+LK}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+B\+LK}{TYPE\_BLK}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+B\+LK = 2\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_af5e2449e308553f3140c58def43ab54d}\label{classbst__ns_1_1SCXRecord_af5e2449e308553f3140c58def43ab54d}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+D\+B\+L1@{T\+Y\+P\+E\+\_\+\+D\+B\+L1}}
+\index{T\+Y\+P\+E\+\_\+\+D\+B\+L1@{T\+Y\+P\+E\+\_\+\+D\+B\+L1}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+D\+B\+L1}{TYPE\_DBL1}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+D\+B\+L1 = 13\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a4f900214380d262fa03d1092e2ea4b8a}\label{classbst__ns_1_1SCXRecord_a4f900214380d262fa03d1092e2ea4b8a}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+D\+B\+L1\+S\+YM@{T\+Y\+P\+E\+\_\+\+D\+B\+L1\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+D\+B\+L1\+S\+YM@{T\+Y\+P\+E\+\_\+\+D\+B\+L1\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+D\+B\+L1\+S\+YM}{TYPE\_DBL1SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+D\+B\+L1\+S\+YM = 27\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_af6dbccddc5b03de4b10e183a38413e64}\label{classbst__ns_1_1SCXRecord_af6dbccddc5b03de4b10e183a38413e64}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+D\+B\+L2@{T\+Y\+P\+E\+\_\+\+D\+B\+L2}}
+\index{T\+Y\+P\+E\+\_\+\+D\+B\+L2@{T\+Y\+P\+E\+\_\+\+D\+B\+L2}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+D\+B\+L2}{TYPE\_DBL2}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+D\+B\+L2 = 14\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a17f2e28caa171d59bb58af0b3b92e2e9}\label{classbst__ns_1_1SCXRecord_a17f2e28caa171d59bb58af0b3b92e2e9}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+D\+B\+L2\+S\+YM@{T\+Y\+P\+E\+\_\+\+D\+B\+L2\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+D\+B\+L2\+S\+YM@{T\+Y\+P\+E\+\_\+\+D\+B\+L2\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+D\+B\+L2\+S\+YM}{TYPE\_DBL2SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+D\+B\+L2\+S\+YM = 28\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_aa4a75da85c7799d8cb287d08811209e9}\label{classbst__ns_1_1SCXRecord_aa4a75da85c7799d8cb287d08811209e9}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+D\+B\+L3@{T\+Y\+P\+E\+\_\+\+D\+B\+L3}}
+\index{T\+Y\+P\+E\+\_\+\+D\+B\+L3@{T\+Y\+P\+E\+\_\+\+D\+B\+L3}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+D\+B\+L3}{TYPE\_DBL3}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+D\+B\+L3 = 15\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a4e876202e1b5929f982b946287be7690}\label{classbst__ns_1_1SCXRecord_a4e876202e1b5929f982b946287be7690}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+D\+B\+L3\+S\+YM@{T\+Y\+P\+E\+\_\+\+D\+B\+L3\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+D\+B\+L3\+S\+YM@{T\+Y\+P\+E\+\_\+\+D\+B\+L3\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+D\+B\+L3\+S\+YM}{TYPE\_DBL3SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+D\+B\+L3\+S\+YM = 29\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a2115276d4de941cd0dcf0222ea65e5cb}\label{classbst__ns_1_1SCXRecord_a2115276d4de941cd0dcf0222ea65e5cb}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+D\+B\+L4@{T\+Y\+P\+E\+\_\+\+D\+B\+L4}}
+\index{T\+Y\+P\+E\+\_\+\+D\+B\+L4@{T\+Y\+P\+E\+\_\+\+D\+B\+L4}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+D\+B\+L4}{TYPE\_DBL4}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+D\+B\+L4 = 16\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a6e62cd8c43c2dd8c583bf101094aed03}\label{classbst__ns_1_1SCXRecord_a6e62cd8c43c2dd8c583bf101094aed03}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+D\+B\+L4\+S\+YM@{T\+Y\+P\+E\+\_\+\+D\+B\+L4\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+D\+B\+L4\+S\+YM@{T\+Y\+P\+E\+\_\+\+D\+B\+L4\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+D\+B\+L4\+S\+YM}{TYPE\_DBL4SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+D\+B\+L4\+S\+YM = 30\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_afbd455b4d9c688123649bd661056bf3f}\label{classbst__ns_1_1SCXRecord_afbd455b4d9c688123649bd661056bf3f}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+D\+EL@{T\+Y\+P\+E\+\_\+\+D\+EL}}
+\index{T\+Y\+P\+E\+\_\+\+D\+EL@{T\+Y\+P\+E\+\_\+\+D\+EL}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+D\+EL}{TYPE\_DEL}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+D\+EL = 1\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a06dcb8bed28b088f6dbf7cd15991dfd1}\label{classbst__ns_1_1SCXRecord_a06dcb8bed28b088f6dbf7cd15991dfd1}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+F\+I\+ND@{T\+Y\+P\+E\+\_\+\+F\+I\+ND}}
+\index{T\+Y\+P\+E\+\_\+\+F\+I\+ND@{T\+Y\+P\+E\+\_\+\+F\+I\+ND}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+F\+I\+ND}{TYPE\_FIND}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+F\+I\+ND = -\/1\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_afc069eba9ed16a5ffdbc9f5a3e33eb8c}\label{classbst__ns_1_1SCXRecord_afc069eba9ed16a5ffdbc9f5a3e33eb8c}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+I\+NS@{T\+Y\+P\+E\+\_\+\+I\+NS}}
+\index{T\+Y\+P\+E\+\_\+\+I\+NS@{T\+Y\+P\+E\+\_\+\+I\+NS}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+I\+NS}{TYPE\_INS}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+I\+NS = 0\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a0e23ae4d646e889a457df7df143bc95a}\label{classbst__ns_1_1SCXRecord_a0e23ae4d646e889a457df7df143bc95a}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+N\+O\+OP@{T\+Y\+P\+E\+\_\+\+N\+O\+OP}}
+\index{T\+Y\+P\+E\+\_\+\+N\+O\+OP@{T\+Y\+P\+E\+\_\+\+N\+O\+OP}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+N\+O\+OP}{TYPE\_NOOP}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+N\+O\+OP = 32\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_ace5436c6cbba73c8c17529f7f605c0b2}\label{classbst__ns_1_1SCXRecord_ace5436c6cbba73c8c17529f7f605c0b2}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+P\+U\+SH@{T\+Y\+P\+E\+\_\+\+P\+U\+SH}}
+\index{T\+Y\+P\+E\+\_\+\+P\+U\+SH@{T\+Y\+P\+E\+\_\+\+P\+U\+SH}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+P\+U\+SH}{TYPE\_PUSH}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+P\+U\+SH = 5\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a18340cd31d82e3ec79fb292011e5bdbe}\label{classbst__ns_1_1SCXRecord_a18340cd31d82e3ec79fb292011e5bdbe}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+P\+U\+S\+H\+S\+YM@{T\+Y\+P\+E\+\_\+\+P\+U\+S\+H\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+P\+U\+S\+H\+S\+YM@{T\+Y\+P\+E\+\_\+\+P\+U\+S\+H\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+P\+U\+S\+H\+S\+YM}{TYPE\_PUSHSYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+P\+U\+S\+H\+S\+YM = 19\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a9f2946ea296a3289d770646458eecfa2}\label{classbst__ns_1_1SCXRecord_a9f2946ea296a3289d770646458eecfa2}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+R\+B1@{T\+Y\+P\+E\+\_\+\+R\+B1}}
+\index{T\+Y\+P\+E\+\_\+\+R\+B1@{T\+Y\+P\+E\+\_\+\+R\+B1}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+R\+B1}{TYPE\_RB1}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+R\+B1 = 3\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a89eeec55147c741763245f2b5c695770}\label{classbst__ns_1_1SCXRecord_a89eeec55147c741763245f2b5c695770}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+R\+B1\+S\+YM@{T\+Y\+P\+E\+\_\+\+R\+B1\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+R\+B1\+S\+YM@{T\+Y\+P\+E\+\_\+\+R\+B1\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+R\+B1\+S\+YM}{TYPE\_RB1SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+R\+B1\+S\+YM = 17\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a7d90066fb5fa026bc88a01cc2675059b}\label{classbst__ns_1_1SCXRecord_a7d90066fb5fa026bc88a01cc2675059b}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+R\+B2@{T\+Y\+P\+E\+\_\+\+R\+B2}}
+\index{T\+Y\+P\+E\+\_\+\+R\+B2@{T\+Y\+P\+E\+\_\+\+R\+B2}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+R\+B2}{TYPE\_RB2}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+R\+B2 = 4\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_af48a81834a9a03a2dfc5156dee2ee950}\label{classbst__ns_1_1SCXRecord_af48a81834a9a03a2dfc5156dee2ee950}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+R\+B2\+S\+YM@{T\+Y\+P\+E\+\_\+\+R\+B2\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+R\+B2\+S\+YM@{T\+Y\+P\+E\+\_\+\+R\+B2\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+R\+B2\+S\+YM}{TYPE\_RB2SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+R\+B2\+S\+YM = 18\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a1c9436563626cacffd1fece60cfac30a}\label{classbst__ns_1_1SCXRecord_a1c9436563626cacffd1fece60cfac30a}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+R\+E\+P\+L\+A\+CE@{T\+Y\+P\+E\+\_\+\+R\+E\+P\+L\+A\+CE}}
+\index{T\+Y\+P\+E\+\_\+\+R\+E\+P\+L\+A\+CE@{T\+Y\+P\+E\+\_\+\+R\+E\+P\+L\+A\+CE}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+R\+E\+P\+L\+A\+CE}{TYPE\_REPLACE}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+R\+E\+P\+L\+A\+CE = 31\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a2ec4ce153055e8e0577e08ee9020e1f9}\label{classbst__ns_1_1SCXRecord_a2ec4ce153055e8e0577e08ee9020e1f9}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W1@{T\+Y\+P\+E\+\_\+\+W1}}
+\index{T\+Y\+P\+E\+\_\+\+W1@{T\+Y\+P\+E\+\_\+\+W1}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W1}{TYPE\_W1}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W1 = 6\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_af40b97d91dcb961dde9013019da49538}\label{classbst__ns_1_1SCXRecord_af40b97d91dcb961dde9013019da49538}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W1\+S\+YM@{T\+Y\+P\+E\+\_\+\+W1\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+W1\+S\+YM@{T\+Y\+P\+E\+\_\+\+W1\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W1\+S\+YM}{TYPE\_W1SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W1\+S\+YM = 20\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a9a88e3ff30eabbebc01d1480cc6dbdf6}\label{classbst__ns_1_1SCXRecord_a9a88e3ff30eabbebc01d1480cc6dbdf6}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W2@{T\+Y\+P\+E\+\_\+\+W2}}
+\index{T\+Y\+P\+E\+\_\+\+W2@{T\+Y\+P\+E\+\_\+\+W2}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W2}{TYPE\_W2}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W2 = 7\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_ab690bec0dc75b97fa6a1d260d86b2ab9}\label{classbst__ns_1_1SCXRecord_ab690bec0dc75b97fa6a1d260d86b2ab9}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W2\+S\+YM@{T\+Y\+P\+E\+\_\+\+W2\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+W2\+S\+YM@{T\+Y\+P\+E\+\_\+\+W2\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W2\+S\+YM}{TYPE\_W2SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W2\+S\+YM = 21\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a0a88774d83c15e2dc231df16d4cd907b}\label{classbst__ns_1_1SCXRecord_a0a88774d83c15e2dc231df16d4cd907b}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W3@{T\+Y\+P\+E\+\_\+\+W3}}
+\index{T\+Y\+P\+E\+\_\+\+W3@{T\+Y\+P\+E\+\_\+\+W3}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W3}{TYPE\_W3}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W3 = 8\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a917e0d386b53b9eaff39d33bd2a37f4b}\label{classbst__ns_1_1SCXRecord_a917e0d386b53b9eaff39d33bd2a37f4b}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W3\+S\+YM@{T\+Y\+P\+E\+\_\+\+W3\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+W3\+S\+YM@{T\+Y\+P\+E\+\_\+\+W3\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W3\+S\+YM}{TYPE\_W3SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W3\+S\+YM = 22\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_ab928d1cabbcaa459855b883e3438fc92}\label{classbst__ns_1_1SCXRecord_ab928d1cabbcaa459855b883e3438fc92}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W4@{T\+Y\+P\+E\+\_\+\+W4}}
+\index{T\+Y\+P\+E\+\_\+\+W4@{T\+Y\+P\+E\+\_\+\+W4}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W4}{TYPE\_W4}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W4 = 9\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a48f56e548914970234daf233bb953e5a}\label{classbst__ns_1_1SCXRecord_a48f56e548914970234daf233bb953e5a}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W4\+S\+YM@{T\+Y\+P\+E\+\_\+\+W4\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+W4\+S\+YM@{T\+Y\+P\+E\+\_\+\+W4\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W4\+S\+YM}{TYPE\_W4SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W4\+S\+YM = 23\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_afc98c244e075bd350fcbdbe6c01e94bf}\label{classbst__ns_1_1SCXRecord_afc98c244e075bd350fcbdbe6c01e94bf}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W5@{T\+Y\+P\+E\+\_\+\+W5}}
+\index{T\+Y\+P\+E\+\_\+\+W5@{T\+Y\+P\+E\+\_\+\+W5}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W5}{TYPE\_W5}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W5 = 10\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_aa4f915da3d1bdcf1b63e11be59031ac7}\label{classbst__ns_1_1SCXRecord_aa4f915da3d1bdcf1b63e11be59031ac7}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W5\+S\+YM@{T\+Y\+P\+E\+\_\+\+W5\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+W5\+S\+YM@{T\+Y\+P\+E\+\_\+\+W5\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W5\+S\+YM}{TYPE\_W5SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W5\+S\+YM = 24\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_af57222b8f4c33530d611c619b103c1d7}\label{classbst__ns_1_1SCXRecord_af57222b8f4c33530d611c619b103c1d7}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W6@{T\+Y\+P\+E\+\_\+\+W6}}
+\index{T\+Y\+P\+E\+\_\+\+W6@{T\+Y\+P\+E\+\_\+\+W6}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W6}{TYPE\_W6}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W6 = 11\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_a4e010c66b666b160b2fb177cb9573a90}\label{classbst__ns_1_1SCXRecord_a4e010c66b666b160b2fb177cb9573a90}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W6\+S\+YM@{T\+Y\+P\+E\+\_\+\+W6\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+W6\+S\+YM@{T\+Y\+P\+E\+\_\+\+W6\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W6\+S\+YM}{TYPE\_W6SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W6\+S\+YM = 25\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_ab0d4f9a6d76b1be804061d809673e41a}\label{classbst__ns_1_1SCXRecord_ab0d4f9a6d76b1be804061d809673e41a}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W7@{T\+Y\+P\+E\+\_\+\+W7}}
+\index{T\+Y\+P\+E\+\_\+\+W7@{T\+Y\+P\+E\+\_\+\+W7}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W7}{TYPE\_W7}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W7 = 12\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1SCXRecord_ad1a27e48ecafa960328de582204dce0e}\label{classbst__ns_1_1SCXRecord_ad1a27e48ecafa960328de582204dce0e}} 
+\index{bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}!T\+Y\+P\+E\+\_\+\+W7\+S\+YM@{T\+Y\+P\+E\+\_\+\+W7\+S\+YM}}
+\index{T\+Y\+P\+E\+\_\+\+W7\+S\+YM@{T\+Y\+P\+E\+\_\+\+W7\+S\+YM}!bst\+\_\+ns\+::\+S\+C\+X\+Record@{bst\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{T\+Y\+P\+E\+\_\+\+W7\+S\+YM}{TYPE\_W7SYM}}
+{\footnotesize\ttfamily template$<$class K, class V$>$ \\
+const int \hyperlink{classbst__ns_1_1SCXRecord}{bst\+\_\+ns\+::\+S\+C\+X\+Record}$<$ K, V $>$\+::T\+Y\+P\+E\+\_\+\+W7\+S\+YM = 26\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/brown\+\_\+ext\+\_\+bst\+\_\+rq\+\_\+lf/\hyperlink{scxrecord_8h}{scxrecord.\+h}\end{DoxyCompactItemize}

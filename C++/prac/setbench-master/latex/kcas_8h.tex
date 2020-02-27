@@ -1,0 +1,70 @@
+\hypertarget{kcas_8h}{}\section{common/kcas/kcas.h File Reference}
+\label{kcas_8h}\index{common/kcas/kcas.\+h@{common/kcas/kcas.\+h}}
+{\ttfamily \#include \char`\"{}kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}casword.\+h\char`\"{}}\newline
+Include dependency graph for kcas.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{kcas_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{kcas_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structcasword}{casword$<$ T $>$}
+\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacekcas}{kcas}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{kcas_8h_a56bcbd24dba9c9c05c0e132588aa5576}{C\+A\+S\+W\+O\+R\+D\+\_\+\+B\+I\+T\+S\+\_\+\+T\+Y\+PE}~\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespacekcas_a92e383d96831fa6163a3d562d4a38053}{kcas\+::write\+Init\+Ptr} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} const newval)
+\item 
+void \hyperlink{namespacekcas_abd890f3f111dbd76aba1be89220ea07d}{kcas\+::write\+Init\+Val} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} const newval)
+\item 
+\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} \hyperlink{namespacekcas_a1f34f966b2243f133f1d936ec1761578}{kcas\+::read\+Ptr} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr)
+\item 
+\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} \hyperlink{namespacekcas_a41e805427c946f9e77ae065c624b2399}{kcas\+::read\+Val} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr)
+\item 
+bool \hyperlink{namespacekcas_ae51aac13e4c5df1190241ae51968387a}{kcas\+::execute} ()
+\item 
+\hyperlink{kcas__reuse__impl_8h_a5bbc81d391bfd6b4288a0d33f105a0b2}{kcasptr\+\_\+t} \hyperlink{namespacekcas_aa3f3e7af6facd9b5108b3b3fe8e4ed82}{kcas\+::get\+Descriptor} ()
+\item 
+void \hyperlink{namespacekcas_a39af7f008e3b3cb3815045257d15e735}{kcas\+::start} ()
+\item 
+{\footnotesize template$<$typename T $>$ }\\void \hyperlink{namespacekcas_acb0544489e45e08050227ab563d9ee15}{kcas\+::add} (\hyperlink{structcasword}{casword}$<$ T $>$ $\ast$caswordptr, T old\+Val, T new\+Val)
+\item 
+{\footnotesize template$<$typename T , typename... Args$>$ }\\void \hyperlink{namespacekcas_a227f3321961ae92470ed749e94656202}{kcas\+::add} (\hyperlink{structcasword}{casword}$<$ T $>$ $\ast$caswordptr, T old\+Val, T new\+Val, Args... args)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classKCASHTM}{K\+C\+A\+S\+H\+TM}$<$ \hyperlink{skiplist_8h_a17681fc241567944ff9f0c062af6b7bf}{M\+A\+X\+\_\+\+K\+C\+AS} $>$ \hyperlink{namespacekcas_af460e5af7d85e9a87e52d4240e222fb5}{kcas\+::instance}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{kcas_8h_a56bcbd24dba9c9c05c0e132588aa5576}\label{kcas_8h_a56bcbd24dba9c9c05c0e132588aa5576}} 
+\index{kcas.\+h@{kcas.\+h}!C\+A\+S\+W\+O\+R\+D\+\_\+\+B\+I\+T\+S\+\_\+\+T\+Y\+PE@{C\+A\+S\+W\+O\+R\+D\+\_\+\+B\+I\+T\+S\+\_\+\+T\+Y\+PE}}
+\index{C\+A\+S\+W\+O\+R\+D\+\_\+\+B\+I\+T\+S\+\_\+\+T\+Y\+PE@{C\+A\+S\+W\+O\+R\+D\+\_\+\+B\+I\+T\+S\+\_\+\+T\+Y\+PE}!kcas.\+h@{kcas.\+h}}
+\subsubsection{\texorpdfstring{C\+A\+S\+W\+O\+R\+D\+\_\+\+B\+I\+T\+S\+\_\+\+T\+Y\+PE}{CASWORD\_BITS\_TYPE}}
+{\footnotesize\ttfamily \#define C\+A\+S\+W\+O\+R\+D\+\_\+\+B\+I\+T\+S\+\_\+\+T\+Y\+PE~\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}}
+

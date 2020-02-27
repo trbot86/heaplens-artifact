@@ -1,0 +1,305 @@
+\hypertarget{gcc_2powerpc_8h}{}\section{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/powerpc.h File Reference}
+\label{gcc_2powerpc_8h}\index{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/powerpc.\+h@{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/powerpc.\+h}}
+{\ttfamily \#include \char`\"{}../all\+\_\+aligned\+\_\+atomic\+\_\+load\+\_\+store.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../test\+\_\+and\+\_\+set\+\_\+t\+\_\+is\+\_\+ao\+\_\+t.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../ao\+\_\+t\+\_\+is\+\_\+int.\+h\char`\"{}}\newline
+Include dependency graph for powerpc.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gcc_2powerpc_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a3904dc699d6a6d6e771a93aa66aeb805}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_aa6b9cf57e4373ade9ce01d28a58ad21d}{A\+O\+\_\+nop\+\_\+write}()~\hyperlink{ibmc_2powerpc_8h_a5febfde98faf0a03093897ef864a9589}{A\+O\+\_\+lwsync}()
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a7c6d0c7c0585da4d8cd259df2423b82f}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a3a367b9626ced22d98eb45e958a21aad}{A\+O\+\_\+nop\+\_\+read}()~\hyperlink{ibmc_2powerpc_8h_a5febfde98faf0a03093897ef864a9589}{A\+O\+\_\+lwsync}()
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a5e899b880760568b4da25ec2d6011cbd}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+read}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a29328d5664268a40645ea9d2f82c8bef}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a29328d5664268a40645ea9d2f82c8bef}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a6ad5da471c2a52c703969db302060c12}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_addf7856c1f3a120a04ad68e843b23de4}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a27cd35e8e9c1987a362a8610811e1c40}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+release}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_ad5f311a090d1e6e1bb35a6e68ee35fad}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a0c5d9cf68a56bfa9e267db0f2795811c}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_ad0b08bc254deecdcba5a4f3366432cf3}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_ad85c7af2ae0a778eba77a7762a358819}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a98ec53065c0dfd18bc1013c500da377c}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a02ddf1d6bcd91f33310ecc1046fac9e0}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a382c4cd949fca638724c9b2d82456223}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a5b93814d170e72872f2552552c63c2e4}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release}
+\item 
+\#define \hyperlink{gcc_2powerpc_8h_a9fa0fc1a9eadcba085e57bf180a53cef}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void \hyperlink{gcc_2powerpc_8h_afe3a6778eacc82252ba138fc9a157b04}{A\+O\+\_\+nop\+\_\+full} (void)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void \hyperlink{gcc_2powerpc_8h_a75a6574066b34ce697dcc012ec0e7128}{A\+O\+\_\+lwsync} (void)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{gcc_2powerpc_8h_afd982c8bbaa60d3294cc30f92f170847}{A\+O\+\_\+load\+\_\+acquire} (const volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void \hyperlink{gcc_2powerpc_8h_a7b4e8216189c3f4e7f7418e5c2a98b0f}{A\+O\+\_\+store\+\_\+release} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} value)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} \hyperlink{gcc_2powerpc_8h_a8ec1c2583e26c57a7b4d17f239fa41e8}{A\+O\+\_\+test\+\_\+and\+\_\+set} (volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$addr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} \hyperlink{gcc_2powerpc_8h_a0af1bdd53473eb43906a057efe883f6d}{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire} (volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$addr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} \hyperlink{gcc_2powerpc_8h_abd4f99ea301b67851c8a6a1dc61e97c1}{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+release} (volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$addr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} \hyperlink{gcc_2powerpc_8h_a9f485bd63ce5c6a017ec241906e2f651}{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full} (volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$addr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{gcc_2powerpc_8h_a2e1cdaa59eda3ac15129d16951295698}{A\+O\+\_\+compare\+\_\+and\+\_\+swap} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{gcc_2powerpc_8h_a81fc146600046fb8ee9ce4339f078e2e}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{gcc_2powerpc_8h_ae39d774429bea0d5c3b604bbb820a4ea}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{gcc_2powerpc_8h_a634397de6de764015b30cdff3ff00b06}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{gcc_2powerpc_8h_a170c7c9f843994a726a56442e732afc1}{A\+O\+\_\+fetch\+\_\+and\+\_\+add} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} incr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{gcc_2powerpc_8h_a5c9e99c843f97a3706a23a6b453e39dd}{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} incr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{gcc_2powerpc_8h_a0d6acfb6d483cd1641c5d01df6b9d3ff}{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} incr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{gcc_2powerpc_8h_abdc9c4590fde7e5847593f6a9c250d7f}{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} incr)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{gcc_2powerpc_8h_a0c5d9cf68a56bfa9e267db0f2795811c}\label{gcc_2powerpc_8h_a0c5d9cf68a56bfa9e267db0f2795811c}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}{AO\_HAVE\_compare\_and\_swap}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_ad0b08bc254deecdcba5a4f3366432cf3}\label{gcc_2powerpc_8h_ad0b08bc254deecdcba5a4f3366432cf3}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}{AO\_HAVE\_compare\_and\_swap\_acquire}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a98ec53065c0dfd18bc1013c500da377c}\label{gcc_2powerpc_8h_a98ec53065c0dfd18bc1013c500da377c}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}{AO\_HAVE\_compare\_and\_swap\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_ad85c7af2ae0a778eba77a7762a358819}\label{gcc_2powerpc_8h_ad85c7af2ae0a778eba77a7762a358819}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}{AO\_HAVE\_compare\_and\_swap\_release}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a02ddf1d6bcd91f33310ecc1046fac9e0}\label{gcc_2powerpc_8h_a02ddf1d6bcd91f33310ecc1046fac9e0}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add}{AO\_HAVE\_fetch\_and\_add}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a382c4cd949fca638724c9b2d82456223}\label{gcc_2powerpc_8h_a382c4cd949fca638724c9b2d82456223}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire}{AO\_HAVE\_fetch\_and\_add\_acquire}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a9fa0fc1a9eadcba085e57bf180a53cef}\label{gcc_2powerpc_8h_a9fa0fc1a9eadcba085e57bf180a53cef}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}{AO\_HAVE\_fetch\_and\_add\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a5b93814d170e72872f2552552c63c2e4}\label{gcc_2powerpc_8h_a5b93814d170e72872f2552552c63c2e4}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release}{AO\_HAVE\_fetch\_and\_add\_release}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a29328d5664268a40645ea9d2f82c8bef}\label{gcc_2powerpc_8h_a29328d5664268a40645ea9d2f82c8bef}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}{AO\_HAVE\_load\_acquire}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a29328d5664268a40645ea9d2f82c8bef}\label{gcc_2powerpc_8h_a29328d5664268a40645ea9d2f82c8bef}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}{AO\_HAVE\_load\_acquire}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+load\+\_\+acquire}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a3904dc699d6a6d6e771a93aa66aeb805}\label{gcc_2powerpc_8h_a3904dc699d6a6d6e771a93aa66aeb805}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}{AO\_HAVE\_nop\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a5e899b880760568b4da25ec2d6011cbd}\label{gcc_2powerpc_8h_a5e899b880760568b4da25ec2d6011cbd}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+read@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+read}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+read@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+read}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+read}{AO\_HAVE\_nop\_read}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+read}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a7c6d0c7c0585da4d8cd259df2423b82f}\label{gcc_2powerpc_8h_a7c6d0c7c0585da4d8cd259df2423b82f}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}{AO\_HAVE\_nop\_write}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+write}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a6ad5da471c2a52c703969db302060c12}\label{gcc_2powerpc_8h_a6ad5da471c2a52c703969db302060c12}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set}{AO\_HAVE\_test\_and\_set}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_addf7856c1f3a120a04ad68e843b23de4}\label{gcc_2powerpc_8h_addf7856c1f3a120a04ad68e843b23de4}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire}{AO\_HAVE\_test\_and\_set\_acquire}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_ad5f311a090d1e6e1bb35a6e68ee35fad}\label{gcc_2powerpc_8h_ad5f311a090d1e6e1bb35a6e68ee35fad}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}{AO\_HAVE\_test\_and\_set\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a27cd35e8e9c1987a362a8610811e1c40}\label{gcc_2powerpc_8h_a27cd35e8e9c1987a362a8610811e1c40}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+release}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+release}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+release}{AO\_HAVE\_test\_and\_set\_release}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+release}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a3a367b9626ced22d98eb45e958a21aad}\label{gcc_2powerpc_8h_a3a367b9626ced22d98eb45e958a21aad}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+nop\+\_\+read@{A\+O\+\_\+nop\+\_\+read}}
+\index{A\+O\+\_\+nop\+\_\+read@{A\+O\+\_\+nop\+\_\+read}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+nop\+\_\+read}{AO\_nop\_read}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+nop\+\_\+read(\begin{DoxyParamCaption}\item[{}]{void }\end{DoxyParamCaption})~\hyperlink{ibmc_2powerpc_8h_a5febfde98faf0a03093897ef864a9589}{A\+O\+\_\+lwsync}()}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_aa6b9cf57e4373ade9ce01d28a58ad21d}\label{gcc_2powerpc_8h_aa6b9cf57e4373ade9ce01d28a58ad21d}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+nop\+\_\+write@{A\+O\+\_\+nop\+\_\+write}}
+\index{A\+O\+\_\+nop\+\_\+write@{A\+O\+\_\+nop\+\_\+write}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+nop\+\_\+write}{AO\_nop\_write}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+nop\+\_\+write(\begin{DoxyParamCaption}\item[{}]{void }\end{DoxyParamCaption})~\hyperlink{ibmc_2powerpc_8h_a5febfde98faf0a03093897ef864a9589}{A\+O\+\_\+lwsync}()}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{gcc_2powerpc_8h_a2e1cdaa59eda3ac15129d16951295698}\label{gcc_2powerpc_8h_a2e1cdaa59eda3ac15129d16951295698}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+compare\+\_\+and\+\_\+swap}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+compare\+\_\+and\+\_\+swap}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap()}{AO\_compare\_and\_swap()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a81fc146600046fb8ee9ce4339f078e2e}\label{gcc_2powerpc_8h_a81fc146600046fb8ee9ce4339f078e2e}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire()}{AO\_compare\_and\_swap\_acquire()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a634397de6de764015b30cdff3ff00b06}\label{gcc_2powerpc_8h_a634397de6de764015b30cdff3ff00b06}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full()}{AO\_compare\_and\_swap\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_ae39d774429bea0d5c3b604bbb820a4ea}\label{gcc_2powerpc_8h_ae39d774429bea0d5c3b604bbb820a4ea}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release()}{AO\_compare\_and\_swap\_release()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a170c7c9f843994a726a56442e732afc1}\label{gcc_2powerpc_8h_a170c7c9f843994a726a56442e732afc1}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+add@{A\+O\+\_\+fetch\+\_\+and\+\_\+add}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+add@{A\+O\+\_\+fetch\+\_\+and\+\_\+add}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+add()}{AO\_fetch\_and\_add()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+add (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{incr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a5c9e99c843f97a3706a23a6b453e39dd}\label{gcc_2powerpc_8h_a5c9e99c843f97a3706a23a6b453e39dd}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire()}{AO\_fetch\_and\_add\_acquire()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+acquire (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{incr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_abdc9c4590fde7e5847593f6a9c250d7f}\label{gcc_2powerpc_8h_abdc9c4590fde7e5847593f6a9c250d7f}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full()}{AO\_fetch\_and\_add\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{incr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a0d6acfb6d483cd1641c5d01df6b9d3ff}\label{gcc_2powerpc_8h_a0d6acfb6d483cd1641c5d01df6b9d3ff}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release()}{AO\_fetch\_and\_add\_release()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+release (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{incr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_afd982c8bbaa60d3294cc30f92f170847}\label{gcc_2powerpc_8h_afd982c8bbaa60d3294cc30f92f170847}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+load\+\_\+acquire@{A\+O\+\_\+load\+\_\+acquire}}
+\index{A\+O\+\_\+load\+\_\+acquire@{A\+O\+\_\+load\+\_\+acquire}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+load\+\_\+acquire()}{AO\_load\_acquire()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+load\+\_\+acquire (\begin{DoxyParamCaption}\item[{const volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a75a6574066b34ce697dcc012ec0e7128}\label{gcc_2powerpc_8h_a75a6574066b34ce697dcc012ec0e7128}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+lwsync@{A\+O\+\_\+lwsync}}
+\index{A\+O\+\_\+lwsync@{A\+O\+\_\+lwsync}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+lwsync()}{AO\_lwsync()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void A\+O\+\_\+lwsync (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_afe3a6778eacc82252ba138fc9a157b04}\label{gcc_2powerpc_8h_afe3a6778eacc82252ba138fc9a157b04}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+nop\+\_\+full@{A\+O\+\_\+nop\+\_\+full}}
+\index{A\+O\+\_\+nop\+\_\+full@{A\+O\+\_\+nop\+\_\+full}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+nop\+\_\+full()}{AO\_nop\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void A\+O\+\_\+nop\+\_\+full (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a7b4e8216189c3f4e7f7418e5c2a98b0f}\label{gcc_2powerpc_8h_a7b4e8216189c3f4e7f7418e5c2a98b0f}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+store\+\_\+release@{A\+O\+\_\+store\+\_\+release}}
+\index{A\+O\+\_\+store\+\_\+release@{A\+O\+\_\+store\+\_\+release}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+store\+\_\+release()}{AO\_store\_release()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void A\+O\+\_\+store\+\_\+release (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{value }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a8ec1c2583e26c57a7b4d17f239fa41e8}\label{gcc_2powerpc_8h_a8ec1c2583e26c57a7b4d17f239fa41e8}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+test\+\_\+and\+\_\+set@{A\+O\+\_\+test\+\_\+and\+\_\+set}}
+\index{A\+O\+\_\+test\+\_\+and\+\_\+set@{A\+O\+\_\+test\+\_\+and\+\_\+set}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+test\+\_\+and\+\_\+set()}{AO\_test\_and\_set()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} A\+O\+\_\+test\+\_\+and\+\_\+set (\begin{DoxyParamCaption}\item[{volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$}]{addr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a0af1bdd53473eb43906a057efe883f6d}\label{gcc_2powerpc_8h_a0af1bdd53473eb43906a057efe883f6d}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire@{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire}}
+\index{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire@{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire()}{AO\_test\_and\_set\_acquire()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+acquire (\begin{DoxyParamCaption}\item[{volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$}]{addr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_a9f485bd63ce5c6a017ec241906e2f651}\label{gcc_2powerpc_8h_a9f485bd63ce5c6a017ec241906e2f651}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full@{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full}}
+\index{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full@{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full()}{AO\_test\_and\_set\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$}]{addr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{gcc_2powerpc_8h_abd4f99ea301b67851c8a6a1dc61e97c1}\label{gcc_2powerpc_8h_abd4f99ea301b67851c8a6a1dc61e97c1}} 
+\index{gcc/powerpc.\+h@{gcc/powerpc.\+h}!A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+release@{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+release}}
+\index{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+release@{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+release}!gcc/powerpc.\+h@{gcc/powerpc.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+release()}{AO\_test\_and\_set\_release()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+release (\begin{DoxyParamCaption}\item[{volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$}]{addr }\end{DoxyParamCaption})}
+

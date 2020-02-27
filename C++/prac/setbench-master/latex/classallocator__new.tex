@@ -1,0 +1,126 @@
+\hypertarget{classallocator__new}{}\section{allocator\+\_\+new$<$ T $>$ Class Template Reference}
+\label{classallocator__new}\index{allocator\+\_\+new$<$ T $>$@{allocator\+\_\+new$<$ T $>$}}
+
+
+{\ttfamily \#include $<$allocator\+\_\+new.\+h$>$}
+
+
+
+Inheritance diagram for allocator\+\_\+new$<$ T $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{classallocator__new__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for allocator\+\_\+new$<$ T $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{classallocator__new__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structallocator__new_1_1rebind}{rebind}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+T $\ast$ \hyperlink{classallocator__new_a93705f1c38fc18ec21bdaa37ccfa6ff8}{allocate} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classallocator__new_a00547577144cf3d387a064abcdae08ce}{deallocate} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const p)
+\item 
+void \hyperlink{classallocator__new_a37ae8dafab8224d4c09c496ef558156e}{deallocate\+And\+Clear} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, \hyperlink{classblockbag}{blockbag}$<$ T $>$ $\ast$const bag)
+\item 
+void \hyperlink{classallocator__new_a6891234824482b3c8b83a1b91521b5e3}{debug\+Print\+Status} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classallocator__new_a4b65439e6dc7bbd4da71728599e12895}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classallocator__new_a913b5e0ed2d2cc75c2e7d03e1a75d47b}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+\hyperlink{classallocator__new_a7256b6a2bf88e0ecd0cc437cd3fb6964}{allocator\+\_\+new} (const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes}, \hyperlink{classdebugInfo}{debug\+Info} $\ast$const \+\_\+debug)
+\item 
+\hyperlink{classallocator__new_a608b5c8ce78e0d255e9f26ffc9ef00f8}{$\sim$allocator\+\_\+new} ()
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T = void$>$\newline
+class allocator\+\_\+new$<$ T $>$}
+
+C++ record manager implementation (P\+O\+DC 2015) by Trevor Brown.
+
+Copyright (C) 2015 Trevor Brown 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classallocator__new_a7256b6a2bf88e0ecd0cc437cd3fb6964}\label{classallocator__new_a7256b6a2bf88e0ecd0cc437cd3fb6964}} 
+\index{allocator\+\_\+new@{allocator\+\_\+new}!allocator\+\_\+new@{allocator\+\_\+new}}
+\index{allocator\+\_\+new@{allocator\+\_\+new}!allocator\+\_\+new@{allocator\+\_\+new}}
+\subsubsection{\texorpdfstring{allocator\+\_\+new()}{allocator\_new()}}
+{\footnotesize\ttfamily template$<$typename T  = void$>$ \\
+\hyperlink{classallocator__new}{allocator\+\_\+new}$<$ T $>$\+::\hyperlink{classallocator__new}{allocator\+\_\+new} (\begin{DoxyParamCaption}\item[{const int}]{num\+Processes,  }\item[{\hyperlink{classdebugInfo}{debug\+Info} $\ast$const}]{\+\_\+debug }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classallocator__new_a608b5c8ce78e0d255e9f26ffc9ef00f8}\label{classallocator__new_a608b5c8ce78e0d255e9f26ffc9ef00f8}} 
+\index{allocator\+\_\+new@{allocator\+\_\+new}!````~allocator\+\_\+new@{$\sim$allocator\+\_\+new}}
+\index{````~allocator\+\_\+new@{$\sim$allocator\+\_\+new}!allocator\+\_\+new@{allocator\+\_\+new}}
+\subsubsection{\texorpdfstring{$\sim$allocator\+\_\+new()}{~allocator\_new()}}
+{\footnotesize\ttfamily template$<$typename T  = void$>$ \\
+\hyperlink{classallocator__new}{allocator\+\_\+new}$<$ T $>$\+::$\sim$\hyperlink{classallocator__new}{allocator\+\_\+new} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classallocator__new_a93705f1c38fc18ec21bdaa37ccfa6ff8}\label{classallocator__new_a93705f1c38fc18ec21bdaa37ccfa6ff8}} 
+\index{allocator\+\_\+new@{allocator\+\_\+new}!allocate@{allocate}}
+\index{allocate@{allocate}!allocator\+\_\+new@{allocator\+\_\+new}}
+\subsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily template$<$typename T  = void$>$ \\
+T$\ast$ \hyperlink{classallocator__new}{allocator\+\_\+new}$<$ T $>$\+::allocate (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classallocator__new_a00547577144cf3d387a064abcdae08ce}\label{classallocator__new_a00547577144cf3d387a064abcdae08ce}} 
+\index{allocator\+\_\+new@{allocator\+\_\+new}!deallocate@{deallocate}}
+\index{deallocate@{deallocate}!allocator\+\_\+new@{allocator\+\_\+new}}
+\subsubsection{\texorpdfstring{deallocate()}{deallocate()}}
+{\footnotesize\ttfamily template$<$typename T  = void$>$ \\
+void \hyperlink{classallocator__new}{allocator\+\_\+new}$<$ T $>$\+::deallocate (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{p }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classallocator__new_a37ae8dafab8224d4c09c496ef558156e}\label{classallocator__new_a37ae8dafab8224d4c09c496ef558156e}} 
+\index{allocator\+\_\+new@{allocator\+\_\+new}!deallocate\+And\+Clear@{deallocate\+And\+Clear}}
+\index{deallocate\+And\+Clear@{deallocate\+And\+Clear}!allocator\+\_\+new@{allocator\+\_\+new}}
+\subsubsection{\texorpdfstring{deallocate\+And\+Clear()}{deallocateAndClear()}}
+{\footnotesize\ttfamily template$<$typename T  = void$>$ \\
+void \hyperlink{classallocator__new}{allocator\+\_\+new}$<$ T $>$\+::deallocate\+And\+Clear (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{\hyperlink{classblockbag}{blockbag}$<$ T $>$ $\ast$const}]{bag }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classallocator__new_a6891234824482b3c8b83a1b91521b5e3}\label{classallocator__new_a6891234824482b3c8b83a1b91521b5e3}} 
+\index{allocator\+\_\+new@{allocator\+\_\+new}!debug\+Print\+Status@{debug\+Print\+Status}}
+\index{debug\+Print\+Status@{debug\+Print\+Status}!allocator\+\_\+new@{allocator\+\_\+new}}
+\subsubsection{\texorpdfstring{debug\+Print\+Status()}{debugPrintStatus()}}
+{\footnotesize\ttfamily template$<$typename T  = void$>$ \\
+void \hyperlink{classallocator__new}{allocator\+\_\+new}$<$ T $>$\+::debug\+Print\+Status (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classallocator__new_a913b5e0ed2d2cc75c2e7d03e1a75d47b}\label{classallocator__new_a913b5e0ed2d2cc75c2e7d03e1a75d47b}} 
+\index{allocator\+\_\+new@{allocator\+\_\+new}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!allocator\+\_\+new@{allocator\+\_\+new}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void$>$ \\
+void \hyperlink{classallocator__new}{allocator\+\_\+new}$<$ T $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classallocator__new_a4b65439e6dc7bbd4da71728599e12895}\label{classallocator__new_a4b65439e6dc7bbd4da71728599e12895}} 
+\index{allocator\+\_\+new@{allocator\+\_\+new}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!allocator\+\_\+new@{allocator\+\_\+new}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void$>$ \\
+void \hyperlink{classallocator__new}{allocator\+\_\+new}$<$ T $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/recordmgr/\hyperlink{allocator__new_8h}{allocator\+\_\+new.\+h}\end{DoxyCompactItemize}

@@ -1,0 +1,12 @@
+<map id="common/atomic_ops/atomic_ops/sysdeps/gcc/m68k.h" name="common/atomic_ops/atomic_ops/sysdeps/gcc/m68k.h">
+<area shape="rect" id="node2" href="$all__aligned__atomic__load__store_8h.html" title="../all_aligned_atomic\l_load_store.h" alt="" coords="367,95,509,136"/>
+<area shape="rect" id="node7" href="$ordered_8h.html" title="../ordered.h" alt="" coords="625,102,713,129"/>
+<area shape="rect" id="node10" href="$test__and__set__t__is__char_8h.html" title="../test_and_set_t_is\l_char.h" alt="" coords="737,95,875,136"/>
+<area shape="rect" id="node11" href="$ao__t__is__int_8h.html" title="../ao_t_is_int.h" alt="" coords="899,102,1007,129"/>
+<area shape="rect" id="node3" href="$aligned__atomic__load__store_8h.html" title="aligned_atomic_load\l_store.h" alt="" coords="5,184,145,225"/>
+<area shape="rect" id="node4" href="$char__atomic__load__store_8h.html" title="char_atomic_load_store.h" alt="" coords="170,191,341,218"/>
+<area shape="rect" id="node5" href="$short__aligned__atomic__load__store_8h.html" title="short_aligned_atomic\l_load_store.h" alt="" coords="365,184,511,225"/>
+<area shape="rect" id="node6" href="$int__aligned__atomic__load__store_8h.html" title="int_aligned_atomic\l_load_store.h" alt="" coords="535,184,666,225"/>
+<area shape="rect" id="node8" href="$ordered__except__wr_8h.html" title="ordered_except_wr.h" alt="" coords="691,191,833,218"/>
+<area shape="rect" id="node9" href="$read__ordered_8h.html" title="read_ordered.h" alt="" coords="708,273,816,300"/>
+</map>

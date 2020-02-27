@@ -1,0 +1,36 @@
+D\+Bx1000 is an single node O\+L\+TP database management system (D\+B\+MS). The goal of D\+Bx1000 is to make D\+B\+MS scalable on future 1000-\/core processors. We implemented all the seven classic concurrency control schemes in D\+Bx1000. They exhibit different scalability properties under different workloads.
+
+The concurrency control scalability study is described in the following paper. \begin{DoxyVerb}Staring into the Abyss: An Evaluation of Concurrency Control with One Thousand Cores
+Xiangyao Yu, George Bezerra, Andrew Pavlo, Srinivas Devadas, Michael Stonebraker
+http://www.vldb.org/pvldb/vol8/p209-yu.pdf
+\end{DoxyVerb}
+
+
+\subsection*{Build \& Test }
+
+To build the database. \begin{DoxyVerb}make -j
+\end{DoxyVerb}
+
+
+To test the database \begin{DoxyVerb}python test.py
+\end{DoxyVerb}
+
+
+\subsection*{Configuration }
+
+D\+B\+MS configurations can be changed in the \hyperlink{config_8h}{config.\+h} file. Please refer to R\+E\+A\+D\+ME for the meaning of each configuration. Here we only list several most important ones. \begin{DoxyVerb}THREAD_CNT        : Number of worker threads running in the database.
+WORKLOAD          : Supported workloads include YCSB and TPCC
+CC_ALG            : Concurrency control algorithm. Seven algorithms are supported 
+                    (DL_DETECT, NO_WAIT, HEKATON, SILO, TICTOC) 
+MAX_TXN_PER_PART  : Number of transactions to run per thread per partition.
+\end{DoxyVerb}
+
+
+Configurations can also be specified as command argument at runtime. Run the following command for a full list of program argument. \begin{DoxyVerb}./rundb -h
+\end{DoxyVerb}
+
+
+\subsection*{Run }
+
+The D\+B\+MS can be run with \begin{DoxyVerb}./rundb\end{DoxyVerb}
+ 

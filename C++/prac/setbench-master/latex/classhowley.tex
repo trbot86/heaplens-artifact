@@ -1,0 +1,101 @@
+\hypertarget{classhowley}{}\section{howley$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$ Class Template Reference}
+\label{classhowley}\index{howley$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$@{howley$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$}}
+
+
+{\ttfamily \#include $<$howley\+\_\+impl.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classhowley_ac5d2f61eedc19a5b2f5db14421682b4c}{howley} (const int \+\_\+\+N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS, const skey\+\_\+t \&\+\_\+\+K\+E\+Y\+\_\+\+M\+IN, const skey\+\_\+t \&\+\_\+\+K\+E\+Y\+\_\+\+M\+AX, const sval\+\_\+t \&\+\_\+\+V\+A\+L\+U\+E\+\_\+\+R\+E\+S\+E\+R\+V\+ED, unsigned int id)
+\item 
+\hyperlink{classhowley_a7683fe814e9483ec72e02b552965d9a8}{$\sim$howley} ()
+\item 
+void \hyperlink{classhowley_ad896657fb61ab833beb5854d3ab41195}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classhowley_ad451346bdc013f8f91a66e864ff6118c}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+sval\+\_\+t \hyperlink{classhowley_a42cff4d570c8fda67543525ebc0342e3}{bst\+\_\+contains} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t k)
+\item 
+sval\+\_\+t \hyperlink{classhowley_a2c3298e68329401c0ba27bf50a11f624}{bst\+\_\+add} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t k, sval\+\_\+t \hyperlink{reclaimer__ebr__tree__q_8h_acd3c1c4d280aac729e9fdb520dc99f20}{v})
+\item 
+sval\+\_\+t \hyperlink{classhowley_a469bbd88967ff50d865bbf368b1eae5e}{bst\+\_\+remove} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t k)
+\item 
+\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$ \hyperlink{classhowley_a37175ef84b9e6c359dc5cc1148fa289b}{get\+\_\+root} ()
+\item 
+Rec\+Mgr $\ast$ \hyperlink{classhowley_a9581b4d5eb22feca0cd2ac799a0c6145}{debug\+Get\+Rec\+Mgr} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classhowley_ac5d2f61eedc19a5b2f5db14421682b4c}\label{classhowley_ac5d2f61eedc19a5b2f5db14421682b4c}} 
+\index{howley@{howley}!howley@{howley}}
+\index{howley@{howley}!howley@{howley}}
+\subsubsection{\texorpdfstring{howley()}{howley()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classhowley}{howley}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::\hyperlink{classhowley}{howley} (\begin{DoxyParamCaption}\item[{const int}]{\+\_\+\+N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS,  }\item[{const skey\+\_\+t \&}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+IN,  }\item[{const skey\+\_\+t \&}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+AX,  }\item[{const sval\+\_\+t \&}]{\+\_\+\+V\+A\+L\+U\+E\+\_\+\+R\+E\+S\+E\+R\+V\+ED,  }\item[{unsigned int}]{id }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classhowley_a7683fe814e9483ec72e02b552965d9a8}\label{classhowley_a7683fe814e9483ec72e02b552965d9a8}} 
+\index{howley@{howley}!````~howley@{$\sim$howley}}
+\index{````~howley@{$\sim$howley}!howley@{howley}}
+\subsubsection{\texorpdfstring{$\sim$howley()}{~howley()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classhowley}{howley}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::$\sim$\hyperlink{classhowley}{howley} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classhowley_a2c3298e68329401c0ba27bf50a11f624}\label{classhowley_a2c3298e68329401c0ba27bf50a11f624}} 
+\index{howley@{howley}!bst\+\_\+add@{bst\+\_\+add}}
+\index{bst\+\_\+add@{bst\+\_\+add}!howley@{howley}}
+\subsubsection{\texorpdfstring{bst\+\_\+add()}{bst\_add()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classhowley}{howley}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::bst\+\_\+add (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{k,  }\item[{sval\+\_\+t}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classhowley_a42cff4d570c8fda67543525ebc0342e3}\label{classhowley_a42cff4d570c8fda67543525ebc0342e3}} 
+\index{howley@{howley}!bst\+\_\+contains@{bst\+\_\+contains}}
+\index{bst\+\_\+contains@{bst\+\_\+contains}!howley@{howley}}
+\subsubsection{\texorpdfstring{bst\+\_\+contains()}{bst\_contains()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classhowley}{howley}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::bst\+\_\+contains (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{k }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classhowley_a469bbd88967ff50d865bbf368b1eae5e}\label{classhowley_a469bbd88967ff50d865bbf368b1eae5e}} 
+\index{howley@{howley}!bst\+\_\+remove@{bst\+\_\+remove}}
+\index{bst\+\_\+remove@{bst\+\_\+remove}!howley@{howley}}
+\subsubsection{\texorpdfstring{bst\+\_\+remove()}{bst\_remove()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classhowley}{howley}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::bst\+\_\+remove (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{k }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classhowley_a9581b4d5eb22feca0cd2ac799a0c6145}\label{classhowley_a9581b4d5eb22feca0cd2ac799a0c6145}} 
+\index{howley@{howley}!debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}}
+\index{debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}!howley@{howley}}
+\subsubsection{\texorpdfstring{debug\+Get\+Rec\+Mgr()}{debugGetRecMgr()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+Rec\+Mgr$\ast$ \hyperlink{classhowley}{howley}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::debug\+Get\+Rec\+Mgr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classhowley_ad451346bdc013f8f91a66e864ff6118c}\label{classhowley_ad451346bdc013f8f91a66e864ff6118c}} 
+\index{howley@{howley}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!howley@{howley}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classhowley}{howley}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classhowley_a37175ef84b9e6c359dc5cc1148fa289b}\label{classhowley_a37175ef84b9e6c359dc5cc1148fa289b}} 
+\index{howley@{howley}!get\+\_\+root@{get\+\_\+root}}
+\index{get\+\_\+root@{get\+\_\+root}!howley@{howley}}
+\subsubsection{\texorpdfstring{get\+\_\+root()}{get\_root()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$$\ast$ \hyperlink{classhowley}{howley}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+\_\+root (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classhowley_ad896657fb61ab833beb5854d3ab41195}\label{classhowley_ad896657fb61ab833beb5854d3ab41195}} 
+\index{howley@{howley}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!howley@{howley}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classhowley}{howley}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/howley\+\_\+int\+\_\+bst\+\_\+lf/\hyperlink{howley__impl_8h}{howley\+\_\+impl.\+h}\end{DoxyCompactItemize}

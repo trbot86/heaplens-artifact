@@ -1,0 +1,134 @@
+\hypertarget{papi__util__impl_8h}{}\section{common/papi/papi\+\_\+util\+\_\+impl.h File Reference}
+\label{papi__util__impl_8h}\index{common/papi/papi\+\_\+util\+\_\+impl.\+h@{common/papi/papi\+\_\+util\+\_\+impl.\+h}}
+{\ttfamily \#include \char`\"{}papi\+\_\+util.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}plaf.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+Include dependency graph for papi\+\_\+util\+\_\+impl.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{papi__util__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{papi__util__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ \hyperlink{papi__util__impl_8h_af4fa6024a8247452bf232012e5aa05f7}{cpu\+\_\+counter} (int c)
+\item 
+void \hyperlink{papi__util__impl_8h_a312951c273be06228c8aa5300a787666}{papi\+\_\+init\+\_\+program} (const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes})
+\item 
+void \hyperlink{papi__util__impl_8h_a973c1889c4fa77191f848bafab9f9a9f}{papi\+\_\+deinit\+\_\+program} ()
+\item 
+void \hyperlink{papi__util__impl_8h_a4722136f0473114bad3b934dc15b2dc8}{papi\+\_\+create\+\_\+eventset} (int id)
+\item 
+void \hyperlink{papi__util__impl_8h_a26878f707b4c7f6dbbfdc953013aa190}{papi\+\_\+start\+\_\+counters} (int id)
+\item 
+void \hyperlink{papi__util__impl_8h_ab6226f0c6bd7dba115c293aae2a0e1d6}{papi\+\_\+stop\+\_\+counters} (int id)
+\item 
+void \hyperlink{papi__util__impl_8h_aa15e08b61561d7365caa4eb253011145}{papi\+\_\+print\+\_\+counters} (long long num\+\_\+operations)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{papi__util__impl_8h_a1bc55fb652fde54bf0789ed9f8925cbf}{all\+\_\+cpu\+\_\+counters} \mbox{[}$\,$\mbox{]}
+\item 
+std\+::string \hyperlink{papi__util__impl_8h_a3b47a224878d3c4523cfa53aa1781894}{all\+\_\+cpu\+\_\+counters\+\_\+strings} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{papi__util__impl_8h_af4fa6024a8247452bf232012e5aa05f7}\label{papi__util__impl_8h_af4fa6024a8247452bf232012e5aa05f7}} 
+\index{papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}!cpu\+\_\+counter@{cpu\+\_\+counter}}
+\index{cpu\+\_\+counter@{cpu\+\_\+counter}!papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{cpu\+\_\+counter()}{cpu\_counter()}}
+{\footnotesize\ttfamily char$\ast$ cpu\+\_\+counter (\begin{DoxyParamCaption}\item[{int}]{c }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{papi__util__impl_8h_a4722136f0473114bad3b934dc15b2dc8}\label{papi__util__impl_8h_a4722136f0473114bad3b934dc15b2dc8}} 
+\index{papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}!papi\+\_\+create\+\_\+eventset@{papi\+\_\+create\+\_\+eventset}}
+\index{papi\+\_\+create\+\_\+eventset@{papi\+\_\+create\+\_\+eventset}!papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{papi\+\_\+create\+\_\+eventset()}{papi\_create\_eventset()}}
+{\footnotesize\ttfamily void papi\+\_\+create\+\_\+eventset (\begin{DoxyParamCaption}\item[{int}]{id }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{papi__util__impl_8h_a973c1889c4fa77191f848bafab9f9a9f}\label{papi__util__impl_8h_a973c1889c4fa77191f848bafab9f9a9f}} 
+\index{papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}!papi\+\_\+deinit\+\_\+program@{papi\+\_\+deinit\+\_\+program}}
+\index{papi\+\_\+deinit\+\_\+program@{papi\+\_\+deinit\+\_\+program}!papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{papi\+\_\+deinit\+\_\+program()}{papi\_deinit\_program()}}
+{\footnotesize\ttfamily void papi\+\_\+deinit\+\_\+program (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{papi__util__impl_8h_a312951c273be06228c8aa5300a787666}\label{papi__util__impl_8h_a312951c273be06228c8aa5300a787666}} 
+\index{papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}!papi\+\_\+init\+\_\+program@{papi\+\_\+init\+\_\+program}}
+\index{papi\+\_\+init\+\_\+program@{papi\+\_\+init\+\_\+program}!papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{papi\+\_\+init\+\_\+program()}{papi\_init\_program()}}
+{\footnotesize\ttfamily void papi\+\_\+init\+\_\+program (\begin{DoxyParamCaption}\item[{const int}]{num\+Processes }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{papi__util__impl_8h_aa15e08b61561d7365caa4eb253011145}\label{papi__util__impl_8h_aa15e08b61561d7365caa4eb253011145}} 
+\index{papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}!papi\+\_\+print\+\_\+counters@{papi\+\_\+print\+\_\+counters}}
+\index{papi\+\_\+print\+\_\+counters@{papi\+\_\+print\+\_\+counters}!papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{papi\+\_\+print\+\_\+counters()}{papi\_print\_counters()}}
+{\footnotesize\ttfamily void papi\+\_\+print\+\_\+counters (\begin{DoxyParamCaption}\item[{long long}]{num\+\_\+operations }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{papi__util__impl_8h_a26878f707b4c7f6dbbfdc953013aa190}\label{papi__util__impl_8h_a26878f707b4c7f6dbbfdc953013aa190}} 
+\index{papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}!papi\+\_\+start\+\_\+counters@{papi\+\_\+start\+\_\+counters}}
+\index{papi\+\_\+start\+\_\+counters@{papi\+\_\+start\+\_\+counters}!papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{papi\+\_\+start\+\_\+counters()}{papi\_start\_counters()}}
+{\footnotesize\ttfamily void papi\+\_\+start\+\_\+counters (\begin{DoxyParamCaption}\item[{int}]{id }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{papi__util__impl_8h_ab6226f0c6bd7dba115c293aae2a0e1d6}\label{papi__util__impl_8h_ab6226f0c6bd7dba115c293aae2a0e1d6}} 
+\index{papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}!papi\+\_\+stop\+\_\+counters@{papi\+\_\+stop\+\_\+counters}}
+\index{papi\+\_\+stop\+\_\+counters@{papi\+\_\+stop\+\_\+counters}!papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{papi\+\_\+stop\+\_\+counters()}{papi\_stop\_counters()}}
+{\footnotesize\ttfamily void papi\+\_\+stop\+\_\+counters (\begin{DoxyParamCaption}\item[{int}]{id }\end{DoxyParamCaption})}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{papi__util__impl_8h_a1bc55fb652fde54bf0789ed9f8925cbf}\label{papi__util__impl_8h_a1bc55fb652fde54bf0789ed9f8925cbf}} 
+\index{papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}!all\+\_\+cpu\+\_\+counters@{all\+\_\+cpu\+\_\+counters}}
+\index{all\+\_\+cpu\+\_\+counters@{all\+\_\+cpu\+\_\+counters}!papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{all\+\_\+cpu\+\_\+counters}{all\_cpu\_counters}}
+{\footnotesize\ttfamily int all\+\_\+cpu\+\_\+counters\mbox{[}$\,$\mbox{]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+
+
+
+
+
+
+
+
+
+\}
+\end{DoxyCode}
+\mbox{\Hypertarget{papi__util__impl_8h_a3b47a224878d3c4523cfa53aa1781894}\label{papi__util__impl_8h_a3b47a224878d3c4523cfa53aa1781894}} 
+\index{papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}!all\+\_\+cpu\+\_\+counters\+\_\+strings@{all\+\_\+cpu\+\_\+counters\+\_\+strings}}
+\index{all\+\_\+cpu\+\_\+counters\+\_\+strings@{all\+\_\+cpu\+\_\+counters\+\_\+strings}!papi\+\_\+util\+\_\+impl.\+h@{papi\+\_\+util\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{all\+\_\+cpu\+\_\+counters\+\_\+strings}{all\_cpu\_counters\_strings}}
+{\footnotesize\ttfamily std\+::string all\+\_\+cpu\+\_\+counters\+\_\+strings\mbox{[}$\,$\mbox{]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+
+
+
+
+
+
+
+
+
+\}
+\end{DoxyCode}

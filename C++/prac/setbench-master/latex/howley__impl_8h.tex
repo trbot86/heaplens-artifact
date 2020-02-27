@@ -1,0 +1,210 @@
+\hypertarget{howley__impl_8h}{}\section{ds/howley\+\_\+int\+\_\+bst\+\_\+lf/howley\+\_\+impl.h File Reference}
+\label{howley__impl_8h}\index{ds/howley\+\_\+int\+\_\+bst\+\_\+lf/howley\+\_\+impl.\+h@{ds/howley\+\_\+int\+\_\+bst\+\_\+lf/howley\+\_\+impl.\+h}}
+{\ttfamily \#include \char`\"{}record\+\_\+manager.\+h\char`\"{}}\newline
+Include dependency graph for howley\+\_\+impl.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{howley__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=186pt]{howley__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structnode__t}{node\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+union \hyperlink{unionoperation__t}{operation\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+struct \hyperlink{structchild__cas__op__t}{child\+\_\+cas\+\_\+op\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+struct \hyperlink{structrelocate__op__t}{relocate\+\_\+op\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+struct \hyperlink{structnode__t}{node\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+union \hyperlink{unionoperation__t}{operation\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+struct \hyperlink{structfind__result}{find\+\_\+result$<$ sval\+\_\+t $>$}
+\item 
+class \hyperlink{classhowley}{howley$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{howley__impl_8h_a973cd3793dcc5ef0f66fbfb7dbb71d72}{U\+S\+E\+\_\+\+P\+A\+D\+D\+I\+NG}
+\item 
+\#define \hyperlink{howley__impl_8h_aa44c67fc984d2af1b6b015f4ba895881}{L\+A\+R\+G\+E\+\_\+\+D\+ES}
+\item 
+\#define \hyperlink{howley__impl_8h_a83585ad33cdc7b6bcba92e22e7cbb374}{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+N\+O\+NE}~0
+\item 
+\#define \hyperlink{howley__impl_8h_a010bc4fa5e37f455bb135248bd021f12}{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+M\+A\+RK}~1
+\item 
+\#define \hyperlink{howley__impl_8h_a58617f973bba165b27ac3a82c3a7ea53}{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+C\+H\+I\+L\+D\+C\+AS}~2
+\item 
+\#define \hyperlink{howley__impl_8h_a85df1bdc70f89d322808d27ddf736a49}{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+R\+E\+L\+O\+C\+A\+TE}~3
+\item 
+\#define \hyperlink{howley__impl_8h_a0c7a28f247b0ca4b55e66bf63c077d48}{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+O\+N\+G\+O\+I\+NG}~0
+\item 
+\#define \hyperlink{howley__impl_8h_a9ed099af61547496025cdb2c755765a4}{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+S\+U\+C\+C\+E\+S\+S\+F\+UL}~1
+\item 
+\#define \hyperlink{howley__impl_8h_ae67901bc510234c93a7c5518e62c97a6}{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+F\+A\+I\+L\+ED}~2
+\item 
+\#define \hyperlink{howley__impl_8h_a841b291dedf074d07299e089dc0722e6}{F\+O\+U\+ND}~0x0
+\item 
+\#define \hyperlink{howley__impl_8h_af5cb398ce67ea2ef094601892e31ec60}{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+L}~0x1
+\item 
+\#define \hyperlink{howley__impl_8h_a08ce824ab165f80fa955a33beb987f71}{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+R}~0x2
+\item 
+\#define \hyperlink{howley__impl_8h_a5376571bbf4cdc9782683635f366f89a}{A\+B\+O\+RT}~0x3
+\item 
+\#define \hyperlink{howley__impl_8h_ab362674fb794db3c6e3ad7991de29df0}{G\+E\+T\+F\+L\+AG}(ptr)~(((uint64\+\_\+t) (ptr)) \& 3)
+\item 
+\#define \hyperlink{howley__impl_8h_a9829c15fc7f2d94f1ccb9fb26a5f55e7}{F\+L\+AG}(ptr,  flag)~((\hyperlink{unionoperation__t}{operation\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) ((((uint64\+\_\+t) (ptr)) \& 0xfffffffffffffffc) $\vert$ (flag)))
+\item 
+\#define \hyperlink{howley__impl_8h_a20756c298e94bde80b531faf4426a72d}{U\+N\+F\+L\+AG}(ptr)~((\hyperlink{unionoperation__t}{operation\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) (((uint64\+\_\+t) (ptr)) \& 0xfffffffffffffffc))
+\item 
+\#define \hyperlink{howley__impl_8h_af3019ba66c10378dfb938814d53fdd45}{I\+S\+N\+U\+LL}(node)~(((node) == N\+U\+LL) $\vert$$\vert$ (((uint64\+\_\+t) (node)) \& 1))
+\item 
+\#define \hyperlink{howley__impl_8h_a351e585a7f2f27c49231abdb25305a17}{S\+E\+T\+N\+U\+LL}(node)~((\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) ((((uintptr\+\_\+t) (node)) \& 0xfffffffffffffffe) $\vert$ 1))
+\item 
+\#define \hyperlink{howley__impl_8h_ae9c83c5a0094591300211a1beede2d8a}{N\+U\+L\+L\+\_\+\+N\+O\+D\+E\+P\+TR}~((\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) 1)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const unsigned int \hyperlink{howley__impl_8h_af6c75d3ff32b0478ec36dd44d7e8e664}{val\+\_\+mask} = $\sim$(0x3)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{howley__impl_8h_a5376571bbf4cdc9782683635f366f89a}\label{howley__impl_8h_a5376571bbf4cdc9782683635f366f89a}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!A\+B\+O\+RT@{A\+B\+O\+RT}}
+\index{A\+B\+O\+RT@{A\+B\+O\+RT}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{A\+B\+O\+RT}{ABORT}}
+{\footnotesize\ttfamily \#define A\+B\+O\+RT~0x3}
+
+\mbox{\Hypertarget{howley__impl_8h_a9829c15fc7f2d94f1ccb9fb26a5f55e7}\label{howley__impl_8h_a9829c15fc7f2d94f1ccb9fb26a5f55e7}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!F\+L\+AG@{F\+L\+AG}}
+\index{F\+L\+AG@{F\+L\+AG}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{F\+L\+AG}{FLAG}}
+{\footnotesize\ttfamily \#define F\+L\+AG(\begin{DoxyParamCaption}\item[{}]{ptr,  }\item[{}]{flag }\end{DoxyParamCaption})~((\hyperlink{unionoperation__t}{operation\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) ((((uint64\+\_\+t) (ptr)) \& 0xfffffffffffffffc) $\vert$ (flag)))}
+
+\mbox{\Hypertarget{howley__impl_8h_a841b291dedf074d07299e089dc0722e6}\label{howley__impl_8h_a841b291dedf074d07299e089dc0722e6}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!F\+O\+U\+ND@{F\+O\+U\+ND}}
+\index{F\+O\+U\+ND@{F\+O\+U\+ND}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{F\+O\+U\+ND}{FOUND}}
+{\footnotesize\ttfamily \#define F\+O\+U\+ND~0x0}
+
+\mbox{\Hypertarget{howley__impl_8h_ab362674fb794db3c6e3ad7991de29df0}\label{howley__impl_8h_ab362674fb794db3c6e3ad7991de29df0}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!G\+E\+T\+F\+L\+AG@{G\+E\+T\+F\+L\+AG}}
+\index{G\+E\+T\+F\+L\+AG@{G\+E\+T\+F\+L\+AG}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{G\+E\+T\+F\+L\+AG}{GETFLAG}}
+{\footnotesize\ttfamily \#define G\+E\+T\+F\+L\+AG(\begin{DoxyParamCaption}\item[{}]{ptr }\end{DoxyParamCaption})~(((uint64\+\_\+t) (ptr)) \& 3)}
+
+\mbox{\Hypertarget{howley__impl_8h_af3019ba66c10378dfb938814d53fdd45}\label{howley__impl_8h_af3019ba66c10378dfb938814d53fdd45}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!I\+S\+N\+U\+LL@{I\+S\+N\+U\+LL}}
+\index{I\+S\+N\+U\+LL@{I\+S\+N\+U\+LL}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{I\+S\+N\+U\+LL}{ISNULL}}
+{\footnotesize\ttfamily \#define I\+S\+N\+U\+LL(\begin{DoxyParamCaption}\item[{}]{node }\end{DoxyParamCaption})~(((node) == N\+U\+LL) $\vert$$\vert$ (((uint64\+\_\+t) (node)) \& 1))}
+
+\mbox{\Hypertarget{howley__impl_8h_aa44c67fc984d2af1b6b015f4ba895881}\label{howley__impl_8h_aa44c67fc984d2af1b6b015f4ba895881}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!L\+A\+R\+G\+E\+\_\+\+D\+ES@{L\+A\+R\+G\+E\+\_\+\+D\+ES}}
+\index{L\+A\+R\+G\+E\+\_\+\+D\+ES@{L\+A\+R\+G\+E\+\_\+\+D\+ES}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{L\+A\+R\+G\+E\+\_\+\+D\+ES}{LARGE\_DES}}
+{\footnotesize\ttfamily \#define L\+A\+R\+G\+E\+\_\+\+D\+ES}
+
+\mbox{\Hypertarget{howley__impl_8h_af5cb398ce67ea2ef094601892e31ec60}\label{howley__impl_8h_af5cb398ce67ea2ef094601892e31ec60}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+L@{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+L}}
+\index{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+L@{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+L}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+L}{NOT\_FOUND\_L}}
+{\footnotesize\ttfamily \#define N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+L~0x1}
+
+\mbox{\Hypertarget{howley__impl_8h_a08ce824ab165f80fa955a33beb987f71}\label{howley__impl_8h_a08ce824ab165f80fa955a33beb987f71}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+R@{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+R}}
+\index{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+R@{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+R}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+R}{NOT\_FOUND\_R}}
+{\footnotesize\ttfamily \#define N\+O\+T\+\_\+\+F\+O\+U\+N\+D\+\_\+R~0x2}
+
+\mbox{\Hypertarget{howley__impl_8h_ae9c83c5a0094591300211a1beede2d8a}\label{howley__impl_8h_ae9c83c5a0094591300211a1beede2d8a}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!N\+U\+L\+L\+\_\+\+N\+O\+D\+E\+P\+TR@{N\+U\+L\+L\+\_\+\+N\+O\+D\+E\+P\+TR}}
+\index{N\+U\+L\+L\+\_\+\+N\+O\+D\+E\+P\+TR@{N\+U\+L\+L\+\_\+\+N\+O\+D\+E\+P\+TR}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{N\+U\+L\+L\+\_\+\+N\+O\+D\+E\+P\+TR}{NULL\_NODEPTR}}
+{\footnotesize\ttfamily \#define N\+U\+L\+L\+\_\+\+N\+O\+D\+E\+P\+TR~((\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) 1)}
+
+\mbox{\Hypertarget{howley__impl_8h_a351e585a7f2f27c49231abdb25305a17}\label{howley__impl_8h_a351e585a7f2f27c49231abdb25305a17}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!S\+E\+T\+N\+U\+LL@{S\+E\+T\+N\+U\+LL}}
+\index{S\+E\+T\+N\+U\+LL@{S\+E\+T\+N\+U\+LL}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+E\+T\+N\+U\+LL}{SETNULL}}
+{\footnotesize\ttfamily \#define S\+E\+T\+N\+U\+LL(\begin{DoxyParamCaption}\item[{}]{node }\end{DoxyParamCaption})~((\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) ((((uintptr\+\_\+t) (node)) \& 0xfffffffffffffffe) $\vert$ 1))}
+
+\mbox{\Hypertarget{howley__impl_8h_a58617f973bba165b27ac3a82c3a7ea53}\label{howley__impl_8h_a58617f973bba165b27ac3a82c3a7ea53}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+C\+H\+I\+L\+D\+C\+AS@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+C\+H\+I\+L\+D\+C\+AS}}
+\index{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+C\+H\+I\+L\+D\+C\+AS@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+C\+H\+I\+L\+D\+C\+AS}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+C\+H\+I\+L\+D\+C\+AS}{STATE\_OP\_CHILDCAS}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+C\+H\+I\+L\+D\+C\+AS~2}
+
+\mbox{\Hypertarget{howley__impl_8h_ae67901bc510234c93a7c5518e62c97a6}\label{howley__impl_8h_ae67901bc510234c93a7c5518e62c97a6}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+F\+A\+I\+L\+ED@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+F\+A\+I\+L\+ED}}
+\index{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+F\+A\+I\+L\+ED@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+F\+A\+I\+L\+ED}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+F\+A\+I\+L\+ED}{STATE\_OP\_FAILED}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+F\+A\+I\+L\+ED~2}
+
+\mbox{\Hypertarget{howley__impl_8h_a010bc4fa5e37f455bb135248bd021f12}\label{howley__impl_8h_a010bc4fa5e37f455bb135248bd021f12}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+M\+A\+RK@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+M\+A\+RK}}
+\index{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+M\+A\+RK@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+M\+A\+RK}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+M\+A\+RK}{STATE\_OP\_MARK}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+M\+A\+RK~1}
+
+\mbox{\Hypertarget{howley__impl_8h_a83585ad33cdc7b6bcba92e22e7cbb374}\label{howley__impl_8h_a83585ad33cdc7b6bcba92e22e7cbb374}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+N\+O\+NE@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+N\+O\+NE}}
+\index{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+N\+O\+NE@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+N\+O\+NE}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+N\+O\+NE}{STATE\_OP\_NONE}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+N\+O\+NE~0}
+
+\mbox{\Hypertarget{howley__impl_8h_a0c7a28f247b0ca4b55e66bf63c077d48}\label{howley__impl_8h_a0c7a28f247b0ca4b55e66bf63c077d48}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+O\+N\+G\+O\+I\+NG@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+O\+N\+G\+O\+I\+NG}}
+\index{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+O\+N\+G\+O\+I\+NG@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+O\+N\+G\+O\+I\+NG}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+O\+N\+G\+O\+I\+NG}{STATE\_OP\_ONGOING}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+O\+N\+G\+O\+I\+NG~0}
+
+\mbox{\Hypertarget{howley__impl_8h_a85df1bdc70f89d322808d27ddf736a49}\label{howley__impl_8h_a85df1bdc70f89d322808d27ddf736a49}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+R\+E\+L\+O\+C\+A\+TE@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+R\+E\+L\+O\+C\+A\+TE}}
+\index{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+R\+E\+L\+O\+C\+A\+TE@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+R\+E\+L\+O\+C\+A\+TE}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+R\+E\+L\+O\+C\+A\+TE}{STATE\_OP\_RELOCATE}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+R\+E\+L\+O\+C\+A\+TE~3}
+
+\mbox{\Hypertarget{howley__impl_8h_a9ed099af61547496025cdb2c755765a4}\label{howley__impl_8h_a9ed099af61547496025cdb2c755765a4}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+S\+U\+C\+C\+E\+S\+S\+F\+UL@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+S\+U\+C\+C\+E\+S\+S\+F\+UL}}
+\index{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+S\+U\+C\+C\+E\+S\+S\+F\+UL@{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+S\+U\+C\+C\+E\+S\+S\+F\+UL}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+S\+U\+C\+C\+E\+S\+S\+F\+UL}{STATE\_OP\_SUCCESSFUL}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+O\+P\+\_\+\+S\+U\+C\+C\+E\+S\+S\+F\+UL~1}
+
+\mbox{\Hypertarget{howley__impl_8h_a20756c298e94bde80b531faf4426a72d}\label{howley__impl_8h_a20756c298e94bde80b531faf4426a72d}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!U\+N\+F\+L\+AG@{U\+N\+F\+L\+AG}}
+\index{U\+N\+F\+L\+AG@{U\+N\+F\+L\+AG}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{U\+N\+F\+L\+AG}{UNFLAG}}
+{\footnotesize\ttfamily \#define U\+N\+F\+L\+AG(\begin{DoxyParamCaption}\item[{}]{ptr }\end{DoxyParamCaption})~((\hyperlink{unionoperation__t}{operation\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) (((uint64\+\_\+t) (ptr)) \& 0xfffffffffffffffc))}
+
+\mbox{\Hypertarget{howley__impl_8h_a973cd3793dcc5ef0f66fbfb7dbb71d72}\label{howley__impl_8h_a973cd3793dcc5ef0f66fbfb7dbb71d72}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!U\+S\+E\+\_\+\+P\+A\+D\+D\+I\+NG@{U\+S\+E\+\_\+\+P\+A\+D\+D\+I\+NG}}
+\index{U\+S\+E\+\_\+\+P\+A\+D\+D\+I\+NG@{U\+S\+E\+\_\+\+P\+A\+D\+D\+I\+NG}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{U\+S\+E\+\_\+\+P\+A\+D\+D\+I\+NG}{USE\_PADDING}}
+{\footnotesize\ttfamily \#define U\+S\+E\+\_\+\+P\+A\+D\+D\+I\+NG}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{howley__impl_8h_af6c75d3ff32b0478ec36dd44d7e8e664}\label{howley__impl_8h_af6c75d3ff32b0478ec36dd44d7e8e664}} 
+\index{howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}!val\+\_\+mask@{val\+\_\+mask}}
+\index{val\+\_\+mask@{val\+\_\+mask}!howley\+\_\+impl.\+h@{howley\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{val\+\_\+mask}{val\_mask}}
+{\footnotesize\ttfamily const unsigned int val\+\_\+mask = $\sim$(0x3)}
+

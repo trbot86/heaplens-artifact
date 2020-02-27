@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['s_5fdata',['S_DATA',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a64790b3052e4f13e395b1ef08400cde6',1,'tpcc_const.h']]],
+  ['s_5fdist_5f01',['S_DIST_01',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a84381f98aea8fd0f196bc917dbe8196b',1,'tpcc_const.h']]],
+  ['s_5fdist_5f02',['S_DIST_02',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a4e1e368da9daabe611d68ab65d436edf',1,'tpcc_const.h']]],
+  ['s_5fdist_5f03',['S_DIST_03',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058af746f9e6bfbe4e6f4a49283011d24a93',1,'tpcc_const.h']]],
+  ['s_5fdist_5f04',['S_DIST_04',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058af02e545d12dce00432e26153eff04535',1,'tpcc_const.h']]],
+  ['s_5fdist_5f05',['S_DIST_05',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a5961e9daad59a21eb5b453779a404ed2',1,'tpcc_const.h']]],
+  ['s_5fdist_5f06',['S_DIST_06',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a512199fe4f15af8279135f6962c27a05',1,'tpcc_const.h']]],
+  ['s_5fdist_5f07',['S_DIST_07',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a8d633dc633007477d7e01077e3be769f',1,'tpcc_const.h']]],
+  ['s_5fdist_5f08',['S_DIST_08',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058ab08defda7d37312ed5975393074a64d2',1,'tpcc_const.h']]],
+  ['s_5fdist_5f09',['S_DIST_09',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a240be779ede4adb3304c5c1503c4b34d',1,'tpcc_const.h']]],
+  ['s_5fdist_5f10',['S_DIST_10',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058aaa39346bf6cd1ee9ff9e02786704442b',1,'tpcc_const.h']]],
+  ['s_5fi_5fid',['S_I_ID',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a413f4bdc27600d22916bf3b45c4fc570',1,'tpcc_const.h']]],
+  ['s_5forder_5fcnt',['S_ORDER_CNT',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a8c9338b64158e48ec54078ad5fd6bf6b',1,'tpcc_const.h']]],
+  ['s_5fquantity',['S_QUANTITY',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058aafcb14e530de95595141d316753316b8',1,'tpcc_const.h']]],
+  ['s_5fremote_5fcnt',['S_REMOTE_CNT',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a89d4ab968148b383f1a05d9cd64c8c62',1,'tpcc_const.h']]],
+  ['s_5fw_5fid',['S_W_ID',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058ac8e7d21c94718f5162efa3580750b18a',1,'tpcc_const.h']]],
+  ['s_5fytd',['S_YTD',['../tpcc__const_8h.html#a0ae1e3bf78c960c83e2d437efd802058a2f0f47a14cbaebf3b44ca836226f0c07',1,'tpcc_const.h']]],
+  ['scan',['SCAN',['../global_8h.html#a567f81b0ae33b00d189d7714e9fde0bcad94678be726a02dc0089d328487a3c2d',1,'global.h']]],
+  ['simple',['SIMPLE',['../intlf__impl_8h.html#a1d1cfd8ffb84e947f82999c682b666a7a1a6b6e9893ec9e5d9710335b4c74d3f6',1,'intlf_impl.h']]],
+  ['stdev',['STDEV',['../gstats_8h.html#aa5e4744ebbda83fd3ef2ae3226461ac3a543457e2b7362e7d4112e4465b9ddc68',1,'gstats.h']]],
+  ['success',['SUCCESS',['../abtree__kcas_8h.html#a334a18e3f61b9e4ace2ae7d51e348bebac7f69f7c9e5aea9b8f54cf02870e2bf8',1,'SUCCESS():&#160;abtree_kcas.h'],['../internal__kcas_8h.html#a334a18e3f61b9e4ace2ae7d51e348bebac7f69f7c9e5aea9b8f54cf02870e2bf8',1,'SUCCESS():&#160;internal_kcas.h'],['../internal__kcas__unbalanced_8h.html#a334a18e3f61b9e4ace2ae7d51e348bebac7f69f7c9e5aea9b8f54cf02870e2bf8',1,'SUCCESS():&#160;internal_kcas_unbalanced.h'],['../skiplist_8h.html#a334a18e3f61b9e4ace2ae7d51e348bebac7f69f7c9e5aea9b8f54cf02870e2bf8',1,'SUCCESS():&#160;skiplist.h']]],
+  ['success_5fwith_5fheight_5fupdate',['SUCCESS_WITH_HEIGHT_UPDATE',['../internal__kcas_8h.html#a334a18e3f61b9e4ace2ae7d51e348beba9070d56728053384de45de4236e21d0f',1,'SUCCESS_WITH_HEIGHT_UPDATE():&#160;internal_kcas.h'],['../internal__kcas__unbalanced_8h.html#a334a18e3f61b9e4ace2ae7d51e348beba9070d56728053384de45de4236e21d0f',1,'SUCCESS_WITH_HEIGHT_UPDATE():&#160;internal_kcas_unbalanced.h'],['../skiplist_8h.html#a334a18e3f61b9e4ace2ae7d51e348beba9070d56728053384de45de4236e21d0f',1,'SUCCESS_WITH_HEIGHT_UPDATE():&#160;skiplist.h']]],
+  ['sum',['SUM',['../gstats_8h.html#aa5e4744ebbda83fd3ef2ae3226461ac3a82c030bf31e2d975e6a85cf67ba88bb4',1,'gstats.h']]]
+];

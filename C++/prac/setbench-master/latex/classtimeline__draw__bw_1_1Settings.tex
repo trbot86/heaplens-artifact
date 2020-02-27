@@ -1,0 +1,121 @@
+\hypertarget{classtimeline__draw__bw_1_1Settings}{}\section{timeline\+\_\+draw\+\_\+bw.\+Settings Class Reference}
+\label{classtimeline__draw__bw_1_1Settings}\index{timeline\+\_\+draw\+\_\+bw.\+Settings@{timeline\+\_\+draw\+\_\+bw.\+Settings}}
+
+
+customize the following settings for your input.  
+
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classtimeline__draw__bw_1_1Settings_a8f4a4dfe365bc55f55f3b3a8ef3524a3}{get\+Thread} (self, line)
+\begin{DoxyCompactList}\small\item\em should return the thread number for a given line (interval) \end{DoxyCompactList}\item 
+def \hyperlink{classtimeline__draw__bw_1_1Settings_a15ac4f74b26be5aaa7ff99efc9ef187a}{get\+Start} (self, line)
+\begin{DoxyCompactList}\small\item\em should return the interval start for a given line (interval) \end{DoxyCompactList}\item 
+def \hyperlink{classtimeline__draw__bw_1_1Settings_a18a9eae1f801909cc112e5401a1290d1}{get\+End} (self, line)
+\begin{DoxyCompactList}\small\item\em should return the interval end for a given line (interval) \end{DoxyCompactList}\item 
+def \hyperlink{classtimeline__draw__bw_1_1Settings_a173c1a3bf8d4ac4f607aff243ba06116}{get\+Color} (self, line)
+\begin{DoxyCompactList}\small\item\em should return the color for a given line (interval) \end{DoxyCompactList}\item 
+def \hyperlink{classtimeline__draw__bw_1_1Settings_a572fa3777fd6842b68033807657afe1d}{include\+Line} (self, line)
+\begin{DoxyCompactList}\small\item\em should return True if the line is to be included in the graph and False otherwise \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{classtimeline__draw__bw_1_1Settings_a941a3030f430ef7defb2cfde3045c504}{max\+Thread} = 1000
+\item 
+int \hyperlink{classtimeline__draw__bw_1_1Settings_a06f2f1a8d2657cd2cf303759a105a900}{window\+Start\+\_\+ms} = 0
+\item 
+int \hyperlink{classtimeline__draw__bw_1_1Settings_a0a6c1531e4af92cbc594e461180f5675}{window\+Size\+\_\+ms} = 60000
+\item 
+int \hyperlink{classtimeline__draw__bw_1_1Settings_a5ee81de952a739f08c3d5fa516f09471}{min\+Duration\+\_\+ms} = 20
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+customize the following settings for your input. 
+
+by default, this expects three space-\/separated columns\+: thread\+\_\+number start\+\_\+time\+\_\+in\+\_\+nanosec end\+\_\+time\+\_\+in\+\_\+nanosec 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtimeline__draw__bw_1_1Settings_a173c1a3bf8d4ac4f607aff243ba06116}\label{classtimeline__draw__bw_1_1Settings_a173c1a3bf8d4ac4f607aff243ba06116}} 
+\index{timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}!get\+Color@{get\+Color}}
+\index{get\+Color@{get\+Color}!timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}}
+\subsubsection{\texorpdfstring{get\+Color()}{getColor()}}
+{\footnotesize\ttfamily def timeline\+\_\+draw\+\_\+bw.\+Settings.\+get\+Color (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+should return the color for a given line (interval) 
+
+\mbox{\Hypertarget{classtimeline__draw__bw_1_1Settings_a18a9eae1f801909cc112e5401a1290d1}\label{classtimeline__draw__bw_1_1Settings_a18a9eae1f801909cc112e5401a1290d1}} 
+\index{timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}!get\+End@{get\+End}}
+\index{get\+End@{get\+End}!timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}}
+\subsubsection{\texorpdfstring{get\+End()}{getEnd()}}
+{\footnotesize\ttfamily def timeline\+\_\+draw\+\_\+bw.\+Settings.\+get\+End (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+should return the interval end for a given line (interval) 
+
+\mbox{\Hypertarget{classtimeline__draw__bw_1_1Settings_a15ac4f74b26be5aaa7ff99efc9ef187a}\label{classtimeline__draw__bw_1_1Settings_a15ac4f74b26be5aaa7ff99efc9ef187a}} 
+\index{timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}!get\+Start@{get\+Start}}
+\index{get\+Start@{get\+Start}!timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}}
+\subsubsection{\texorpdfstring{get\+Start()}{getStart()}}
+{\footnotesize\ttfamily def timeline\+\_\+draw\+\_\+bw.\+Settings.\+get\+Start (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+should return the interval start for a given line (interval) 
+
+\mbox{\Hypertarget{classtimeline__draw__bw_1_1Settings_a8f4a4dfe365bc55f55f3b3a8ef3524a3}\label{classtimeline__draw__bw_1_1Settings_a8f4a4dfe365bc55f55f3b3a8ef3524a3}} 
+\index{timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}!get\+Thread@{get\+Thread}}
+\index{get\+Thread@{get\+Thread}!timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}}
+\subsubsection{\texorpdfstring{get\+Thread()}{getThread()}}
+{\footnotesize\ttfamily def timeline\+\_\+draw\+\_\+bw.\+Settings.\+get\+Thread (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+should return the thread number for a given line (interval) 
+
+\mbox{\Hypertarget{classtimeline__draw__bw_1_1Settings_a572fa3777fd6842b68033807657afe1d}\label{classtimeline__draw__bw_1_1Settings_a572fa3777fd6842b68033807657afe1d}} 
+\index{timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}!include\+Line@{include\+Line}}
+\index{include\+Line@{include\+Line}!timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}}
+\subsubsection{\texorpdfstring{include\+Line()}{includeLine()}}
+{\footnotesize\ttfamily def timeline\+\_\+draw\+\_\+bw.\+Settings.\+include\+Line (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+should return True if the line is to be included in the graph and False otherwise 
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classtimeline__draw__bw_1_1Settings_a941a3030f430ef7defb2cfde3045c504}\label{classtimeline__draw__bw_1_1Settings_a941a3030f430ef7defb2cfde3045c504}} 
+\index{timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}!max\+Thread@{max\+Thread}}
+\index{max\+Thread@{max\+Thread}!timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}}
+\subsubsection{\texorpdfstring{max\+Thread}{maxThread}}
+{\footnotesize\ttfamily int timeline\+\_\+draw\+\_\+bw.\+Settings.\+max\+Thread = 1000\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classtimeline__draw__bw_1_1Settings_a5ee81de952a739f08c3d5fa516f09471}\label{classtimeline__draw__bw_1_1Settings_a5ee81de952a739f08c3d5fa516f09471}} 
+\index{timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}!min\+Duration\+\_\+ms@{min\+Duration\+\_\+ms}}
+\index{min\+Duration\+\_\+ms@{min\+Duration\+\_\+ms}!timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}}
+\subsubsection{\texorpdfstring{min\+Duration\+\_\+ms}{minDuration\_ms}}
+{\footnotesize\ttfamily int timeline\+\_\+draw\+\_\+bw.\+Settings.\+min\+Duration\+\_\+ms = 20\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classtimeline__draw__bw_1_1Settings_a0a6c1531e4af92cbc594e461180f5675}\label{classtimeline__draw__bw_1_1Settings_a0a6c1531e4af92cbc594e461180f5675}} 
+\index{timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}!window\+Size\+\_\+ms@{window\+Size\+\_\+ms}}
+\index{window\+Size\+\_\+ms@{window\+Size\+\_\+ms}!timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}}
+\subsubsection{\texorpdfstring{window\+Size\+\_\+ms}{windowSize\_ms}}
+{\footnotesize\ttfamily int timeline\+\_\+draw\+\_\+bw.\+Settings.\+window\+Size\+\_\+ms = 60000\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classtimeline__draw__bw_1_1Settings_a06f2f1a8d2657cd2cf303759a105a900}\label{classtimeline__draw__bw_1_1Settings_a06f2f1a8d2657cd2cf303759a105a900}} 
+\index{timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}!window\+Start\+\_\+ms@{window\+Start\+\_\+ms}}
+\index{window\+Start\+\_\+ms@{window\+Start\+\_\+ms}!timeline\+\_\+draw\+\_\+bw\+::\+Settings@{timeline\+\_\+draw\+\_\+bw\+::\+Settings}}
+\subsubsection{\texorpdfstring{window\+Start\+\_\+ms}{windowStart\_ms}}
+{\footnotesize\ttfamily int timeline\+\_\+draw\+\_\+bw.\+Settings.\+window\+Start\+\_\+ms = 0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+microbench/experiments/timelines/\hyperlink{timeline__draw__bw_8py}{timeline\+\_\+draw\+\_\+bw.\+py}\end{DoxyCompactItemize}

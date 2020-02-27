@@ -1,0 +1,101 @@
+\hypertarget{classintlf}{}\section{intlf$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$ Class Template Reference}
+\label{classintlf}\index{intlf$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$@{intlf$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$}}
+
+
+{\ttfamily \#include $<$intlf\+\_\+impl.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classintlf_a6bd5eb6671be5a08d0efdc23eced2725}{intlf} (const int \+\_\+\+N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS, const skey\+\_\+t \&\+\_\+\+K\+E\+Y\+\_\+\+M\+IN, const skey\+\_\+t \&\+\_\+\+K\+E\+Y\+\_\+\+M\+AX, const sval\+\_\+t \&\+\_\+\+V\+A\+L\+U\+E\+\_\+\+R\+E\+S\+E\+R\+V\+ED, unsigned int id)
+\item 
+\hyperlink{classintlf_a701e57f370a296fc3f73ed8c0ba0745c}{$\sim$intlf} ()
+\item 
+void \hyperlink{classintlf_a4b001c748e2bb49c74a9d65204776c73}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classintlf_ab394875c208489665f7d700accdb216d}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$ \hyperlink{classintlf_ac5a1a18fd5b9a34f3cbda1e2afd73bdd}{get\+\_\+root} ()
+\item 
+Rec\+Mgr $\ast$ \hyperlink{classintlf_aeeca12eca54beb687a0791436dec1933}{debug\+Get\+Rec\+Mgr} ()
+\item 
+sval\+\_\+t \hyperlink{classintlf_aee3e00131237612924107a00d5743f1c}{insert} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key, sval\+\_\+t item)
+\item 
+bool \hyperlink{classintlf_a4f90087f9da607ffbcfad794131ddf17}{remove} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key)
+\item 
+sval\+\_\+t \hyperlink{classintlf_aeb7ce634a90eca56c3b26412cb48d552}{find} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key)
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classintlf_a6bd5eb6671be5a08d0efdc23eced2725}\label{classintlf_a6bd5eb6671be5a08d0efdc23eced2725}} 
+\index{intlf@{intlf}!intlf@{intlf}}
+\index{intlf@{intlf}!intlf@{intlf}}
+\subsubsection{\texorpdfstring{intlf()}{intlf()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classintlf}{intlf}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::\hyperlink{classintlf}{intlf} (\begin{DoxyParamCaption}\item[{const int}]{\+\_\+\+N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS,  }\item[{const skey\+\_\+t \&}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+IN,  }\item[{const skey\+\_\+t \&}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+AX,  }\item[{const sval\+\_\+t \&}]{\+\_\+\+V\+A\+L\+U\+E\+\_\+\+R\+E\+S\+E\+R\+V\+ED,  }\item[{unsigned int}]{id }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintlf_a701e57f370a296fc3f73ed8c0ba0745c}\label{classintlf_a701e57f370a296fc3f73ed8c0ba0745c}} 
+\index{intlf@{intlf}!````~intlf@{$\sim$intlf}}
+\index{````~intlf@{$\sim$intlf}!intlf@{intlf}}
+\subsubsection{\texorpdfstring{$\sim$intlf()}{~intlf()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classintlf}{intlf}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::$\sim$\hyperlink{classintlf}{intlf} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classintlf_aeeca12eca54beb687a0791436dec1933}\label{classintlf_aeeca12eca54beb687a0791436dec1933}} 
+\index{intlf@{intlf}!debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}}
+\index{debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}!intlf@{intlf}}
+\subsubsection{\texorpdfstring{debug\+Get\+Rec\+Mgr()}{debugGetRecMgr()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+Rec\+Mgr$\ast$ \hyperlink{classintlf}{intlf}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::debug\+Get\+Rec\+Mgr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintlf_ab394875c208489665f7d700accdb216d}\label{classintlf_ab394875c208489665f7d700accdb216d}} 
+\index{intlf@{intlf}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!intlf@{intlf}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classintlf}{intlf}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintlf_aeb7ce634a90eca56c3b26412cb48d552}\label{classintlf_aeb7ce634a90eca56c3b26412cb48d552}} 
+\index{intlf@{intlf}!find@{find}}
+\index{find@{find}!intlf@{intlf}}
+\subsubsection{\texorpdfstring{find()}{find()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classintlf}{intlf}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::find (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintlf_ac5a1a18fd5b9a34f3cbda1e2afd73bdd}\label{classintlf_ac5a1a18fd5b9a34f3cbda1e2afd73bdd}} 
+\index{intlf@{intlf}!get\+\_\+root@{get\+\_\+root}}
+\index{get\+\_\+root@{get\+\_\+root}!intlf@{intlf}}
+\subsubsection{\texorpdfstring{get\+\_\+root()}{get\_root()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$$\ast$ \hyperlink{classintlf}{intlf}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+\_\+root (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintlf_a4b001c748e2bb49c74a9d65204776c73}\label{classintlf_a4b001c748e2bb49c74a9d65204776c73}} 
+\index{intlf@{intlf}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!intlf@{intlf}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classintlf}{intlf}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintlf_aee3e00131237612924107a00d5743f1c}\label{classintlf_aee3e00131237612924107a00d5743f1c}} 
+\index{intlf@{intlf}!insert@{insert}}
+\index{insert@{insert}!intlf@{intlf}}
+\subsubsection{\texorpdfstring{insert()}{insert()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classintlf}{intlf}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::insert (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key,  }\item[{sval\+\_\+t}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classintlf_a4f90087f9da607ffbcfad794131ddf17}\label{classintlf_a4f90087f9da607ffbcfad794131ddf17}} 
+\index{intlf@{intlf}!remove@{remove}}
+\index{remove@{remove}!intlf@{intlf}}
+\subsubsection{\texorpdfstring{remove()}{remove()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+bool \hyperlink{classintlf}{intlf}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::remove (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/ramachandran\+\_\+int\+\_\+bst\+\_\+lf/\hyperlink{intlf__impl_8h}{intlf\+\_\+impl.\+h}\end{DoxyCompactItemize}

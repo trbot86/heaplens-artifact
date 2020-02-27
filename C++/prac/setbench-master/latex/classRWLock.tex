@@ -1,0 +1,108 @@
+\hypertarget{classRWLock}{}\section{R\+W\+Lock Class Reference}
+\label{classRWLock}\index{R\+W\+Lock@{R\+W\+Lock}}
+
+
+{\ttfamily \#include $<$rwlock.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classRWLock_ad584ecc0f762d79a55672c0a280fac3e}{R\+W\+Lock} ()
+\item 
+void \hyperlink{classRWLock_a86bb2cfffb42fa153968313033e84c7a}{init} ()
+\item 
+bool \hyperlink{classRWLock_a66fb3ab26aba574bd7bdc3601f48e58f}{is\+Write\+Locked} ()
+\item 
+bool \hyperlink{classRWLock_ad8cee8ddb2215d3b614bfe4e1f9532a1}{is\+Read\+Locked} ()
+\item 
+bool \hyperlink{classRWLock_afebbcc3ec51f82d54e45803134ecfaa1}{is\+Upgrading} ()
+\item 
+bool \hyperlink{classRWLock_a19701f284ca1362468c6571f1bb606b4}{is\+Locked} ()
+\item 
+void \hyperlink{classRWLock_ac1a8814594b39358b3fc15552903963c}{read\+Lock} ()
+\item 
+void \hyperlink{classRWLock_a0f24f87d56d88c5449d3eb9ab3c6c8be}{read\+Unlock} ()
+\item 
+bool \hyperlink{classRWLock_a5ac47c287ea985c1ac0df8feac4eb089}{upgrade\+Lock} ()
+\item 
+void \hyperlink{classRWLock_a64b83c3c0cff22d9d3512daaeacc7bfb}{write\+Lock} ()
+\item 
+void \hyperlink{classRWLock_a3c735ecb40882e9c4c3b7f8419692bad}{write\+Unlock} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classRWLock_ad584ecc0f762d79a55672c0a280fac3e}\label{classRWLock_ad584ecc0f762d79a55672c0a280fac3e}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!R\+W\+Lock@{R\+W\+Lock}}
+\index{R\+W\+Lock@{R\+W\+Lock}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{R\+W\+Lock()}{RWLock()}}
+{\footnotesize\ttfamily R\+W\+Lock\+::\+R\+W\+Lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classRWLock_a86bb2cfffb42fa153968313033e84c7a}\label{classRWLock_a86bb2cfffb42fa153968313033e84c7a}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!init@{init}}
+\index{init@{init}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily void R\+W\+Lock\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRWLock_a19701f284ca1362468c6571f1bb606b4}\label{classRWLock_a19701f284ca1362468c6571f1bb606b4}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!is\+Locked@{is\+Locked}}
+\index{is\+Locked@{is\+Locked}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{is\+Locked()}{isLocked()}}
+{\footnotesize\ttfamily bool R\+W\+Lock\+::is\+Locked (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRWLock_ad8cee8ddb2215d3b614bfe4e1f9532a1}\label{classRWLock_ad8cee8ddb2215d3b614bfe4e1f9532a1}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!is\+Read\+Locked@{is\+Read\+Locked}}
+\index{is\+Read\+Locked@{is\+Read\+Locked}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{is\+Read\+Locked()}{isReadLocked()}}
+{\footnotesize\ttfamily bool R\+W\+Lock\+::is\+Read\+Locked (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRWLock_afebbcc3ec51f82d54e45803134ecfaa1}\label{classRWLock_afebbcc3ec51f82d54e45803134ecfaa1}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!is\+Upgrading@{is\+Upgrading}}
+\index{is\+Upgrading@{is\+Upgrading}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{is\+Upgrading()}{isUpgrading()}}
+{\footnotesize\ttfamily bool R\+W\+Lock\+::is\+Upgrading (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRWLock_a66fb3ab26aba574bd7bdc3601f48e58f}\label{classRWLock_a66fb3ab26aba574bd7bdc3601f48e58f}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!is\+Write\+Locked@{is\+Write\+Locked}}
+\index{is\+Write\+Locked@{is\+Write\+Locked}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{is\+Write\+Locked()}{isWriteLocked()}}
+{\footnotesize\ttfamily bool R\+W\+Lock\+::is\+Write\+Locked (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRWLock_ac1a8814594b39358b3fc15552903963c}\label{classRWLock_ac1a8814594b39358b3fc15552903963c}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!read\+Lock@{read\+Lock}}
+\index{read\+Lock@{read\+Lock}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{read\+Lock()}{readLock()}}
+{\footnotesize\ttfamily void R\+W\+Lock\+::read\+Lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRWLock_a0f24f87d56d88c5449d3eb9ab3c6c8be}\label{classRWLock_a0f24f87d56d88c5449d3eb9ab3c6c8be}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!read\+Unlock@{read\+Unlock}}
+\index{read\+Unlock@{read\+Unlock}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{read\+Unlock()}{readUnlock()}}
+{\footnotesize\ttfamily void R\+W\+Lock\+::read\+Unlock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRWLock_a5ac47c287ea985c1ac0df8feac4eb089}\label{classRWLock_a5ac47c287ea985c1ac0df8feac4eb089}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!upgrade\+Lock@{upgrade\+Lock}}
+\index{upgrade\+Lock@{upgrade\+Lock}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{upgrade\+Lock()}{upgradeLock()}}
+{\footnotesize\ttfamily bool R\+W\+Lock\+::upgrade\+Lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRWLock_a64b83c3c0cff22d9d3512daaeacc7bfb}\label{classRWLock_a64b83c3c0cff22d9d3512daaeacc7bfb}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!write\+Lock@{write\+Lock}}
+\index{write\+Lock@{write\+Lock}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{write\+Lock()}{writeLock()}}
+{\footnotesize\ttfamily void R\+W\+Lock\+::write\+Lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRWLock_a3c735ecb40882e9c4c3b7f8419692bad}\label{classRWLock_a3c735ecb40882e9c4c3b7f8419692bad}} 
+\index{R\+W\+Lock@{R\+W\+Lock}!write\+Unlock@{write\+Unlock}}
+\index{write\+Unlock@{write\+Unlock}!R\+W\+Lock@{R\+W\+Lock}}
+\subsubsection{\texorpdfstring{write\+Unlock()}{writeUnlock()}}
+{\footnotesize\ttfamily void R\+W\+Lock\+::write\+Unlock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/\hyperlink{rwlock_8h}{rwlock.\+h}\end{DoxyCompactItemize}

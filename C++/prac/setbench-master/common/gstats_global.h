@@ -39,6 +39,8 @@
 #error "Must define GSTATS_HANDLE_STATS before including this file"
 #endif
 
+#include "memhook.h"
+
 #include "gstats.h"
 #include "locks_impl.h"
 

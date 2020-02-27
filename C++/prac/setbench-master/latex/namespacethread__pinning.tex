@@ -1,0 +1,78 @@
+\hypertarget{namespacethread__pinning}{}\section{thread\+\_\+pinning Namespace Reference}
+\label{namespacethread__pinning}\index{thread\+\_\+pinning@{thread\+\_\+pinning}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespacethread__pinning_ac1e8e55d93b77cc034100f804b3e713c}{setbench\+\_\+deinit} (const int num\+Threads)
+\item 
+void \hyperlink{namespacethread__pinning_abda6810a8633fe3b7b467c0d29c27303}{configure\+Policy} (const int num\+Threads, string policy)
+\item 
+void \hyperlink{namespacethread__pinning_ac692fe08caa63da2c77a1d55fc1c7da3}{bind\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+int \hyperlink{namespacethread__pinning_a3024ed19665e61e13361f77280e4b2fb}{get\+Actual\+Binding} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+bool \hyperlink{namespacethread__pinning_a8918d0901125acd9d90e325a78a83f60}{is\+Injective\+Mapping} (const int num\+Threads)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+cpu\+\_\+set\+\_\+t $\ast$$\ast$ \hyperlink{namespacethread__pinning_ae529f1f3dabd63c55374ca3be2676e05}{cpusets}
+\item 
+int $\ast$ \hyperlink{namespacethread__pinning_acf2804117d5f9bea3cbb57d08ab07dda}{custom\+Binding}
+\item 
+int \hyperlink{namespacethread__pinning_ad9d699e093492f19d15cd1bda6633a5e}{num\+Custom\+Bindings}
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{namespacethread__pinning_ac692fe08caa63da2c77a1d55fc1c7da3}\label{namespacethread__pinning_ac692fe08caa63da2c77a1d55fc1c7da3}} 
+\index{thread\+\_\+pinning@{thread\+\_\+pinning}!bind\+Thread@{bind\+Thread}}
+\index{bind\+Thread@{bind\+Thread}!thread\+\_\+pinning@{thread\+\_\+pinning}}
+\subsubsection{\texorpdfstring{bind\+Thread()}{bindThread()}}
+{\footnotesize\ttfamily void thread\+\_\+pinning\+::bind\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacethread__pinning_abda6810a8633fe3b7b467c0d29c27303}\label{namespacethread__pinning_abda6810a8633fe3b7b467c0d29c27303}} 
+\index{thread\+\_\+pinning@{thread\+\_\+pinning}!configure\+Policy@{configure\+Policy}}
+\index{configure\+Policy@{configure\+Policy}!thread\+\_\+pinning@{thread\+\_\+pinning}}
+\subsubsection{\texorpdfstring{configure\+Policy()}{configurePolicy()}}
+{\footnotesize\ttfamily void thread\+\_\+pinning\+::configure\+Policy (\begin{DoxyParamCaption}\item[{const int}]{num\+Threads,  }\item[{string}]{policy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacethread__pinning_a3024ed19665e61e13361f77280e4b2fb}\label{namespacethread__pinning_a3024ed19665e61e13361f77280e4b2fb}} 
+\index{thread\+\_\+pinning@{thread\+\_\+pinning}!get\+Actual\+Binding@{get\+Actual\+Binding}}
+\index{get\+Actual\+Binding@{get\+Actual\+Binding}!thread\+\_\+pinning@{thread\+\_\+pinning}}
+\subsubsection{\texorpdfstring{get\+Actual\+Binding()}{getActualBinding()}}
+{\footnotesize\ttfamily int thread\+\_\+pinning\+::get\+Actual\+Binding (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacethread__pinning_a8918d0901125acd9d90e325a78a83f60}\label{namespacethread__pinning_a8918d0901125acd9d90e325a78a83f60}} 
+\index{thread\+\_\+pinning@{thread\+\_\+pinning}!is\+Injective\+Mapping@{is\+Injective\+Mapping}}
+\index{is\+Injective\+Mapping@{is\+Injective\+Mapping}!thread\+\_\+pinning@{thread\+\_\+pinning}}
+\subsubsection{\texorpdfstring{is\+Injective\+Mapping()}{isInjectiveMapping()}}
+{\footnotesize\ttfamily bool thread\+\_\+pinning\+::is\+Injective\+Mapping (\begin{DoxyParamCaption}\item[{const int}]{num\+Threads }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacethread__pinning_ac1e8e55d93b77cc034100f804b3e713c}\label{namespacethread__pinning_ac1e8e55d93b77cc034100f804b3e713c}} 
+\index{thread\+\_\+pinning@{thread\+\_\+pinning}!setbench\+\_\+deinit@{setbench\+\_\+deinit}}
+\index{setbench\+\_\+deinit@{setbench\+\_\+deinit}!thread\+\_\+pinning@{thread\+\_\+pinning}}
+\subsubsection{\texorpdfstring{setbench\+\_\+deinit()}{setbench\_deinit()}}
+{\footnotesize\ttfamily void thread\+\_\+pinning\+::setbench\+\_\+deinit (\begin{DoxyParamCaption}\item[{const int}]{num\+Threads }\end{DoxyParamCaption})}
+
+Public functions 
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{namespacethread__pinning_ae529f1f3dabd63c55374ca3be2676e05}\label{namespacethread__pinning_ae529f1f3dabd63c55374ca3be2676e05}} 
+\index{thread\+\_\+pinning@{thread\+\_\+pinning}!cpusets@{cpusets}}
+\index{cpusets@{cpusets}!thread\+\_\+pinning@{thread\+\_\+pinning}}
+\subsubsection{\texorpdfstring{cpusets}{cpusets}}
+{\footnotesize\ttfamily cpu\+\_\+set\+\_\+t $\ast$$\ast$ thread\+\_\+pinning\+::cpusets}
+
+\mbox{\Hypertarget{namespacethread__pinning_acf2804117d5f9bea3cbb57d08ab07dda}\label{namespacethread__pinning_acf2804117d5f9bea3cbb57d08ab07dda}} 
+\index{thread\+\_\+pinning@{thread\+\_\+pinning}!custom\+Binding@{custom\+Binding}}
+\index{custom\+Binding@{custom\+Binding}!thread\+\_\+pinning@{thread\+\_\+pinning}}
+\subsubsection{\texorpdfstring{custom\+Binding}{customBinding}}
+{\footnotesize\ttfamily int $\ast$ thread\+\_\+pinning\+::custom\+Binding}
+
+\mbox{\Hypertarget{namespacethread__pinning_ad9d699e093492f19d15cd1bda6633a5e}\label{namespacethread__pinning_ad9d699e093492f19d15cd1bda6633a5e}} 
+\index{thread\+\_\+pinning@{thread\+\_\+pinning}!num\+Custom\+Bindings@{num\+Custom\+Bindings}}
+\index{num\+Custom\+Bindings@{num\+Custom\+Bindings}!thread\+\_\+pinning@{thread\+\_\+pinning}}
+\subsubsection{\texorpdfstring{num\+Custom\+Bindings}{numCustomBindings}}
+{\footnotesize\ttfamily int thread\+\_\+pinning\+::num\+Custom\+Bindings}
+

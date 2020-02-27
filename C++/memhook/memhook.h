@@ -16,7 +16,7 @@
 
 #define BACKTRACE_DEPTH 2
 #define MAX_THREADS 2
-#define MAX_TRACK 1
+#define MAX_TRACK 10
 #define MAX_TYPE_LENGTH 1000
 #define PADDING 64
 
@@ -99,10 +99,10 @@ typedef set<const char*> filenameset;
 static filenameset fset;
 
 //Global array for tracking all allocations
-static info_t* allArrays;
+info_t* allArrays;
 
 //Local array tracking a thread's allocations
-thread_local static info_t* myArray;
+thread_local info_t* myArray;
 
 thread_local static ThreadExiter exiter;
 
@@ -115,7 +115,7 @@ int get_slot(thread::id id);
 void dumpstatstofile(const char *file);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);
-template <typename T> T malloc(size_t size);
+template <typename T> T malloc(size_t size, bool fakearg=true);
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
@@ -124,7 +124,7 @@ inline T* operator * (const MemStamp &stamp, T *p) {
 }
 
 template <typename T>
-T malloc(size_t size) {    
+T malloc(size_t size, bool fakearg) {    
     T ptr = (T)std::malloc(size);
     if(ptr == NULL) throw bad_alloc();
 

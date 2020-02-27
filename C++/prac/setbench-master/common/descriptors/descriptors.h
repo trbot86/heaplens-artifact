@@ -8,6 +8,8 @@
 #ifndef DESCRIPTORS_H
 #define	DESCRIPTORS_H
 
+#include "memhook.h"
+
 typedef intptr_t tagptr_t;
 typedef intptr_t mutables_t;
 

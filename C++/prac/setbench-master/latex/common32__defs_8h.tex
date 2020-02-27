@@ -1,0 +1,127 @@
+\hypertarget{common32__defs_8h}{}\section{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/msftc/common32\+\_\+defs.h File Reference}
+\label{common32__defs_8h}\index{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/msftc/common32\+\_\+defs.\+h@{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/msftc/common32\+\_\+defs.\+h}}
+{\ttfamily \#include $<$windows.\+h$>$}\newline
+Include dependency graph for common32\+\_\+defs.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{common32__defs_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{common32__defs_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{common32__defs_8h_aede901be38bc7e813b1873a5dea466a2}{\+\_\+\+Interlocked\+Increment}~Interlocked\+Increment
+\item 
+\#define \hyperlink{common32__defs_8h_abe2f273d81bbe28c84b15fc11f485f28}{\+\_\+\+Interlocked\+Decrement}~Interlocked\+Decrement
+\item 
+\#define \hyperlink{common32__defs_8h_ad7ea1cf0eac5d04fcd050930d8bbbba2}{\+\_\+\+Interlocked\+Exchange}~Interlocked\+Exchange
+\item 
+\#define \hyperlink{common32__defs_8h_afbc9fb70d9a90743170084753f2bf91a}{\+\_\+\+Interlocked\+Exchange\+Add}~Interlocked\+Exchange\+Add
+\item 
+\#define \hyperlink{common32__defs_8h_ab89709e42e35a421bf0e9c8bc49e4408}{\+\_\+\+Interlocked\+Compare\+Exchange}~Interlocked\+Compare\+Exchange
+\item 
+\#define \hyperlink{common32__defs_8h_a84d4fef5716c9fdaa8d8a6d980df2a0f}{A\+O\+\_\+\+I\+N\+T\+E\+R\+L\+O\+C\+K\+E\+D\+\_\+\+V\+O\+L\+A\+T\+I\+LE}
+\item 
+\#define \hyperlink{common32__defs_8h_a9fa0fc1a9eadcba085e57bf180a53cef}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}
+\item 
+\#define \hyperlink{common32__defs_8h_a65fb7f14069ffab2e6329ffc98563770}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}
+\item 
+\#define \hyperlink{common32__defs_8h_a9c25ee9f67d96eec7f26152cf363fc06}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{common32__defs_8h_a63b6d5232496fb679621fa985234eff8}{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$p, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} incr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{common32__defs_8h_a685167af2036f69b0cfcd31a141d79b0}{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$p)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{common32__defs_8h_a204c40d27bb1d43b2f29b15a516ac7db}{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$p)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{common32__defs_8h_ab89709e42e35a421bf0e9c8bc49e4408}\label{common32__defs_8h_ab89709e42e35a421bf0e9c8bc49e4408}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!\+\_\+\+Interlocked\+Compare\+Exchange@{\+\_\+\+Interlocked\+Compare\+Exchange}}
+\index{\+\_\+\+Interlocked\+Compare\+Exchange@{\+\_\+\+Interlocked\+Compare\+Exchange}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+Interlocked\+Compare\+Exchange}{\_InterlockedCompareExchange}}
+{\footnotesize\ttfamily \#define \+\_\+\+Interlocked\+Compare\+Exchange~Interlocked\+Compare\+Exchange}
+
+\mbox{\Hypertarget{common32__defs_8h_abe2f273d81bbe28c84b15fc11f485f28}\label{common32__defs_8h_abe2f273d81bbe28c84b15fc11f485f28}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!\+\_\+\+Interlocked\+Decrement@{\+\_\+\+Interlocked\+Decrement}}
+\index{\+\_\+\+Interlocked\+Decrement@{\+\_\+\+Interlocked\+Decrement}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+Interlocked\+Decrement}{\_InterlockedDecrement}}
+{\footnotesize\ttfamily \#define \+\_\+\+Interlocked\+Decrement~Interlocked\+Decrement}
+
+\mbox{\Hypertarget{common32__defs_8h_ad7ea1cf0eac5d04fcd050930d8bbbba2}\label{common32__defs_8h_ad7ea1cf0eac5d04fcd050930d8bbbba2}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!\+\_\+\+Interlocked\+Exchange@{\+\_\+\+Interlocked\+Exchange}}
+\index{\+\_\+\+Interlocked\+Exchange@{\+\_\+\+Interlocked\+Exchange}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+Interlocked\+Exchange}{\_InterlockedExchange}}
+{\footnotesize\ttfamily \#define \+\_\+\+Interlocked\+Exchange~Interlocked\+Exchange}
+
+\mbox{\Hypertarget{common32__defs_8h_afbc9fb70d9a90743170084753f2bf91a}\label{common32__defs_8h_afbc9fb70d9a90743170084753f2bf91a}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!\+\_\+\+Interlocked\+Exchange\+Add@{\+\_\+\+Interlocked\+Exchange\+Add}}
+\index{\+\_\+\+Interlocked\+Exchange\+Add@{\+\_\+\+Interlocked\+Exchange\+Add}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+Interlocked\+Exchange\+Add}{\_InterlockedExchangeAdd}}
+{\footnotesize\ttfamily \#define \+\_\+\+Interlocked\+Exchange\+Add~Interlocked\+Exchange\+Add}
+
+\mbox{\Hypertarget{common32__defs_8h_aede901be38bc7e813b1873a5dea466a2}\label{common32__defs_8h_aede901be38bc7e813b1873a5dea466a2}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!\+\_\+\+Interlocked\+Increment@{\+\_\+\+Interlocked\+Increment}}
+\index{\+\_\+\+Interlocked\+Increment@{\+\_\+\+Interlocked\+Increment}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+Interlocked\+Increment}{\_InterlockedIncrement}}
+{\footnotesize\ttfamily \#define \+\_\+\+Interlocked\+Increment~Interlocked\+Increment}
+
+\mbox{\Hypertarget{common32__defs_8h_a65fb7f14069ffab2e6329ffc98563770}\label{common32__defs_8h_a65fb7f14069ffab2e6329ffc98563770}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}{AO\_HAVE\_fetch\_and\_add1\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}
+
+\mbox{\Hypertarget{common32__defs_8h_a9fa0fc1a9eadcba085e57bf180a53cef}\label{common32__defs_8h_a9fa0fc1a9eadcba085e57bf180a53cef}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}{AO\_HAVE\_fetch\_and\_add\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}
+
+\mbox{\Hypertarget{common32__defs_8h_a9c25ee9f67d96eec7f26152cf363fc06}\label{common32__defs_8h_a9c25ee9f67d96eec7f26152cf363fc06}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}{AO\_HAVE\_fetch\_and\_sub1\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}
+
+\mbox{\Hypertarget{common32__defs_8h_a84d4fef5716c9fdaa8d8a6d980df2a0f}\label{common32__defs_8h_a84d4fef5716c9fdaa8d8a6d980df2a0f}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!A\+O\+\_\+\+I\+N\+T\+E\+R\+L\+O\+C\+K\+E\+D\+\_\+\+V\+O\+L\+A\+T\+I\+LE@{A\+O\+\_\+\+I\+N\+T\+E\+R\+L\+O\+C\+K\+E\+D\+\_\+\+V\+O\+L\+A\+T\+I\+LE}}
+\index{A\+O\+\_\+\+I\+N\+T\+E\+R\+L\+O\+C\+K\+E\+D\+\_\+\+V\+O\+L\+A\+T\+I\+LE@{A\+O\+\_\+\+I\+N\+T\+E\+R\+L\+O\+C\+K\+E\+D\+\_\+\+V\+O\+L\+A\+T\+I\+LE}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+I\+N\+T\+E\+R\+L\+O\+C\+K\+E\+D\+\_\+\+V\+O\+L\+A\+T\+I\+LE}{AO\_INTERLOCKED\_VOLATILE}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+I\+N\+T\+E\+R\+L\+O\+C\+K\+E\+D\+\_\+\+V\+O\+L\+A\+T\+I\+LE}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{common32__defs_8h_a685167af2036f69b0cfcd31a141d79b0}\label{common32__defs_8h_a685167af2036f69b0cfcd31a141d79b0}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full()}{AO\_fetch\_and\_add1\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{p }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{common32__defs_8h_a63b6d5232496fb679621fa985234eff8}\label{common32__defs_8h_a63b6d5232496fb679621fa985234eff8}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full()}{AO\_fetch\_and\_add\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{p,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{incr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{common32__defs_8h_a204c40d27bb1d43b2f29b15a516ac7db}\label{common32__defs_8h_a204c40d27bb1d43b2f29b15a516ac7db}} 
+\index{common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}!common32\+\_\+defs.\+h@{common32\+\_\+defs.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full()}{AO\_fetch\_and\_sub1\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{p }\end{DoxyParamCaption})}
+

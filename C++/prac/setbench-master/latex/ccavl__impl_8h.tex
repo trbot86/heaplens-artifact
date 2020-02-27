@@ -1,0 +1,302 @@
+\hypertarget{ccavl__impl_8h}{}\section{ds/bronson\+\_\+pext\+\_\+bst\+\_\+occ/ccavl\+\_\+impl.h File Reference}
+\label{ccavl__impl_8h}\index{ds/bronson\+\_\+pext\+\_\+bst\+\_\+occ/ccavl\+\_\+impl.\+h@{ds/bronson\+\_\+pext\+\_\+bst\+\_\+occ/ccavl\+\_\+impl.\+h}}
+{\ttfamily \#include \char`\"{}record\+\_\+manager.\+h\char`\"{}}\newline
+Include dependency graph for ccavl\+\_\+impl.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ccavl__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{ccavl__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structnode__t}{node\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+class \hyperlink{classccavl}{ccavl$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{ccavl__impl_8h_a7a041bdfb6b4691fb8b555bae01cf832}{lock\+\_\+size}~sizeof(\hyperlink{ccavl__impl_8h_a61cf36cb33c84af9c784f95686701a94}{ptlock\+\_\+t})
+\item 
+\#define \hyperlink{ccavl__impl_8h_a6d9d34d4799ffadb69b0ec3e9d515fcf}{mutex\+\_\+init}(lock)~pthread\+\_\+spin\+\_\+init(lock, P\+T\+H\+R\+E\+A\+D\+\_\+\+P\+R\+O\+C\+E\+S\+S\+\_\+\+P\+R\+I\+V\+A\+TE)
+\item 
+\#define \hyperlink{ccavl__impl_8h_a2793804469a49df615fc762fb6fb64b3}{mutex\+\_\+destroy}(lock)~pthread\+\_\+spin\+\_\+destroy(lock)
+\item 
+\#define \hyperlink{ccavl__impl_8h_a35de680623da27146172466c96d83872}{mutex\+\_\+lock}(lock)~pthread\+\_\+spin\+\_\+lock(lock)
+\item 
+\#define \hyperlink{ccavl__impl_8h_a1614ea94e8dd8e74489f564bc9e68d4d}{mutex\+\_\+unlock}(lock)~pthread\+\_\+spin\+\_\+unlock(lock)
+\item 
+\#define \hyperlink{ccavl__impl_8h_a55fc4ab9385a6c4149a56ae1beeb062f}{lock\+\_\+mb}()~asm volatile(\char`\"{}\char`\"{}\+:::\char`\"{}memory\char`\"{})
+\item 
+\#define \hyperlink{ccavl__impl_8h_aeb19232c6c415fe5bd17f05658991270}{I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}~1
+\item 
+\#define \hyperlink{ccavl__impl_8h_afa99ec4acc4ecb2dc3c2d05da15d0e3f}{M\+AX}(a,  b)~( (a) $>$ (b) ? (a) \+: (b) )
+\item 
+\#define \hyperlink{ccavl__impl_8h_ae2f08dc603ae93c402abd918ba4e23e1}{A\+BS}(a)~( (a) $>$ 0 ? (a)  \+: -\/(a) )
+\item 
+\#define \hyperlink{ccavl__impl_8h_aeb73e4a3b76869aa7429ab685d607942}{P\+A\+D\+\_\+\+S\+I\+ZE}~128
+\item 
+\#define \hyperlink{ccavl__impl_8h_a25ca55840a4a71eccfb6f31654210859}{S\+P\+I\+N\+\_\+\+C\+O\+U\+NT}~100
+\item 
+\#define \hyperlink{ccavl__impl_8h_ad5b70e65cc313cfb05d4607b9d55a5d7}{Y\+I\+E\+L\+D\+\_\+\+C\+O\+U\+NT}~0
+\item 
+\#define \hyperlink{ccavl__impl_8h_a437ef08681e7210d6678427030446a54}{L\+E\+FT}~\textquotesingle{}L\textquotesingle{}
+\item 
+\#define \hyperlink{ccavl__impl_8h_a80fb826a684cf3f0d306b22aa100ddac}{R\+I\+G\+HT}~\textquotesingle{}R\textquotesingle{}
+\item 
+\#define \hyperlink{ccavl__impl_8h_aa913a36431e4cc2510e68d0acaafa56c}{Return\+Key}~0
+\item 
+\#define \hyperlink{ccavl__impl_8h_a324b39794b8382ecaa9e346e964a1ec1}{Return\+Entry}~1
+\item 
+\#define \hyperlink{ccavl__impl_8h_a2311aad8f7b6d2b0aa3924114411b900}{Return\+Node}~2
+\item 
+\#define \hyperlink{ccavl__impl_8h_a4431901a9e1bb62a85aae957a983a38c}{O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+OW}~8
+\item 
+\#define \hyperlink{ccavl__impl_8h_a6ed245337360a5d8cb24a611c4283339}{Unlinked\+O\+VL}~(1\+L\+L)
+\item 
+\#define \hyperlink{ccavl__impl_8h_ab6de716be21e60376b7f9d5e13851bd5}{O\+V\+L\+Grow\+Lock\+Mask}~(2\+L\+L)
+\item 
+\#define \hyperlink{ccavl__impl_8h_a575d2db7831b958c348b23ca0a1e1b02}{O\+V\+L\+Shrink\+Lock\+Mask}~(4\+L\+L)
+\item 
+\#define \hyperlink{ccavl__impl_8h_adf29383a588c217d5f79955ca3f8531d}{O\+V\+L\+Grow\+Count\+Shift}~(3)
+\item 
+\#define \hyperlink{ccavl__impl_8h_ac3877fc1e3bf06cdced5ebe639c93792}{O\+V\+L\+Shrink\+Count\+Shift}~(\hyperlink{ccavl__impl_8h_adf29383a588c217d5f79955ca3f8531d}{O\+V\+L\+Grow\+Count\+Shift} + \hyperlink{ccavl__impl_8h_a4431901a9e1bb62a85aae957a983a38c}{O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+OW})
+\item 
+\#define \hyperlink{ccavl__impl_8h_aa2a094b4ef43d631a3da9702292c4f36}{O\+V\+L\+Grow\+Count\+Mask}~(((1\+L $<$$<$ O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W ) -\/ 1) $<$$<$ O\+V\+L\+Grow\+Count\+Shift)
+\item 
+\#define \hyperlink{ccavl__impl_8h_ae2225bb3865c65e8cefca96de202f1ec}{Update\+Always}~0
+\item 
+\#define \hyperlink{ccavl__impl_8h_a78fba2910b1402dae2077acdb99699b8}{Update\+If\+Absent}~1
+\item 
+\#define \hyperlink{ccavl__impl_8h_ab0cd3ef4e3eeb2e077b2c2709244adf2}{Update\+If\+Present}~2
+\item 
+\#define \hyperlink{ccavl__impl_8h_aa11e02ebd5de8d5887a373f4bbb2fee3}{Update\+If\+Eq}~3
+\item 
+\#define \hyperlink{ccavl__impl_8h_ab19f7b617fd80751cfe5c83a1aa96d17}{Unlink\+Required}~-\/1
+\item 
+\#define \hyperlink{ccavl__impl_8h_ae826b033c282dedefcda8fc8c84bd3e4}{Rebalance\+Required}~-\/2
+\item 
+\#define \hyperlink{ccavl__impl_8h_a2b9e52e56530f5144e455e6068ded452}{Nothing\+Required}~-\/3
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef pthread\+\_\+spinlock\+\_\+t \hyperlink{ccavl__impl_8h_a61cf36cb33c84af9c784f95686701a94}{ptlock\+\_\+t}
+\item 
+typedef unsigned long long \hyperlink{ccavl__impl_8h_ad18cce847aba06882c0ceedf7c5b32dc}{version\+\_\+t}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{ccavl__impl_8h_ae2f08dc603ae93c402abd918ba4e23e1}\label{ccavl__impl_8h_ae2f08dc603ae93c402abd918ba4e23e1}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!A\+BS@{A\+BS}}
+\index{A\+BS@{A\+BS}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{A\+BS}{ABS}}
+{\footnotesize\ttfamily \#define A\+BS(\begin{DoxyParamCaption}\item[{}]{a }\end{DoxyParamCaption})~( (a) $>$ 0 ? (a)  \+: -\/(a) )}
+
+\mbox{\Hypertarget{ccavl__impl_8h_aeb19232c6c415fe5bd17f05658991270}\label{ccavl__impl_8h_aeb19232c6c415fe5bd17f05658991270}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!I\+M\+P\+L\+E\+M\+E\+N\+T\+ED@{I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}}
+\index{I\+M\+P\+L\+E\+M\+E\+N\+T\+ED@{I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{I\+M\+P\+L\+E\+M\+E\+N\+T\+ED}{IMPLEMENTED}}
+{\footnotesize\ttfamily \#define I\+M\+P\+L\+E\+M\+E\+N\+T\+ED~1}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a437ef08681e7210d6678427030446a54}\label{ccavl__impl_8h_a437ef08681e7210d6678427030446a54}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!L\+E\+FT@{L\+E\+FT}}
+\index{L\+E\+FT@{L\+E\+FT}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{L\+E\+FT}{LEFT}}
+{\footnotesize\ttfamily \#define L\+E\+FT~\textquotesingle{}L\textquotesingle{}}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a55fc4ab9385a6c4149a56ae1beeb062f}\label{ccavl__impl_8h_a55fc4ab9385a6c4149a56ae1beeb062f}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!lock\+\_\+mb@{lock\+\_\+mb}}
+\index{lock\+\_\+mb@{lock\+\_\+mb}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{lock\+\_\+mb}{lock\_mb}}
+{\footnotesize\ttfamily \#define lock\+\_\+mb(\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})~asm volatile(\char`\"{}\char`\"{}\+:::\char`\"{}memory\char`\"{})}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a7a041bdfb6b4691fb8b555bae01cf832}\label{ccavl__impl_8h_a7a041bdfb6b4691fb8b555bae01cf832}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!lock\+\_\+size@{lock\+\_\+size}}
+\index{lock\+\_\+size@{lock\+\_\+size}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{lock\+\_\+size}{lock\_size}}
+{\footnotesize\ttfamily \#define lock\+\_\+size~sizeof(\hyperlink{ccavl__impl_8h_a61cf36cb33c84af9c784f95686701a94}{ptlock\+\_\+t})}
+
+\mbox{\Hypertarget{ccavl__impl_8h_afa99ec4acc4ecb2dc3c2d05da15d0e3f}\label{ccavl__impl_8h_afa99ec4acc4ecb2dc3c2d05da15d0e3f}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!M\+AX@{M\+AX}}
+\index{M\+AX@{M\+AX}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{M\+AX}{MAX}}
+{\footnotesize\ttfamily \#define M\+AX(\begin{DoxyParamCaption}\item[{}]{a,  }\item[{}]{b }\end{DoxyParamCaption})~( (a) $>$ (b) ? (a) \+: (b) )}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a2793804469a49df615fc762fb6fb64b3}\label{ccavl__impl_8h_a2793804469a49df615fc762fb6fb64b3}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!mutex\+\_\+destroy@{mutex\+\_\+destroy}}
+\index{mutex\+\_\+destroy@{mutex\+\_\+destroy}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{mutex\+\_\+destroy}{mutex\_destroy}}
+{\footnotesize\ttfamily \#define mutex\+\_\+destroy(\begin{DoxyParamCaption}\item[{}]{lock }\end{DoxyParamCaption})~pthread\+\_\+spin\+\_\+destroy(lock)}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a6d9d34d4799ffadb69b0ec3e9d515fcf}\label{ccavl__impl_8h_a6d9d34d4799ffadb69b0ec3e9d515fcf}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!mutex\+\_\+init@{mutex\+\_\+init}}
+\index{mutex\+\_\+init@{mutex\+\_\+init}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{mutex\+\_\+init}{mutex\_init}}
+{\footnotesize\ttfamily \#define mutex\+\_\+init(\begin{DoxyParamCaption}\item[{}]{lock }\end{DoxyParamCaption})~pthread\+\_\+spin\+\_\+init(lock, P\+T\+H\+R\+E\+A\+D\+\_\+\+P\+R\+O\+C\+E\+S\+S\+\_\+\+P\+R\+I\+V\+A\+TE)}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a35de680623da27146172466c96d83872}\label{ccavl__impl_8h_a35de680623da27146172466c96d83872}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!mutex\+\_\+lock@{mutex\+\_\+lock}}
+\index{mutex\+\_\+lock@{mutex\+\_\+lock}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{mutex\+\_\+lock}{mutex\_lock}}
+{\footnotesize\ttfamily \#define mutex\+\_\+lock(\begin{DoxyParamCaption}\item[{}]{lock }\end{DoxyParamCaption})~pthread\+\_\+spin\+\_\+lock(lock)}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a1614ea94e8dd8e74489f564bc9e68d4d}\label{ccavl__impl_8h_a1614ea94e8dd8e74489f564bc9e68d4d}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!mutex\+\_\+unlock@{mutex\+\_\+unlock}}
+\index{mutex\+\_\+unlock@{mutex\+\_\+unlock}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{mutex\+\_\+unlock}{mutex\_unlock}}
+{\footnotesize\ttfamily \#define mutex\+\_\+unlock(\begin{DoxyParamCaption}\item[{}]{lock }\end{DoxyParamCaption})~pthread\+\_\+spin\+\_\+unlock(lock)}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a2b9e52e56530f5144e455e6068ded452}\label{ccavl__impl_8h_a2b9e52e56530f5144e455e6068ded452}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Nothing\+Required@{Nothing\+Required}}
+\index{Nothing\+Required@{Nothing\+Required}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Nothing\+Required}{NothingRequired}}
+{\footnotesize\ttfamily \#define Nothing\+Required~-\/3}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a4431901a9e1bb62a85aae957a983a38c}\label{ccavl__impl_8h_a4431901a9e1bb62a85aae957a983a38c}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+OW@{O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+OW}}
+\index{O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+OW@{O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+OW}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+OW}{OVL\_BITS\_BEFORE\_OVERFLOW}}
+{\footnotesize\ttfamily \#define O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+OW~8}
+
+\mbox{\Hypertarget{ccavl__impl_8h_aa2a094b4ef43d631a3da9702292c4f36}\label{ccavl__impl_8h_aa2a094b4ef43d631a3da9702292c4f36}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!O\+V\+L\+Grow\+Count\+Mask@{O\+V\+L\+Grow\+Count\+Mask}}
+\index{O\+V\+L\+Grow\+Count\+Mask@{O\+V\+L\+Grow\+Count\+Mask}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{O\+V\+L\+Grow\+Count\+Mask}{OVLGrowCountMask}}
+{\footnotesize\ttfamily \#define O\+V\+L\+Grow\+Count\+Mask~(((1\+L $<$$<$ O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W ) -\/ 1) $<$$<$ O\+V\+L\+Grow\+Count\+Shift)}
+
+\mbox{\Hypertarget{ccavl__impl_8h_adf29383a588c217d5f79955ca3f8531d}\label{ccavl__impl_8h_adf29383a588c217d5f79955ca3f8531d}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!O\+V\+L\+Grow\+Count\+Shift@{O\+V\+L\+Grow\+Count\+Shift}}
+\index{O\+V\+L\+Grow\+Count\+Shift@{O\+V\+L\+Grow\+Count\+Shift}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{O\+V\+L\+Grow\+Count\+Shift}{OVLGrowCountShift}}
+{\footnotesize\ttfamily \#define O\+V\+L\+Grow\+Count\+Shift~(3)}
+
+\mbox{\Hypertarget{ccavl__impl_8h_ab6de716be21e60376b7f9d5e13851bd5}\label{ccavl__impl_8h_ab6de716be21e60376b7f9d5e13851bd5}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!O\+V\+L\+Grow\+Lock\+Mask@{O\+V\+L\+Grow\+Lock\+Mask}}
+\index{O\+V\+L\+Grow\+Lock\+Mask@{O\+V\+L\+Grow\+Lock\+Mask}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{O\+V\+L\+Grow\+Lock\+Mask}{OVLGrowLockMask}}
+{\footnotesize\ttfamily \#define O\+V\+L\+Grow\+Lock\+Mask~(2\+L\+L)}
+
+\mbox{\Hypertarget{ccavl__impl_8h_ac3877fc1e3bf06cdced5ebe639c93792}\label{ccavl__impl_8h_ac3877fc1e3bf06cdced5ebe639c93792}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!O\+V\+L\+Shrink\+Count\+Shift@{O\+V\+L\+Shrink\+Count\+Shift}}
+\index{O\+V\+L\+Shrink\+Count\+Shift@{O\+V\+L\+Shrink\+Count\+Shift}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{O\+V\+L\+Shrink\+Count\+Shift}{OVLShrinkCountShift}}
+{\footnotesize\ttfamily \#define O\+V\+L\+Shrink\+Count\+Shift~(\hyperlink{ccavl__impl_8h_adf29383a588c217d5f79955ca3f8531d}{O\+V\+L\+Grow\+Count\+Shift} + \hyperlink{ccavl__impl_8h_a4431901a9e1bb62a85aae957a983a38c}{O\+V\+L\+\_\+\+B\+I\+T\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+O\+V\+E\+R\+F\+L\+OW})}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a575d2db7831b958c348b23ca0a1e1b02}\label{ccavl__impl_8h_a575d2db7831b958c348b23ca0a1e1b02}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!O\+V\+L\+Shrink\+Lock\+Mask@{O\+V\+L\+Shrink\+Lock\+Mask}}
+\index{O\+V\+L\+Shrink\+Lock\+Mask@{O\+V\+L\+Shrink\+Lock\+Mask}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{O\+V\+L\+Shrink\+Lock\+Mask}{OVLShrinkLockMask}}
+{\footnotesize\ttfamily \#define O\+V\+L\+Shrink\+Lock\+Mask~(4\+L\+L)}
+
+\mbox{\Hypertarget{ccavl__impl_8h_aeb73e4a3b76869aa7429ab685d607942}\label{ccavl__impl_8h_aeb73e4a3b76869aa7429ab685d607942}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!P\+A\+D\+\_\+\+S\+I\+ZE@{P\+A\+D\+\_\+\+S\+I\+ZE}}
+\index{P\+A\+D\+\_\+\+S\+I\+ZE@{P\+A\+D\+\_\+\+S\+I\+ZE}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{P\+A\+D\+\_\+\+S\+I\+ZE}{PAD\_SIZE}}
+{\footnotesize\ttfamily \#define P\+A\+D\+\_\+\+S\+I\+ZE~128}
+
+\mbox{\Hypertarget{ccavl__impl_8h_ae826b033c282dedefcda8fc8c84bd3e4}\label{ccavl__impl_8h_ae826b033c282dedefcda8fc8c84bd3e4}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Rebalance\+Required@{Rebalance\+Required}}
+\index{Rebalance\+Required@{Rebalance\+Required}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Rebalance\+Required}{RebalanceRequired}}
+{\footnotesize\ttfamily \#define Rebalance\+Required~-\/2}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a324b39794b8382ecaa9e346e964a1ec1}\label{ccavl__impl_8h_a324b39794b8382ecaa9e346e964a1ec1}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Return\+Entry@{Return\+Entry}}
+\index{Return\+Entry@{Return\+Entry}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Return\+Entry}{ReturnEntry}}
+{\footnotesize\ttfamily \#define Return\+Entry~1}
+
+\mbox{\Hypertarget{ccavl__impl_8h_aa913a36431e4cc2510e68d0acaafa56c}\label{ccavl__impl_8h_aa913a36431e4cc2510e68d0acaafa56c}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Return\+Key@{Return\+Key}}
+\index{Return\+Key@{Return\+Key}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Return\+Key}{ReturnKey}}
+{\footnotesize\ttfamily \#define Return\+Key~0}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a2311aad8f7b6d2b0aa3924114411b900}\label{ccavl__impl_8h_a2311aad8f7b6d2b0aa3924114411b900}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Return\+Node@{Return\+Node}}
+\index{Return\+Node@{Return\+Node}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Return\+Node}{ReturnNode}}
+{\footnotesize\ttfamily \#define Return\+Node~2}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a80fb826a684cf3f0d306b22aa100ddac}\label{ccavl__impl_8h_a80fb826a684cf3f0d306b22aa100ddac}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!R\+I\+G\+HT@{R\+I\+G\+HT}}
+\index{R\+I\+G\+HT@{R\+I\+G\+HT}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{R\+I\+G\+HT}{RIGHT}}
+{\footnotesize\ttfamily \#define R\+I\+G\+HT~\textquotesingle{}R\textquotesingle{}}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a25ca55840a4a71eccfb6f31654210859}\label{ccavl__impl_8h_a25ca55840a4a71eccfb6f31654210859}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!S\+P\+I\+N\+\_\+\+C\+O\+U\+NT@{S\+P\+I\+N\+\_\+\+C\+O\+U\+NT}}
+\index{S\+P\+I\+N\+\_\+\+C\+O\+U\+NT@{S\+P\+I\+N\+\_\+\+C\+O\+U\+NT}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+P\+I\+N\+\_\+\+C\+O\+U\+NT}{SPIN\_COUNT}}
+{\footnotesize\ttfamily \#define S\+P\+I\+N\+\_\+\+C\+O\+U\+NT~100}
+
+The number of spins before yielding. \mbox{\Hypertarget{ccavl__impl_8h_a6ed245337360a5d8cb24a611c4283339}\label{ccavl__impl_8h_a6ed245337360a5d8cb24a611c4283339}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Unlinked\+O\+VL@{Unlinked\+O\+VL}}
+\index{Unlinked\+O\+VL@{Unlinked\+O\+VL}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Unlinked\+O\+VL}{UnlinkedOVL}}
+{\footnotesize\ttfamily \#define Unlinked\+O\+VL~(1\+L\+L)}
+
+\mbox{\Hypertarget{ccavl__impl_8h_ab19f7b617fd80751cfe5c83a1aa96d17}\label{ccavl__impl_8h_ab19f7b617fd80751cfe5c83a1aa96d17}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Unlink\+Required@{Unlink\+Required}}
+\index{Unlink\+Required@{Unlink\+Required}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Unlink\+Required}{UnlinkRequired}}
+{\footnotesize\ttfamily \#define Unlink\+Required~-\/1}
+
+\mbox{\Hypertarget{ccavl__impl_8h_ae2225bb3865c65e8cefca96de202f1ec}\label{ccavl__impl_8h_ae2225bb3865c65e8cefca96de202f1ec}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Update\+Always@{Update\+Always}}
+\index{Update\+Always@{Update\+Always}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Update\+Always}{UpdateAlways}}
+{\footnotesize\ttfamily \#define Update\+Always~0}
+
+\mbox{\Hypertarget{ccavl__impl_8h_a78fba2910b1402dae2077acdb99699b8}\label{ccavl__impl_8h_a78fba2910b1402dae2077acdb99699b8}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Update\+If\+Absent@{Update\+If\+Absent}}
+\index{Update\+If\+Absent@{Update\+If\+Absent}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Update\+If\+Absent}{UpdateIfAbsent}}
+{\footnotesize\ttfamily \#define Update\+If\+Absent~1}
+
+\mbox{\Hypertarget{ccavl__impl_8h_aa11e02ebd5de8d5887a373f4bbb2fee3}\label{ccavl__impl_8h_aa11e02ebd5de8d5887a373f4bbb2fee3}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Update\+If\+Eq@{Update\+If\+Eq}}
+\index{Update\+If\+Eq@{Update\+If\+Eq}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Update\+If\+Eq}{UpdateIfEq}}
+{\footnotesize\ttfamily \#define Update\+If\+Eq~3}
+
+\mbox{\Hypertarget{ccavl__impl_8h_ab0cd3ef4e3eeb2e077b2c2709244adf2}\label{ccavl__impl_8h_ab0cd3ef4e3eeb2e077b2c2709244adf2}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Update\+If\+Present@{Update\+If\+Present}}
+\index{Update\+If\+Present@{Update\+If\+Present}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Update\+If\+Present}{UpdateIfPresent}}
+{\footnotesize\ttfamily \#define Update\+If\+Present~2}
+
+\mbox{\Hypertarget{ccavl__impl_8h_ad5b70e65cc313cfb05d4607b9d55a5d7}\label{ccavl__impl_8h_ad5b70e65cc313cfb05d4607b9d55a5d7}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!Y\+I\+E\+L\+D\+\_\+\+C\+O\+U\+NT@{Y\+I\+E\+L\+D\+\_\+\+C\+O\+U\+NT}}
+\index{Y\+I\+E\+L\+D\+\_\+\+C\+O\+U\+NT@{Y\+I\+E\+L\+D\+\_\+\+C\+O\+U\+NT}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{Y\+I\+E\+L\+D\+\_\+\+C\+O\+U\+NT}{YIELD\_COUNT}}
+{\footnotesize\ttfamily \#define Y\+I\+E\+L\+D\+\_\+\+C\+O\+U\+NT~0}
+
+The number of yields before blocking. 
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{ccavl__impl_8h_a61cf36cb33c84af9c784f95686701a94}\label{ccavl__impl_8h_a61cf36cb33c84af9c784f95686701a94}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!ptlock\+\_\+t@{ptlock\+\_\+t}}
+\index{ptlock\+\_\+t@{ptlock\+\_\+t}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{ptlock\+\_\+t}{ptlock\_t}}
+{\footnotesize\ttfamily typedef pthread\+\_\+spinlock\+\_\+t \hyperlink{ccavl__impl_8h_a61cf36cb33c84af9c784f95686701a94}{ptlock\+\_\+t}}
+
+\mbox{\Hypertarget{ccavl__impl_8h_ad18cce847aba06882c0ceedf7c5b32dc}\label{ccavl__impl_8h_ad18cce847aba06882c0ceedf7c5b32dc}} 
+\index{ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}!version\+\_\+t@{version\+\_\+t}}
+\index{version\+\_\+t@{version\+\_\+t}!ccavl\+\_\+impl.\+h@{ccavl\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{version\+\_\+t}{version\_t}}
+{\footnotesize\ttfamily typedef unsigned long long \hyperlink{ccavl__impl_8h_ad18cce847aba06882c0ceedf7c5b32dc}{version\+\_\+t}}
+

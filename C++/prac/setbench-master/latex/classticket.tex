@@ -1,0 +1,101 @@
+\hypertarget{classticket}{}\section{ticket$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$ Class Template Reference}
+\label{classticket}\index{ticket$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$@{ticket$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$}}
+
+
+{\ttfamily \#include $<$ticket\+\_\+impl.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classticket_aecd4fbf1e68e74e9959ce2f5e2b05bf5}{ticket} (const int \+\_\+\+N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS, const skey\+\_\+t \&\+\_\+\+K\+E\+Y\+\_\+\+M\+IN, const skey\+\_\+t \&\+\_\+\+K\+E\+Y\+\_\+\+M\+AX, const sval\+\_\+t \&\+\_\+\+V\+A\+L\+U\+E\+\_\+\+R\+E\+S\+E\+R\+V\+ED, unsigned int id)
+\item 
+\hyperlink{classticket_ac4b9d890af8742df497a89a926dccde9}{$\sim$ticket} ()
+\item 
+void \hyperlink{classticket_a87fe7b99876fa33696c931c234051d54}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classticket_a7fdba09ca002de28d968fb5e2540dc45}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+sval\+\_\+t \hyperlink{classticket_a89a2bc20f3d0b46c9e0b94e43f5bc05f}{bst\+\_\+tk\+\_\+find} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key)
+\item 
+sval\+\_\+t \hyperlink{classticket_ad6c01e82fc3074b7bbbc0dbb3bb75c43}{bst\+\_\+tk\+\_\+insert} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key, sval\+\_\+t val)
+\item 
+sval\+\_\+t \hyperlink{classticket_a4fc1111d09c54bc5d7b40d26dde1efdf}{bst\+\_\+tk\+\_\+delete} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key)
+\item 
+\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$ \hyperlink{classticket_a045f514bd329f9e22e62ef6671d07833}{get\+\_\+root} ()
+\item 
+Rec\+Mgr $\ast$ \hyperlink{classticket_abc8a9c97c3e1ae76f106f4f8eba0e6f0}{debug\+Get\+Rec\+Mgr} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classticket_aecd4fbf1e68e74e9959ce2f5e2b05bf5}\label{classticket_aecd4fbf1e68e74e9959ce2f5e2b05bf5}} 
+\index{ticket@{ticket}!ticket@{ticket}}
+\index{ticket@{ticket}!ticket@{ticket}}
+\subsubsection{\texorpdfstring{ticket()}{ticket()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classticket}{ticket}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::\hyperlink{classticket}{ticket} (\begin{DoxyParamCaption}\item[{const int}]{\+\_\+\+N\+U\+M\+\_\+\+T\+H\+R\+E\+A\+DS,  }\item[{const skey\+\_\+t \&}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+IN,  }\item[{const skey\+\_\+t \&}]{\+\_\+\+K\+E\+Y\+\_\+\+M\+AX,  }\item[{const sval\+\_\+t \&}]{\+\_\+\+V\+A\+L\+U\+E\+\_\+\+R\+E\+S\+E\+R\+V\+ED,  }\item[{unsigned int}]{id }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classticket_ac4b9d890af8742df497a89a926dccde9}\label{classticket_ac4b9d890af8742df497a89a926dccde9}} 
+\index{ticket@{ticket}!````~ticket@{$\sim$ticket}}
+\index{````~ticket@{$\sim$ticket}!ticket@{ticket}}
+\subsubsection{\texorpdfstring{$\sim$ticket()}{~ticket()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classticket}{ticket}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::$\sim$\hyperlink{classticket}{ticket} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classticket_a4fc1111d09c54bc5d7b40d26dde1efdf}\label{classticket_a4fc1111d09c54bc5d7b40d26dde1efdf}} 
+\index{ticket@{ticket}!bst\+\_\+tk\+\_\+delete@{bst\+\_\+tk\+\_\+delete}}
+\index{bst\+\_\+tk\+\_\+delete@{bst\+\_\+tk\+\_\+delete}!ticket@{ticket}}
+\subsubsection{\texorpdfstring{bst\+\_\+tk\+\_\+delete()}{bst\_tk\_delete()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classticket}{ticket}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::bst\+\_\+tk\+\_\+delete (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classticket_a89a2bc20f3d0b46c9e0b94e43f5bc05f}\label{classticket_a89a2bc20f3d0b46c9e0b94e43f5bc05f}} 
+\index{ticket@{ticket}!bst\+\_\+tk\+\_\+find@{bst\+\_\+tk\+\_\+find}}
+\index{bst\+\_\+tk\+\_\+find@{bst\+\_\+tk\+\_\+find}!ticket@{ticket}}
+\subsubsection{\texorpdfstring{bst\+\_\+tk\+\_\+find()}{bst\_tk\_find()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classticket}{ticket}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::bst\+\_\+tk\+\_\+find (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classticket_ad6c01e82fc3074b7bbbc0dbb3bb75c43}\label{classticket_ad6c01e82fc3074b7bbbc0dbb3bb75c43}} 
+\index{ticket@{ticket}!bst\+\_\+tk\+\_\+insert@{bst\+\_\+tk\+\_\+insert}}
+\index{bst\+\_\+tk\+\_\+insert@{bst\+\_\+tk\+\_\+insert}!ticket@{ticket}}
+\subsubsection{\texorpdfstring{bst\+\_\+tk\+\_\+insert()}{bst\_tk\_insert()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classticket}{ticket}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::bst\+\_\+tk\+\_\+insert (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key,  }\item[{sval\+\_\+t}]{val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classticket_abc8a9c97c3e1ae76f106f4f8eba0e6f0}\label{classticket_abc8a9c97c3e1ae76f106f4f8eba0e6f0}} 
+\index{ticket@{ticket}!debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}}
+\index{debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}!ticket@{ticket}}
+\subsubsection{\texorpdfstring{debug\+Get\+Rec\+Mgr()}{debugGetRecMgr()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+Rec\+Mgr$\ast$ \hyperlink{classticket}{ticket}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::debug\+Get\+Rec\+Mgr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classticket_a7fdba09ca002de28d968fb5e2540dc45}\label{classticket_a7fdba09ca002de28d968fb5e2540dc45}} 
+\index{ticket@{ticket}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!ticket@{ticket}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classticket}{ticket}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classticket_a045f514bd329f9e22e62ef6671d07833}\label{classticket_a045f514bd329f9e22e62ef6671d07833}} 
+\index{ticket@{ticket}!get\+\_\+root@{get\+\_\+root}}
+\index{get\+\_\+root@{get\+\_\+root}!ticket@{ticket}}
+\subsubsection{\texorpdfstring{get\+\_\+root()}{get\_root()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$$\ast$ \hyperlink{classticket}{ticket}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+\_\+root (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classticket_a87fe7b99876fa33696c931c234051d54}\label{classticket_a87fe7b99876fa33696c931c234051d54}} 
+\index{ticket@{ticket}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!ticket@{ticket}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classticket}{ticket}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/guerraoui\+\_\+ext\+\_\+bst\+\_\+ticket/\hyperlink{ticket__impl_8h}{ticket\+\_\+impl.\+h}\end{DoxyCompactItemize}

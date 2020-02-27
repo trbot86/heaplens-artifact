@@ -1,0 +1,104 @@
+\hypertarget{classreclaimer__debracap_1_1ThreadData}{}\section{reclaimer\+\_\+debracap$<$ T, Pool $>$\+:\+:Thread\+Data Class Reference}
+\label{classreclaimer__debracap_1_1ThreadData}\index{reclaimer\+\_\+debracap$<$ T, Pool $>$\+::\+Thread\+Data@{reclaimer\+\_\+debracap$<$ T, Pool $>$\+::\+Thread\+Data}}
+
+
+{\ttfamily \#include $<$reclaimer\+\_\+debracap.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classreclaimer__debracap_1_1ThreadData_a9261b7ee9d25732cbf85ffc86ecc9a0d}{Thread\+Data} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::atomic\+\_\+long \hyperlink{classreclaimer__debracap_1_1ThreadData_a1945683fff11e2ff4b1e67ab7608e611}{announced\+Epoch}
+\item 
+long \hyperlink{classreclaimer__debracap_1_1ThreadData_a3c2208d42126409c6d831ec546effa73}{localvar\+\_\+announced\+Epoch}
+\item 
+\hyperlink{classblockbag}{blockbag}$<$ T $>$ $\ast$ \hyperlink{classreclaimer__debracap_1_1ThreadData_ac8cb4f998e1b5dbda8452b9798810db0}{epochbags} \mbox{[}\hyperlink{reclaimer__ebr__tree__q_8h_acc0cc9ce1a68a29c4e0e126887b517dd}{N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+E\+P\+O\+C\+H\+\_\+\+B\+A\+GS}\mbox{]}
+\item 
+int \hyperlink{classreclaimer__debracap_1_1ThreadData_af4c3bb0b83bafe5cd3d0a6f44e523fee}{index}
+\item 
+\hyperlink{classblockbag}{blockbag}$<$ T $>$ $\ast$ \hyperlink{classreclaimer__debracap_1_1ThreadData_a2d41da34bc867760dc217af79f6cf34a}{current\+Bag}
+\item 
+int \hyperlink{classreclaimer__debracap_1_1ThreadData_a9c2dba809417c7086f6e804131e04678}{checked}
+\item 
+int \hyperlink{classreclaimer__debracap_1_1ThreadData_abfbcde4f274cdf53bf45f93450146edf}{ops\+Since\+Read}
+\item 
+int \hyperlink{classreclaimer__debracap_1_1ThreadData_ad14c2b8766f794f6c2c3ca426e0d932e}{times\+Bag\+Too\+Large\+Since\+Rotation}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classreclaimer__debracap_1_1ThreadData_a9261b7ee9d25732cbf85ffc86ecc9a0d}\label{classreclaimer__debracap_1_1ThreadData_a9261b7ee9d25732cbf85ffc86ecc9a0d}} 
+\index{reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}!Thread\+Data@{Thread\+Data}}
+\index{Thread\+Data@{Thread\+Data}!reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}}
+\subsubsection{\texorpdfstring{Thread\+Data()}{ThreadData()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::Thread\+Data\+::\+Thread\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classreclaimer__debracap_1_1ThreadData_a1945683fff11e2ff4b1e67ab7608e611}\label{classreclaimer__debracap_1_1ThreadData_a1945683fff11e2ff4b1e67ab7608e611}} 
+\index{reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}!announced\+Epoch@{announced\+Epoch}}
+\index{announced\+Epoch@{announced\+Epoch}!reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}}
+\subsubsection{\texorpdfstring{announced\+Epoch}{announcedEpoch}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+std\+::atomic\+\_\+long \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::Thread\+Data\+::announced\+Epoch}
+
+\mbox{\Hypertarget{classreclaimer__debracap_1_1ThreadData_a9c2dba809417c7086f6e804131e04678}\label{classreclaimer__debracap_1_1ThreadData_a9c2dba809417c7086f6e804131e04678}} 
+\index{reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}!checked@{checked}}
+\index{checked@{checked}!reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}}
+\subsubsection{\texorpdfstring{checked}{checked}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+int \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::Thread\+Data\+::checked}
+
+\mbox{\Hypertarget{classreclaimer__debracap_1_1ThreadData_a2d41da34bc867760dc217af79f6cf34a}\label{classreclaimer__debracap_1_1ThreadData_a2d41da34bc867760dc217af79f6cf34a}} 
+\index{reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}!current\+Bag@{current\+Bag}}
+\index{current\+Bag@{current\+Bag}!reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}}
+\subsubsection{\texorpdfstring{current\+Bag}{currentBag}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classblockbag}{blockbag}$<$T$>$$\ast$ \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::Thread\+Data\+::current\+Bag}
+
+\mbox{\Hypertarget{classreclaimer__debracap_1_1ThreadData_ac8cb4f998e1b5dbda8452b9798810db0}\label{classreclaimer__debracap_1_1ThreadData_ac8cb4f998e1b5dbda8452b9798810db0}} 
+\index{reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}!epochbags@{epochbags}}
+\index{epochbags@{epochbags}!reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}}
+\subsubsection{\texorpdfstring{epochbags}{epochbags}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classblockbag}{blockbag}$<$T$>$$\ast$ \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::Thread\+Data\+::epochbags\mbox{[}\hyperlink{reclaimer__ebr__tree__q_8h_acc0cc9ce1a68a29c4e0e126887b517dd}{N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+E\+P\+O\+C\+H\+\_\+\+B\+A\+GS}\mbox{]}}
+
+\mbox{\Hypertarget{classreclaimer__debracap_1_1ThreadData_af4c3bb0b83bafe5cd3d0a6f44e523fee}\label{classreclaimer__debracap_1_1ThreadData_af4c3bb0b83bafe5cd3d0a6f44e523fee}} 
+\index{reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}!index@{index}}
+\index{index@{index}!reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}}
+\subsubsection{\texorpdfstring{index}{index}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+int \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::Thread\+Data\+::index}
+
+\mbox{\Hypertarget{classreclaimer__debracap_1_1ThreadData_a3c2208d42126409c6d831ec546effa73}\label{classreclaimer__debracap_1_1ThreadData_a3c2208d42126409c6d831ec546effa73}} 
+\index{reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}!localvar\+\_\+announced\+Epoch@{localvar\+\_\+announced\+Epoch}}
+\index{localvar\+\_\+announced\+Epoch@{localvar\+\_\+announced\+Epoch}!reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}}
+\subsubsection{\texorpdfstring{localvar\+\_\+announced\+Epoch}{localvar\_announcedEpoch}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+long \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::Thread\+Data\+::localvar\+\_\+announced\+Epoch}
+
+\mbox{\Hypertarget{classreclaimer__debracap_1_1ThreadData_abfbcde4f274cdf53bf45f93450146edf}\label{classreclaimer__debracap_1_1ThreadData_abfbcde4f274cdf53bf45f93450146edf}} 
+\index{reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}!ops\+Since\+Read@{ops\+Since\+Read}}
+\index{ops\+Since\+Read@{ops\+Since\+Read}!reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}}
+\subsubsection{\texorpdfstring{ops\+Since\+Read}{opsSinceRead}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+int \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::Thread\+Data\+::ops\+Since\+Read}
+
+\mbox{\Hypertarget{classreclaimer__debracap_1_1ThreadData_ad14c2b8766f794f6c2c3ca426e0d932e}\label{classreclaimer__debracap_1_1ThreadData_ad14c2b8766f794f6c2c3ca426e0d932e}} 
+\index{reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}!times\+Bag\+Too\+Large\+Since\+Rotation@{times\+Bag\+Too\+Large\+Since\+Rotation}}
+\index{times\+Bag\+Too\+Large\+Since\+Rotation@{times\+Bag\+Too\+Large\+Since\+Rotation}!reclaimer\+\_\+debracap\+::\+Thread\+Data@{reclaimer\+\_\+debracap\+::\+Thread\+Data}}
+\subsubsection{\texorpdfstring{times\+Bag\+Too\+Large\+Since\+Rotation}{timesBagTooLargeSinceRotation}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+int \hyperlink{classreclaimer__debracap}{reclaimer\+\_\+debracap}$<$ T, Pool $>$\+::Thread\+Data\+::times\+Bag\+Too\+Large\+Since\+Rotation}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/recordmgr/\hyperlink{reclaimer__debracap_8h}{reclaimer\+\_\+debracap.\+h}\end{DoxyCompactItemize}

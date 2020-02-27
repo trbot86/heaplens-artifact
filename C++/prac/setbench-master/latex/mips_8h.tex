@@ -1,0 +1,115 @@
+\hypertarget{mips_8h}{}\section{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/mips.h File Reference}
+\label{mips_8h}\index{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/mips.\+h@{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/mips.\+h}}
+{\ttfamily \#include \char`\"{}../all\+\_\+aligned\+\_\+atomic\+\_\+load\+\_\+store.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../acquire\+\_\+release\+\_\+volatile.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../test\+\_\+and\+\_\+set\+\_\+t\+\_\+is\+\_\+ao\+\_\+t.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../standard\+\_\+ao\+\_\+double\+\_\+t.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../ao\+\_\+t\+\_\+is\+\_\+int.\+h\char`\"{}}\newline
+Include dependency graph for mips.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{mips_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{mips_8h_ab65316d98c499c612122d64bc69bf5fa}{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}
+\item 
+\#define \hyperlink{mips_8h_a3904dc699d6a6d6e771a93aa66aeb805}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}
+\item 
+\#define \hyperlink{mips_8h_a0c5d9cf68a56bfa9e267db0f2795811c}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}
+\item 
+\#define \hyperlink{mips_8h_ad0b08bc254deecdcba5a4f3366432cf3}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}
+\item 
+\#define \hyperlink{mips_8h_ad85c7af2ae0a778eba77a7762a358819}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}
+\item 
+\#define \hyperlink{mips_8h_a98ec53065c0dfd18bc1013c500da377c}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void \hyperlink{mips_8h_afe3a6778eacc82252ba138fc9a157b04}{A\+O\+\_\+nop\+\_\+full} (void)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{mips_8h_a2e1cdaa59eda3ac15129d16951295698}{A\+O\+\_\+compare\+\_\+and\+\_\+swap} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{mips_8h_a81fc146600046fb8ee9ce4339f078e2e}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{mips_8h_ae39d774429bea0d5c3b604bbb820a4ea}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{mips_8h_a634397de6de764015b30cdff3ff00b06}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{mips_8h_a0c5d9cf68a56bfa9e267db0f2795811c}\label{mips_8h_a0c5d9cf68a56bfa9e267db0f2795811c}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}{AO\_HAVE\_compare\_and\_swap}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap}
+
+\mbox{\Hypertarget{mips_8h_ad0b08bc254deecdcba5a4f3366432cf3}\label{mips_8h_ad0b08bc254deecdcba5a4f3366432cf3}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}{AO\_HAVE\_compare\_and\_swap\_acquire}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}
+
+\mbox{\Hypertarget{mips_8h_a98ec53065c0dfd18bc1013c500da377c}\label{mips_8h_a98ec53065c0dfd18bc1013c500da377c}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}{AO\_HAVE\_compare\_and\_swap\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+
+\mbox{\Hypertarget{mips_8h_ad85c7af2ae0a778eba77a7762a358819}\label{mips_8h_ad85c7af2ae0a778eba77a7762a358819}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}{AO\_HAVE\_compare\_and\_swap\_release}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}
+
+\mbox{\Hypertarget{mips_8h_a3904dc699d6a6d6e771a93aa66aeb805}\label{mips_8h_a3904dc699d6a6d6e771a93aa66aeb805}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}{AO\_HAVE\_nop\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+nop\+\_\+full}
+
+\mbox{\Hypertarget{mips_8h_ab65316d98c499c612122d64bc69bf5fa}\label{mips_8h_ab65316d98c499c612122d64bc69bf5fa}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG@{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}}
+\index{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG@{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}{AO\_NO\_DD\_ORDERING}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+N\+O\+\_\+\+D\+D\+\_\+\+O\+R\+D\+E\+R\+I\+NG}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{mips_8h_a2e1cdaa59eda3ac15129d16951295698}\label{mips_8h_a2e1cdaa59eda3ac15129d16951295698}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+compare\+\_\+and\+\_\+swap}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap@{A\+O\+\_\+compare\+\_\+and\+\_\+swap}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap()}{AO\_compare\_and\_swap()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{mips_8h_a81fc146600046fb8ee9ce4339f078e2e}\label{mips_8h_a81fc146600046fb8ee9ce4339f078e2e}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire()}{AO\_compare\_and\_swap\_acquire()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+acquire (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{mips_8h_a634397de6de764015b30cdff3ff00b06}\label{mips_8h_a634397de6de764015b30cdff3ff00b06}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full()}{AO\_compare\_and\_swap\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{mips_8h_ae39d774429bea0d5c3b604bbb820a4ea}\label{mips_8h_ae39d774429bea0d5c3b604bbb820a4ea}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release()}{AO\_compare\_and\_swap\_release()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+release (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{mips_8h_afe3a6778eacc82252ba138fc9a157b04}\label{mips_8h_afe3a6778eacc82252ba138fc9a157b04}} 
+\index{mips.\+h@{mips.\+h}!A\+O\+\_\+nop\+\_\+full@{A\+O\+\_\+nop\+\_\+full}}
+\index{A\+O\+\_\+nop\+\_\+full@{A\+O\+\_\+nop\+\_\+full}!mips.\+h@{mips.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+nop\+\_\+full()}{AO\_nop\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} void A\+O\+\_\+nop\+\_\+full (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+

@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['kcas_5fleftshift',['KCAS_LEFTSHIFT',['../kcas__reuse__htm__impl_8h.html#aed57ca4a1dc4eb34cd1996cce5f7b197',1,'KCAS_LEFTSHIFT():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#aed57ca4a1dc4eb34cd1996cce5f7b197',1,'KCAS_LEFTSHIFT():&#160;kcas_reuse_impl.h']]],
+  ['kcas_5fmax_5fk',['KCAS_MAX_K',['../internal__kcas__unbalanced_8h.html#a5a806cf3aa6b67c24b86af2b3006ed8e',1,'internal_kcas_unbalanced.h']]],
+  ['kcas_5fmax_5fthreads',['KCAS_MAX_THREADS',['../kcas__reuse__htm__impl_8h.html#a6089afddf2f1b26c22642c0c18188b84',1,'KCAS_MAX_THREADS():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#a6089afddf2f1b26c22642c0c18188b84',1,'KCAS_MAX_THREADS():&#160;kcas_reuse_impl.h']]],
+  ['kcas_5fseqbits_5fmask_5fstate',['KCAS_SEQBITS_MASK_STATE',['../kcas__reuse__htm__impl_8h.html#ac5171ddfdac7c4f4b85d6694a0fa4e06',1,'KCAS_SEQBITS_MASK_STATE():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#ac5171ddfdac7c4f4b85d6694a0fa4e06',1,'KCAS_SEQBITS_MASK_STATE():&#160;kcas_reuse_impl.h']]],
+  ['kcas_5fseqbits_5fnew',['KCAS_SEQBITS_NEW',['../kcas__reuse__htm__impl_8h.html#a25bc6d8bc74b65814601e19ac109275d',1,'KCAS_SEQBITS_NEW():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#a25bc6d8bc74b65814601e19ac109275d',1,'KCAS_SEQBITS_NEW():&#160;kcas_reuse_impl.h']]],
+  ['kcas_5fseqbits_5foffset_5fstate',['KCAS_SEQBITS_OFFSET_STATE',['../kcas__reuse__htm__impl_8h.html#ae79e31f9663ebf39224c292618da8ac1',1,'KCAS_SEQBITS_OFFSET_STATE():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#ae79e31f9663ebf39224c292618da8ac1',1,'KCAS_SEQBITS_OFFSET_STATE():&#160;kcas_reuse_impl.h']]],
+  ['kcas_5fstate_5ffailed',['KCAS_STATE_FAILED',['../kcas__reuse__htm__impl_8h.html#a9afe459b8a5e37c1821e790bde6463ba',1,'KCAS_STATE_FAILED():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#a9afe459b8a5e37c1821e790bde6463ba',1,'KCAS_STATE_FAILED():&#160;kcas_reuse_impl.h']]],
+  ['kcas_5fstate_5fsucceeded',['KCAS_STATE_SUCCEEDED',['../kcas__reuse__htm__impl_8h.html#a62583da7023324bdf6c8426ef7f07d95',1,'KCAS_STATE_SUCCEEDED():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#a62583da7023324bdf6c8426ef7f07d95',1,'KCAS_STATE_SUCCEEDED():&#160;kcas_reuse_impl.h']]],
+  ['kcas_5fstate_5fundecided',['KCAS_STATE_UNDECIDED',['../kcas__reuse__htm__impl_8h.html#a66ed72b1fde7249826ab8e825dd94b61',1,'KCAS_STATE_UNDECIDED():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#a66ed72b1fde7249826ab8e825dd94b61',1,'KCAS_STATE_UNDECIDED():&#160;kcas_reuse_impl.h']]],
+  ['kcas_5ftagbit',['KCAS_TAGBIT',['../kcas__reuse__htm__impl_8h.html#a636a1f6fdaa98ac9b838143e9af5704f',1,'KCAS_TAGBIT():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#a636a1f6fdaa98ac9b838143e9af5704f',1,'KCAS_TAGBIT():&#160;kcas_reuse_impl.h']]],
+  ['kcasptr_5ft',['kcasptr_t',['../kcas__reuse__htm__impl_8h.html#a5bbc81d391bfd6b4288a0d33f105a0b2',1,'kcasptr_t():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#a5bbc81d391bfd6b4288a0d33f105a0b2',1,'kcasptr_t():&#160;kcas_reuse_impl.h']]],
+  ['kcastagptr_5ft',['kcastagptr_t',['../kcas__reuse__htm__impl_8h.html#a22868433cf4300ce32f000ed8c8dd76c',1,'kcastagptr_t():&#160;kcas_reuse_htm_impl.h'],['../kcas__reuse__impl_8h.html#a22868433cf4300ce32f000ed8c8dd76c',1,'kcastagptr_t():&#160;kcas_reuse_impl.h']]],
+  ['kernel',['KERNEL',['../testing_8cpp.html#ac4e52c1bd876037cd22e859f38fd5d27',1,'testing.cpp']]],
+  ['key_5fmask',['KEY_MASK',['../intlf__impl_8h.html#ad0c475de6664a29bd77b0a977b7be38b',1,'intlf_impl.h']]],
+  ['key_5forder',['KEY_ORDER',['../config_8h.html#aa0fbc35b8b662a6b869f2e44ce7b2bde',1,'config.h']]],
+  ['key_5fto_5fvalue',['KEY_TO_VALUE',['../microbench_2main_8cpp.html#a7b7f69eff5cdfe2099a375517bb21f1f',1,'main.cpp']]],
+  ['key_5ftype',['KEY_TYPE',['../index__base_8h.html#ae35c40bc2f912c11f0e36ac66cba4489',1,'index_base.h']]],
+  ['kvpair_5fmask',['KVPAIR_MASK',['../brown__ext__ist__lf__impl_8h.html#ac10fb842c3485b138772cec3fdd97af8',1,'brown_ext_ist_lf_impl.h']]],
+  ['kvpair_5fto_5fcasword',['KVPAIR_TO_CASWORD',['../brown__ext__ist__lf__impl_8h.html#a951fae5e46d62d3b2c6fd6dae7c75c50',1,'brown_ext_ist_lf_impl.h']]]
+];

@@ -1,0 +1,106 @@
+\hypertarget{classManager}{}\section{Manager Class Reference}
+\label{classManager}\index{Manager@{Manager}}
+
+
+{\ttfamily \#include $<$manager.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classManager_a5e70b531d3af13c1a6af84dcc84fa225}{init} ()
+\item 
+void \hyperlink{classManager_a74880d5dc83646708152b9b36430cac0}{setbench\+\_\+deinit} ()
+\item 
+\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \hyperlink{classManager_a61c4d259fc2e68dd0f0687956b873f06}{get\+\_\+ts} (uint64\+\_\+t thread\+\_\+id)
+\item 
+void \hyperlink{classManager_a38f950d2922952fe93425db9e627a873}{add\+\_\+ts} (uint64\+\_\+t thd\+\_\+id, \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} ts)
+\item 
+\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \hyperlink{classManager_a7a4b0edad70dc91abe7ddcc49fc7ed77}{get\+\_\+min\+\_\+ts} (uint64\+\_\+t \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}=0)
+\item 
+void \hyperlink{classManager_a3e78aa1d124adce621968849bf780525}{lock\+\_\+row} (\hyperlink{classrow__t}{row\+\_\+t} $\ast$row)
+\item 
+void \hyperlink{classManager_abe51a30570ddb5180653c0a7fdaeb5b5}{release\+\_\+row} (\hyperlink{classrow__t}{row\+\_\+t} $\ast$row)
+\item 
+\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$ \hyperlink{classManager_acf3a85553d0879190c6a8293bf475e8f}{get\+\_\+txn\+\_\+man} (int thd\+\_\+id)
+\item 
+void \hyperlink{classManager_a0a3992cf0f8cb6e267df5d9511ef0265}{set\+\_\+txn\+\_\+man} (\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$txn)
+\item 
+uint64\+\_\+t \hyperlink{classManager_a397c36cac2730af19ba1835b7886661a}{get\+\_\+epoch} ()
+\item 
+void \hyperlink{classManager_a107fabeaae1ae04fb8223475fd678344}{update\+\_\+epoch} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classManager_a38f950d2922952fe93425db9e627a873}\label{classManager_a38f950d2922952fe93425db9e627a873}} 
+\index{Manager@{Manager}!add\+\_\+ts@{add\+\_\+ts}}
+\index{add\+\_\+ts@{add\+\_\+ts}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{add\+\_\+ts()}{add\_ts()}}
+{\footnotesize\ttfamily void Manager\+::add\+\_\+ts (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{thd\+\_\+id,  }\item[{\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t}}]{ts }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classManager_a397c36cac2730af19ba1835b7886661a}\label{classManager_a397c36cac2730af19ba1835b7886661a}} 
+\index{Manager@{Manager}!get\+\_\+epoch@{get\+\_\+epoch}}
+\index{get\+\_\+epoch@{get\+\_\+epoch}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{get\+\_\+epoch()}{get\_epoch()}}
+{\footnotesize\ttfamily uint64\+\_\+t Manager\+::get\+\_\+epoch (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classManager_a7a4b0edad70dc91abe7ddcc49fc7ed77}\label{classManager_a7a4b0edad70dc91abe7ddcc49fc7ed77}} 
+\index{Manager@{Manager}!get\+\_\+min\+\_\+ts@{get\+\_\+min\+\_\+ts}}
+\index{get\+\_\+min\+\_\+ts@{get\+\_\+min\+\_\+ts}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{get\+\_\+min\+\_\+ts()}{get\_min\_ts()}}
+{\footnotesize\ttfamily \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} Manager\+::get\+\_\+min\+\_\+ts (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{tid = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classManager_a61c4d259fc2e68dd0f0687956b873f06}\label{classManager_a61c4d259fc2e68dd0f0687956b873f06}} 
+\index{Manager@{Manager}!get\+\_\+ts@{get\+\_\+ts}}
+\index{get\+\_\+ts@{get\+\_\+ts}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{get\+\_\+ts()}{get\_ts()}}
+{\footnotesize\ttfamily uint64\+\_\+t Manager\+::get\+\_\+ts (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{thread\+\_\+id }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classManager_acf3a85553d0879190c6a8293bf475e8f}\label{classManager_acf3a85553d0879190c6a8293bf475e8f}} 
+\index{Manager@{Manager}!get\+\_\+txn\+\_\+man@{get\+\_\+txn\+\_\+man}}
+\index{get\+\_\+txn\+\_\+man@{get\+\_\+txn\+\_\+man}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{get\+\_\+txn\+\_\+man()}{get\_txn\_man()}}
+{\footnotesize\ttfamily \hyperlink{classtxn__man}{txn\+\_\+man}$\ast$ Manager\+::get\+\_\+txn\+\_\+man (\begin{DoxyParamCaption}\item[{int}]{thd\+\_\+id }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classManager_a5e70b531d3af13c1a6af84dcc84fa225}\label{classManager_a5e70b531d3af13c1a6af84dcc84fa225}} 
+\index{Manager@{Manager}!init@{init}}
+\index{init@{init}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily void Manager\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classManager_a3e78aa1d124adce621968849bf780525}\label{classManager_a3e78aa1d124adce621968849bf780525}} 
+\index{Manager@{Manager}!lock\+\_\+row@{lock\+\_\+row}}
+\index{lock\+\_\+row@{lock\+\_\+row}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{lock\+\_\+row()}{lock\_row()}}
+{\footnotesize\ttfamily void Manager\+::lock\+\_\+row (\begin{DoxyParamCaption}\item[{\hyperlink{classrow__t}{row\+\_\+t} $\ast$}]{row }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classManager_abe51a30570ddb5180653c0a7fdaeb5b5}\label{classManager_abe51a30570ddb5180653c0a7fdaeb5b5}} 
+\index{Manager@{Manager}!release\+\_\+row@{release\+\_\+row}}
+\index{release\+\_\+row@{release\+\_\+row}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{release\+\_\+row()}{release\_row()}}
+{\footnotesize\ttfamily void Manager\+::release\+\_\+row (\begin{DoxyParamCaption}\item[{\hyperlink{classrow__t}{row\+\_\+t} $\ast$}]{row }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classManager_a0a3992cf0f8cb6e267df5d9511ef0265}\label{classManager_a0a3992cf0f8cb6e267df5d9511ef0265}} 
+\index{Manager@{Manager}!set\+\_\+txn\+\_\+man@{set\+\_\+txn\+\_\+man}}
+\index{set\+\_\+txn\+\_\+man@{set\+\_\+txn\+\_\+man}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{set\+\_\+txn\+\_\+man()}{set\_txn\_man()}}
+{\footnotesize\ttfamily void Manager\+::set\+\_\+txn\+\_\+man (\begin{DoxyParamCaption}\item[{\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$}]{txn }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classManager_a74880d5dc83646708152b9b36430cac0}\label{classManager_a74880d5dc83646708152b9b36430cac0}} 
+\index{Manager@{Manager}!setbench\+\_\+deinit@{setbench\+\_\+deinit}}
+\index{setbench\+\_\+deinit@{setbench\+\_\+deinit}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{setbench\+\_\+deinit()}{setbench\_deinit()}}
+{\footnotesize\ttfamily void Manager\+::setbench\+\_\+deinit (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classManager_a107fabeaae1ae04fb8223475fd678344}\label{classManager_a107fabeaae1ae04fb8223475fd678344}} 
+\index{Manager@{Manager}!update\+\_\+epoch@{update\+\_\+epoch}}
+\index{update\+\_\+epoch@{update\+\_\+epoch}!Manager@{Manager}}
+\subsubsection{\texorpdfstring{update\+\_\+epoch()}{update\_epoch()}}
+{\footnotesize\ttfamily void Manager\+::update\+\_\+epoch (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+macrobench/system/\hyperlink{manager_8h}{manager.\+h}\item 
+macrobench/system/\hyperlink{manager_8cpp}{manager.\+cpp}\end{DoxyCompactItemize}

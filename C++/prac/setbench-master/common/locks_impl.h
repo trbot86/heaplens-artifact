@@ -8,6 +8,8 @@
 #ifndef LOCKS_IMPL_H
 #define LOCKS_IMPL_H
 
+#include "memhook.h"
+
 static void acquireLock(volatile int *lock) {
     while (1) {
         if (*lock) {

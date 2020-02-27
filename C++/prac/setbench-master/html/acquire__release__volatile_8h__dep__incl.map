@@ -1,0 +1,6 @@
+<map id="common/atomic_ops/atomic_ops/sysdeps/acquire_release_volatile.h" name="common/atomic_ops/atomic_ops/sysdeps/acquire_release_volatile.h">
+<area shape="rect" id="node2" href="$all__acquire__release__volatile_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/all_acquire\l_release_volatile.h" alt="" coords="111,109,297,165"/>
+<area shape="rect" id="node5" href="$mips_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/mips.h" alt="" coords="321,117,508,158"/>
+<area shape="rect" id="node3" href="$gcc_2ia64_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/ia64.h" alt="" coords="5,213,192,255"/>
+<area shape="rect" id="node4" href="$hpc_2ia64_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/hpc/ia64.h" alt="" coords="216,213,403,255"/>
+</map>

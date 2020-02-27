@@ -1,0 +1,5 @@
+<map id="workload" name="workload">
+<area shape="rect" id="node2" href="$classTestWorkload.html" title="TestWorkload" alt="" coords="5,80,108,107"/>
+<area shape="rect" id="node3" href="$classtpcc__wl.html" title="tpcc_wl" alt="" coords="133,80,199,107"/>
+<area shape="rect" id="node4" href="$classycsb__wl.html" title="ycsb_wl" alt="" coords="224,80,295,107"/>
+</map>

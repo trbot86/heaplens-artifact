@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classtxn__man.html" title="txn_man" alt="" coords="5,56,77,83"/>
+<area shape="rect" id="node2" href="$classTestTxnMan.html" title="TestTxnMan" alt="" coords="131,5,226,32"/>
+<area shape="rect" id="node3" href="$classtpcc__txn__man.html" title="tpcc_txn_man" alt="" coords="127,56,231,83"/>
+<area shape="rect" id="node4" href="$classycsb__txn__man.html" title="ycsb_txn_man" alt="" coords="125,107,232,133"/>
+</map>

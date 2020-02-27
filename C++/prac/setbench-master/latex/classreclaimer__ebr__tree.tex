@@ -1,0 +1,283 @@
+\hypertarget{classreclaimer__ebr__tree}{}\section{reclaimer\+\_\+ebr\+\_\+tree$<$ T, Pool $>$ Class Template Reference}
+\label{classreclaimer__ebr__tree}\index{reclaimer\+\_\+ebr\+\_\+tree$<$ T, Pool $>$@{reclaimer\+\_\+ebr\+\_\+tree$<$ T, Pool $>$}}
+
+
+{\ttfamily \#include $<$reclaimer\+\_\+ebr\+\_\+tree.\+h$>$}
+
+
+
+Inheritance diagram for reclaimer\+\_\+ebr\+\_\+tree$<$ T, Pool $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{classreclaimer__ebr__tree__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for reclaimer\+\_\+ebr\+\_\+tree$<$ T, Pool $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classreclaimer__ebr__tree__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structreclaimer__ebr__tree_1_1rebind}{rebind}
+\item 
+struct \hyperlink{structreclaimer__ebr__tree_1_1rebind2}{rebind2}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classreclaimer__ebr__tree_a3c1034e327a3b2136b4fd7212d701ff7}{get\+Safe\+Blockbags} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, \hyperlink{classblockbag}{blockbag}$<$ T $>$ $\ast$$\ast$bags)
+\item 
+long long \hyperlink{classreclaimer__ebr__tree_aa8028a1222c839193450c18e67de9054}{get\+Size\+In\+Nodes} ()
+\item 
+std\+::string \hyperlink{classreclaimer__ebr__tree_a8e199d1bf0d466f1317f7d637a6c427f}{get\+Details\+String} ()
+\item 
+std\+::string \hyperlink{classreclaimer__ebr__tree_a36c7cdb0fc910954e2854d099577578d}{get\+Size\+String} ()
+\item 
+bool \hyperlink{classreclaimer__ebr__tree_ad738d298fd4c156af87eaa52e8b67911}{is\+Quiescent} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__ebr__tree_ad9653eeebe33675cae7f754026296e49}{rotate\+Epoch\+Bags} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__ebr__tree_abba75a9a4c5b57f3865dab1b7a79a873}{end\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+{\footnotesize template$<$typename First , typename... Rest$>$ }\\bool \hyperlink{classreclaimer__ebr__tree_a3f049dc3decd80d6b2e22cc0af668efa}{start\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, void $\ast$const $\ast$const reclaimers, const int num\+Reclaimers, const bool read\+Only=false)
+\item 
+void \hyperlink{classreclaimer__ebr__tree_ab47468d3259fb52ff889134d66070eb4}{retire} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$p)
+\item 
+void \hyperlink{classreclaimer__ebr__tree_ab1987de4ed6253f4ff15790660791c44}{debug\+Print\+Status} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__ebr__tree_a8010c52193245d2bbc14039afc1a4b19}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__ebr__tree_aa38c8b0f0fa033a35dd8f9af80ddd4a7}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+\hyperlink{classreclaimer__ebr__tree_ac1b054e2dade349fdb777185707fed46}{reclaimer\+\_\+ebr\+\_\+tree} (const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes}, Pool $\ast$\+\_\+pool, \hyperlink{classdebugInfo}{debug\+Info} $\ast$const \+\_\+debug, \hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const \+\_\+recovery\+Mgr=N\+U\+LL)
+\item 
+\hyperlink{classreclaimer__ebr__tree_a12b133bbaac8b15c30f42bfa35a89130}{$\sim$reclaimer\+\_\+ebr\+\_\+tree} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \hyperlink{classreclaimer__ebr__tree_a9fd97c017a569cb88fc2fe23630a15bf}{quiescence\+Is\+Per\+Record\+Type} ()
+\item 
+static bool \hyperlink{classreclaimer__ebr__tree_a10902145ffb73e322be25a61a735eba3}{is\+Protected} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+static bool \hyperlink{classreclaimer__ebr__tree_a9e2faa5a9d111fcf1c44c1bad0e2c3d2}{is\+Q\+Protected} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+static bool \hyperlink{classreclaimer__ebr__tree_a5ad297478a76719d6d643234ee053e78}{protect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj, \hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type} not\+Retired\+Callback, \hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg} callback\+Arg, bool memory\+Barrier=true)
+\item 
+static void \hyperlink{classreclaimer__ebr__tree_ac574b08de5fbfb4c70248cf9cbfb3d26}{unprotect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+static bool \hyperlink{classreclaimer__ebr__tree_a56fe1802d92cd833480d75cc249f1199}{q\+Protect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj, \hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type} not\+Retired\+Callback, \hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg} callback\+Arg, bool memory\+Barrier=true)
+\item 
+static void \hyperlink{classreclaimer__ebr__tree_a13e7475450b4065fd76608e10e51f7a7}{q\+Unprotect\+All} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+static bool \hyperlink{classreclaimer__ebr__tree_a3d2a44d772dd6fdcca0f593b01b20287}{should\+Help} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structthread__data__t}{thread\+\_\+data\+\_\+t} \hyperlink{classreclaimer__ebr__tree_a3ec46853a0bf878335338c3b89debed7}{thread\+\_\+data} \mbox{[}\hyperlink{plaf_8h_ac1585a3455dd3e33e877e588be9e466b}{M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+D\+S\+\_\+\+P\+O\+W2}\mbox{]}
+\item 
+epoch\+\_\+tree $\ast$ \hyperlink{classreclaimer__ebr__tree_a83b6dbb2cda5383592a2aed9d5d66402}{epoch}
+\item 
+\hyperlink{classreclaimer__ebr__tree_a574b9ffbb2e9390a01476454383cabef}{P\+AD}
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classreclaimer__ebr__tree_ac1b054e2dade349fdb777185707fed46}\label{classreclaimer__ebr__tree_ac1b054e2dade349fdb777185707fed46}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{reclaimer\+\_\+ebr\+\_\+tree()}{reclaimer\_ebr\_tree()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::\hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree} (\begin{DoxyParamCaption}\item[{const int}]{num\+Processes,  }\item[{Pool $\ast$}]{\+\_\+pool,  }\item[{\hyperlink{classdebugInfo}{debug\+Info} $\ast$const}]{\+\_\+debug,  }\item[{\hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const}]{\+\_\+recovery\+Mgr = {\ttfamily NULL} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a12b133bbaac8b15c30f42bfa35a89130}\label{classreclaimer__ebr__tree_a12b133bbaac8b15c30f42bfa35a89130}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!````~reclaimer\+\_\+ebr\+\_\+tree@{$\sim$reclaimer\+\_\+ebr\+\_\+tree}}
+\index{````~reclaimer\+\_\+ebr\+\_\+tree@{$\sim$reclaimer\+\_\+ebr\+\_\+tree}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{$\sim$reclaimer\+\_\+ebr\+\_\+tree()}{~reclaimer\_ebr\_tree()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::$\sim$\hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classreclaimer__ebr__tree_ab1987de4ed6253f4ff15790660791c44}\label{classreclaimer__ebr__tree_ab1987de4ed6253f4ff15790660791c44}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!debug\+Print\+Status@{debug\+Print\+Status}}
+\index{debug\+Print\+Status@{debug\+Print\+Status}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{debug\+Print\+Status()}{debugPrintStatus()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::debug\+Print\+Status (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_aa38c8b0f0fa033a35dd8f9af80ddd4a7}\label{classreclaimer__ebr__tree_aa38c8b0f0fa033a35dd8f9af80ddd4a7}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_abba75a9a4c5b57f3865dab1b7a79a873}\label{classreclaimer__ebr__tree_abba75a9a4c5b57f3865dab1b7a79a873}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!end\+Op@{end\+Op}}
+\index{end\+Op@{end\+Op}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{end\+Op()}{endOp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::end\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a8e199d1bf0d466f1317f7d637a6c427f}\label{classreclaimer__ebr__tree_a8e199d1bf0d466f1317f7d637a6c427f}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!get\+Details\+String@{get\+Details\+String}}
+\index{get\+Details\+String@{get\+Details\+String}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{get\+Details\+String()}{getDetailsString()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+std\+::string \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::get\+Details\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a3c1034e327a3b2136b4fd7212d701ff7}\label{classreclaimer__ebr__tree_a3c1034e327a3b2136b4fd7212d701ff7}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!get\+Safe\+Blockbags@{get\+Safe\+Blockbags}}
+\index{get\+Safe\+Blockbags@{get\+Safe\+Blockbags}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{get\+Safe\+Blockbags()}{getSafeBlockbags()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::get\+Safe\+Blockbags (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{\hyperlink{classblockbag}{blockbag}$<$ T $>$ $\ast$$\ast$}]{bags }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_aa8028a1222c839193450c18e67de9054}\label{classreclaimer__ebr__tree_aa8028a1222c839193450c18e67de9054}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}}
+\index{get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{get\+Size\+In\+Nodes()}{getSizeInNodes()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+long long \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::get\+Size\+In\+Nodes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a36c7cdb0fc910954e2854d099577578d}\label{classreclaimer__ebr__tree_a36c7cdb0fc910954e2854d099577578d}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!get\+Size\+String@{get\+Size\+String}}
+\index{get\+Size\+String@{get\+Size\+String}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{get\+Size\+String()}{getSizeString()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+std\+::string \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::get\+Size\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a8010c52193245d2bbc14039afc1a4b19}\label{classreclaimer__ebr__tree_a8010c52193245d2bbc14039afc1a4b19}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a10902145ffb73e322be25a61a735eba3}\label{classreclaimer__ebr__tree_a10902145ffb73e322be25a61a735eba3}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!is\+Protected@{is\+Protected}}
+\index{is\+Protected@{is\+Protected}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{is\+Protected()}{isProtected()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::is\+Protected (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a9e2faa5a9d111fcf1c44c1bad0e2c3d2}\label{classreclaimer__ebr__tree_a9e2faa5a9d111fcf1c44c1bad0e2c3d2}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!is\+Q\+Protected@{is\+Q\+Protected}}
+\index{is\+Q\+Protected@{is\+Q\+Protected}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{is\+Q\+Protected()}{isQProtected()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::is\+Q\+Protected (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_ad738d298fd4c156af87eaa52e8b67911}\label{classreclaimer__ebr__tree_ad738d298fd4c156af87eaa52e8b67911}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!is\+Quiescent@{is\+Quiescent}}
+\index{is\+Quiescent@{is\+Quiescent}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{is\+Quiescent()}{isQuiescent()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+bool \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::is\+Quiescent (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a5ad297478a76719d6d643234ee053e78}\label{classreclaimer__ebr__tree_a5ad297478a76719d6d643234ee053e78}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!protect@{protect}}
+\index{protect@{protect}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{protect()}{protect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::protect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj,  }\item[{\hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type}}]{not\+Retired\+Callback,  }\item[{\hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg}}]{callback\+Arg,  }\item[{bool}]{memory\+Barrier = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a56fe1802d92cd833480d75cc249f1199}\label{classreclaimer__ebr__tree_a56fe1802d92cd833480d75cc249f1199}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!q\+Protect@{q\+Protect}}
+\index{q\+Protect@{q\+Protect}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{q\+Protect()}{qProtect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::q\+Protect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj,  }\item[{\hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type}}]{not\+Retired\+Callback,  }\item[{\hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg}}]{callback\+Arg,  }\item[{bool}]{memory\+Barrier = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a9fd97c017a569cb88fc2fe23630a15bf}\label{classreclaimer__ebr__tree_a9fd97c017a569cb88fc2fe23630a15bf}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!quiescence\+Is\+Per\+Record\+Type@{quiescence\+Is\+Per\+Record\+Type}}
+\index{quiescence\+Is\+Per\+Record\+Type@{quiescence\+Is\+Per\+Record\+Type}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{quiescence\+Is\+Per\+Record\+Type()}{quiescenceIsPerRecordType()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::quiescence\+Is\+Per\+Record\+Type (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a13e7475450b4065fd76608e10e51f7a7}\label{classreclaimer__ebr__tree_a13e7475450b4065fd76608e10e51f7a7}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!q\+Unprotect\+All@{q\+Unprotect\+All}}
+\index{q\+Unprotect\+All@{q\+Unprotect\+All}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{q\+Unprotect\+All()}{qUnprotectAll()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static void \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::q\+Unprotect\+All (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_ab47468d3259fb52ff889134d66070eb4}\label{classreclaimer__ebr__tree_ab47468d3259fb52ff889134d66070eb4}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!retire@{retire}}
+\index{retire@{retire}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{retire()}{retire()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::retire (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$}]{p }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_ad9653eeebe33675cae7f754026296e49}\label{classreclaimer__ebr__tree_ad9653eeebe33675cae7f754026296e49}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!rotate\+Epoch\+Bags@{rotate\+Epoch\+Bags}}
+\index{rotate\+Epoch\+Bags@{rotate\+Epoch\+Bags}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{rotate\+Epoch\+Bags()}{rotateEpochBags()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::rotate\+Epoch\+Bags (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a3d2a44d772dd6fdcca0f593b01b20287}\label{classreclaimer__ebr__tree_a3d2a44d772dd6fdcca0f593b01b20287}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!should\+Help@{should\+Help}}
+\index{should\+Help@{should\+Help}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{should\+Help()}{shouldHelp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::should\+Help (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a3f049dc3decd80d6b2e22cc0af668efa}\label{classreclaimer__ebr__tree_a3f049dc3decd80d6b2e22cc0af668efa}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!start\+Op@{start\+Op}}
+\index{start\+Op@{start\+Op}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{start\+Op()}{startOp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+template$<$typename First , typename... Rest$>$ \\
+bool \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::start\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{void $\ast$const $\ast$const}]{reclaimers,  }\item[{const int}]{num\+Reclaimers,  }\item[{const bool}]{read\+Only = {\ttfamily false} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_ac574b08de5fbfb4c70248cf9cbfb3d26}\label{classreclaimer__ebr__tree_ac574b08de5fbfb4c70248cf9cbfb3d26}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!unprotect@{unprotect}}
+\index{unprotect@{unprotect}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{unprotect()}{unprotect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static void \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::unprotect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a83b6dbb2cda5383592a2aed9d5d66402}\label{classreclaimer__ebr__tree_a83b6dbb2cda5383592a2aed9d5d66402}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!epoch@{epoch}}
+\index{epoch@{epoch}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{epoch}{epoch}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+epoch\+\_\+tree$\ast$ \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::epoch\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a574b9ffbb2e9390a01476454383cabef}\label{classreclaimer__ebr__tree_a574b9ffbb2e9390a01476454383cabef}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!P\+AD@{P\+AD}}
+\index{P\+AD@{P\+AD}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{P\+AD}{PAD}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::P\+AD\hspace{0.3cm}{\ttfamily [protected]}}
+
+\mbox{\Hypertarget{classreclaimer__ebr__tree_a3ec46853a0bf878335338c3b89debed7}\label{classreclaimer__ebr__tree_a3ec46853a0bf878335338c3b89debed7}} 
+\index{reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}!thread\+\_\+data@{thread\+\_\+data}}
+\index{thread\+\_\+data@{thread\+\_\+data}!reclaimer\+\_\+ebr\+\_\+tree@{reclaimer\+\_\+ebr\+\_\+tree}}
+\subsubsection{\texorpdfstring{thread\+\_\+data}{thread\_data}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{structthread__data__t}{thread\+\_\+data\+\_\+t} \hyperlink{classreclaimer__ebr__tree}{reclaimer\+\_\+ebr\+\_\+tree}$<$ T, Pool $>$\+::thread\+\_\+data\mbox{[}\hyperlink{plaf_8h_ac1585a3455dd3e33e877e588be9e466b}{M\+A\+X\+\_\+\+T\+H\+R\+E\+A\+D\+S\+\_\+\+P\+O\+W2}\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/recordmgr/\hyperlink{reclaimer__ebr__tree_8h}{reclaimer\+\_\+ebr\+\_\+tree.\+h}\end{DoxyCompactItemize}

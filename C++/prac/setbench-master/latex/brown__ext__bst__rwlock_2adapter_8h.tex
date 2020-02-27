@@ -1,0 +1,56 @@
+\hypertarget{brown__ext__bst__rwlock_2adapter_8h}{}\section{ds/brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.h File Reference}
+\label{brown__ext__bst__rwlock_2adapter_8h}\index{ds/brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h@{ds/brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$csignal$>$}\newline
+{\ttfamily \#include \char`\"{}errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}random\+\_\+fnv1a.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}bst\+\_\+rwlock\+\_\+impl.\+h\char`\"{}}\newline
+Include dependency graph for adapter.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{brown__ext__bst__rwlock_2adapter_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classds__adapter}{ds\+\_\+adapter$<$ K, V, Reclaim, Alloc, Pool $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{brown__ext__bst__rwlock_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}~\hyperlink{classrecord__manager}{record\+\_\+manager}$<$Reclaim, Alloc, Pool, \hyperlink{classbst__rwlock__ns_1_1Node}{bst\+\_\+rwlock\+\_\+ns\+::\+Node}$<$K, V$>$$>$
+\item 
+\#define \hyperlink{brown__ext__bst__rwlock_2adapter_8h_a8c510cbe2f8c9555fac68275cc2aeb7b}{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}~\hyperlink{classbst__rwlock__ns_1_1bst__rwlock}{bst\+\_\+rwlock\+\_\+ns\+::bst\+\_\+rwlock}$<$K, V, std\+::less$<$K$>$, \hyperlink{sigouin__skip__list__kcas_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}$>$
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classds__adapter}{ds\+\_\+adapter} \hyperlink{brown__ext__bst__rwlock_2adapter_8h_aa87097d9d58ced9bacb972d53cc59a48}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{brown__ext__bst__rwlock_2adapter_8h_a8c510cbe2f8c9555fac68275cc2aeb7b}\label{brown__ext__bst__rwlock_2adapter_8h_a8c510cbe2f8c9555fac68275cc2aeb7b}} 
+\index{brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h@{brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h}!D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T@{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}}
+\index{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T@{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}!brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h@{brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h}}
+\subsubsection{\texorpdfstring{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}{DATA\_STRUCTURE\_T}}
+{\footnotesize\ttfamily \#define D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T~\hyperlink{classbst__rwlock__ns_1_1bst__rwlock}{bst\+\_\+rwlock\+\_\+ns\+::bst\+\_\+rwlock}$<$K, V, std\+::less$<$K$>$, \hyperlink{sigouin__skip__list__kcas_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}$>$}
+
+\mbox{\Hypertarget{brown__ext__bst__rwlock_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}\label{brown__ext__bst__rwlock_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}} 
+\index{brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h@{brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h}!R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T@{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}}
+\index{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T@{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}!brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h@{brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}{RECORD\_MANAGER\_T}}
+{\footnotesize\ttfamily \#define R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T~\hyperlink{classrecord__manager}{record\+\_\+manager}$<$Reclaim, Alloc, Pool, \hyperlink{classbst__rwlock__ns_1_1Node}{bst\+\_\+rwlock\+\_\+ns\+::\+Node}$<$K, V$>$$>$}
+
+Implementation of a global reader/writer locking unbalanced external binary search tree. Trevor Brown, 2018. 
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{brown__ext__bst__rwlock_2adapter_8h_aa87097d9d58ced9bacb972d53cc59a48}\label{brown__ext__bst__rwlock_2adapter_8h_aa87097d9d58ced9bacb972d53cc59a48}} 
+\index{brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h@{brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h@{brown\+\_\+ext\+\_\+bst\+\_\+rwlock/adapter.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+attribute\+\_\+\+\_\+}{\_\_attribute\_\_}}
+{\footnotesize\ttfamily class \hyperlink{classds__adapter}{ds\+\_\+adapter}  \+\_\+\+\_\+attribute\+\_\+\+\_\+}
+

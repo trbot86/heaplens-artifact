@@ -1,0 +1,21 @@
+<map id="macrobench/system/wl.cpp" name="macrobench/system/wl.cpp">
+<area shape="rect" id="node2" href="$global_8h.html" title="global.h" alt="" coords="1441,453,1508,480"/>
+<area shape="rect" id="node34" href="$helper_8h.html" title="helper.h" alt="" coords="873,379,941,405"/>
+<area shape="rect" id="node35" href="$wl_8h.html" title="wl.h" alt="" coords="1255,80,1302,107"/>
+<area shape="rect" id="node36" href="$all__indexes_8h.html" title="all_indexes.h" alt="" coords="1005,155,1104,181"/>
+<area shape="rect" id="node41" href="$row_8h.html" title="row.h" alt="" coords="626,304,681,331"/>
+<area shape="rect" id="node48" href="$table_8h.html" title="table.h" alt="" coords="1377,155,1439,181"/>
+<area shape="rect" id="node49" href="$catalog_8h.html" title="catalog.h" alt="" coords="1513,304,1588,331"/>
+<area shape="rect" id="node50" href="$mem__alloc_8h.html" title="mem_alloc.h" alt="" coords="1665,379,1761,405"/>
+<area shape="rect" id="node24" href="$config_8h.html" title="config.h" alt="" coords="997,603,1065,629"/>
+<area shape="rect" id="node25" href="$stats_8h.html" title="stats.h" alt="" coords="1982,528,2045,555"/>
+<area shape="rect" id="node26" href="$dl__detect_8h.html" title="dl_detect.h" alt="" coords="2355,528,2442,555"/>
+<area shape="rect" id="node29" href="$thread__pinning_8h.html" title="thread_pinning.h" alt="" coords="631,528,748,555"/>
+<area shape="rect" id="node33" href="$papi__util_8h.html" title="papi_util.h" alt="" coords="2198,528,2279,555"/>
+<area shape="rect" id="node32" href="$plaf_8h.html" title="plaf.h" alt="" coords="130,603,185,629"/>
+<area shape="rect" id="node37" href="$index__adapter_8h.html" title="index_adapter.h" alt="" coords="849,229,964,256"/>
+<area shape="rect" id="node42" href="$row__lock_8h.html" title="row_lock.h" alt="" coords="195,379,280,405"/>
+<area shape="rect" id="node43" href="$index__base_8h.html" title="index_base.h" alt="" coords="857,304,956,331"/>
+<area shape="rect" id="node46" href="$random__fnv1a_8h.html" title="random_fnv1a.h" alt="" coords="5,453,120,480"/>
+<area shape="rect" id="node44" href="$record__manager_8h.html" title="record_manager.h" alt="" coords="195,453,322,480"/>
+</map>

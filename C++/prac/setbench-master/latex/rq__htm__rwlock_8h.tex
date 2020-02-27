@@ -1,0 +1,188 @@
+\hypertarget{rq__htm__rwlock_8h}{}\section{common/rq/rq\+\_\+htm\+\_\+rwlock.h File Reference}
+\label{rq__htm__rwlock_8h}\index{common/rq/rq\+\_\+htm\+\_\+rwlock.\+h@{common/rq/rq\+\_\+htm\+\_\+rwlock.\+h}}
+{\ttfamily \#include \char`\"{}rq\+\_\+debugging.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$hashlist.\+h$>$}\newline
+{\ttfamily \#include $<$rwlock.\+h$>$}\newline
+{\ttfamily \#include $<$rtm.\+h$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+Include dependency graph for rq\+\_\+htm\+\_\+rwlock.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{rq__htm__rwlock_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classRQProvider}{R\+Q\+Provider$<$ K, V, Node\+Type, Data\+Structure, Record\+Manager, logical\+Deletion, can\+Retire\+Nodes\+Logically\+Deleted\+By\+Other\+Processes $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{rq__htm__rwlock_8h_a874d4864650d46df09eba7f76091c13e}{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}~8
+\item 
+\#define \hyperlink{rq__htm__rwlock_8h_ac1e51123328c8f7f9492737e2932b7ed}{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}~32
+\item 
+\#define \hyperlink{rq__htm__rwlock_8h_a9e3b0fffc47950ead635b8494b02ad64}{M\+A\+X\+\_\+\+H\+T\+M\+\_\+\+A\+T\+T\+E\+M\+P\+TS}~30
+\item 
+\#define \hyperlink{rq__htm__rwlock_8h_a5789ece14e8083b480036ab34c9938c8}{dosum}(src)
+\item 
+\#define \hyperlink{rq__htm__rwlock_8h_ae650e3f928535ed242b62626f45383b3}{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}~1024
+\item 
+\#define \hyperlink{rq__htm__rwlock_8h_a9329267133c50fa57b21c8520b54e8b4}{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}~0
+\item 
+\#define \hyperlink{rq__htm__rwlock_8h_a285827679aa696a2a624f3b818043f2b}{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2}~(1$<$$<$8)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>struct \{\\
+\>\>long long \hyperlink{rq__htm__rwlock_8h_a643fd1eef8dbd00706b939b113a76394}{rq\_lin\_time}\\
+\>\>\hyperlink{classHashList}{HashList}$<$ K $>$ $\ast$ \hyperlink{rq__htm__rwlock_8h_acbd99802e40e0182f82e51aae72a87b6}{hashlist}\\
+\>\>\hyperlink{rq__htm__rwlock_8h_a5b18afa05738a875043b663fef5ca73e}{PAD}\\
+\>\>void $\ast$ \hyperlink{rq__htm__rwlock_8h_a4b0983b987c306fb6f41d88224455adb}{announcements} \mbox{[}\hyperlink{rq__snapcollector_8h_a874d4864650d46df09eba7f76091c13e}{MAX\_NODES\_DELETED\_ATOMICALLY}+1\mbox{]}\\
+\>\>int \hyperlink{rq__htm__rwlock_8h_a366f32d205b54323a29ca6c04977983e}{numAnnouncements}\\
+\>\>int \hyperlink{rq__htm__rwlock_8h_aac3f5c587a4c3dfa266111d9b56dbd3b}{commitWriter}\\
+\>\>int \hyperlink{rq__htm__rwlock_8h_a7aa763be18b64d39d414f388a6e2b18d}{abortWriter}\\
+\>\>int \hyperlink{rq__htm__rwlock_8h_a34b6867e9ffb7f9fd11f8c469e328133}{commitReader}\\
+\>\>int \hyperlink{rq__htm__rwlock_8h_a4143f357494894f7a4fcdb0e22212fb7}{abortReader}\\
+\>\>int \hyperlink{rq__htm__rwlock_8h_a0cfa90bc10215166be15e9c8c6a6ba56}{fallback}\\
+\>\} \\
+\>char \hyperlink{rq__htm__rwlock_8h_a635f5365cabd10672254f452bb7bcf0b}{bytes} \mbox{[}\hyperlink{rq__unsafe_8h_ae650e3f928535ed242b62626f45383b3}{\_\_RQ\_THREAD\_DATA\_SIZE}\mbox{]}\\
+\}; \\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{rq__htm__rwlock_8h_ae650e3f928535ed242b62626f45383b3}\label{rq__htm__rwlock_8h_ae650e3f928535ed242b62626f45383b3}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE@{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}}
+\index{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE@{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}{\_\_RQ\_THREAD\_DATA\_SIZE}}
+{\footnotesize\ttfamily \#define \+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE~1024}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a5789ece14e8083b480036ab34c9938c8}\label{rq__htm__rwlock_8h_a5789ece14e8083b480036ab34c9938c8}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!dosum@{dosum}}
+\index{dosum@{dosum}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{dosum}{dosum}}
+{\footnotesize\ttfamily \#define dosum(\begin{DoxyParamCaption}\item[{}]{src }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(\{ \(\backslash\)
+    long \textcolor{keywordtype}{long} \_\_sum = 0; \(\backslash\)
+    for (\textcolor{keywordtype}{int} \_\_i=0;\_\_i<NUM\_PROCESSES;++\_\_i) \{ \(\backslash\)
+        \_\_sum += threadData[\_\_i].src; \(\backslash\)
+    \} \(\backslash\)
+    \_\_sum; \(\backslash\)
+\})
+\end{DoxyCode}
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a285827679aa696a2a624f3b818043f2b}\label{rq__htm__rwlock_8h_a285827679aa696a2a624f3b818043f2b}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2@{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2}}
+\index{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2@{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2}{HASHLIST\_INIT\_CAPACITY\_POW2}}
+{\footnotesize\ttfamily \#define H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2~(1$<$$<$8)}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a9e3b0fffc47950ead635b8494b02ad64}\label{rq__htm__rwlock_8h_a9e3b0fffc47950ead635b8494b02ad64}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!M\+A\+X\+\_\+\+H\+T\+M\+\_\+\+A\+T\+T\+E\+M\+P\+TS@{M\+A\+X\+\_\+\+H\+T\+M\+\_\+\+A\+T\+T\+E\+M\+P\+TS}}
+\index{M\+A\+X\+\_\+\+H\+T\+M\+\_\+\+A\+T\+T\+E\+M\+P\+TS@{M\+A\+X\+\_\+\+H\+T\+M\+\_\+\+A\+T\+T\+E\+M\+P\+TS}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+H\+T\+M\+\_\+\+A\+T\+T\+E\+M\+P\+TS}{MAX\_HTM\_ATTEMPTS}}
+{\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+H\+T\+M\+\_\+\+A\+T\+T\+E\+M\+P\+TS~30}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_ac1e51123328c8f7f9492737e2932b7ed}\label{rq__htm__rwlock_8h_ac1e51123328c8f7f9492737e2932b7ed}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE@{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}}
+\index{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE@{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}{MAX\_KEYS\_PER\_NODE}}
+{\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE~32}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a874d4864650d46df09eba7f76091c13e}\label{rq__htm__rwlock_8h_a874d4864650d46df09eba7f76091c13e}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY@{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}}
+\index{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY@{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}{MAX\_NODES\_DELETED\_ATOMICALLY}}
+{\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY~8}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a9329267133c50fa57b21c8520b54e8b4}\label{rq__htm__rwlock_8h_a9329267133c50fa57b21c8520b54e8b4}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET@{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}}
+\index{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET@{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}{TIMESTAMP\_NOT\_SET}}
+{\footnotesize\ttfamily \#define T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET~0}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a896e97ab23fd58fa7a51af66a8c64f45}\label{rq__htm__rwlock_8h_a896e97ab23fd58fa7a51af66a8c64f45}} 
+\subsubsection{\texorpdfstring{"@24}{@24}}
+{\footnotesize\ttfamily union \{ ... \} }
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a4143f357494894f7a4fcdb0e22212fb7}\label{rq__htm__rwlock_8h_a4143f357494894f7a4fcdb0e22212fb7}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!abort\+Reader@{abort\+Reader}}
+\index{abort\+Reader@{abort\+Reader}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{abort\+Reader}{abortReader}}
+{\footnotesize\ttfamily int abort\+Reader}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a7aa763be18b64d39d414f388a6e2b18d}\label{rq__htm__rwlock_8h_a7aa763be18b64d39d414f388a6e2b18d}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!abort\+Writer@{abort\+Writer}}
+\index{abort\+Writer@{abort\+Writer}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{abort\+Writer}{abortWriter}}
+{\footnotesize\ttfamily int abort\+Writer}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a4b0983b987c306fb6f41d88224455adb}\label{rq__htm__rwlock_8h_a4b0983b987c306fb6f41d88224455adb}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!announcements@{announcements}}
+\index{announcements@{announcements}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{announcements}{announcements}}
+{\footnotesize\ttfamily void$\ast$ announcements\mbox{[}\hyperlink{rq__snapcollector_8h_a874d4864650d46df09eba7f76091c13e}{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}+1\mbox{]}}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a635f5365cabd10672254f452bb7bcf0b}\label{rq__htm__rwlock_8h_a635f5365cabd10672254f452bb7bcf0b}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!bytes@{bytes}}
+\index{bytes@{bytes}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{bytes}{bytes}}
+{\footnotesize\ttfamily char bytes\mbox{[}\hyperlink{rq__unsafe_8h_ae650e3f928535ed242b62626f45383b3}{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}\mbox{]}}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a34b6867e9ffb7f9fd11f8c469e328133}\label{rq__htm__rwlock_8h_a34b6867e9ffb7f9fd11f8c469e328133}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!commit\+Reader@{commit\+Reader}}
+\index{commit\+Reader@{commit\+Reader}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{commit\+Reader}{commitReader}}
+{\footnotesize\ttfamily int commit\+Reader}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_aac3f5c587a4c3dfa266111d9b56dbd3b}\label{rq__htm__rwlock_8h_aac3f5c587a4c3dfa266111d9b56dbd3b}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!commit\+Writer@{commit\+Writer}}
+\index{commit\+Writer@{commit\+Writer}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{commit\+Writer}{commitWriter}}
+{\footnotesize\ttfamily int commit\+Writer}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a0cfa90bc10215166be15e9c8c6a6ba56}\label{rq__htm__rwlock_8h_a0cfa90bc10215166be15e9c8c6a6ba56}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!fallback@{fallback}}
+\index{fallback@{fallback}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{fallback}{fallback}}
+{\footnotesize\ttfamily int fallback}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_acbd99802e40e0182f82e51aae72a87b6}\label{rq__htm__rwlock_8h_acbd99802e40e0182f82e51aae72a87b6}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!hashlist@{hashlist}}
+\index{hashlist@{hashlist}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{hashlist}{hashlist}}
+{\footnotesize\ttfamily \hyperlink{classHashList}{Hash\+List}$<$K$>$$\ast$ hashlist}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a366f32d205b54323a29ca6c04977983e}\label{rq__htm__rwlock_8h_a366f32d205b54323a29ca6c04977983e}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!num\+Announcements@{num\+Announcements}}
+\index{num\+Announcements@{num\+Announcements}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{num\+Announcements}{numAnnouncements}}
+{\footnotesize\ttfamily int num\+Announcements}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a5b18afa05738a875043b663fef5ca73e}\label{rq__htm__rwlock_8h_a5b18afa05738a875043b663fef5ca73e}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!P\+AD@{P\+AD}}
+\index{P\+AD@{P\+AD}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{P\+AD}{PAD}}
+{\footnotesize\ttfamily P\+AD}
+
+\mbox{\Hypertarget{rq__htm__rwlock_8h_a643fd1eef8dbd00706b939b113a76394}\label{rq__htm__rwlock_8h_a643fd1eef8dbd00706b939b113a76394}} 
+\index{rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}!rq\+\_\+lin\+\_\+time@{rq\+\_\+lin\+\_\+time}}
+\index{rq\+\_\+lin\+\_\+time@{rq\+\_\+lin\+\_\+time}!rq\+\_\+htm\+\_\+rwlock.\+h@{rq\+\_\+htm\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{rq\+\_\+lin\+\_\+time}{rq\_lin\_time}}
+{\footnotesize\ttfamily long long rq\+\_\+lin\+\_\+time}
+

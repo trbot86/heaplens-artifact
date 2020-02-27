@@ -5,6 +5,8 @@
  *
  */
 
+#include "memhook.h"
+
 #ifndef MACHINECONSTANTS_H
 #define	MACHINECONSTANTS_H
 

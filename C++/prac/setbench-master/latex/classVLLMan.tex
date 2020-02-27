@@ -1,0 +1,58 @@
+\hypertarget{classVLLMan}{}\section{V\+L\+L\+Man Class Reference}
+\label{classVLLMan}\index{V\+L\+L\+Man@{V\+L\+L\+Man}}
+
+
+{\ttfamily \#include $<$vll.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classVLLMan_a598c042910b0fc6dff90141de1fbc89b}{init} ()
+\item 
+void \hyperlink{classVLLMan_a3c4fb364b0a0af7d38ee00d846b3524a}{vll\+Main\+Loop} (\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$next\+\_\+txn, \hyperlink{classbase__query}{base\+\_\+query} $\ast$query)
+\item 
+int \hyperlink{classVLLMan_aed7e1d48a7510cfc25c35d82db547746}{begin\+Txn} (\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$txn, \hyperlink{classbase__query}{base\+\_\+query} $\ast$query, \hyperlink{classTxnQEntry}{Txn\+Q\+Entry} $\ast$\&entry)
+\item 
+void \hyperlink{classVLLMan_a7366863b5f2b9158d022344be487cb5e}{finish\+Txn} (\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$txn, \hyperlink{classTxnQEntry}{Txn\+Q\+Entry} $\ast$entry)
+\item 
+void \hyperlink{classVLLMan_a766e95fdf411e87dcbde34940ef98ce1}{execute} (\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$txn, \hyperlink{classbase__query}{base\+\_\+query} $\ast$query)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classVLLMan_aed7e1d48a7510cfc25c35d82db547746}\label{classVLLMan_aed7e1d48a7510cfc25c35d82db547746}} 
+\index{V\+L\+L\+Man@{V\+L\+L\+Man}!begin\+Txn@{begin\+Txn}}
+\index{begin\+Txn@{begin\+Txn}!V\+L\+L\+Man@{V\+L\+L\+Man}}
+\subsubsection{\texorpdfstring{begin\+Txn()}{beginTxn()}}
+{\footnotesize\ttfamily int V\+L\+L\+Man\+::begin\+Txn (\begin{DoxyParamCaption}\item[{\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$}]{txn,  }\item[{\hyperlink{classbase__query}{base\+\_\+query} $\ast$}]{query,  }\item[{\hyperlink{classTxnQEntry}{Txn\+Q\+Entry} $\ast$\&}]{entry }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classVLLMan_a766e95fdf411e87dcbde34940ef98ce1}\label{classVLLMan_a766e95fdf411e87dcbde34940ef98ce1}} 
+\index{V\+L\+L\+Man@{V\+L\+L\+Man}!execute@{execute}}
+\index{execute@{execute}!V\+L\+L\+Man@{V\+L\+L\+Man}}
+\subsubsection{\texorpdfstring{execute()}{execute()}}
+{\footnotesize\ttfamily void V\+L\+L\+Man\+::execute (\begin{DoxyParamCaption}\item[{\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$}]{txn,  }\item[{\hyperlink{classbase__query}{base\+\_\+query} $\ast$}]{query }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classVLLMan_a7366863b5f2b9158d022344be487cb5e}\label{classVLLMan_a7366863b5f2b9158d022344be487cb5e}} 
+\index{V\+L\+L\+Man@{V\+L\+L\+Man}!finish\+Txn@{finish\+Txn}}
+\index{finish\+Txn@{finish\+Txn}!V\+L\+L\+Man@{V\+L\+L\+Man}}
+\subsubsection{\texorpdfstring{finish\+Txn()}{finishTxn()}}
+{\footnotesize\ttfamily void V\+L\+L\+Man\+::finish\+Txn (\begin{DoxyParamCaption}\item[{\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$}]{txn,  }\item[{\hyperlink{classTxnQEntry}{Txn\+Q\+Entry} $\ast$}]{entry }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classVLLMan_a598c042910b0fc6dff90141de1fbc89b}\label{classVLLMan_a598c042910b0fc6dff90141de1fbc89b}} 
+\index{V\+L\+L\+Man@{V\+L\+L\+Man}!init@{init}}
+\index{init@{init}!V\+L\+L\+Man@{V\+L\+L\+Man}}
+\subsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily void V\+L\+L\+Man\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classVLLMan_a3c4fb364b0a0af7d38ee00d846b3524a}\label{classVLLMan_a3c4fb364b0a0af7d38ee00d846b3524a}} 
+\index{V\+L\+L\+Man@{V\+L\+L\+Man}!vll\+Main\+Loop@{vll\+Main\+Loop}}
+\index{vll\+Main\+Loop@{vll\+Main\+Loop}!V\+L\+L\+Man@{V\+L\+L\+Man}}
+\subsubsection{\texorpdfstring{vll\+Main\+Loop()}{vllMainLoop()}}
+{\footnotesize\ttfamily void V\+L\+L\+Man\+::vll\+Main\+Loop (\begin{DoxyParamCaption}\item[{\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$}]{next\+\_\+txn,  }\item[{\hyperlink{classbase__query}{base\+\_\+query} $\ast$}]{query }\end{DoxyParamCaption})}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+macrobench/concurrency\+\_\+control/\hyperlink{vll_8h}{vll.\+h}\item 
+macrobench/concurrency\+\_\+control/\hyperlink{vll_8cpp}{vll.\+cpp}\end{DoxyCompactItemize}

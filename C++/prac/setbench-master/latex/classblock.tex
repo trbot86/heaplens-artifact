@@ -1,0 +1,161 @@
+\hypertarget{classblock}{}\section{block$<$ T $>$ Class Template Reference}
+\label{classblock}\index{block$<$ T $>$@{block$<$ T $>$}}
+
+
+{\ttfamily \#include $<$blockbag.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classblock_a5113ccde76ee845a786b0e1ad4b868c0}{block} (\hyperlink{classblock}{block}$<$ T $>$ $\ast$const \+\_\+next)
+\item 
+\hyperlink{classblock_a84efcb772c0aad6175b1dd456014c0b5}{$\sim$block} ()
+\item 
+bool \hyperlink{classblock_a87db81c761911a5915bb2bfd61480ff6}{is\+Full} ()
+\item 
+bool \hyperlink{classblock_a7785b6608b8d7f83b0d6c82a31d5ad6a}{is\+Empty} ()
+\item 
+void \hyperlink{classblock_ab91760496bae106253e3ddd42757287a}{push} (T $\ast$const obj)
+\item 
+T $\ast$ \hyperlink{classblock_aa247fbd643eede27ec2ca95882d72301}{pop} ()
+\item 
+T $\ast$ \hyperlink{classblock_a02fa9a5b650dba298ce58281394663fa}{peek} (const int ix)
+\item 
+bool \hyperlink{classblock_a5577a11404c029904366f2ca986af19d}{contains} (T $\ast$const obj)
+\item 
+void \hyperlink{classblock_aacb3664270c63f99c066035e7ca2fcc9}{erase} (T $\ast$const obj)
+\item 
+void \hyperlink{classblock_a797c59cf299d9d79333464b98290ba2b}{erase} (const int ix)
+\item 
+void \hyperlink{classblock_a2d3ae9852d97ae2debf1bf9b74a5f991}{replace} (const int ix, T $\ast$const obj)
+\item 
+int \hyperlink{classblock_ab15ffcbd3f70d06e95242afcfa801038}{compute\+Size} ()
+\item 
+void \hyperlink{classblock_ab986a1662a6962895ab967a62f741649}{clear\+Without\+Freeing\+Elements} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classblock}{block}$<$ T $>$ $\ast$ \hyperlink{classblock_a3c34670f424559a9404c00a0dafe48ce}{next}
+\item 
+size\+\_\+t \hyperlink{classblock_aa69ddeb6abdf14f17bb47598d10e6380}{next\+Count}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classblock_a5113ccde76ee845a786b0e1ad4b868c0}\label{classblock_a5113ccde76ee845a786b0e1ad4b868c0}} 
+\index{block@{block}!block@{block}}
+\index{block@{block}!block@{block}}
+\subsubsection{\texorpdfstring{block()}{block()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classblock}{block}$<$ T $>$\+::\hyperlink{classblock}{block} (\begin{DoxyParamCaption}\item[{\hyperlink{classblock}{block}$<$ T $>$ $\ast$const}]{\+\_\+next }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_a84efcb772c0aad6175b1dd456014c0b5}\label{classblock_a84efcb772c0aad6175b1dd456014c0b5}} 
+\index{block@{block}!````~block@{$\sim$block}}
+\index{````~block@{$\sim$block}!block@{block}}
+\subsubsection{\texorpdfstring{$\sim$block()}{~block()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classblock}{block}$<$ T $>$\+::$\sim$\hyperlink{classblock}{block} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classblock_ab986a1662a6962895ab967a62f741649}\label{classblock_ab986a1662a6962895ab967a62f741649}} 
+\index{block@{block}!clear\+Without\+Freeing\+Elements@{clear\+Without\+Freeing\+Elements}}
+\index{clear\+Without\+Freeing\+Elements@{clear\+Without\+Freeing\+Elements}!block@{block}}
+\subsubsection{\texorpdfstring{clear\+Without\+Freeing\+Elements()}{clearWithoutFreeingElements()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classblock}{block}$<$ T $>$\+::clear\+Without\+Freeing\+Elements (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_ab15ffcbd3f70d06e95242afcfa801038}\label{classblock_ab15ffcbd3f70d06e95242afcfa801038}} 
+\index{block@{block}!compute\+Size@{compute\+Size}}
+\index{compute\+Size@{compute\+Size}!block@{block}}
+\subsubsection{\texorpdfstring{compute\+Size()}{computeSize()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+int \hyperlink{classblock}{block}$<$ T $>$\+::compute\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_a5577a11404c029904366f2ca986af19d}\label{classblock_a5577a11404c029904366f2ca986af19d}} 
+\index{block@{block}!contains@{contains}}
+\index{contains@{contains}!block@{block}}
+\subsubsection{\texorpdfstring{contains()}{contains()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+bool \hyperlink{classblock}{block}$<$ T $>$\+::contains (\begin{DoxyParamCaption}\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_aacb3664270c63f99c066035e7ca2fcc9}\label{classblock_aacb3664270c63f99c066035e7ca2fcc9}} 
+\index{block@{block}!erase@{erase}}
+\index{erase@{erase}!block@{block}}
+\subsubsection{\texorpdfstring{erase()}{erase()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classblock}{block}$<$ T $>$\+::erase (\begin{DoxyParamCaption}\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_a797c59cf299d9d79333464b98290ba2b}\label{classblock_a797c59cf299d9d79333464b98290ba2b}} 
+\index{block@{block}!erase@{erase}}
+\index{erase@{erase}!block@{block}}
+\subsubsection{\texorpdfstring{erase()}{erase()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classblock}{block}$<$ T $>$\+::erase (\begin{DoxyParamCaption}\item[{const int}]{ix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_a7785b6608b8d7f83b0d6c82a31d5ad6a}\label{classblock_a7785b6608b8d7f83b0d6c82a31d5ad6a}} 
+\index{block@{block}!is\+Empty@{is\+Empty}}
+\index{is\+Empty@{is\+Empty}!block@{block}}
+\subsubsection{\texorpdfstring{is\+Empty()}{isEmpty()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+bool \hyperlink{classblock}{block}$<$ T $>$\+::is\+Empty (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_a87db81c761911a5915bb2bfd61480ff6}\label{classblock_a87db81c761911a5915bb2bfd61480ff6}} 
+\index{block@{block}!is\+Full@{is\+Full}}
+\index{is\+Full@{is\+Full}!block@{block}}
+\subsubsection{\texorpdfstring{is\+Full()}{isFull()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+bool \hyperlink{classblock}{block}$<$ T $>$\+::is\+Full (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_a02fa9a5b650dba298ce58281394663fa}\label{classblock_a02fa9a5b650dba298ce58281394663fa}} 
+\index{block@{block}!peek@{peek}}
+\index{peek@{peek}!block@{block}}
+\subsubsection{\texorpdfstring{peek()}{peek()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+T$\ast$ \hyperlink{classblock}{block}$<$ T $>$\+::peek (\begin{DoxyParamCaption}\item[{const int}]{ix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_aa247fbd643eede27ec2ca95882d72301}\label{classblock_aa247fbd643eede27ec2ca95882d72301}} 
+\index{block@{block}!pop@{pop}}
+\index{pop@{pop}!block@{block}}
+\subsubsection{\texorpdfstring{pop()}{pop()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+T$\ast$ \hyperlink{classblock}{block}$<$ T $>$\+::pop (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_ab91760496bae106253e3ddd42757287a}\label{classblock_ab91760496bae106253e3ddd42757287a}} 
+\index{block@{block}!push@{push}}
+\index{push@{push}!block@{block}}
+\subsubsection{\texorpdfstring{push()}{push()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classblock}{block}$<$ T $>$\+::push (\begin{DoxyParamCaption}\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classblock_a2d3ae9852d97ae2debf1bf9b74a5f991}\label{classblock_a2d3ae9852d97ae2debf1bf9b74a5f991}} 
+\index{block@{block}!replace@{replace}}
+\index{replace@{replace}!block@{block}}
+\subsubsection{\texorpdfstring{replace()}{replace()}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+void \hyperlink{classblock}{block}$<$ T $>$\+::replace (\begin{DoxyParamCaption}\item[{const int}]{ix,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classblock_a3c34670f424559a9404c00a0dafe48ce}\label{classblock_a3c34670f424559a9404c00a0dafe48ce}} 
+\index{block@{block}!next@{next}}
+\index{next@{next}!block@{block}}
+\subsubsection{\texorpdfstring{next}{next}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+\hyperlink{classblock}{block}$<$T$>$$\ast$ \hyperlink{classblock}{block}$<$ T $>$\+::next}
+
+\mbox{\Hypertarget{classblock_aa69ddeb6abdf14f17bb47598d10e6380}\label{classblock_aa69ddeb6abdf14f17bb47598d10e6380}} 
+\index{block@{block}!next\+Count@{next\+Count}}
+\index{next\+Count@{next\+Count}!block@{block}}
+\subsubsection{\texorpdfstring{next\+Count}{nextCount}}
+{\footnotesize\ttfamily template$<$typename T$>$ \\
+size\+\_\+t \hyperlink{classblock}{block}$<$ T $>$\+::next\+Count}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/recordmgr/\hyperlink{blockbag_8h}{blockbag.\+h}\end{DoxyCompactItemize}

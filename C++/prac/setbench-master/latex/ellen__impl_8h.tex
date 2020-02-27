@@ -1,0 +1,98 @@
+\hypertarget{ellen__impl_8h}{}\section{ds/ellen\+\_\+ext\+\_\+bst\+\_\+lf/ellen\+\_\+impl.h File Reference}
+\label{ellen__impl_8h}\index{ds/ellen\+\_\+ext\+\_\+bst\+\_\+lf/ellen\+\_\+impl.\+h@{ds/ellen\+\_\+ext\+\_\+bst\+\_\+lf/ellen\+\_\+impl.\+h}}
+{\ttfamily \#include \char`\"{}record\+\_\+manager.\+h\char`\"{}}\newline
+Include dependency graph for ellen\+\_\+impl.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ellen__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{ellen__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+union \hyperlink{unioninfo__t}{info\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+struct \hyperlink{structnode__t}{node\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+struct \hyperlink{structiinfo__t}{iinfo\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+struct \hyperlink{structdinfo__t}{dinfo\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+union \hyperlink{unioninfo__t}{info\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+struct \hyperlink{structnode__t}{node\+\_\+t$<$ skey\+\_\+t, sval\+\_\+t $>$}
+\item 
+class \hyperlink{classellen}{ellen$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{ellen__impl_8h_adfeaad7bf7d23df186fda0e57ad364a3}{S\+T\+A\+T\+E\+\_\+\+C\+L\+E\+AN}~0
+\item 
+\#define \hyperlink{ellen__impl_8h_aaa2973e671a8a05673db124ad08d421d}{S\+T\+A\+T\+E\+\_\+\+D\+F\+L\+AG}~1
+\item 
+\#define \hyperlink{ellen__impl_8h_a401bc2f77227cf9dc27839c79f885d73}{S\+T\+A\+T\+E\+\_\+\+I\+F\+L\+AG}~2
+\item 
+\#define \hyperlink{ellen__impl_8h_acc0b44dd83d7dbc4a5505e9eaea1f76f}{S\+T\+A\+T\+E\+\_\+\+M\+A\+RK}~3
+\item 
+\#define \hyperlink{ellen__impl_8h_ab362674fb794db3c6e3ad7991de29df0}{G\+E\+T\+F\+L\+AG}(ptr)~(((uint64\+\_\+t) (ptr)) \& 3)
+\item 
+\#define \hyperlink{ellen__impl_8h_a9829c15fc7f2d94f1ccb9fb26a5f55e7}{F\+L\+AG}(ptr,  flag)~(\hyperlink{unioninfo__t}{info\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) ((((uint64\+\_\+t) (ptr)) \& 0xfffffffffffffffc) $\vert$ (flag))
+\item 
+\#define \hyperlink{ellen__impl_8h_a20756c298e94bde80b531faf4426a72d}{U\+N\+F\+L\+AG}(ptr)~(\hyperlink{unioninfo__t}{info\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) (((uint64\+\_\+t) (ptr)) \& 0xfffffffffffffffc)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{ellen__impl_8h_a9829c15fc7f2d94f1ccb9fb26a5f55e7}\label{ellen__impl_8h_a9829c15fc7f2d94f1ccb9fb26a5f55e7}} 
+\index{ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}!F\+L\+AG@{F\+L\+AG}}
+\index{F\+L\+AG@{F\+L\+AG}!ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{F\+L\+AG}{FLAG}}
+{\footnotesize\ttfamily \#define F\+L\+AG(\begin{DoxyParamCaption}\item[{}]{ptr,  }\item[{}]{flag }\end{DoxyParamCaption})~(\hyperlink{unioninfo__t}{info\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) ((((uint64\+\_\+t) (ptr)) \& 0xfffffffffffffffc) $\vert$ (flag))}
+
+\mbox{\Hypertarget{ellen__impl_8h_ab362674fb794db3c6e3ad7991de29df0}\label{ellen__impl_8h_ab362674fb794db3c6e3ad7991de29df0}} 
+\index{ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}!G\+E\+T\+F\+L\+AG@{G\+E\+T\+F\+L\+AG}}
+\index{G\+E\+T\+F\+L\+AG@{G\+E\+T\+F\+L\+AG}!ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{G\+E\+T\+F\+L\+AG}{GETFLAG}}
+{\footnotesize\ttfamily \#define G\+E\+T\+F\+L\+AG(\begin{DoxyParamCaption}\item[{}]{ptr }\end{DoxyParamCaption})~(((uint64\+\_\+t) (ptr)) \& 3)}
+
+\mbox{\Hypertarget{ellen__impl_8h_adfeaad7bf7d23df186fda0e57ad364a3}\label{ellen__impl_8h_adfeaad7bf7d23df186fda0e57ad364a3}} 
+\index{ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+C\+L\+E\+AN@{S\+T\+A\+T\+E\+\_\+\+C\+L\+E\+AN}}
+\index{S\+T\+A\+T\+E\+\_\+\+C\+L\+E\+AN@{S\+T\+A\+T\+E\+\_\+\+C\+L\+E\+AN}!ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+C\+L\+E\+AN}{STATE\_CLEAN}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+C\+L\+E\+AN~0}
+
+\mbox{\Hypertarget{ellen__impl_8h_aaa2973e671a8a05673db124ad08d421d}\label{ellen__impl_8h_aaa2973e671a8a05673db124ad08d421d}} 
+\index{ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+D\+F\+L\+AG@{S\+T\+A\+T\+E\+\_\+\+D\+F\+L\+AG}}
+\index{S\+T\+A\+T\+E\+\_\+\+D\+F\+L\+AG@{S\+T\+A\+T\+E\+\_\+\+D\+F\+L\+AG}!ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+D\+F\+L\+AG}{STATE\_DFLAG}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+D\+F\+L\+AG~1}
+
+\mbox{\Hypertarget{ellen__impl_8h_a401bc2f77227cf9dc27839c79f885d73}\label{ellen__impl_8h_a401bc2f77227cf9dc27839c79f885d73}} 
+\index{ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+I\+F\+L\+AG@{S\+T\+A\+T\+E\+\_\+\+I\+F\+L\+AG}}
+\index{S\+T\+A\+T\+E\+\_\+\+I\+F\+L\+AG@{S\+T\+A\+T\+E\+\_\+\+I\+F\+L\+AG}!ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+I\+F\+L\+AG}{STATE\_IFLAG}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+I\+F\+L\+AG~2}
+
+\mbox{\Hypertarget{ellen__impl_8h_acc0b44dd83d7dbc4a5505e9eaea1f76f}\label{ellen__impl_8h_acc0b44dd83d7dbc4a5505e9eaea1f76f}} 
+\index{ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}!S\+T\+A\+T\+E\+\_\+\+M\+A\+RK@{S\+T\+A\+T\+E\+\_\+\+M\+A\+RK}}
+\index{S\+T\+A\+T\+E\+\_\+\+M\+A\+RK@{S\+T\+A\+T\+E\+\_\+\+M\+A\+RK}!ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+M\+A\+RK}{STATE\_MARK}}
+{\footnotesize\ttfamily \#define S\+T\+A\+T\+E\+\_\+\+M\+A\+RK~3}
+
+\mbox{\Hypertarget{ellen__impl_8h_a20756c298e94bde80b531faf4426a72d}\label{ellen__impl_8h_a20756c298e94bde80b531faf4426a72d}} 
+\index{ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}!U\+N\+F\+L\+AG@{U\+N\+F\+L\+AG}}
+\index{U\+N\+F\+L\+AG@{U\+N\+F\+L\+AG}!ellen\+\_\+impl.\+h@{ellen\+\_\+impl.\+h}}
+\subsubsection{\texorpdfstring{U\+N\+F\+L\+AG}{UNFLAG}}
+{\footnotesize\ttfamily \#define U\+N\+F\+L\+AG(\begin{DoxyParamCaption}\item[{}]{ptr }\end{DoxyParamCaption})~(\hyperlink{unioninfo__t}{info\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$ $\ast$) (((uint64\+\_\+t) (ptr)) \& 0xfffffffffffffffc)}
+

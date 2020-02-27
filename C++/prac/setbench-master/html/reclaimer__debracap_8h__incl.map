@@ -1,0 +1,13 @@
+<map id="common/recordmgr/reclaimer_debracap.h" name="common/recordmgr/reclaimer_debracap.h">
+<area shape="rect" id="node7" href="$blockbag_8h.html" title="blockbag.h" alt="" coords="315,319,400,345"/>
+<area shape="rect" id="node9" href="$plaf_8h.html" title="plaf.h" alt="" coords="599,468,654,495"/>
+<area shape="rect" id="node11" href="$allocator__interface_8h.html" title="allocator_interface.h" alt="" coords="347,244,485,271"/>
+<area shape="rect" id="node13" href="$reclaimer__interface_8h.html" title="reclaimer_interface.h" alt="" coords="537,95,679,121"/>
+<area shape="rect" id="node8" href="$blockpool_8h.html" title="blockpool.h" alt="" coords="296,393,384,420"/>
+<area shape="rect" id="node10" href="$lockfreeblockbag_8h.html" title="lockfreeblockbag.h" alt="" coords="408,393,539,420"/>
+<area shape="rect" id="node12" href="$debug__info_8h.html" title="debug_info.h" alt="" coords="440,319,536,345"/>
+<area shape="rect" id="node14" href="$recovery__manager_8h.html" title="recovery_manager.h" alt="" coords="630,169,770,196"/>
+<area shape="rect" id="node17" href="$globals_8h.html" title="globals.h" alt="" coords="795,244,869,271"/>
+<area shape="rect" id="node19" href="$pool__interface_8h.html" title="pool_interface.h" alt="" coords="347,169,461,196"/>
+<area shape="rect" id="node18" href="$debugprinting_8h.html" title="debugprinting.h" alt="" coords="907,319,1018,345"/>
+</map>

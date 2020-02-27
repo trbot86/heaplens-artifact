@@ -1,0 +1,120 @@
+\hypertarget{classRecordManagerSet}{}\section{Record\+Manager\+Set$<$ Reclaim, Alloc, Pool, Rest $>$ Class Template Reference}
+\label{classRecordManagerSet}\index{Record\+Manager\+Set$<$ Reclaim, Alloc, Pool, Rest $>$@{Record\+Manager\+Set$<$ Reclaim, Alloc, Pool, Rest $>$}}
+
+
+{\ttfamily \#include $<$record\+\_\+manager.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classRecordManagerSet_a2a1dcedae6027d7a0c0b91cd02a3914e}{Record\+Manager\+Set} (const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes}, \hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const \+\_\+recovery\+Mgr)
+\item 
+{\footnotesize template$<$typename T $>$ }\\\hyperlink{classrecord__manager__single__type}{record\+\_\+manager\+\_\+single\+\_\+type}$<$ T, Reclaim, Alloc, Pool $>$ $\ast$ \hyperlink{classRecordManagerSet_a36b6a81acd2b1108f453b748fad29f63}{get} (T $\ast$const record\+Type)
+\item 
+void \hyperlink{classRecordManagerSet_a7ea98e08390be42bcce2692fdb78530d}{clear\+Counters} (void)
+\item 
+void \hyperlink{classRecordManagerSet_aed788a9c714f6c4f51c15b804eded9a0}{register\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classRecordManagerSet_ac56766fc083cf2e80afb190e677c9a48}{unregister\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classRecordManagerSet_aaf22c9991972f1e8c288c2b61cbbea51}{print\+Status} ()
+\item 
+void \hyperlink{classRecordManagerSet_ac2ffb64b677be27096a3ac3cd01e5bb4}{q\+Unprotect\+All} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classRecordManagerSet_aa0ba6ecff5652ee607893956d9abfb76}{get\+Reclaimers} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, void $\ast$$\ast$const reclaimers, int index)
+\item 
+void \hyperlink{classRecordManagerSet_a7a12979919638016acdad6a6d0e9f7d2}{end\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classRecordManagerSet_ac26e824b5b47eff1e2f1345b5cd11659}{leave\+Quiescent\+State\+For\+Each} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const bool read\+Only=false)
+\item 
+void \hyperlink{classRecordManagerSet_a4cde1849fa081f1b83a82b3f77711ab9}{start\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const bool call\+For\+Each, const bool read\+Only=false)
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classRecordManagerSet_a2a1dcedae6027d7a0c0b91cd02a3914e}\label{classRecordManagerSet_a2a1dcedae6027d7a0c0b91cd02a3914e}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{Record\+Manager\+Set()}{RecordManagerSet()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+\hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::\hyperlink{classRecordManagerSet}{Record\+Manager\+Set} (\begin{DoxyParamCaption}\item[{const int}]{num\+Processes,  }\item[{\hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const}]{\+\_\+recovery\+Mgr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classRecordManagerSet_a7ea98e08390be42bcce2692fdb78530d}\label{classRecordManagerSet_a7ea98e08390be42bcce2692fdb78530d}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!clear\+Counters@{clear\+Counters}}
+\index{clear\+Counters@{clear\+Counters}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{clear\+Counters()}{clearCounters()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+void \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::clear\+Counters (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRecordManagerSet_a7a12979919638016acdad6a6d0e9f7d2}\label{classRecordManagerSet_a7a12979919638016acdad6a6d0e9f7d2}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!end\+Op@{end\+Op}}
+\index{end\+Op@{end\+Op}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{end\+Op()}{endOp()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+void \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::end\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRecordManagerSet_a36b6a81acd2b1108f453b748fad29f63}\label{classRecordManagerSet_a36b6a81acd2b1108f453b748fad29f63}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!get@{get}}
+\index{get@{get}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+template$<$typename T $>$ \\
+\hyperlink{classrecord__manager__single__type}{record\+\_\+manager\+\_\+single\+\_\+type}$<$T, Reclaim, Alloc, Pool$>$$\ast$ \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::get (\begin{DoxyParamCaption}\item[{T $\ast$const}]{record\+Type }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRecordManagerSet_aa0ba6ecff5652ee607893956d9abfb76}\label{classRecordManagerSet_aa0ba6ecff5652ee607893956d9abfb76}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!get\+Reclaimers@{get\+Reclaimers}}
+\index{get\+Reclaimers@{get\+Reclaimers}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{get\+Reclaimers()}{getReclaimers()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+void \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::get\+Reclaimers (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{void $\ast$$\ast$const}]{reclaimers,  }\item[{int}]{index }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRecordManagerSet_ac26e824b5b47eff1e2f1345b5cd11659}\label{classRecordManagerSet_ac26e824b5b47eff1e2f1345b5cd11659}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!leave\+Quiescent\+State\+For\+Each@{leave\+Quiescent\+State\+For\+Each}}
+\index{leave\+Quiescent\+State\+For\+Each@{leave\+Quiescent\+State\+For\+Each}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{leave\+Quiescent\+State\+For\+Each()}{leaveQuiescentStateForEach()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+void \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::leave\+Quiescent\+State\+For\+Each (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const bool}]{read\+Only = {\ttfamily false} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRecordManagerSet_aaf22c9991972f1e8c288c2b61cbbea51}\label{classRecordManagerSet_aaf22c9991972f1e8c288c2b61cbbea51}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!print\+Status@{print\+Status}}
+\index{print\+Status@{print\+Status}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{print\+Status()}{printStatus()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+void \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::print\+Status (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRecordManagerSet_ac2ffb64b677be27096a3ac3cd01e5bb4}\label{classRecordManagerSet_ac2ffb64b677be27096a3ac3cd01e5bb4}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!q\+Unprotect\+All@{q\+Unprotect\+All}}
+\index{q\+Unprotect\+All@{q\+Unprotect\+All}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{q\+Unprotect\+All()}{qUnprotectAll()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+void \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::q\+Unprotect\+All (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRecordManagerSet_aed788a9c714f6c4f51c15b804eded9a0}\label{classRecordManagerSet_aed788a9c714f6c4f51c15b804eded9a0}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!register\+Thread@{register\+Thread}}
+\index{register\+Thread@{register\+Thread}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{register\+Thread()}{registerThread()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+void \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::register\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRecordManagerSet_a4cde1849fa081f1b83a82b3f77711ab9}\label{classRecordManagerSet_a4cde1849fa081f1b83a82b3f77711ab9}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!start\+Op@{start\+Op}}
+\index{start\+Op@{start\+Op}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{start\+Op()}{startOp()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+void \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::start\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const bool}]{call\+For\+Each,  }\item[{const bool}]{read\+Only = {\ttfamily false} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classRecordManagerSet_ac56766fc083cf2e80afb190e677c9a48}\label{classRecordManagerSet_ac56766fc083cf2e80afb190e677c9a48}} 
+\index{Record\+Manager\+Set@{Record\+Manager\+Set}!unregister\+Thread@{unregister\+Thread}}
+\index{unregister\+Thread@{unregister\+Thread}!Record\+Manager\+Set@{Record\+Manager\+Set}}
+\subsubsection{\texorpdfstring{unregister\+Thread()}{unregisterThread()}}
+{\footnotesize\ttfamily template$<$class Reclaim, class Alloc, class Pool, typename... Rest$>$ \\
+void \hyperlink{classRecordManagerSet}{Record\+Manager\+Set}$<$ Reclaim, Alloc, Pool, Rest $>$\+::unregister\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/recordmgr/\hyperlink{record__manager_8h}{record\+\_\+manager.\+h}\end{DoxyCompactItemize}

@@ -1,0 +1,298 @@
+\hypertarget{classbst__ns_1_1bst}{}\section{bst\+\_\+ns\+:\+:bst$<$ K, V, Compare, Rec\+Manager $>$ Class Template Reference}
+\label{classbst__ns_1_1bst}\index{bst\+\_\+ns\+::bst$<$ K, V, Compare, Rec\+Manager $>$@{bst\+\_\+ns\+::bst$<$ K, V, Compare, Rec\+Manager $>$}}
+
+
+{\ttfamily \#include $<$bst\+\_\+impl.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classbst__ns_1_1bst_a3cfb3ede09f269633f96bb3d83c9b216}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classbst__ns_1_1bst_a637afb81516af748a18caaf34e20a3b5}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+\hyperlink{classbst__ns_1_1bst_aa917b4d8a64085282bdb6a94282255b1}{bst} (const K \+\_\+\+N\+O\+\_\+\+K\+EY, const V \+\_\+\+N\+O\+\_\+\+V\+A\+L\+UE, const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes}, int suspected\+Crash\+Signal=S\+I\+G\+Q\+U\+IT, int allowed\+Violations\+Per\+Path=6)
+\item 
+\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$ \hyperlink{classbst__ns_1_1bst_a037981db7b5b0451d9d429fbffb51209}{debug\+\_\+get\+Entry\+Point} ()
+\item 
+long long \hyperlink{classbst__ns_1_1bst_adf543c23e8a49408bb85f9421a4bcef8}{get\+Size\+In\+Nodes} (\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$const u)
+\item 
+long long \hyperlink{classbst__ns_1_1bst_aa9e0e2565d7d7d11ac3c64dd5c1df6ad}{get\+Size\+In\+Nodes} ()
+\item 
+std\+::string \hyperlink{classbst__ns_1_1bst_adb0dbcb9e07a12a10bd63ba3a7d7673a}{get\+Size\+String} ()
+\item 
+long long \hyperlink{classbst__ns_1_1bst_a08b4846a99c3ee33d5030d7b0edad9b7}{get\+Size} (\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$const u)
+\item 
+long long \hyperlink{classbst__ns_1_1bst_aebafe1df3868581c45cc7ea3a418ba55}{get\+Size} ()
+\item 
+void \hyperlink{classbst__ns_1_1bst_a9f5db4d1669ab7e4c45c3f0e56a1794e}{dfs\+Deallocate\+Bottom\+Up} (\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$const u, int $\ast$num\+Nodes)
+\item 
+\hyperlink{classbst__ns_1_1bst_a4c894013d0092212d3f2bc2fb7eb8fb6}{$\sim$bst} ()
+\item 
+\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$ \hyperlink{classbst__ns_1_1bst_a267da827db6252aec7a3f120bfad7c85}{get\+Root} (void)
+\item 
+const V \hyperlink{classbst__ns_1_1bst_a6cd6bfaae7e6100322415e420a06d546}{insert} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&key, const V \&val)
+\item 
+const V \hyperlink{classbst__ns_1_1bst_a63851e4152896a4d00f6db93a9527299}{insert\+If\+Absent} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&key, const V \&val)
+\item 
+const std\+::pair$<$ V, bool $>$ \hyperlink{classbst__ns_1_1bst_aba4ffb8755d802c9ae92c40a275559ac}{erase} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&key)
+\item 
+const std\+::pair$<$ V, bool $>$ \hyperlink{classbst__ns_1_1bst_afbc48b466220d2de3bdb6ac29877ecb1}{find} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&key)
+\item 
+int \hyperlink{classbst__ns_1_1bst_aac59710c399b54c5a23cc2ae38688bb4}{range\+Query} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&lo, const K \&hi, K $\ast$const result\+Keys, V $\ast$const result\+Values)
+\item 
+bool \hyperlink{classbst__ns_1_1bst_a794752307f06c0cdaa56dd7e30028bfa}{contains} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, const K \&key)
+\item 
+int \hyperlink{classbst__ns_1_1bst_af6d6b7918b5f4417a7462d712b5c4695}{size} (void)
+\item 
+bool \hyperlink{classbst__ns_1_1bst_a6e04d71942c2db3ce039a65ac020f8af}{is\+Logically\+Deleted} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, \hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$node)
+\item 
+int \hyperlink{classbst__ns_1_1bst_a51d37738bc278d1b640c96380bad9be9}{get\+Keys} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, \hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$node, K $\ast$const output\+Keys, V $\ast$const output\+Values)
+\item 
+bool \hyperlink{classbst__ns_1_1bst_a581f0a73f0567c0b6527f97038715849}{is\+In\+Range} (const K \&key, const K \&lo, const K \&hi)
+\item 
+void \hyperlink{classbst__ns_1_1bst_a4b88ec8d5359baef55d780168792f988}{debug\+Print\+Allocator\+Status} ()
+\item 
+void \hyperlink{classbst__ns_1_1bst_a86b206075f5fa4c2f272a6fb1b547421}{debug\+Print\+To\+File} (std\+::string prefix, long id1, std\+::string infix, long id2, std\+::string suffix)
+\item 
+std\+::string \hyperlink{classbst__ns_1_1bst_a147971fbaa7c42d26442240f42f505ef}{tagptr\+To\+String} (uintptr\+\_\+t tagptr)
+\item 
+Rec\+Manager $\ast$const \hyperlink{classbst__ns_1_1bst_acb9992d1e5f6bdf91d6437ea08244614}{debug\+Get\+Rec\+Mgr} ()
+\item 
+bool \hyperlink{classbst__ns_1_1bst_a019ec02bfcc4eb12a6b1e9e06ea82fe6}{validate} (const long long keysum, const bool checkkeysum)
+\item 
+long long \hyperlink{classbst__ns_1_1bst_a1ef14de4c39bec643f720918c110f89a}{debug\+Key\+Sum} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const K \hyperlink{classbst__ns_1_1bst_a29f9c4bcd6b3196ee4c7664caa4ddfc1}{N\+O\+\_\+\+K\+EY}
+\item 
+const V \hyperlink{classbst__ns_1_1bst_af1520d0c3d203a1b4e8d1967092662a5}{N\+O\+\_\+\+V\+A\+L\+UE}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classbst__ns_1_1bst_aa917b4d8a64085282bdb6a94282255b1}\label{classbst__ns_1_1bst_aa917b4d8a64085282bdb6a94282255b1}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!bst@{bst}}
+\index{bst@{bst}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{bst()}{bst()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+\hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::\hyperlink{classbst__ns_1_1bst}{bst} (\begin{DoxyParamCaption}\item[{const K}]{\+\_\+\+N\+O\+\_\+\+K\+EY,  }\item[{const V}]{\+\_\+\+N\+O\+\_\+\+V\+A\+L\+UE,  }\item[{const int}]{num\+Processes,  }\item[{int}]{suspected\+Crash\+Signal = {\ttfamily SIGQUIT},  }\item[{int}]{allowed\+Violations\+Per\+Path = {\ttfamily 6} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a4c894013d0092212d3f2bc2fb7eb8fb6}\label{classbst__ns_1_1bst_a4c894013d0092212d3f2bc2fb7eb8fb6}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!````~bst@{$\sim$bst}}
+\index{````~bst@{$\sim$bst}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{$\sim$bst()}{~bst()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+\hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::$\sim$\hyperlink{classbst__ns_1_1bst}{bst} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classbst__ns_1_1bst_a794752307f06c0cdaa56dd7e30028bfa}\label{classbst__ns_1_1bst_a794752307f06c0cdaa56dd7e30028bfa}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!contains@{contains}}
+\index{contains@{contains}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{contains()}{contains()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+bool \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::contains (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a037981db7b5b0451d9d429fbffb51209}\label{classbst__ns_1_1bst_a037981db7b5b0451d9d429fbffb51209}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!debug\+\_\+get\+Entry\+Point@{debug\+\_\+get\+Entry\+Point}}
+\index{debug\+\_\+get\+Entry\+Point@{debug\+\_\+get\+Entry\+Point}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{debug\+\_\+get\+Entry\+Point()}{debug\_getEntryPoint()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+\hyperlink{classbst__ns_1_1Node}{Node}$<$K,V$>$$\ast$ \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::debug\+\_\+get\+Entry\+Point (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_acb9992d1e5f6bdf91d6437ea08244614}\label{classbst__ns_1_1bst_acb9992d1e5f6bdf91d6437ea08244614}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}}
+\index{debug\+Get\+Rec\+Mgr@{debug\+Get\+Rec\+Mgr}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{debug\+Get\+Rec\+Mgr()}{debugGetRecMgr()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+Rec\+Manager$\ast$ const \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::debug\+Get\+Rec\+Mgr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a1ef14de4c39bec643f720918c110f89a}\label{classbst__ns_1_1bst_a1ef14de4c39bec643f720918c110f89a}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!debug\+Key\+Sum@{debug\+Key\+Sum}}
+\index{debug\+Key\+Sum@{debug\+Key\+Sum}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{debug\+Key\+Sum()}{debugKeySum()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+long long \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::debug\+Key\+Sum (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a4b88ec8d5359baef55d780168792f988}\label{classbst__ns_1_1bst_a4b88ec8d5359baef55d780168792f988}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!debug\+Print\+Allocator\+Status@{debug\+Print\+Allocator\+Status}}
+\index{debug\+Print\+Allocator\+Status@{debug\+Print\+Allocator\+Status}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{debug\+Print\+Allocator\+Status()}{debugPrintAllocatorStatus()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+void \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::debug\+Print\+Allocator\+Status (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+E\+ND F\+U\+N\+C\+T\+I\+O\+NS F\+OR R\+A\+N\+GE Q\+U\+E\+RY S\+U\+P\+P\+O\+RT \mbox{\Hypertarget{classbst__ns_1_1bst_a86b206075f5fa4c2f272a6fb1b547421}\label{classbst__ns_1_1bst_a86b206075f5fa4c2f272a6fb1b547421}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!debug\+Print\+To\+File@{debug\+Print\+To\+File}}
+\index{debug\+Print\+To\+File@{debug\+Print\+To\+File}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{debug\+Print\+To\+File()}{debugPrintToFile()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+void \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::debug\+Print\+To\+File (\begin{DoxyParamCaption}\item[{std\+::string}]{prefix,  }\item[{long}]{id1,  }\item[{std\+::string}]{infix,  }\item[{long}]{id2,  }\item[{std\+::string}]{suffix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a637afb81516af748a18caaf34e20a3b5}\label{classbst__ns_1_1bst_a637afb81516af748a18caaf34e20a3b5}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+void \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a9f5db4d1669ab7e4c45c3f0e56a1794e}\label{classbst__ns_1_1bst_a9f5db4d1669ab7e4c45c3f0e56a1794e}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!dfs\+Deallocate\+Bottom\+Up@{dfs\+Deallocate\+Bottom\+Up}}
+\index{dfs\+Deallocate\+Bottom\+Up@{dfs\+Deallocate\+Bottom\+Up}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{dfs\+Deallocate\+Bottom\+Up()}{dfsDeallocateBottomUp()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+void \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::dfs\+Deallocate\+Bottom\+Up (\begin{DoxyParamCaption}\item[{\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$const}]{u,  }\item[{int $\ast$}]{num\+Nodes }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_aba4ffb8755d802c9ae92c40a275559ac}\label{classbst__ns_1_1bst_aba4ffb8755d802c9ae92c40a275559ac}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!erase@{erase}}
+\index{erase@{erase}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{erase()}{erase()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+const std\+::pair$<$ V, bool $>$ \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::erase (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_afbc48b466220d2de3bdb6ac29877ecb1}\label{classbst__ns_1_1bst_afbc48b466220d2de3bdb6ac29877ecb1}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!find@{find}}
+\index{find@{find}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{find()}{find()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+const std\+::pair$<$ V, bool $>$ \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::find (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{key }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a51d37738bc278d1b640c96380bad9be9}\label{classbst__ns_1_1bst_a51d37738bc278d1b640c96380bad9be9}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!get\+Keys@{get\+Keys}}
+\index{get\+Keys@{get\+Keys}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{get\+Keys()}{getKeys()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+int \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::get\+Keys (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$}]{node,  }\item[{K $\ast$const}]{output\+Keys,  }\item[{V $\ast$const}]{output\+Values }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a267da827db6252aec7a3f120bfad7c85}\label{classbst__ns_1_1bst_a267da827db6252aec7a3f120bfad7c85}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!get\+Root@{get\+Root}}
+\index{get\+Root@{get\+Root}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{get\+Root()}{getRoot()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+\hyperlink{classbst__ns_1_1Node}{Node}$<$K,V$>$$\ast$ \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::get\+Root (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a08b4846a99c3ee33d5030d7b0edad9b7}\label{classbst__ns_1_1bst_a08b4846a99c3ee33d5030d7b0edad9b7}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!get\+Size@{get\+Size}}
+\index{get\+Size@{get\+Size}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{get\+Size()}{getSize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+long long \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::get\+Size (\begin{DoxyParamCaption}\item[{\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$const}]{u }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_aebafe1df3868581c45cc7ea3a418ba55}\label{classbst__ns_1_1bst_aebafe1df3868581c45cc7ea3a418ba55}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!get\+Size@{get\+Size}}
+\index{get\+Size@{get\+Size}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{get\+Size()}{getSize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+long long \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::get\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_adf543c23e8a49408bb85f9421a4bcef8}\label{classbst__ns_1_1bst_adf543c23e8a49408bb85f9421a4bcef8}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}}
+\index{get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{get\+Size\+In\+Nodes()}{getSizeInNodes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+long long \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::get\+Size\+In\+Nodes (\begin{DoxyParamCaption}\item[{\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$const}]{u }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_aa9e0e2565d7d7d11ac3c64dd5c1df6ad}\label{classbst__ns_1_1bst_aa9e0e2565d7d7d11ac3c64dd5c1df6ad}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}}
+\index{get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{get\+Size\+In\+Nodes()}{getSizeInNodes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+long long \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::get\+Size\+In\+Nodes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_adb0dbcb9e07a12a10bd63ba3a7d7673a}\label{classbst__ns_1_1bst_adb0dbcb9e07a12a10bd63ba3a7d7673a}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!get\+Size\+String@{get\+Size\+String}}
+\index{get\+Size\+String@{get\+Size\+String}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{get\+Size\+String()}{getSizeString()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+std\+::string \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::get\+Size\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a3cfb3ede09f269633f96bb3d83c9b216}\label{classbst__ns_1_1bst_a3cfb3ede09f269633f96bb3d83c9b216}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+void \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This function must be called once by each thread that will invoke any functions on this class.
+
+It must be okay that we do this with the main thread and later with another thread!!! \mbox{\Hypertarget{classbst__ns_1_1bst_a6cd6bfaae7e6100322415e420a06d546}\label{classbst__ns_1_1bst_a6cd6bfaae7e6100322415e420a06d546}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!insert@{insert}}
+\index{insert@{insert}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{insert()}{insert()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+const V \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::insert (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{key,  }\item[{const V \&}]{val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a63851e4152896a4d00f6db93a9527299}\label{classbst__ns_1_1bst_a63851e4152896a4d00f6db93a9527299}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!insert\+If\+Absent@{insert\+If\+Absent}}
+\index{insert\+If\+Absent@{insert\+If\+Absent}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{insert\+If\+Absent()}{insertIfAbsent()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+const V \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::insert\+If\+Absent (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{key,  }\item[{const V \&}]{val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a581f0a73f0567c0b6527f97038715849}\label{classbst__ns_1_1bst_a581f0a73f0567c0b6527f97038715849}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!is\+In\+Range@{is\+In\+Range}}
+\index{is\+In\+Range@{is\+In\+Range}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{is\+In\+Range()}{isInRange()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+bool \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::is\+In\+Range (\begin{DoxyParamCaption}\item[{const K \&}]{key,  }\item[{const K \&}]{lo,  }\item[{const K \&}]{hi }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a6e04d71942c2db3ce039a65ac020f8af}\label{classbst__ns_1_1bst_a6e04d71942c2db3ce039a65ac020f8af}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!is\+Logically\+Deleted@{is\+Logically\+Deleted}}
+\index{is\+Logically\+Deleted@{is\+Logically\+Deleted}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{is\+Logically\+Deleted()}{isLogicallyDeleted()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+bool \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::is\+Logically\+Deleted (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{\hyperlink{classbst__ns_1_1Node}{Node}$<$ K, V $>$ $\ast$}]{node }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+warning\+: size is a L\+I\+N\+E\+AR time operation, and does not return consistent results with concurrency B\+E\+G\+IN F\+U\+N\+C\+T\+I\+O\+NS F\+OR R\+A\+N\+GE Q\+U\+E\+RY S\+U\+P\+P\+O\+RT \mbox{\Hypertarget{classbst__ns_1_1bst_aac59710c399b54c5a23cc2ae38688bb4}\label{classbst__ns_1_1bst_aac59710c399b54c5a23cc2ae38688bb4}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!range\+Query@{range\+Query}}
+\index{range\+Query@{range\+Query}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{range\+Query()}{rangeQuery()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+int \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::range\+Query (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{const K \&}]{lo,  }\item[{const K \&}]{hi,  }\item[{K $\ast$const}]{result\+Keys,  }\item[{V $\ast$const}]{result\+Values }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_af6d6b7918b5f4417a7462d712b5c4695}\label{classbst__ns_1_1bst_af6d6b7918b5f4417a7462d712b5c4695}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!size@{size}}
+\index{size@{size}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+int \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::size (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a147971fbaa7c42d26442240f42f505ef}\label{classbst__ns_1_1bst_a147971fbaa7c42d26442240f42f505ef}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!tagptr\+To\+String@{tagptr\+To\+String}}
+\index{tagptr\+To\+String@{tagptr\+To\+String}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{tagptr\+To\+String()}{tagptrToString()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+std\+::string \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::tagptr\+To\+String (\begin{DoxyParamCaption}\item[{uintptr\+\_\+t}]{tagptr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_a019ec02bfcc4eb12a6b1e9e06ea82fe6}\label{classbst__ns_1_1bst_a019ec02bfcc4eb12a6b1e9e06ea82fe6}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!validate@{validate}}
+\index{validate@{validate}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+bool \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::validate (\begin{DoxyParamCaption}\item[{const long long}]{keysum,  }\item[{const bool}]{checkkeysum }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classbst__ns_1_1bst_a29f9c4bcd6b3196ee4c7664caa4ddfc1}\label{classbst__ns_1_1bst_a29f9c4bcd6b3196ee4c7664caa4ddfc1}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!N\+O\+\_\+\+K\+EY@{N\+O\+\_\+\+K\+EY}}
+\index{N\+O\+\_\+\+K\+EY@{N\+O\+\_\+\+K\+EY}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{N\+O\+\_\+\+K\+EY}{NO\_KEY}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+const K \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::N\+O\+\_\+\+K\+EY}
+
+\mbox{\Hypertarget{classbst__ns_1_1bst_af1520d0c3d203a1b4e8d1967092662a5}\label{classbst__ns_1_1bst_af1520d0c3d203a1b4e8d1967092662a5}} 
+\index{bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}!N\+O\+\_\+\+V\+A\+L\+UE@{N\+O\+\_\+\+V\+A\+L\+UE}}
+\index{N\+O\+\_\+\+V\+A\+L\+UE@{N\+O\+\_\+\+V\+A\+L\+UE}!bst\+\_\+ns\+::bst@{bst\+\_\+ns\+::bst}}
+\subsubsection{\texorpdfstring{N\+O\+\_\+\+V\+A\+L\+UE}{NO\_VALUE}}
+{\footnotesize\ttfamily template$<$class K , class V , class Compare , class Rec\+Manager $>$ \\
+const V \hyperlink{classbst__ns_1_1bst}{bst\+\_\+ns\+::bst}$<$ K, V, Compare, Rec\+Manager $>$\+::N\+O\+\_\+\+V\+A\+L\+UE}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/brown\+\_\+ext\+\_\+bst\+\_\+rq\+\_\+lf/\hyperlink{bst__impl_8h}{bst\+\_\+impl.\+h}\end{DoxyCompactItemize}

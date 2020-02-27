@@ -1,0 +1,116 @@
+\hypertarget{reclaimer__rcu_8h}{}\section{common/recordmgr/reclaimer\+\_\+rcu.h File Reference}
+\label{reclaimer__rcu_8h}\index{common/recordmgr/reclaimer\+\_\+rcu.\+h@{common/recordmgr/reclaimer\+\_\+rcu.\+h}}
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$urcu.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}blockbag.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}plaf.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}allocator\+\_\+interface.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}reclaimer\+\_\+interface.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$cstddef$>$}\newline
+Include dependency graph for reclaimer\+\_\+rcu.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{reclaimer__rcu_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu$<$ T, Pool $>$}
+\item 
+struct \hyperlink{structreclaimer__rcu_1_1rebind}{reclaimer\+\_\+rcu$<$ T, Pool $>$\+::rebind$<$ \+\_\+\+Tp1 $>$}
+\item 
+struct \hyperlink{structreclaimer__rcu_1_1rebind2}{reclaimer\+\_\+rcu$<$ T, Pool $>$\+::rebind2$<$ \+\_\+\+Tp1, \+\_\+\+Tp2 $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{reclaimer__rcu_8h_af06c7b73a8f22fc4feb240b7cbb903b5}{O\+F\+F\+S\+E\+T\+\_\+\+OF}(m)
+\item 
+\#define \hyperlink{reclaimer__rcu_8h_a0d1e6460951f8c965551f121ebd9730c}{comma}~,
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T , typename M $>$ }\\M \hyperlink{reclaimer__rcu_8h_ae9cf2884800a8b38314479c4f43797ec}{get\+\_\+member\+\_\+type} (M T\+::$\ast$)
+\item 
+{\footnotesize template$<$typename T , typename M $>$ }\\T \hyperlink{reclaimer__rcu_8h_a2f71e9dbe488450e1afb613efb9680f2}{get\+\_\+class\+\_\+type} (M T\+::$\ast$)
+\item 
+{\footnotesize template$<$typename T , typename R , R T\+::$\ast$ M$>$ }\\constexpr std\+::size\+\_\+t \hyperlink{reclaimer__rcu_8h_af413bfdf3be4303a9ba7ec8e70082b0c}{offset\+\_\+of} ()
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+thread bool \hyperlink{reclaimer__rcu_8h_ab311b4c1560a481a4e5c0c1616ce0ec5}{called\+R\+C\+U\+Lock} = false
+\begin{DoxyCompactList}\small\item\em {\itshape P\+AD;}/ \end{DoxyCompactList}\item 
+\+\_\+\+\_\+thread bool \hyperlink{reclaimer__rcu_8h_a1d4a709063224cd13f51b21b5618b22d}{rcu\+Initialized} = false
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{reclaimer__rcu_8h_a0d1e6460951f8c965551f121ebd9730c}\label{reclaimer__rcu_8h_a0d1e6460951f8c965551f121ebd9730c}} 
+\index{reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}!comma@{comma}}
+\index{comma@{comma}!reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}}
+\subsubsection{\texorpdfstring{comma}{comma}}
+{\footnotesize\ttfamily \#define comma~,}
+
+\mbox{\Hypertarget{reclaimer__rcu_8h_af06c7b73a8f22fc4feb240b7cbb903b5}\label{reclaimer__rcu_8h_af06c7b73a8f22fc4feb240b7cbb903b5}} 
+\index{reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}!O\+F\+F\+S\+E\+T\+\_\+\+OF@{O\+F\+F\+S\+E\+T\+\_\+\+OF}}
+\index{O\+F\+F\+S\+E\+T\+\_\+\+OF@{O\+F\+F\+S\+E\+T\+\_\+\+OF}!reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}}
+\subsubsection{\texorpdfstring{O\+F\+F\+S\+E\+T\+\_\+\+OF}{OFFSET\_OF}}
+{\footnotesize\ttfamily \#define O\+F\+F\+S\+E\+T\+\_\+\+OF(\begin{DoxyParamCaption}\item[{}]{m }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\hyperlink{reclaimer__rcu_8h_af413bfdf3be4303a9ba7ec8e70082b0c}{offset\_of}<decltype(\hyperlink{reclaimer__rcu_8h_a2f71e9dbe488450e1afb613efb9680f2}{get\_class\_type}(m)), \(\backslash\)
+                     decltype(\hyperlink{reclaimer__rcu_8h_ae9cf2884800a8b38314479c4f43797ec}{get\_member\_type}(m)), m>()
+\end{DoxyCode}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{reclaimer__rcu_8h_a2f71e9dbe488450e1afb613efb9680f2}\label{reclaimer__rcu_8h_a2f71e9dbe488450e1afb613efb9680f2}} 
+\index{reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}!get\+\_\+class\+\_\+type@{get\+\_\+class\+\_\+type}}
+\index{get\+\_\+class\+\_\+type@{get\+\_\+class\+\_\+type}!reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}}
+\subsubsection{\texorpdfstring{get\+\_\+class\+\_\+type()}{get\_class\_type()}}
+{\footnotesize\ttfamily template$<$typename T , typename M $>$ \\
+T get\+\_\+class\+\_\+type (\begin{DoxyParamCaption}\item[{M T\+::$\ast$}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{reclaimer__rcu_8h_ae9cf2884800a8b38314479c4f43797ec}\label{reclaimer__rcu_8h_ae9cf2884800a8b38314479c4f43797ec}} 
+\index{reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}!get\+\_\+member\+\_\+type@{get\+\_\+member\+\_\+type}}
+\index{get\+\_\+member\+\_\+type@{get\+\_\+member\+\_\+type}!reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}}
+\subsubsection{\texorpdfstring{get\+\_\+member\+\_\+type()}{get\_member\_type()}}
+{\footnotesize\ttfamily template$<$typename T , typename M $>$ \\
+M get\+\_\+member\+\_\+type (\begin{DoxyParamCaption}\item[{M T\+::$\ast$}]{ }\end{DoxyParamCaption})}
+
+C++ record manager implementation (P\+O\+DC 2015) by Trevor Brown.
+
+Copyright (C) 2015 Trevor Brown \mbox{\Hypertarget{reclaimer__rcu_8h_af413bfdf3be4303a9ba7ec8e70082b0c}\label{reclaimer__rcu_8h_af413bfdf3be4303a9ba7ec8e70082b0c}} 
+\index{reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}!offset\+\_\+of@{offset\+\_\+of}}
+\index{offset\+\_\+of@{offset\+\_\+of}!reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}}
+\subsubsection{\texorpdfstring{offset\+\_\+of()}{offset\_of()}}
+{\footnotesize\ttfamily template$<$typename T , typename R , R T\+::$\ast$ M$>$ \\
+constexpr std\+::size\+\_\+t offset\+\_\+of (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{reclaimer__rcu_8h_ab311b4c1560a481a4e5c0c1616ce0ec5}\label{reclaimer__rcu_8h_ab311b4c1560a481a4e5c0c1616ce0ec5}} 
+\index{reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}!called\+R\+C\+U\+Lock@{called\+R\+C\+U\+Lock}}
+\index{called\+R\+C\+U\+Lock@{called\+R\+C\+U\+Lock}!reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}}
+\subsubsection{\texorpdfstring{called\+R\+C\+U\+Lock}{calledRCULock}}
+{\footnotesize\ttfamily \+\_\+\+\_\+thread bool called\+R\+C\+U\+Lock = false}
+
+
+
+{\itshape P\+AD;}/ 
+
+{\itshape P\+AD;}/ \mbox{\Hypertarget{reclaimer__rcu_8h_a1d4a709063224cd13f51b21b5618b22d}\label{reclaimer__rcu_8h_a1d4a709063224cd13f51b21b5618b22d}} 
+\index{reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}!rcu\+Initialized@{rcu\+Initialized}}
+\index{rcu\+Initialized@{rcu\+Initialized}!reclaimer\+\_\+rcu.\+h@{reclaimer\+\_\+rcu.\+h}}
+\subsubsection{\texorpdfstring{rcu\+Initialized}{rcuInitialized}}
+{\footnotesize\ttfamily \+\_\+\+\_\+thread bool rcu\+Initialized = false}
+

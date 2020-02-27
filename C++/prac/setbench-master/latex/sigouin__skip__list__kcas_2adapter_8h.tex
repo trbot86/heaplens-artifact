@@ -1,0 +1,52 @@
+\hypertarget{sigouin__skip__list__kcas_2adapter_8h}{}\section{ds/sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.h File Reference}
+\label{sigouin__skip__list__kcas_2adapter_8h}\index{ds/sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h@{ds/sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$csignal$>$}\newline
+{\ttfamily \#include \char`\"{}errors.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}random\+\_\+fnv1a.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}record\+\_\+manager.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}skiplist.\+h\char`\"{}}\newline
+Include dependency graph for adapter.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sigouin__skip__list__kcas_2adapter_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sigouin__skip__list__kcas_2adapter_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classds__adapter}{ds\+\_\+adapter$<$ K, V, Reclaim, Alloc, Pool $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{sigouin__skip__list__kcas_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}~\hyperlink{classrecord__manager}{record\+\_\+manager}$<$Reclaim, Alloc, Pool, \hyperlink{classNode}{Node}$<$K, V$>$ $>$
+\item 
+\#define \hyperlink{sigouin__skip__list__kcas_2adapter_8h_a8c510cbe2f8c9555fac68275cc2aeb7b}{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}~\hyperlink{classSkipListKCAS}{Skip\+List\+K\+C\+AS}$<$\hyperlink{sigouin__skip__list__kcas_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}, K, V$>$
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{sigouin__skip__list__kcas_2adapter_8h_a8c510cbe2f8c9555fac68275cc2aeb7b}\label{sigouin__skip__list__kcas_2adapter_8h_a8c510cbe2f8c9555fac68275cc2aeb7b}} 
+\index{sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h@{sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h}!D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T@{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}}
+\index{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T@{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}!sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h@{sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h}}
+\subsubsection{\texorpdfstring{D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T}{DATA\_STRUCTURE\_T}}
+{\footnotesize\ttfamily \#define D\+A\+T\+A\+\_\+\+S\+T\+R\+U\+C\+T\+U\+R\+E\+\_\+T~\hyperlink{classSkipListKCAS}{Skip\+List\+K\+C\+AS}$<$\hyperlink{sigouin__skip__list__kcas_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}, K, V$>$}
+
+\mbox{\Hypertarget{sigouin__skip__list__kcas_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}\label{sigouin__skip__list__kcas_2adapter_8h_ab78aab30b9df76f9f50b53be5260abf2}} 
+\index{sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h@{sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h}!R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T@{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}}
+\index{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T@{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}!sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h@{sigouin\+\_\+skip\+\_\+list\+\_\+kcas/adapter.\+h}}
+\subsubsection{\texorpdfstring{R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T}{RECORD\_MANAGER\_T}}
+{\footnotesize\ttfamily \#define R\+E\+C\+O\+R\+D\+\_\+\+M\+A\+N\+A\+G\+E\+R\+\_\+T~\hyperlink{classrecord__manager}{record\+\_\+manager}$<$Reclaim, Alloc, Pool, \hyperlink{classNode}{Node}$<$K, V$>$ $>$}
+
+\+: A\+DD C\+O\+M\+M\+E\+NT H\+E\+A\+D\+ER 

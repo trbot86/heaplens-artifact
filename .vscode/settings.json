@@ -73,5 +73,6 @@
         "typeindex": "cpp",
         "valarray": "cpp",
         "source_location": "cpp"
-    }
+    },
+    "git.ignoreLimitWarning": true
 }

@@ -1,0 +1,240 @@
+\hypertarget{classreclaimer__rcu}{}\section{reclaimer\+\_\+rcu$<$ T, Pool $>$ Class Template Reference}
+\label{classreclaimer__rcu}\index{reclaimer\+\_\+rcu$<$ T, Pool $>$@{reclaimer\+\_\+rcu$<$ T, Pool $>$}}
+
+
+{\ttfamily \#include $<$reclaimer\+\_\+rcu.\+h$>$}
+
+
+
+Inheritance diagram for reclaimer\+\_\+rcu$<$ T, Pool $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classreclaimer__rcu__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for reclaimer\+\_\+rcu$<$ T, Pool $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classreclaimer__rcu__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structreclaimer__rcu_1_1rebind}{rebind}
+\item 
+struct \hyperlink{structreclaimer__rcu_1_1rebind2}{rebind2}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+long long \hyperlink{classreclaimer__rcu_aef57d5f5142c6254fb451424db5db6e5}{get\+Size\+In\+Nodes} ()
+\item 
+std\+::string \hyperlink{classreclaimer__rcu_a694c71982ebf65c7dab8c292cb8ee85d}{get\+Details\+String} ()
+\item 
+std\+::string \hyperlink{classreclaimer__rcu_a4693be247dba56a115a04ebb1737d715}{get\+Size\+String} ()
+\item 
+bool \hyperlink{classreclaimer__rcu_aac05d4d8bd2341860af63c0d89600d0a}{is\+Quiescent} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__rcu_ae67cc73f8475079f0a2696459d304c95}{rotate\+Epoch\+Bags} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+bool \hyperlink{classreclaimer__rcu_a5d9e6b96518bace44b08d02fc69e6f42}{start\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, void $\ast$const $\ast$const reclaimers, const int num\+Reclaimers)
+\item 
+void \hyperlink{classreclaimer__rcu_aab06e2ef6aeb6bd863b4bbecb121229f}{end\+Op} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__rcu_aff8e363574a08a689a24e355147e38b4}{retire} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$p)
+\item 
+void \hyperlink{classreclaimer__rcu_aecc8947fd089984a2459b34d712f484f}{debug\+Print\+Status} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__rcu_a6b9241339f5715c9c6c6cce62a886411}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classreclaimer__rcu_a3a294a5b1a496cdd531a90f14e3ad708}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+\hyperlink{classreclaimer__rcu_a5ead65ca8fdc3bd6a77c447af6681992}{reclaimer\+\_\+rcu} (const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes}, Pool $\ast$\+\_\+pool, \hyperlink{classdebugInfo}{debug\+Info} $\ast$const \+\_\+debug, \hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const \+\_\+recovery\+Mgr=N\+U\+LL)
+\item 
+\hyperlink{classreclaimer__rcu_a1bf4a6cc53e4f41bd6eb779bdf882605}{$\sim$reclaimer\+\_\+rcu} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \hyperlink{classreclaimer__rcu_a6dc43b3dbe423012ae7ccea223a820c7}{quiescence\+Is\+Per\+Record\+Type} ()
+\item 
+static bool \hyperlink{classreclaimer__rcu_a8b63d95c4391b2ee2f36c74a2141d078}{is\+Protected} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+static bool \hyperlink{classreclaimer__rcu_a64723a698dde603065e5e1c67761d15c}{is\+Q\+Protected} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+static bool \hyperlink{classreclaimer__rcu_aef0461a44efcde0d9253fa4bd9ea5f5f}{protect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj, \hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type} not\+Retired\+Callback, \hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg} callback\+Arg, bool memory\+Barrier=true)
+\item 
+static void \hyperlink{classreclaimer__rcu_aa786ea177bb54fcfd771b25b1b2ced9e}{unprotect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj)
+\item 
+static bool \hyperlink{classreclaimer__rcu_ac1bb65eb5a5ebcc433094e72fa872b0c}{q\+Protect} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, T $\ast$const obj, \hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type} not\+Retired\+Callback, \hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg} callback\+Arg, bool memory\+Barrier=true)
+\item 
+static void \hyperlink{classreclaimer__rcu_a27f67a0be3fad8a808e397ad1ffd73e6}{q\+Unprotect\+All} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+static bool \hyperlink{classreclaimer__rcu_a524af2f160524a0d662b1ffd29730d35}{should\+Help} ()
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classreclaimer__rcu_a5ead65ca8fdc3bd6a77c447af6681992}\label{classreclaimer__rcu_a5ead65ca8fdc3bd6a77c447af6681992}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{reclaimer\+\_\+rcu()}{reclaimer\_rcu()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::\hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu} (\begin{DoxyParamCaption}\item[{const int}]{num\+Processes,  }\item[{Pool $\ast$}]{\+\_\+pool,  }\item[{\hyperlink{classdebugInfo}{debug\+Info} $\ast$const}]{\+\_\+debug,  }\item[{\hyperlink{classRecoveryMgr}{Recovery\+Mgr}$<$ void $\ast$$>$ $\ast$const}]{\+\_\+recovery\+Mgr = {\ttfamily NULL} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a1bf4a6cc53e4f41bd6eb779bdf882605}\label{classreclaimer__rcu_a1bf4a6cc53e4f41bd6eb779bdf882605}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!````~reclaimer\+\_\+rcu@{$\sim$reclaimer\+\_\+rcu}}
+\index{````~reclaimer\+\_\+rcu@{$\sim$reclaimer\+\_\+rcu}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{$\sim$reclaimer\+\_\+rcu()}{~reclaimer\_rcu()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+\hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::$\sim$\hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classreclaimer__rcu_aecc8947fd089984a2459b34d712f484f}\label{classreclaimer__rcu_aecc8947fd089984a2459b34d712f484f}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!debug\+Print\+Status@{debug\+Print\+Status}}
+\index{debug\+Print\+Status@{debug\+Print\+Status}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{debug\+Print\+Status()}{debugPrintStatus()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::debug\+Print\+Status (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a3a294a5b1a496cdd531a90f14e3ad708}\label{classreclaimer__rcu_a3a294a5b1a496cdd531a90f14e3ad708}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_aab06e2ef6aeb6bd863b4bbecb121229f}\label{classreclaimer__rcu_aab06e2ef6aeb6bd863b4bbecb121229f}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!end\+Op@{end\+Op}}
+\index{end\+Op@{end\+Op}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{end\+Op()}{endOp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::end\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a694c71982ebf65c7dab8c292cb8ee85d}\label{classreclaimer__rcu_a694c71982ebf65c7dab8c292cb8ee85d}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!get\+Details\+String@{get\+Details\+String}}
+\index{get\+Details\+String@{get\+Details\+String}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{get\+Details\+String()}{getDetailsString()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+std\+::string \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::get\+Details\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_aef57d5f5142c6254fb451424db5db6e5}\label{classreclaimer__rcu_aef57d5f5142c6254fb451424db5db6e5}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}}
+\index{get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{get\+Size\+In\+Nodes()}{getSizeInNodes()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+long long \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::get\+Size\+In\+Nodes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a4693be247dba56a115a04ebb1737d715}\label{classreclaimer__rcu_a4693be247dba56a115a04ebb1737d715}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!get\+Size\+String@{get\+Size\+String}}
+\index{get\+Size\+String@{get\+Size\+String}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{get\+Size\+String()}{getSizeString()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+std\+::string \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::get\+Size\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a6b9241339f5715c9c6c6cce62a886411}\label{classreclaimer__rcu_a6b9241339f5715c9c6c6cce62a886411}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a8b63d95c4391b2ee2f36c74a2141d078}\label{classreclaimer__rcu_a8b63d95c4391b2ee2f36c74a2141d078}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!is\+Protected@{is\+Protected}}
+\index{is\+Protected@{is\+Protected}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{is\+Protected()}{isProtected()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::is\+Protected (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a64723a698dde603065e5e1c67761d15c}\label{classreclaimer__rcu_a64723a698dde603065e5e1c67761d15c}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!is\+Q\+Protected@{is\+Q\+Protected}}
+\index{is\+Q\+Protected@{is\+Q\+Protected}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{is\+Q\+Protected()}{isQProtected()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::is\+Q\+Protected (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_aac05d4d8bd2341860af63c0d89600d0a}\label{classreclaimer__rcu_aac05d4d8bd2341860af63c0d89600d0a}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!is\+Quiescent@{is\+Quiescent}}
+\index{is\+Quiescent@{is\+Quiescent}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{is\+Quiescent()}{isQuiescent()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+bool \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::is\+Quiescent (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_aef0461a44efcde0d9253fa4bd9ea5f5f}\label{classreclaimer__rcu_aef0461a44efcde0d9253fa4bd9ea5f5f}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!protect@{protect}}
+\index{protect@{protect}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{protect()}{protect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::protect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj,  }\item[{\hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type}}]{not\+Retired\+Callback,  }\item[{\hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg}}]{callback\+Arg,  }\item[{bool}]{memory\+Barrier = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_ac1bb65eb5a5ebcc433094e72fa872b0c}\label{classreclaimer__rcu_ac1bb65eb5a5ebcc433094e72fa872b0c}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!q\+Protect@{q\+Protect}}
+\index{q\+Protect@{q\+Protect}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{q\+Protect()}{qProtect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::q\+Protect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj,  }\item[{\hyperlink{globals_8h_a57f5c0d40b156d7d996492fb2f16e3cd}{Callback\+Type}}]{not\+Retired\+Callback,  }\item[{\hyperlink{globals_8h_a3de64ef48066ac6430631c8b81a15345}{Callback\+Arg}}]{callback\+Arg,  }\item[{bool}]{memory\+Barrier = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a6dc43b3dbe423012ae7ccea223a820c7}\label{classreclaimer__rcu_a6dc43b3dbe423012ae7ccea223a820c7}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!quiescence\+Is\+Per\+Record\+Type@{quiescence\+Is\+Per\+Record\+Type}}
+\index{quiescence\+Is\+Per\+Record\+Type@{quiescence\+Is\+Per\+Record\+Type}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{quiescence\+Is\+Per\+Record\+Type()}{quiescenceIsPerRecordType()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::quiescence\+Is\+Per\+Record\+Type (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a27f67a0be3fad8a808e397ad1ffd73e6}\label{classreclaimer__rcu_a27f67a0be3fad8a808e397ad1ffd73e6}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!q\+Unprotect\+All@{q\+Unprotect\+All}}
+\index{q\+Unprotect\+All@{q\+Unprotect\+All}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{q\+Unprotect\+All()}{qUnprotectAll()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static void \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::q\+Unprotect\+All (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_aff8e363574a08a689a24e355147e38b4}\label{classreclaimer__rcu_aff8e363574a08a689a24e355147e38b4}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!retire@{retire}}
+\index{retire@{retire}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{retire()}{retire()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::retire (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$}]{p }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_ae67cc73f8475079f0a2696459d304c95}\label{classreclaimer__rcu_ae67cc73f8475079f0a2696459d304c95}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!rotate\+Epoch\+Bags@{rotate\+Epoch\+Bags}}
+\index{rotate\+Epoch\+Bags@{rotate\+Epoch\+Bags}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{rotate\+Epoch\+Bags()}{rotateEpochBags()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+void \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::rotate\+Epoch\+Bags (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a524af2f160524a0d662b1ffd29730d35}\label{classreclaimer__rcu_a524af2f160524a0d662b1ffd29730d35}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!should\+Help@{should\+Help}}
+\index{should\+Help@{should\+Help}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{should\+Help()}{shouldHelp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static bool \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::should\+Help (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_a5d9e6b96518bace44b08d02fc69e6f42}\label{classreclaimer__rcu_a5d9e6b96518bace44b08d02fc69e6f42}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!start\+Op@{start\+Op}}
+\index{start\+Op@{start\+Op}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{start\+Op()}{startOp()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+bool \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::start\+Op (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{void $\ast$const $\ast$const}]{reclaimers,  }\item[{const int}]{num\+Reclaimers }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classreclaimer__rcu_aa786ea177bb54fcfd771b25b1b2ced9e}\label{classreclaimer__rcu_aa786ea177bb54fcfd771b25b1b2ced9e}} 
+\index{reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}!unprotect@{unprotect}}
+\index{unprotect@{unprotect}!reclaimer\+\_\+rcu@{reclaimer\+\_\+rcu}}
+\subsubsection{\texorpdfstring{unprotect()}{unprotect()}}
+{\footnotesize\ttfamily template$<$typename T  = void, class Pool  = pool\+\_\+interface$<$\+T$>$$>$ \\
+static void \hyperlink{classreclaimer__rcu}{reclaimer\+\_\+rcu}$<$ T, Pool $>$\+::unprotect (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{T $\ast$const}]{obj }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/recordmgr/\hyperlink{reclaimer__rcu_8h}{reclaimer\+\_\+rcu.\+h}\end{DoxyCompactItemize}

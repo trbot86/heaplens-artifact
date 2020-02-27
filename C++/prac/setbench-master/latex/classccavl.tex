@@ -1,0 +1,215 @@
+\hypertarget{classccavl}{}\section{ccavl$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$ Class Template Reference}
+\label{classccavl}\index{ccavl$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$@{ccavl$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$}}
+
+
+{\ttfamily \#include $<$ccavl\+\_\+impl.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classccavl_ae75621f90c06705d71d42823ce27415b}{ccavl} (const int \hyperlink{testing_8cpp_aa085812188e21ede75351d88b9b2c30d}{num\+Processes}, const skey\+\_\+t \&\+\_\+\+K\+E\+Y\+\_\+\+N\+E\+G\+\_\+\+I\+N\+F\+TY)
+\item 
+\hyperlink{classccavl_a4ef8b4a550508b4405c69c179d068346}{$\sim$ccavl} ()
+\item 
+void \hyperlink{classccavl_a3c5a7ce30103bd377abd52c94a0021e4}{init\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+void \hyperlink{classccavl_a6515857749b20bf66903f66db6d33247}{deinit\+Thread} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid})
+\item 
+sval\+\_\+t \hyperlink{classccavl_acc5cd8e2ab2c439480b38a49462353cb}{insert\+If\+Absent} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key, sval\+\_\+t val)
+\item 
+sval\+\_\+t \hyperlink{classccavl_a1bccdb9a78b965bc23239ca142843701}{insert\+Replace} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key, sval\+\_\+t val)
+\item 
+sval\+\_\+t \hyperlink{classccavl_ad6102621e94aacf02a6ae441c6b2010a}{find} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key)
+\item 
+sval\+\_\+t \hyperlink{classccavl_ad574827b3181dfcc2758d33a920ef888}{erase} (const int \hyperlink{microbench_2main_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid}, skey\+\_\+t key)
+\item 
+\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$ \hyperlink{classccavl_ad6813e2b580885b73267281299aaf91b}{get\+\_\+root} ()
+\item 
+\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$ \hyperlink{classccavl_a3a0b0d9511f6c33a366df29b7e5e78c6}{get\+\_\+left} (\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$curr)
+\item 
+\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$ \hyperlink{classccavl_adea629204a5f01be8cf538a84a82cbe0}{get\+\_\+right} (\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$curr)
+\item 
+long long \hyperlink{classccavl_a8722026efe4a180eefd9fd5a535b8930}{get\+Key\+Checksum} (\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$curr)
+\item 
+long long \hyperlink{classccavl_aad58da3e9edfdc382a5dc434505e1ba0}{get\+Key\+Checksum} ()
+\item 
+long long \hyperlink{classccavl_a6777e1819dbd5db66a28d859b01d147e}{get\+Size} (\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$curr)
+\item 
+bool \hyperlink{classccavl_ac47877ab6e5def2750f5df5cda2c19be}{validate\+Structure} ()
+\item 
+long long \hyperlink{classccavl_a0cba7a4d7634b04f0029d612d8ed2e0e}{get\+Size} ()
+\item 
+long long \hyperlink{classccavl_ac537ecd0a2f9ab354d3e552da16c7b2a}{get\+Size\+In\+Nodes} (\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$const curr)
+\item 
+long long \hyperlink{classccavl_a3436a535b92e8199212b297d80c4ae6e}{get\+Size\+In\+Nodes} ()
+\item 
+void \hyperlink{classccavl_a3ab44e9335cff25b627abb847477438c}{print\+Summary} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const int \hyperlink{classccavl_a8ccf65d91ffe06b1365ddf88e4a7c40a}{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}
+\item 
+skey\+\_\+t \hyperlink{classccavl_ae7c30fe784d924a824eb95fc9a1536df}{K\+E\+Y\+\_\+\+N\+E\+G\+\_\+\+I\+N\+F\+TY}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classccavl_ae75621f90c06705d71d42823ce27415b}\label{classccavl_ae75621f90c06705d71d42823ce27415b}} 
+\index{ccavl@{ccavl}!ccavl@{ccavl}}
+\index{ccavl@{ccavl}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{ccavl()}{ccavl()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::\hyperlink{classccavl}{ccavl} (\begin{DoxyParamCaption}\item[{const int}]{num\+Processes,  }\item[{const skey\+\_\+t \&}]{\+\_\+\+K\+E\+Y\+\_\+\+N\+E\+G\+\_\+\+I\+N\+F\+TY }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_a4ef8b4a550508b4405c69c179d068346}\label{classccavl_a4ef8b4a550508b4405c69c179d068346}} 
+\index{ccavl@{ccavl}!````~ccavl@{$\sim$ccavl}}
+\index{````~ccavl@{$\sim$ccavl}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{$\sim$ccavl()}{~ccavl()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::$\sim$\hyperlink{classccavl}{ccavl} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classccavl_a6515857749b20bf66903f66db6d33247}\label{classccavl_a6515857749b20bf66903f66db6d33247}} 
+\index{ccavl@{ccavl}!deinit\+Thread@{deinit\+Thread}}
+\index{deinit\+Thread@{deinit\+Thread}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{deinit\+Thread()}{deinitThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::deinit\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_ad574827b3181dfcc2758d33a920ef888}\label{classccavl_ad574827b3181dfcc2758d33a920ef888}} 
+\index{ccavl@{ccavl}!erase@{erase}}
+\index{erase@{erase}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{erase()}{erase()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::erase (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_ad6102621e94aacf02a6ae441c6b2010a}\label{classccavl_ad6102621e94aacf02a6ae441c6b2010a}} 
+\index{ccavl@{ccavl}!find@{find}}
+\index{find@{find}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{find()}{find()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::find (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_a3a0b0d9511f6c33a366df29b7e5e78c6}\label{classccavl_a3a0b0d9511f6c33a366df29b7e5e78c6}} 
+\index{ccavl@{ccavl}!get\+\_\+left@{get\+\_\+left}}
+\index{get\+\_\+left@{get\+\_\+left}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{get\+\_\+left()}{get\_left()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$$\ast$ \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+\_\+left (\begin{DoxyParamCaption}\item[{\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$}]{curr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_adea629204a5f01be8cf538a84a82cbe0}\label{classccavl_adea629204a5f01be8cf538a84a82cbe0}} 
+\index{ccavl@{ccavl}!get\+\_\+right@{get\+\_\+right}}
+\index{get\+\_\+right@{get\+\_\+right}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{get\+\_\+right()}{get\_right()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$$\ast$ \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+\_\+right (\begin{DoxyParamCaption}\item[{\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$}]{curr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_ad6813e2b580885b73267281299aaf91b}\label{classccavl_ad6813e2b580885b73267281299aaf91b}} 
+\index{ccavl@{ccavl}!get\+\_\+root@{get\+\_\+root}}
+\index{get\+\_\+root@{get\+\_\+root}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{get\+\_\+root()}{get\_root()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+\hyperlink{structnode__t}{node\+\_\+t}$<$skey\+\_\+t, sval\+\_\+t$>$$\ast$ \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+\_\+root (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_a8722026efe4a180eefd9fd5a535b8930}\label{classccavl_a8722026efe4a180eefd9fd5a535b8930}} 
+\index{ccavl@{ccavl}!get\+Key\+Checksum@{get\+Key\+Checksum}}
+\index{get\+Key\+Checksum@{get\+Key\+Checksum}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{get\+Key\+Checksum()}{getKeyChecksum()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+long long \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+Key\+Checksum (\begin{DoxyParamCaption}\item[{\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$}]{curr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_aad58da3e9edfdc382a5dc434505e1ba0}\label{classccavl_aad58da3e9edfdc382a5dc434505e1ba0}} 
+\index{ccavl@{ccavl}!get\+Key\+Checksum@{get\+Key\+Checksum}}
+\index{get\+Key\+Checksum@{get\+Key\+Checksum}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{get\+Key\+Checksum()}{getKeyChecksum()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+long long \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+Key\+Checksum (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_a6777e1819dbd5db66a28d859b01d147e}\label{classccavl_a6777e1819dbd5db66a28d859b01d147e}} 
+\index{ccavl@{ccavl}!get\+Size@{get\+Size}}
+\index{get\+Size@{get\+Size}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{get\+Size()}{getSize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+long long \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+Size (\begin{DoxyParamCaption}\item[{\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$}]{curr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_a0cba7a4d7634b04f0029d612d8ed2e0e}\label{classccavl_a0cba7a4d7634b04f0029d612d8ed2e0e}} 
+\index{ccavl@{ccavl}!get\+Size@{get\+Size}}
+\index{get\+Size@{get\+Size}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{get\+Size()}{getSize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+long long \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_ac537ecd0a2f9ab354d3e552da16c7b2a}\label{classccavl_ac537ecd0a2f9ab354d3e552da16c7b2a}} 
+\index{ccavl@{ccavl}!get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}}
+\index{get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{get\+Size\+In\+Nodes()}{getSizeInNodes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+long long \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+Size\+In\+Nodes (\begin{DoxyParamCaption}\item[{\hyperlink{structnode__t}{node\+\_\+t}$<$ skey\+\_\+t, sval\+\_\+t $>$ $\ast$const}]{curr }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_a3436a535b92e8199212b297d80c4ae6e}\label{classccavl_a3436a535b92e8199212b297d80c4ae6e}} 
+\index{ccavl@{ccavl}!get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}}
+\index{get\+Size\+In\+Nodes@{get\+Size\+In\+Nodes}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{get\+Size\+In\+Nodes()}{getSizeInNodes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+long long \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::get\+Size\+In\+Nodes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_a3c5a7ce30103bd377abd52c94a0021e4}\label{classccavl_a3c5a7ce30103bd377abd52c94a0021e4}} 
+\index{ccavl@{ccavl}!init\+Thread@{init\+Thread}}
+\index{init\+Thread@{init\+Thread}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{init\+Thread()}{initThread()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::init\+Thread (\begin{DoxyParamCaption}\item[{const int}]{tid }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_acc5cd8e2ab2c439480b38a49462353cb}\label{classccavl_acc5cd8e2ab2c439480b38a49462353cb}} 
+\index{ccavl@{ccavl}!insert\+If\+Absent@{insert\+If\+Absent}}
+\index{insert\+If\+Absent@{insert\+If\+Absent}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{insert\+If\+Absent()}{insertIfAbsent()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::insert\+If\+Absent (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key,  }\item[{sval\+\_\+t}]{val }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_a1bccdb9a78b965bc23239ca142843701}\label{classccavl_a1bccdb9a78b965bc23239ca142843701}} 
+\index{ccavl@{ccavl}!insert\+Replace@{insert\+Replace}}
+\index{insert\+Replace@{insert\+Replace}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{insert\+Replace()}{insertReplace()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+sval\+\_\+t \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::insert\+Replace (\begin{DoxyParamCaption}\item[{const int}]{tid,  }\item[{skey\+\_\+t}]{key,  }\item[{sval\+\_\+t}]{val }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_a3ab44e9335cff25b627abb847477438c}\label{classccavl_a3ab44e9335cff25b627abb847477438c}} 
+\index{ccavl@{ccavl}!print\+Summary@{print\+Summary}}
+\index{print\+Summary@{print\+Summary}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{print\+Summary()}{printSummary()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+void \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::print\+Summary (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classccavl_ac47877ab6e5def2750f5df5cda2c19be}\label{classccavl_ac47877ab6e5def2750f5df5cda2c19be}} 
+\index{ccavl@{ccavl}!validate\+Structure@{validate\+Structure}}
+\index{validate\+Structure@{validate\+Structure}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{validate\+Structure()}{validateStructure()}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+bool \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::validate\+Structure (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classccavl_ae7c30fe784d924a824eb95fc9a1536df}\label{classccavl_ae7c30fe784d924a824eb95fc9a1536df}} 
+\index{ccavl@{ccavl}!K\+E\+Y\+\_\+\+N\+E\+G\+\_\+\+I\+N\+F\+TY@{K\+E\+Y\+\_\+\+N\+E\+G\+\_\+\+I\+N\+F\+TY}}
+\index{K\+E\+Y\+\_\+\+N\+E\+G\+\_\+\+I\+N\+F\+TY@{K\+E\+Y\+\_\+\+N\+E\+G\+\_\+\+I\+N\+F\+TY}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{K\+E\+Y\+\_\+\+N\+E\+G\+\_\+\+I\+N\+F\+TY}{KEY\_NEG\_INFTY}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+skey\+\_\+t \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::K\+E\+Y\+\_\+\+N\+E\+G\+\_\+\+I\+N\+F\+TY}
+
+\mbox{\Hypertarget{classccavl_a8ccf65d91ffe06b1365ddf88e4a7c40a}\label{classccavl_a8ccf65d91ffe06b1365ddf88e4a7c40a}} 
+\index{ccavl@{ccavl}!N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES@{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}}
+\index{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES@{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}!ccavl@{ccavl}}
+\subsubsection{\texorpdfstring{N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}{NUM\_PROCESSES}}
+{\footnotesize\ttfamily template$<$typename skey\+\_\+t , typename sval\+\_\+t , class Rec\+Mgr $>$ \\
+const int \hyperlink{classccavl}{ccavl}$<$ skey\+\_\+t, sval\+\_\+t, Rec\+Mgr $>$\+::N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+ES}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/bronson\+\_\+pext\+\_\+bst\+\_\+occ/\hyperlink{ccavl__impl_8h}{ccavl\+\_\+impl.\+h}\end{DoxyCompactItemize}

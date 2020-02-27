@@ -1,0 +1,81 @@
+\hypertarget{classBucketHeader}{}\section{Bucket\+Header Class Reference}
+\label{classBucketHeader}\index{Bucket\+Header@{Bucket\+Header}}
+
+
+{\ttfamily \#include $<$index\+\_\+hash.\+h$>$}
+
+
+
+Collaboration diagram for Bucket\+Header\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=195pt]{classBucketHeader__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classBucketHeader_af033419413f506161fa21020f830220a}{init} ()
+\item 
+void \hyperlink{classBucketHeader_af83c68acf8763f33c09019407710731c}{insert\+\_\+item} (\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} key, \hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} item, int part\+\_\+id)
+\item 
+void \hyperlink{classBucketHeader_ac626241058ab4e23bbb9827d68078c3f}{read\+\_\+item} (\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE} key, \hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$item, const char $\ast$tname)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classBucketNode}{Bucket\+Node} $\ast$ \hyperlink{classBucketHeader_a4ec7aac89e39ec77488c7b1e8be33c56}{first\+\_\+node}
+\item 
+uint64\+\_\+t \hyperlink{classBucketHeader_aa725cf07022db861aa15b07fec3ab123}{node\+\_\+cnt}
+\item 
+bool \hyperlink{classBucketHeader_aef842697ec95a54f0b5b798b88267e53}{locked}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classBucketHeader_af033419413f506161fa21020f830220a}\label{classBucketHeader_af033419413f506161fa21020f830220a}} 
+\index{Bucket\+Header@{Bucket\+Header}!init@{init}}
+\index{init@{init}!Bucket\+Header@{Bucket\+Header}}
+\subsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily void Bucket\+Header\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classBucketHeader_af83c68acf8763f33c09019407710731c}\label{classBucketHeader_af83c68acf8763f33c09019407710731c}} 
+\index{Bucket\+Header@{Bucket\+Header}!insert\+\_\+item@{insert\+\_\+item}}
+\index{insert\+\_\+item@{insert\+\_\+item}!Bucket\+Header@{Bucket\+Header}}
+\subsubsection{\texorpdfstring{insert\+\_\+item()}{insert\_item()}}
+{\footnotesize\ttfamily void Bucket\+Header\+::insert\+\_\+item (\begin{DoxyParamCaption}\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{key,  }\item[{\hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE}}]{item,  }\item[{int}]{part\+\_\+id }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classBucketHeader_ac626241058ab4e23bbb9827d68078c3f}\label{classBucketHeader_ac626241058ab4e23bbb9827d68078c3f}} 
+\index{Bucket\+Header@{Bucket\+Header}!read\+\_\+item@{read\+\_\+item}}
+\index{read\+\_\+item@{read\+\_\+item}!Bucket\+Header@{Bucket\+Header}}
+\subsubsection{\texorpdfstring{read\+\_\+item()}{read\_item()}}
+{\footnotesize\ttfamily void Bucket\+Header\+::read\+\_\+item (\begin{DoxyParamCaption}\item[{\hyperlink{index__base_8h_ae35c40bc2f912c11f0e36ac66cba4489}{K\+E\+Y\+\_\+\+T\+Y\+PE}}]{key,  }\item[{\hyperlink{microbench_2main_8cpp_ae17cb099b4c9aee7835032339b5a9e0d}{V\+A\+L\+U\+E\+\_\+\+T\+Y\+PE} $\ast$}]{item,  }\item[{const char $\ast$}]{tname }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classBucketHeader_a4ec7aac89e39ec77488c7b1e8be33c56}\label{classBucketHeader_a4ec7aac89e39ec77488c7b1e8be33c56}} 
+\index{Bucket\+Header@{Bucket\+Header}!first\+\_\+node@{first\+\_\+node}}
+\index{first\+\_\+node@{first\+\_\+node}!Bucket\+Header@{Bucket\+Header}}
+\subsubsection{\texorpdfstring{first\+\_\+node}{first\_node}}
+{\footnotesize\ttfamily \hyperlink{classBucketNode}{Bucket\+Node}$\ast$ Bucket\+Header\+::first\+\_\+node}
+
+\mbox{\Hypertarget{classBucketHeader_aef842697ec95a54f0b5b798b88267e53}\label{classBucketHeader_aef842697ec95a54f0b5b798b88267e53}} 
+\index{Bucket\+Header@{Bucket\+Header}!locked@{locked}}
+\index{locked@{locked}!Bucket\+Header@{Bucket\+Header}}
+\subsubsection{\texorpdfstring{locked}{locked}}
+{\footnotesize\ttfamily bool Bucket\+Header\+::locked}
+
+\mbox{\Hypertarget{classBucketHeader_aa725cf07022db861aa15b07fec3ab123}\label{classBucketHeader_aa725cf07022db861aa15b07fec3ab123}} 
+\index{Bucket\+Header@{Bucket\+Header}!node\+\_\+cnt@{node\+\_\+cnt}}
+\index{node\+\_\+cnt@{node\+\_\+cnt}!Bucket\+Header@{Bucket\+Header}}
+\subsubsection{\texorpdfstring{node\+\_\+cnt}{node\_cnt}}
+{\footnotesize\ttfamily uint64\+\_\+t Bucket\+Header\+::node\+\_\+cnt}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+macrobench/storage/index/\hyperlink{index__hash_8h}{index\+\_\+hash.\+h}\end{DoxyCompactItemize}

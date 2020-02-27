@@ -1,0 +1,12 @@
+<map id="common/locks_impl.h" name="common/locks_impl.h">
+<area shape="rect" id="node2" href="$gstats_8h.html" title="common/gstats.h" alt="" coords="5,87,128,114"/>
+<area shape="rect" id="node3" href="$bst__glock__impl_8h.html" title="ds/brown_ext_bst_glock\l/bst_glock_impl.h" alt="" coords="152,80,315,121"/>
+<area shape="rect" id="node5" href="$bst__hohlock__impl_8h.html" title="ds/brown_ext_bst_hohlock\l/bst_hohlock_impl.h" alt="" coords="339,80,517,121"/>
+<area shape="rect" id="node7" href="$bst__hohrwlock__impl_8h.html" title="ds/brown_ext_bst_hohrwlock\l/bst_hohrwlock_impl.h" alt="" coords="541,80,731,121"/>
+<area shape="rect" id="node9" href="$bst__rwlock__impl_8h.html" title="ds/brown_ext_bst_rwlock\l/bst_rwlock_impl.h" alt="" coords="756,80,927,121"/>
+<area shape="rect" id="node11" href="$bst__rwlock_8h.html" title="ds/brown_ext_bst_rwlock\l/bst_rwlock.h" alt="" coords="951,80,1121,121"/>
+<area shape="rect" id="node4" href="$brown__ext__bst__glock_2adapter_8h.html" title="ds/brown_ext_bst_glock\l/adapter.h" alt="" coords="152,169,315,211"/>
+<area shape="rect" id="node6" href="$brown__ext__bst__hohlock_2adapter_8h.html" title="ds/brown_ext_bst_hohlock\l/adapter.h" alt="" coords="339,169,517,211"/>
+<area shape="rect" id="node8" href="$brown__ext__bst__hohrwlock_2adapter_8h.html" title="ds/brown_ext_bst_hohrwlock\l/adapter.h" alt="" coords="541,169,731,211"/>
+<area shape="rect" id="node10" href="$brown__ext__bst__rwlock_2adapter_8h.html" title="ds/brown_ext_bst_rwlock\l/adapter.h" alt="" coords="756,169,927,211"/>
+</map>

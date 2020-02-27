@@ -1,0 +1,118 @@
+\hypertarget{classkcasdesc__t}{}\section{kcasdesc\+\_\+t$<$ M\+A\+X\+\_\+K $>$ Class Template Reference}
+\label{classkcasdesc__t}\index{kcasdesc\+\_\+t$<$ M\+A\+X\+\_\+\+K $>$@{kcasdesc\+\_\+t$<$ M\+A\+X\+\_\+\+K $>$}}
+
+
+{\ttfamily \#include $<$kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h$>$}
+
+
+
+Collaboration diagram for kcasdesc\+\_\+t$<$ M\+A\+X\+\_\+K $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=199pt]{classkcasdesc__t__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classkcasdesc__t_a26f19763934c3b335fcda46d1645095c}{add\+Val\+Addr} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} oldval, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} newval)
+\item 
+void \hyperlink{classkcasdesc__t_a42dbc67de7a757f0d4c8262172994498}{add\+Ptr\+Addr} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} oldval, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} newval)
+\item 
+void \hyperlink{classkcasdesc__t_a26f19763934c3b335fcda46d1645095c}{add\+Val\+Addr} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} oldval, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} newval)
+\item 
+void \hyperlink{classkcasdesc__t_a42dbc67de7a757f0d4c8262172994498}{add\+Ptr\+Addr} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} oldval, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} newval)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+volatile \hyperlink{kcas__reuse__htm__impl_8h_a997daf56279be481f5c4294647725689}{seqbits\+\_\+t} \hyperlink{classkcasdesc__t_aed9ffdbc7a72d10a886e662fb82b26df}{seq\+Bits}
+\item 
+\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} \hyperlink{classkcasdesc__t_a841071a61ea7238f822e1fc644111380}{num\+Entries}
+\item 
+\hyperlink{structkcasentry__t}{kcasentry\+\_\+t} \hyperlink{classkcasdesc__t_adb510f640c081f2550c92f0978d74329}{entries} \mbox{[}M\+A\+X\+\_\+K\mbox{]}
+\item 
+volatile char \hyperlink{classkcasdesc__t_a09eb9afedfaf7a11192802d2e89e68d1}{padding} \mbox{[}128+((64-\/\hyperlink{classkcasdesc__t_a9cace636d1135fde7fb97772e470dbd4}{size}\%64)\%64)\mbox{]}
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const int \hyperlink{classkcasdesc__t_a9cace636d1135fde7fb97772e470dbd4}{size} = sizeof(\hyperlink{classkcasdesc__t_aed9ffdbc7a72d10a886e662fb82b26df}{seq\+Bits})+sizeof(\hyperlink{classkcasdesc__t_a841071a61ea7238f822e1fc644111380}{num\+Entries})+sizeof(\hyperlink{classkcasdesc__t_adb510f640c081f2550c92f0978d74329}{entries})
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classkcasdesc__t_a42dbc67de7a757f0d4c8262172994498}\label{classkcasdesc__t_a42dbc67de7a757f0d4c8262172994498}} 
+\index{kcasdesc\+\_\+t@{kcasdesc\+\_\+t}!add\+Ptr\+Addr@{add\+Ptr\+Addr}}
+\index{add\+Ptr\+Addr@{add\+Ptr\+Addr}!kcasdesc\+\_\+t@{kcasdesc\+\_\+t}}
+\subsubsection{\texorpdfstring{add\+Ptr\+Addr()}{addPtrAddr()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$int M\+A\+X\+\_\+K$>$ \\
+void \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$ M\+A\+X\+\_\+K $>$\+::add\+Ptr\+Addr (\begin{DoxyParamCaption}\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$}]{addr,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}}]{oldval,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}}]{newval }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classkcasdesc__t_a42dbc67de7a757f0d4c8262172994498}\label{classkcasdesc__t_a42dbc67de7a757f0d4c8262172994498}} 
+\index{kcasdesc\+\_\+t@{kcasdesc\+\_\+t}!add\+Ptr\+Addr@{add\+Ptr\+Addr}}
+\index{add\+Ptr\+Addr@{add\+Ptr\+Addr}!kcasdesc\+\_\+t@{kcasdesc\+\_\+t}}
+\subsubsection{\texorpdfstring{add\+Ptr\+Addr()}{addPtrAddr()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$int M\+A\+X\+\_\+K$>$ \\
+void \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$ M\+A\+X\+\_\+K $>$\+::add\+Ptr\+Addr (\begin{DoxyParamCaption}\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$}]{addr,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}}]{oldval,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}}]{newval }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classkcasdesc__t_a26f19763934c3b335fcda46d1645095c}\label{classkcasdesc__t_a26f19763934c3b335fcda46d1645095c}} 
+\index{kcasdesc\+\_\+t@{kcasdesc\+\_\+t}!add\+Val\+Addr@{add\+Val\+Addr}}
+\index{add\+Val\+Addr@{add\+Val\+Addr}!kcasdesc\+\_\+t@{kcasdesc\+\_\+t}}
+\subsubsection{\texorpdfstring{add\+Val\+Addr()}{addValAddr()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$int M\+A\+X\+\_\+K$>$ \\
+void \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$ M\+A\+X\+\_\+K $>$\+::add\+Val\+Addr (\begin{DoxyParamCaption}\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$}]{addr,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}}]{oldval,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}}]{newval }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classkcasdesc__t_a26f19763934c3b335fcda46d1645095c}\label{classkcasdesc__t_a26f19763934c3b335fcda46d1645095c}} 
+\index{kcasdesc\+\_\+t@{kcasdesc\+\_\+t}!add\+Val\+Addr@{add\+Val\+Addr}}
+\index{add\+Val\+Addr@{add\+Val\+Addr}!kcasdesc\+\_\+t@{kcasdesc\+\_\+t}}
+\subsubsection{\texorpdfstring{add\+Val\+Addr()}{addValAddr()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$int M\+A\+X\+\_\+K$>$ \\
+void \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$ M\+A\+X\+\_\+K $>$\+::add\+Val\+Addr (\begin{DoxyParamCaption}\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$}]{addr,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}}]{oldval,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}}]{newval }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classkcasdesc__t_adb510f640c081f2550c92f0978d74329}\label{classkcasdesc__t_adb510f640c081f2550c92f0978d74329}} 
+\index{kcasdesc\+\_\+t@{kcasdesc\+\_\+t}!entries@{entries}}
+\index{entries@{entries}!kcasdesc\+\_\+t@{kcasdesc\+\_\+t}}
+\subsubsection{\texorpdfstring{entries}{entries}}
+{\footnotesize\ttfamily template$<$int M\+A\+X\+\_\+K$>$ \\
+\hyperlink{structkcasentry__t}{kcasentry\+\_\+t} \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$ M\+A\+X\+\_\+K $>$\+::entries}
+
+\mbox{\Hypertarget{classkcasdesc__t_a841071a61ea7238f822e1fc644111380}\label{classkcasdesc__t_a841071a61ea7238f822e1fc644111380}} 
+\index{kcasdesc\+\_\+t@{kcasdesc\+\_\+t}!num\+Entries@{num\+Entries}}
+\index{num\+Entries@{num\+Entries}!kcasdesc\+\_\+t@{kcasdesc\+\_\+t}}
+\subsubsection{\texorpdfstring{num\+Entries}{numEntries}}
+{\footnotesize\ttfamily template$<$int M\+A\+X\+\_\+K$>$ \\
+\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$ M\+A\+X\+\_\+K $>$\+::num\+Entries}
+
+\mbox{\Hypertarget{classkcasdesc__t_a09eb9afedfaf7a11192802d2e89e68d1}\label{classkcasdesc__t_a09eb9afedfaf7a11192802d2e89e68d1}} 
+\index{kcasdesc\+\_\+t@{kcasdesc\+\_\+t}!padding@{padding}}
+\index{padding@{padding}!kcasdesc\+\_\+t@{kcasdesc\+\_\+t}}
+\subsubsection{\texorpdfstring{padding}{padding}}
+{\footnotesize\ttfamily template$<$int M\+A\+X\+\_\+K$>$ \\
+volatile char \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$ M\+A\+X\+\_\+K $>$\+::padding}
+
+\mbox{\Hypertarget{classkcasdesc__t_aed9ffdbc7a72d10a886e662fb82b26df}\label{classkcasdesc__t_aed9ffdbc7a72d10a886e662fb82b26df}} 
+\index{kcasdesc\+\_\+t@{kcasdesc\+\_\+t}!seq\+Bits@{seq\+Bits}}
+\index{seq\+Bits@{seq\+Bits}!kcasdesc\+\_\+t@{kcasdesc\+\_\+t}}
+\subsubsection{\texorpdfstring{seq\+Bits}{seqBits}}
+{\footnotesize\ttfamily template$<$int M\+A\+X\+\_\+K$>$ \\
+volatile \hyperlink{kcas__reuse__htm__impl_8h_a997daf56279be481f5c4294647725689}{seqbits\+\_\+t} \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$ M\+A\+X\+\_\+K $>$\+::seq\+Bits}
+
+\mbox{\Hypertarget{classkcasdesc__t_a9cace636d1135fde7fb97772e470dbd4}\label{classkcasdesc__t_a9cace636d1135fde7fb97772e470dbd4}} 
+\index{kcasdesc\+\_\+t@{kcasdesc\+\_\+t}!size@{size}}
+\index{size@{size}!kcasdesc\+\_\+t@{kcasdesc\+\_\+t}}
+\subsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily template$<$int M\+A\+X\+\_\+K$>$ \\
+static const int \hyperlink{classkcasdesc__t}{kcasdesc\+\_\+t}$<$ M\+A\+X\+\_\+K $>$\+::size = sizeof(\hyperlink{classkcasdesc__t_aed9ffdbc7a72d10a886e662fb82b26df}{seq\+Bits})+sizeof(\hyperlink{classkcasdesc__t_a841071a61ea7238f822e1fc644111380}{num\+Entries})+sizeof(\hyperlink{classkcasdesc__t_adb510f640c081f2550c92f0978d74329}{entries})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+common/kcas/\hyperlink{kcas__reuse__htm__impl_8h}{kcas\+\_\+reuse\+\_\+htm\+\_\+impl.\+h}\item 
+common/kcas/\hyperlink{kcas__reuse__impl_8h}{kcas\+\_\+reuse\+\_\+impl.\+h}\end{DoxyCompactItemize}

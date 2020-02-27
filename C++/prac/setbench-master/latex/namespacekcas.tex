@@ -1,0 +1,96 @@
+\hypertarget{namespacekcas}{}\section{kcas Namespace Reference}
+\label{namespacekcas}\index{kcas@{kcas}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespacekcas_a92e383d96831fa6163a3d562d4a38053}{write\+Init\+Ptr} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} const newval)
+\item 
+void \hyperlink{namespacekcas_abd890f3f111dbd76aba1be89220ea07d}{write\+Init\+Val} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr, \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} const newval)
+\item 
+\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} \hyperlink{namespacekcas_a1f34f966b2243f133f1d936ec1761578}{read\+Ptr} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr)
+\item 
+\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} \hyperlink{namespacekcas_a41e805427c946f9e77ae065c624b2399}{read\+Val} (\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$addr)
+\item 
+bool \hyperlink{namespacekcas_ae51aac13e4c5df1190241ae51968387a}{execute} ()
+\item 
+\hyperlink{kcas__reuse__impl_8h_a5bbc81d391bfd6b4288a0d33f105a0b2}{kcasptr\+\_\+t} \hyperlink{namespacekcas_aa3f3e7af6facd9b5108b3b3fe8e4ed82}{get\+Descriptor} ()
+\item 
+void \hyperlink{namespacekcas_a39af7f008e3b3cb3815045257d15e735}{start} ()
+\item 
+{\footnotesize template$<$typename T $>$ }\\void \hyperlink{namespacekcas_acb0544489e45e08050227ab563d9ee15}{add} (\hyperlink{structcasword}{casword}$<$ T $>$ $\ast$caswordptr, T old\+Val, T new\+Val)
+\item 
+{\footnotesize template$<$typename T , typename... Args$>$ }\\void \hyperlink{namespacekcas_a227f3321961ae92470ed749e94656202}{add} (\hyperlink{structcasword}{casword}$<$ T $>$ $\ast$caswordptr, T old\+Val, T new\+Val, Args... args)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classKCASHTM}{K\+C\+A\+S\+H\+TM}$<$ \hyperlink{skiplist_8h_a17681fc241567944ff9f0c062af6b7bf}{M\+A\+X\+\_\+\+K\+C\+AS} $>$ \hyperlink{namespacekcas_af460e5af7d85e9a87e52d4240e222fb5}{instance}
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{namespacekcas_acb0544489e45e08050227ab563d9ee15}\label{namespacekcas_acb0544489e45e08050227ab563d9ee15}} 
+\index{kcas@{kcas}!add@{add}}
+\index{add@{add}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{add()}{add()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void kcas\+::add (\begin{DoxyParamCaption}\item[{\hyperlink{structcasword}{casword}$<$ T $>$ $\ast$}]{caswordptr,  }\item[{T}]{old\+Val,  }\item[{T}]{new\+Val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacekcas_a227f3321961ae92470ed749e94656202}\label{namespacekcas_a227f3321961ae92470ed749e94656202}} 
+\index{kcas@{kcas}!add@{add}}
+\index{add@{add}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{add()}{add()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename... Args$>$ \\
+void kcas\+::add (\begin{DoxyParamCaption}\item[{\hyperlink{structcasword}{casword}$<$ T $>$ $\ast$}]{caswordptr,  }\item[{T}]{old\+Val,  }\item[{T}]{new\+Val,  }\item[{Args...}]{args }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacekcas_ae51aac13e4c5df1190241ae51968387a}\label{namespacekcas_ae51aac13e4c5df1190241ae51968387a}} 
+\index{kcas@{kcas}!execute@{execute}}
+\index{execute@{execute}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{execute()}{execute()}}
+{\footnotesize\ttfamily bool kcas\+::execute (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacekcas_aa3f3e7af6facd9b5108b3b3fe8e4ed82}\label{namespacekcas_aa3f3e7af6facd9b5108b3b3fe8e4ed82}} 
+\index{kcas@{kcas}!get\+Descriptor@{get\+Descriptor}}
+\index{get\+Descriptor@{get\+Descriptor}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{get\+Descriptor()}{getDescriptor()}}
+{\footnotesize\ttfamily \hyperlink{kcas__reuse__impl_8h_a5bbc81d391bfd6b4288a0d33f105a0b2}{kcasptr\+\_\+t} kcas\+::get\+Descriptor (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacekcas_a1f34f966b2243f133f1d936ec1761578}\label{namespacekcas_a1f34f966b2243f133f1d936ec1761578}} 
+\index{kcas@{kcas}!read\+Ptr@{read\+Ptr}}
+\index{read\+Ptr@{read\+Ptr}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{read\+Ptr()}{readPtr()}}
+{\footnotesize\ttfamily \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} kcas\+::read\+Ptr (\begin{DoxyParamCaption}\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$}]{addr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacekcas_a41e805427c946f9e77ae065c624b2399}\label{namespacekcas_a41e805427c946f9e77ae065c624b2399}} 
+\index{kcas@{kcas}!read\+Val@{read\+Val}}
+\index{read\+Val@{read\+Val}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{read\+Val()}{readVal()}}
+{\footnotesize\ttfamily \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} kcas\+::read\+Val (\begin{DoxyParamCaption}\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$}]{addr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacekcas_a39af7f008e3b3cb3815045257d15e735}\label{namespacekcas_a39af7f008e3b3cb3815045257d15e735}} 
+\index{kcas@{kcas}!start@{start}}
+\index{start@{start}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{start()}{start()}}
+{\footnotesize\ttfamily void kcas\+::start (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacekcas_a92e383d96831fa6163a3d562d4a38053}\label{namespacekcas_a92e383d96831fa6163a3d562d4a38053}} 
+\index{kcas@{kcas}!write\+Init\+Ptr@{write\+Init\+Ptr}}
+\index{write\+Init\+Ptr@{write\+Init\+Ptr}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{write\+Init\+Ptr()}{writeInitPtr()}}
+{\footnotesize\ttfamily void kcas\+::write\+Init\+Ptr (\begin{DoxyParamCaption}\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$}]{addr,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} const}]{newval }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespacekcas_abd890f3f111dbd76aba1be89220ea07d}\label{namespacekcas_abd890f3f111dbd76aba1be89220ea07d}} 
+\index{kcas@{kcas}!write\+Init\+Val@{write\+Init\+Val}}
+\index{write\+Init\+Val@{write\+Init\+Val}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{write\+Init\+Val()}{writeInitVal()}}
+{\footnotesize\ttfamily void kcas\+::write\+Init\+Val (\begin{DoxyParamCaption}\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} volatile $\ast$}]{addr,  }\item[{\hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t} const}]{newval }\end{DoxyParamCaption})}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{namespacekcas_af460e5af7d85e9a87e52d4240e222fb5}\label{namespacekcas_af460e5af7d85e9a87e52d4240e222fb5}} 
+\index{kcas@{kcas}!instance@{instance}}
+\index{instance@{instance}!kcas@{kcas}}
+\subsubsection{\texorpdfstring{instance}{instance}}
+{\footnotesize\ttfamily \hyperlink{classKCASHTM}{K\+C\+A\+S\+H\+TM}$<$\hyperlink{skiplist_8h_a17681fc241567944ff9f0c062af6b7bf}{M\+A\+X\+\_\+\+K\+C\+AS}$>$ kcas\+::instance}
+

@@ -1,0 +1,126 @@
+\hypertarget{rq__rwlock_8h}{}\section{common/rq/rq\+\_\+rwlock.h File Reference}
+\label{rq__rwlock_8h}\index{common/rq/rq\+\_\+rwlock.\+h@{common/rq/rq\+\_\+rwlock.\+h}}
+{\ttfamily \#include \char`\"{}rq\+\_\+debugging.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$hashlist.\+h$>$}\newline
+{\ttfamily \#include $<$rwlock.\+h$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+Include dependency graph for rq\+\_\+rwlock.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{rq__rwlock_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classRQProvider}{R\+Q\+Provider$<$ K, V, Node\+Type, Data\+Structure, Record\+Manager, logical\+Deletion, can\+Retire\+Nodes\+Logically\+Deleted\+By\+Other\+Processes $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{rq__rwlock_8h_a874d4864650d46df09eba7f76091c13e}{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}~8
+\item 
+\#define \hyperlink{rq__rwlock_8h_ac1e51123328c8f7f9492737e2932b7ed}{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}~32
+\item 
+\#define \hyperlink{rq__rwlock_8h_ae650e3f928535ed242b62626f45383b3}{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}~1024
+\item 
+\#define \hyperlink{rq__rwlock_8h_a9329267133c50fa57b21c8520b54e8b4}{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}~0
+\item 
+\#define \hyperlink{rq__rwlock_8h_a285827679aa696a2a624f3b818043f2b}{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2}~(1$<$$<$8)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>struct \{\\
+\>\>long long \hyperlink{rq__rwlock_8h_a643fd1eef8dbd00706b939b113a76394}{rq\_lin\_time}\\
+\>\>\hyperlink{classHashList}{HashList}$<$ K $>$ $\ast$ \hyperlink{rq__rwlock_8h_acbd99802e40e0182f82e51aae72a87b6}{hashlist}\\
+\>\>\hyperlink{rq__rwlock_8h_a5b18afa05738a875043b663fef5ca73e}{PAD}\\
+\>\>void $\ast$ \hyperlink{rq__rwlock_8h_a4b0983b987c306fb6f41d88224455adb}{announcements} \mbox{[}\hyperlink{rq__snapcollector_8h_a874d4864650d46df09eba7f76091c13e}{MAX\_NODES\_DELETED\_ATOMICALLY}+1\mbox{]}\\
+\>\>int \hyperlink{rq__rwlock_8h_a366f32d205b54323a29ca6c04977983e}{numAnnouncements}\\
+\>\} \\
+\>char \hyperlink{rq__rwlock_8h_a635f5365cabd10672254f452bb7bcf0b}{bytes} \mbox{[}\hyperlink{rq__unsafe_8h_ae650e3f928535ed242b62626f45383b3}{\_\_RQ\_THREAD\_DATA\_SIZE}\mbox{]}\\
+\}; \\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{rq__rwlock_8h_ae650e3f928535ed242b62626f45383b3}\label{rq__rwlock_8h_ae650e3f928535ed242b62626f45383b3}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE@{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}}
+\index{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE@{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}{\_\_RQ\_THREAD\_DATA\_SIZE}}
+{\footnotesize\ttfamily \#define \+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE~1024}
+
+\mbox{\Hypertarget{rq__rwlock_8h_a285827679aa696a2a624f3b818043f2b}\label{rq__rwlock_8h_a285827679aa696a2a624f3b818043f2b}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2@{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2}}
+\index{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2@{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2}{HASHLIST\_INIT\_CAPACITY\_POW2}}
+{\footnotesize\ttfamily \#define H\+A\+S\+H\+L\+I\+S\+T\+\_\+\+I\+N\+I\+T\+\_\+\+C\+A\+P\+A\+C\+I\+T\+Y\+\_\+\+P\+O\+W2~(1$<$$<$8)}
+
+\mbox{\Hypertarget{rq__rwlock_8h_ac1e51123328c8f7f9492737e2932b7ed}\label{rq__rwlock_8h_ac1e51123328c8f7f9492737e2932b7ed}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE@{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}}
+\index{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE@{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}{MAX\_KEYS\_PER\_NODE}}
+{\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE~32}
+
+\mbox{\Hypertarget{rq__rwlock_8h_a874d4864650d46df09eba7f76091c13e}\label{rq__rwlock_8h_a874d4864650d46df09eba7f76091c13e}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY@{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}}
+\index{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY@{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}{MAX\_NODES\_DELETED\_ATOMICALLY}}
+{\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY~8}
+
+\mbox{\Hypertarget{rq__rwlock_8h_a9329267133c50fa57b21c8520b54e8b4}\label{rq__rwlock_8h_a9329267133c50fa57b21c8520b54e8b4}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET@{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}}
+\index{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET@{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}{TIMESTAMP\_NOT\_SET}}
+{\footnotesize\ttfamily \#define T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET~0}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{rq__rwlock_8h_a273e1bd4180d3dbbdfc46d4c465c1374}\label{rq__rwlock_8h_a273e1bd4180d3dbbdfc46d4c465c1374}} 
+\subsubsection{\texorpdfstring{"@31}{@31}}
+{\footnotesize\ttfamily union \{ ... \} }
+
+\mbox{\Hypertarget{rq__rwlock_8h_a4b0983b987c306fb6f41d88224455adb}\label{rq__rwlock_8h_a4b0983b987c306fb6f41d88224455adb}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!announcements@{announcements}}
+\index{announcements@{announcements}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{announcements}{announcements}}
+{\footnotesize\ttfamily void$\ast$ announcements\mbox{[}\hyperlink{rq__snapcollector_8h_a874d4864650d46df09eba7f76091c13e}{M\+A\+X\+\_\+\+N\+O\+D\+E\+S\+\_\+\+D\+E\+L\+E\+T\+E\+D\+\_\+\+A\+T\+O\+M\+I\+C\+A\+L\+LY}+1\mbox{]}}
+
+\mbox{\Hypertarget{rq__rwlock_8h_a635f5365cabd10672254f452bb7bcf0b}\label{rq__rwlock_8h_a635f5365cabd10672254f452bb7bcf0b}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!bytes@{bytes}}
+\index{bytes@{bytes}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{bytes}{bytes}}
+{\footnotesize\ttfamily char bytes\mbox{[}\hyperlink{rq__unsafe_8h_ae650e3f928535ed242b62626f45383b3}{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}\mbox{]}}
+
+\mbox{\Hypertarget{rq__rwlock_8h_acbd99802e40e0182f82e51aae72a87b6}\label{rq__rwlock_8h_acbd99802e40e0182f82e51aae72a87b6}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!hashlist@{hashlist}}
+\index{hashlist@{hashlist}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{hashlist}{hashlist}}
+{\footnotesize\ttfamily \hyperlink{classHashList}{Hash\+List}$<$K$>$$\ast$ hashlist}
+
+\mbox{\Hypertarget{rq__rwlock_8h_a366f32d205b54323a29ca6c04977983e}\label{rq__rwlock_8h_a366f32d205b54323a29ca6c04977983e}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!num\+Announcements@{num\+Announcements}}
+\index{num\+Announcements@{num\+Announcements}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{num\+Announcements}{numAnnouncements}}
+{\footnotesize\ttfamily int num\+Announcements}
+
+\mbox{\Hypertarget{rq__rwlock_8h_a5b18afa05738a875043b663fef5ca73e}\label{rq__rwlock_8h_a5b18afa05738a875043b663fef5ca73e}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!P\+AD@{P\+AD}}
+\index{P\+AD@{P\+AD}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{P\+AD}{PAD}}
+{\footnotesize\ttfamily P\+AD}
+
+\mbox{\Hypertarget{rq__rwlock_8h_a643fd1eef8dbd00706b939b113a76394}\label{rq__rwlock_8h_a643fd1eef8dbd00706b939b113a76394}} 
+\index{rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}!rq\+\_\+lin\+\_\+time@{rq\+\_\+lin\+\_\+time}}
+\index{rq\+\_\+lin\+\_\+time@{rq\+\_\+lin\+\_\+time}!rq\+\_\+rwlock.\+h@{rq\+\_\+rwlock.\+h}}
+\subsubsection{\texorpdfstring{rq\+\_\+lin\+\_\+time}{rq\_lin\_time}}
+{\footnotesize\ttfamily long long rq\+\_\+lin\+\_\+time}
+

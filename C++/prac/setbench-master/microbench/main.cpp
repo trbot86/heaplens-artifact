@@ -19,8 +19,6 @@ typedef long long test_type;
 #include <omp.h>
 #include <perftools.h>
 
-#include "memhook.h"
-
 #ifdef PRINT_JEMALLOC_STATS
     #include <jemalloc/jemalloc.h>
     #define DEBUG_PRINT_ARENA_STATS malloc_stats_print(printCallback, NULL, "ag")

@@ -1,0 +1,403 @@
+\hypertarget{global_8cpp}{}\section{macrobench/system/global.cpp File Reference}
+\label{global_8cpp}\index{macrobench/system/global.\+cpp@{macrobench/system/global.\+cpp}}
+{\ttfamily \#include \char`\"{}global.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}mem\+\_\+alloc.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stats.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}dl\+\_\+detect.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}manager.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}query.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}plock.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}occ.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}vll.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include \char`\"{}papi\+\_\+util\+\_\+impl.\+h\char`\"{}}\newline
+Include dependency graph for global.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{global_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+thread int \hyperlink{global_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}{tid} = 0
+\item 
+\hyperlink{classmem__alloc}{mem\+\_\+alloc} \hyperlink{global_8cpp_a4ee569cdb953b518e86d8902ead5c542}{mem\+\_\+allocator}
+\item 
+\hyperlink{classStats}{Stats} \hyperlink{global_8cpp_a5925d216740c89f43482df806fd14e8c}{stats}
+\item 
+\hyperlink{classDL__detect}{D\+L\+\_\+detect} \hyperlink{global_8cpp_a34d8b0302435ffeaa81db758b65c1dd7}{dl\+\_\+detector}
+\item 
+\hyperlink{classManager}{Manager} $\ast$ \hyperlink{global_8cpp_ae6ad432d465d240cf321183b194cec77}{glob\+\_\+manager}
+\item 
+\hyperlink{classQuery__queue}{Query\+\_\+queue} $\ast$ \hyperlink{global_8cpp_a50bf39e2527021308f2222a6b3581c5a}{query\+\_\+queue}
+\item 
+\hyperlink{classPlock}{Plock} \hyperlink{global_8cpp_a3389387744b64ec79515181125bafc21}{part\+\_\+lock\+\_\+man}
+\item 
+\hyperlink{classOptCC}{Opt\+CC} \hyperlink{global_8cpp_a08b0b22e00b889cfbfe6c186d273fdd4}{occ\+\_\+man}
+\item 
+\hyperlink{classVLLMan}{V\+L\+L\+Man} \hyperlink{global_8cpp_a11d5cf613009f8dee1df4d19f609a7ee}{vll\+\_\+man}
+\item 
+bool volatile \hyperlink{global_8cpp_ac67ca3065e0f87d0943ff7548565b06d}{warmup\+\_\+finish} = false
+\item 
+bool volatile \hyperlink{global_8cpp_afdb59ac154837e9dfeef1a8cc3551424}{enable\+\_\+thread\+\_\+mem\+\_\+pool} = false
+\item 
+pthread\+\_\+barrier\+\_\+t \hyperlink{global_8cpp_a3d9e8a0b9e23c1a2433918c527aa8bfc}{warmup\+\_\+bar}
+\item 
+carbon\+\_\+barrier\+\_\+t \hyperlink{global_8cpp_a94dc986e9983f7154ea693936a855b60}{enable\+\_\+barrier}
+\item 
+string \hyperlink{global_8cpp_ae2ca090a7193bb584eae4aa90460c723}{g\+\_\+thr\+\_\+pinning\+\_\+policy} = \char`\"{}\char`\"{}
+\item 
+\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \hyperlink{global_8cpp_a015b3415aa97ec31eff3c289df821cba}{g\+\_\+abort\+\_\+penalty} = \hyperlink{config_8h_a4394093994aceb37a9c60977d2b9b3bc}{A\+B\+O\+R\+T\+\_\+\+P\+E\+N\+A\+L\+TY}
+\item 
+bool \hyperlink{global_8cpp_af83c8280d6d12e7d1f9da9e8518c0f97}{g\+\_\+central\+\_\+man} = \hyperlink{config_8h_aaa4034439e1c0d66788d4500ec50122e}{C\+E\+N\+T\+R\+A\+L\+\_\+\+M\+AN}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a4a58540467a5e70e5707274fd0904073}{g\+\_\+ts\+\_\+alloc} = \hyperlink{config_8h_ad3a777092b505f33132e01e07c1a284f}{T\+S\+\_\+\+A\+L\+L\+OC}
+\item 
+bool \hyperlink{global_8cpp_a4964523436f9391bbf12ab0df1330cb5}{g\+\_\+key\+\_\+order} = \hyperlink{config_8h_aa0fbc35b8b662a6b869f2e44ce7b2bde}{K\+E\+Y\+\_\+\+O\+R\+D\+ER}
+\item 
+bool \hyperlink{global_8cpp_ab26e932736cddf7633e5c2aa157608c3}{g\+\_\+no\+\_\+dl} = \hyperlink{config_8h_a89d14f60f546baa70ff272c6fea8ed1e}{N\+O\+\_\+\+DL}
+\item 
+\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \hyperlink{global_8cpp_a8e7c23f3b0004bb758f68c06eb2bf7b4}{g\+\_\+timeout} = \hyperlink{config_8h_a45ba202b05caf39795aeca91b0ae547e}{T\+I\+M\+E\+O\+UT}
+\item 
+\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \hyperlink{global_8cpp_a0bebe9a361a811512605574c7ef194cd}{g\+\_\+dl\+\_\+loop\+\_\+detect} = \hyperlink{config_8h_ae3cdcf6ee0596c42ff9a95012af807d7}{D\+L\+\_\+\+L\+O\+O\+P\+\_\+\+D\+E\+T\+E\+CT}
+\item 
+bool \hyperlink{global_8cpp_a41ec62b10bde83219d141570999a183b}{g\+\_\+ts\+\_\+batch\+\_\+alloc} = \hyperlink{config_8h_a291fe2205af762b35d481eadc2276519}{T\+S\+\_\+\+B\+A\+T\+C\+H\+\_\+\+A\+L\+L\+OC}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_afe7b56dda5438aa1aaddb1090a3f72ba}{g\+\_\+ts\+\_\+batch\+\_\+num} = \hyperlink{config_8h_a1bb6b9b68c19efd52cf81edb1ca27e6c}{T\+S\+\_\+\+B\+A\+T\+C\+H\+\_\+\+N\+UM}
+\item 
+bool \hyperlink{global_8cpp_a8dffda6e24abfda29b9b5ab25204baaf}{g\+\_\+part\+\_\+alloc} = \hyperlink{config_8h_a0dd4c252fbd6449b7ceb1e54107770d9}{P\+A\+R\+T\+\_\+\+A\+L\+L\+OC}
+\item 
+bool \hyperlink{global_8cpp_a7d6901e189922fb1a6152fd176756165}{g\+\_\+mem\+\_\+pad} = \hyperlink{config_8h_a2e610aada113168d281591174c6d59c5}{M\+E\+M\+\_\+\+P\+AD}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a66373e8843d3f8a93f6213f1be63f79d}{g\+\_\+cc\+\_\+alg} = \hyperlink{config_8h_a93c3cd83f514b422330ae83814683f10}{C\+C\+\_\+\+A\+LG}
+\item 
+\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \hyperlink{global_8cpp_a67fde9a586d5a1cd5496e38b3fece8de}{g\+\_\+query\+\_\+intvl} = \hyperlink{config_8h_ae661e5e7288d892dc1e29b1e1789daf3}{Q\+U\+E\+R\+Y\+\_\+\+I\+N\+T\+VL}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a1cb4e3b8ba07d836819be38d86a581a0}{g\+\_\+part\+\_\+per\+\_\+txn} = \hyperlink{config_8h_a8f3eea6b958cdb1967c984c31d216e0a}{P\+A\+R\+T\+\_\+\+P\+E\+R\+\_\+\+T\+XN}
+\item 
+double \hyperlink{global_8cpp_a8c0af1afeb3cae58fbf984da5aaa8312}{g\+\_\+perc\+\_\+multi\+\_\+part} = \hyperlink{config_8h_a91bd9d13777b7af789bc991222913840}{P\+E\+R\+C\+\_\+\+M\+U\+L\+T\+I\+\_\+\+P\+A\+RT}
+\item 
+double \hyperlink{global_8cpp_aa98d47a3e831b5611bda9e0d650b73f8}{g\+\_\+read\+\_\+perc} = \hyperlink{config_8h_a017dd1d7147efbabda65abceca39e0d8}{R\+E\+A\+D\+\_\+\+P\+E\+RC}
+\item 
+double \hyperlink{global_8cpp_a94aba543b5390f728f5e5a2132ce6cad}{g\+\_\+write\+\_\+perc} = \hyperlink{config_8h_ac638b800d9fd00e676e57ea3d3bcfda1}{W\+R\+I\+T\+E\+\_\+\+P\+E\+RC}
+\item 
+double \hyperlink{global_8cpp_a327d554a06899a7906a6cda0471d4869}{g\+\_\+zipf\+\_\+theta} = \hyperlink{config_8h_a08c50eff33aff018f459cf8e053fb119}{Z\+I\+P\+F\+\_\+\+T\+H\+E\+TA}
+\item 
+bool \hyperlink{global_8cpp_ad33fc44ad58a0c124186de38956de426}{g\+\_\+prt\+\_\+lat\+\_\+distr} = \hyperlink{config_8h_ac49e0a29fc716d376c2cdb9703a81532}{P\+R\+T\+\_\+\+L\+A\+T\+\_\+\+D\+I\+S\+TR}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_ac85bfc0cce3c2cc87a2d2be445a64cfb}{g\+\_\+part\+\_\+cnt} = \hyperlink{config_8h_ab583241f746171215dbc2134262c7bc6}{P\+A\+R\+T\+\_\+\+C\+NT}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a0480db45f0426c3e37e2fd6dc5fae30c}{g\+\_\+virtual\+\_\+part\+\_\+cnt} = \hyperlink{config_8h_a43dab00ac48747d01d881d1f0697f259}{V\+I\+R\+T\+U\+A\+L\+\_\+\+P\+A\+R\+T\+\_\+\+C\+NT}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a5cc6e19295c09faead416fb263e1a317}{g\+\_\+thread\+\_\+cnt} = \hyperlink{config_8h_a5c68205d96e223406f17a87c6bb150dd}{T\+H\+R\+E\+A\+D\+\_\+\+C\+NT}
+\item 
+\hyperlink{global_8h_aa288382a207683aa38aca516f6edd66d}{U\+Int64} \hyperlink{global_8cpp_aa099fb322b0541babb942082e11916b2}{g\+\_\+synth\+\_\+table\+\_\+size} = \hyperlink{config_8h_ade31af91f7c549e54f6731a89ec1b2bf}{S\+Y\+N\+T\+H\+\_\+\+T\+A\+B\+L\+E\+\_\+\+S\+I\+ZE}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a4f9894c1a14deba3ded3dc3b79acd57b}{g\+\_\+req\+\_\+per\+\_\+query} = \hyperlink{config_8h_ae988ea1e3424fee472a8bc6cd2e076c6}{R\+E\+Q\+\_\+\+P\+E\+R\+\_\+\+Q\+U\+E\+RY}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a6141fa4bc70ceab40ae012f53644f605}{g\+\_\+field\+\_\+per\+\_\+tuple} = \hyperlink{config_8h_a19a268812e9ac6ee2f292cb72ed45230}{F\+I\+E\+L\+D\+\_\+\+P\+E\+R\+\_\+\+T\+U\+P\+LE}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a16cfb4646852ba1cd802abd24471f6fe}{g\+\_\+init\+\_\+parallelism} = \hyperlink{config_8h_ae0b210f0d3e912636e12f713d3f8b110}{I\+N\+I\+T\+\_\+\+P\+A\+R\+A\+L\+L\+E\+L\+I\+SM}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_adf8f5eae819c5db4241fd38b4de8dff7}{g\+\_\+num\+\_\+wh} = \hyperlink{config_8h_a32b99d172508acdf7b0029539fe51fd1}{N\+U\+M\+\_\+\+WH}
+\item 
+double \hyperlink{global_8cpp_a501dd9637cd70449681b5d5cb9a16dcd}{g\+\_\+perc\+\_\+payment} = \hyperlink{config_8h_afeb65f5b49aedd4c6d4b5500a240306e}{P\+E\+R\+C\+\_\+\+P\+A\+Y\+M\+E\+NT}
+\item 
+bool \hyperlink{global_8cpp_a1029101cba9111a80e85537fe5a7fac6}{g\+\_\+wh\+\_\+update} = \hyperlink{config_8h_a52c95e43cd63bd4c4d775a7b4a560e26}{W\+H\+\_\+\+U\+P\+D\+A\+TE}
+\item 
+char $\ast$ \hyperlink{global_8cpp_a4d59733effad59b54bbd4e5d6016c538}{output\+\_\+file} = N\+U\+LL
+\item 
+map$<$ string, string $>$ \hyperlink{global_8cpp_a13a235f73c1883b2a698c424d7acf93d}{g\+\_\+params}
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a3f4c3b01376fdb148fff92830fe0efb0}{g\+\_\+max\+\_\+items} = 100000
+\item 
+\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} \hyperlink{global_8cpp_a1eb04b671d6a32a6c2b6a25a77b4af57}{g\+\_\+cust\+\_\+per\+\_\+dist} = 3000
+\end{DoxyCompactItemize}
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{global_8cpp_a34d8b0302435ffeaa81db758b65c1dd7}\label{global_8cpp_a34d8b0302435ffeaa81db758b65c1dd7}} 
+\index{global.\+cpp@{global.\+cpp}!dl\+\_\+detector@{dl\+\_\+detector}}
+\index{dl\+\_\+detector@{dl\+\_\+detector}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{dl\+\_\+detector}{dl\_detector}}
+{\footnotesize\ttfamily \hyperlink{classDL__detect}{D\+L\+\_\+detect} dl\+\_\+detector}
+
+\mbox{\Hypertarget{global_8cpp_a94dc986e9983f7154ea693936a855b60}\label{global_8cpp_a94dc986e9983f7154ea693936a855b60}} 
+\index{global.\+cpp@{global.\+cpp}!enable\+\_\+barrier@{enable\+\_\+barrier}}
+\index{enable\+\_\+barrier@{enable\+\_\+barrier}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{enable\+\_\+barrier}{enable\_barrier}}
+{\footnotesize\ttfamily carbon\+\_\+barrier\+\_\+t enable\+\_\+barrier}
+
+\mbox{\Hypertarget{global_8cpp_afdb59ac154837e9dfeef1a8cc3551424}\label{global_8cpp_afdb59ac154837e9dfeef1a8cc3551424}} 
+\index{global.\+cpp@{global.\+cpp}!enable\+\_\+thread\+\_\+mem\+\_\+pool@{enable\+\_\+thread\+\_\+mem\+\_\+pool}}
+\index{enable\+\_\+thread\+\_\+mem\+\_\+pool@{enable\+\_\+thread\+\_\+mem\+\_\+pool}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{enable\+\_\+thread\+\_\+mem\+\_\+pool}{enable\_thread\_mem\_pool}}
+{\footnotesize\ttfamily bool volatile enable\+\_\+thread\+\_\+mem\+\_\+pool = false}
+
+\mbox{\Hypertarget{global_8cpp_a015b3415aa97ec31eff3c289df821cba}\label{global_8cpp_a015b3415aa97ec31eff3c289df821cba}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+abort\+\_\+penalty@{g\+\_\+abort\+\_\+penalty}}
+\index{g\+\_\+abort\+\_\+penalty@{g\+\_\+abort\+\_\+penalty}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+abort\+\_\+penalty}{g\_abort\_penalty}}
+{\footnotesize\ttfamily \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} g\+\_\+abort\+\_\+penalty = \hyperlink{config_8h_a4394093994aceb37a9c60977d2b9b3bc}{A\+B\+O\+R\+T\+\_\+\+P\+E\+N\+A\+L\+TY}}
+
+\mbox{\Hypertarget{global_8cpp_a66373e8843d3f8a93f6213f1be63f79d}\label{global_8cpp_a66373e8843d3f8a93f6213f1be63f79d}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+cc\+\_\+alg@{g\+\_\+cc\+\_\+alg}}
+\index{g\+\_\+cc\+\_\+alg@{g\+\_\+cc\+\_\+alg}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+cc\+\_\+alg}{g\_cc\_alg}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+cc\+\_\+alg = \hyperlink{config_8h_a93c3cd83f514b422330ae83814683f10}{C\+C\+\_\+\+A\+LG}}
+
+\mbox{\Hypertarget{global_8cpp_af83c8280d6d12e7d1f9da9e8518c0f97}\label{global_8cpp_af83c8280d6d12e7d1f9da9e8518c0f97}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+central\+\_\+man@{g\+\_\+central\+\_\+man}}
+\index{g\+\_\+central\+\_\+man@{g\+\_\+central\+\_\+man}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+central\+\_\+man}{g\_central\_man}}
+{\footnotesize\ttfamily bool g\+\_\+central\+\_\+man = \hyperlink{config_8h_aaa4034439e1c0d66788d4500ec50122e}{C\+E\+N\+T\+R\+A\+L\+\_\+\+M\+AN}}
+
+\mbox{\Hypertarget{global_8cpp_a1eb04b671d6a32a6c2b6a25a77b4af57}\label{global_8cpp_a1eb04b671d6a32a6c2b6a25a77b4af57}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+cust\+\_\+per\+\_\+dist@{g\+\_\+cust\+\_\+per\+\_\+dist}}
+\index{g\+\_\+cust\+\_\+per\+\_\+dist@{g\+\_\+cust\+\_\+per\+\_\+dist}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+cust\+\_\+per\+\_\+dist}{g\_cust\_per\_dist}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+cust\+\_\+per\+\_\+dist = 3000}
+
+\mbox{\Hypertarget{global_8cpp_a0bebe9a361a811512605574c7ef194cd}\label{global_8cpp_a0bebe9a361a811512605574c7ef194cd}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+dl\+\_\+loop\+\_\+detect@{g\+\_\+dl\+\_\+loop\+\_\+detect}}
+\index{g\+\_\+dl\+\_\+loop\+\_\+detect@{g\+\_\+dl\+\_\+loop\+\_\+detect}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+dl\+\_\+loop\+\_\+detect}{g\_dl\_loop\_detect}}
+{\footnotesize\ttfamily \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} g\+\_\+dl\+\_\+loop\+\_\+detect = \hyperlink{config_8h_ae3cdcf6ee0596c42ff9a95012af807d7}{D\+L\+\_\+\+L\+O\+O\+P\+\_\+\+D\+E\+T\+E\+CT}}
+
+\mbox{\Hypertarget{global_8cpp_a6141fa4bc70ceab40ae012f53644f605}\label{global_8cpp_a6141fa4bc70ceab40ae012f53644f605}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+field\+\_\+per\+\_\+tuple@{g\+\_\+field\+\_\+per\+\_\+tuple}}
+\index{g\+\_\+field\+\_\+per\+\_\+tuple@{g\+\_\+field\+\_\+per\+\_\+tuple}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+field\+\_\+per\+\_\+tuple}{g\_field\_per\_tuple}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+field\+\_\+per\+\_\+tuple = \hyperlink{config_8h_a19a268812e9ac6ee2f292cb72ed45230}{F\+I\+E\+L\+D\+\_\+\+P\+E\+R\+\_\+\+T\+U\+P\+LE}}
+
+\mbox{\Hypertarget{global_8cpp_a16cfb4646852ba1cd802abd24471f6fe}\label{global_8cpp_a16cfb4646852ba1cd802abd24471f6fe}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+init\+\_\+parallelism@{g\+\_\+init\+\_\+parallelism}}
+\index{g\+\_\+init\+\_\+parallelism@{g\+\_\+init\+\_\+parallelism}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+init\+\_\+parallelism}{g\_init\_parallelism}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+init\+\_\+parallelism = \hyperlink{config_8h_ae0b210f0d3e912636e12f713d3f8b110}{I\+N\+I\+T\+\_\+\+P\+A\+R\+A\+L\+L\+E\+L\+I\+SM}}
+
+\mbox{\Hypertarget{global_8cpp_a4964523436f9391bbf12ab0df1330cb5}\label{global_8cpp_a4964523436f9391bbf12ab0df1330cb5}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+key\+\_\+order@{g\+\_\+key\+\_\+order}}
+\index{g\+\_\+key\+\_\+order@{g\+\_\+key\+\_\+order}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+key\+\_\+order}{g\_key\_order}}
+{\footnotesize\ttfamily bool g\+\_\+key\+\_\+order = \hyperlink{config_8h_aa0fbc35b8b662a6b869f2e44ce7b2bde}{K\+E\+Y\+\_\+\+O\+R\+D\+ER}}
+
+\mbox{\Hypertarget{global_8cpp_a3f4c3b01376fdb148fff92830fe0efb0}\label{global_8cpp_a3f4c3b01376fdb148fff92830fe0efb0}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+max\+\_\+items@{g\+\_\+max\+\_\+items}}
+\index{g\+\_\+max\+\_\+items@{g\+\_\+max\+\_\+items}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+max\+\_\+items}{g\_max\_items}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+max\+\_\+items = 100000}
+
+\mbox{\Hypertarget{global_8cpp_a7d6901e189922fb1a6152fd176756165}\label{global_8cpp_a7d6901e189922fb1a6152fd176756165}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+mem\+\_\+pad@{g\+\_\+mem\+\_\+pad}}
+\index{g\+\_\+mem\+\_\+pad@{g\+\_\+mem\+\_\+pad}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+mem\+\_\+pad}{g\_mem\_pad}}
+{\footnotesize\ttfamily bool g\+\_\+mem\+\_\+pad = \hyperlink{config_8h_a2e610aada113168d281591174c6d59c5}{M\+E\+M\+\_\+\+P\+AD}}
+
+\mbox{\Hypertarget{global_8cpp_ab26e932736cddf7633e5c2aa157608c3}\label{global_8cpp_ab26e932736cddf7633e5c2aa157608c3}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+no\+\_\+dl@{g\+\_\+no\+\_\+dl}}
+\index{g\+\_\+no\+\_\+dl@{g\+\_\+no\+\_\+dl}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+no\+\_\+dl}{g\_no\_dl}}
+{\footnotesize\ttfamily bool g\+\_\+no\+\_\+dl = \hyperlink{config_8h_a89d14f60f546baa70ff272c6fea8ed1e}{N\+O\+\_\+\+DL}}
+
+\mbox{\Hypertarget{global_8cpp_adf8f5eae819c5db4241fd38b4de8dff7}\label{global_8cpp_adf8f5eae819c5db4241fd38b4de8dff7}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+num\+\_\+wh@{g\+\_\+num\+\_\+wh}}
+\index{g\+\_\+num\+\_\+wh@{g\+\_\+num\+\_\+wh}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+num\+\_\+wh}{g\_num\_wh}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+num\+\_\+wh = \hyperlink{config_8h_a32b99d172508acdf7b0029539fe51fd1}{N\+U\+M\+\_\+\+WH}}
+
+\mbox{\Hypertarget{global_8cpp_a13a235f73c1883b2a698c424d7acf93d}\label{global_8cpp_a13a235f73c1883b2a698c424d7acf93d}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+params@{g\+\_\+params}}
+\index{g\+\_\+params@{g\+\_\+params}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+params}{g\_params}}
+{\footnotesize\ttfamily map$<$string, string$>$ g\+\_\+params}
+
+\mbox{\Hypertarget{global_8cpp_a8dffda6e24abfda29b9b5ab25204baaf}\label{global_8cpp_a8dffda6e24abfda29b9b5ab25204baaf}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+part\+\_\+alloc@{g\+\_\+part\+\_\+alloc}}
+\index{g\+\_\+part\+\_\+alloc@{g\+\_\+part\+\_\+alloc}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+part\+\_\+alloc}{g\_part\_alloc}}
+{\footnotesize\ttfamily bool g\+\_\+part\+\_\+alloc = \hyperlink{config_8h_a0dd4c252fbd6449b7ceb1e54107770d9}{P\+A\+R\+T\+\_\+\+A\+L\+L\+OC}}
+
+\mbox{\Hypertarget{global_8cpp_ac85bfc0cce3c2cc87a2d2be445a64cfb}\label{global_8cpp_ac85bfc0cce3c2cc87a2d2be445a64cfb}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+part\+\_\+cnt@{g\+\_\+part\+\_\+cnt}}
+\index{g\+\_\+part\+\_\+cnt@{g\+\_\+part\+\_\+cnt}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+part\+\_\+cnt}{g\_part\_cnt}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+part\+\_\+cnt = \hyperlink{config_8h_ab583241f746171215dbc2134262c7bc6}{P\+A\+R\+T\+\_\+\+C\+NT}}
+
+\mbox{\Hypertarget{global_8cpp_a1cb4e3b8ba07d836819be38d86a581a0}\label{global_8cpp_a1cb4e3b8ba07d836819be38d86a581a0}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+part\+\_\+per\+\_\+txn@{g\+\_\+part\+\_\+per\+\_\+txn}}
+\index{g\+\_\+part\+\_\+per\+\_\+txn@{g\+\_\+part\+\_\+per\+\_\+txn}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+part\+\_\+per\+\_\+txn}{g\_part\_per\_txn}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+part\+\_\+per\+\_\+txn = \hyperlink{config_8h_a8f3eea6b958cdb1967c984c31d216e0a}{P\+A\+R\+T\+\_\+\+P\+E\+R\+\_\+\+T\+XN}}
+
+\mbox{\Hypertarget{global_8cpp_a8c0af1afeb3cae58fbf984da5aaa8312}\label{global_8cpp_a8c0af1afeb3cae58fbf984da5aaa8312}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+perc\+\_\+multi\+\_\+part@{g\+\_\+perc\+\_\+multi\+\_\+part}}
+\index{g\+\_\+perc\+\_\+multi\+\_\+part@{g\+\_\+perc\+\_\+multi\+\_\+part}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+perc\+\_\+multi\+\_\+part}{g\_perc\_multi\_part}}
+{\footnotesize\ttfamily double g\+\_\+perc\+\_\+multi\+\_\+part = \hyperlink{config_8h_a91bd9d13777b7af789bc991222913840}{P\+E\+R\+C\+\_\+\+M\+U\+L\+T\+I\+\_\+\+P\+A\+RT}}
+
+\mbox{\Hypertarget{global_8cpp_a501dd9637cd70449681b5d5cb9a16dcd}\label{global_8cpp_a501dd9637cd70449681b5d5cb9a16dcd}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+perc\+\_\+payment@{g\+\_\+perc\+\_\+payment}}
+\index{g\+\_\+perc\+\_\+payment@{g\+\_\+perc\+\_\+payment}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+perc\+\_\+payment}{g\_perc\_payment}}
+{\footnotesize\ttfamily double g\+\_\+perc\+\_\+payment = \hyperlink{config_8h_afeb65f5b49aedd4c6d4b5500a240306e}{P\+E\+R\+C\+\_\+\+P\+A\+Y\+M\+E\+NT}}
+
+\mbox{\Hypertarget{global_8cpp_ad33fc44ad58a0c124186de38956de426}\label{global_8cpp_ad33fc44ad58a0c124186de38956de426}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+prt\+\_\+lat\+\_\+distr@{g\+\_\+prt\+\_\+lat\+\_\+distr}}
+\index{g\+\_\+prt\+\_\+lat\+\_\+distr@{g\+\_\+prt\+\_\+lat\+\_\+distr}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+prt\+\_\+lat\+\_\+distr}{g\_prt\_lat\_distr}}
+{\footnotesize\ttfamily bool g\+\_\+prt\+\_\+lat\+\_\+distr = \hyperlink{config_8h_ac49e0a29fc716d376c2cdb9703a81532}{P\+R\+T\+\_\+\+L\+A\+T\+\_\+\+D\+I\+S\+TR}}
+
+\mbox{\Hypertarget{global_8cpp_a67fde9a586d5a1cd5496e38b3fece8de}\label{global_8cpp_a67fde9a586d5a1cd5496e38b3fece8de}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+query\+\_\+intvl@{g\+\_\+query\+\_\+intvl}}
+\index{g\+\_\+query\+\_\+intvl@{g\+\_\+query\+\_\+intvl}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+query\+\_\+intvl}{g\_query\_intvl}}
+{\footnotesize\ttfamily \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} g\+\_\+query\+\_\+intvl = \hyperlink{config_8h_ae661e5e7288d892dc1e29b1e1789daf3}{Q\+U\+E\+R\+Y\+\_\+\+I\+N\+T\+VL}}
+
+\mbox{\Hypertarget{global_8cpp_aa98d47a3e831b5611bda9e0d650b73f8}\label{global_8cpp_aa98d47a3e831b5611bda9e0d650b73f8}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+read\+\_\+perc@{g\+\_\+read\+\_\+perc}}
+\index{g\+\_\+read\+\_\+perc@{g\+\_\+read\+\_\+perc}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+read\+\_\+perc}{g\_read\_perc}}
+{\footnotesize\ttfamily double g\+\_\+read\+\_\+perc = \hyperlink{config_8h_a017dd1d7147efbabda65abceca39e0d8}{R\+E\+A\+D\+\_\+\+P\+E\+RC}}
+
+\mbox{\Hypertarget{global_8cpp_a4f9894c1a14deba3ded3dc3b79acd57b}\label{global_8cpp_a4f9894c1a14deba3ded3dc3b79acd57b}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+req\+\_\+per\+\_\+query@{g\+\_\+req\+\_\+per\+\_\+query}}
+\index{g\+\_\+req\+\_\+per\+\_\+query@{g\+\_\+req\+\_\+per\+\_\+query}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+req\+\_\+per\+\_\+query}{g\_req\_per\_query}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+req\+\_\+per\+\_\+query = \hyperlink{config_8h_ae988ea1e3424fee472a8bc6cd2e076c6}{R\+E\+Q\+\_\+\+P\+E\+R\+\_\+\+Q\+U\+E\+RY}}
+
+\mbox{\Hypertarget{global_8cpp_aa099fb322b0541babb942082e11916b2}\label{global_8cpp_aa099fb322b0541babb942082e11916b2}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+synth\+\_\+table\+\_\+size@{g\+\_\+synth\+\_\+table\+\_\+size}}
+\index{g\+\_\+synth\+\_\+table\+\_\+size@{g\+\_\+synth\+\_\+table\+\_\+size}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+synth\+\_\+table\+\_\+size}{g\_synth\_table\_size}}
+{\footnotesize\ttfamily \hyperlink{global_8h_aa288382a207683aa38aca516f6edd66d}{U\+Int64} g\+\_\+synth\+\_\+table\+\_\+size = \hyperlink{config_8h_ade31af91f7c549e54f6731a89ec1b2bf}{S\+Y\+N\+T\+H\+\_\+\+T\+A\+B\+L\+E\+\_\+\+S\+I\+ZE}}
+
+\mbox{\Hypertarget{global_8cpp_ae2ca090a7193bb584eae4aa90460c723}\label{global_8cpp_ae2ca090a7193bb584eae4aa90460c723}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+thr\+\_\+pinning\+\_\+policy@{g\+\_\+thr\+\_\+pinning\+\_\+policy}}
+\index{g\+\_\+thr\+\_\+pinning\+\_\+policy@{g\+\_\+thr\+\_\+pinning\+\_\+policy}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+thr\+\_\+pinning\+\_\+policy}{g\_thr\_pinning\_policy}}
+{\footnotesize\ttfamily string g\+\_\+thr\+\_\+pinning\+\_\+policy = \char`\"{}\char`\"{}}
+
+\mbox{\Hypertarget{global_8cpp_a5cc6e19295c09faead416fb263e1a317}\label{global_8cpp_a5cc6e19295c09faead416fb263e1a317}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+thread\+\_\+cnt@{g\+\_\+thread\+\_\+cnt}}
+\index{g\+\_\+thread\+\_\+cnt@{g\+\_\+thread\+\_\+cnt}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+thread\+\_\+cnt}{g\_thread\_cnt}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+thread\+\_\+cnt = \hyperlink{config_8h_a5c68205d96e223406f17a87c6bb150dd}{T\+H\+R\+E\+A\+D\+\_\+\+C\+NT}}
+
+\mbox{\Hypertarget{global_8cpp_a8e7c23f3b0004bb758f68c06eb2bf7b4}\label{global_8cpp_a8e7c23f3b0004bb758f68c06eb2bf7b4}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+timeout@{g\+\_\+timeout}}
+\index{g\+\_\+timeout@{g\+\_\+timeout}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+timeout}{g\_timeout}}
+{\footnotesize\ttfamily \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} g\+\_\+timeout = \hyperlink{config_8h_a45ba202b05caf39795aeca91b0ae547e}{T\+I\+M\+E\+O\+UT}}
+
+\mbox{\Hypertarget{global_8cpp_a4a58540467a5e70e5707274fd0904073}\label{global_8cpp_a4a58540467a5e70e5707274fd0904073}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+ts\+\_\+alloc@{g\+\_\+ts\+\_\+alloc}}
+\index{g\+\_\+ts\+\_\+alloc@{g\+\_\+ts\+\_\+alloc}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+ts\+\_\+alloc}{g\_ts\_alloc}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+ts\+\_\+alloc = \hyperlink{config_8h_ad3a777092b505f33132e01e07c1a284f}{T\+S\+\_\+\+A\+L\+L\+OC}}
+
+\mbox{\Hypertarget{global_8cpp_a41ec62b10bde83219d141570999a183b}\label{global_8cpp_a41ec62b10bde83219d141570999a183b}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+ts\+\_\+batch\+\_\+alloc@{g\+\_\+ts\+\_\+batch\+\_\+alloc}}
+\index{g\+\_\+ts\+\_\+batch\+\_\+alloc@{g\+\_\+ts\+\_\+batch\+\_\+alloc}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+ts\+\_\+batch\+\_\+alloc}{g\_ts\_batch\_alloc}}
+{\footnotesize\ttfamily bool g\+\_\+ts\+\_\+batch\+\_\+alloc = \hyperlink{config_8h_a291fe2205af762b35d481eadc2276519}{T\+S\+\_\+\+B\+A\+T\+C\+H\+\_\+\+A\+L\+L\+OC}}
+
+\mbox{\Hypertarget{global_8cpp_afe7b56dda5438aa1aaddb1090a3f72ba}\label{global_8cpp_afe7b56dda5438aa1aaddb1090a3f72ba}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+ts\+\_\+batch\+\_\+num@{g\+\_\+ts\+\_\+batch\+\_\+num}}
+\index{g\+\_\+ts\+\_\+batch\+\_\+num@{g\+\_\+ts\+\_\+batch\+\_\+num}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+ts\+\_\+batch\+\_\+num}{g\_ts\_batch\_num}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+ts\+\_\+batch\+\_\+num = \hyperlink{config_8h_a1bb6b9b68c19efd52cf81edb1ca27e6c}{T\+S\+\_\+\+B\+A\+T\+C\+H\+\_\+\+N\+UM}}
+
+\mbox{\Hypertarget{global_8cpp_a0480db45f0426c3e37e2fd6dc5fae30c}\label{global_8cpp_a0480db45f0426c3e37e2fd6dc5fae30c}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+virtual\+\_\+part\+\_\+cnt@{g\+\_\+virtual\+\_\+part\+\_\+cnt}}
+\index{g\+\_\+virtual\+\_\+part\+\_\+cnt@{g\+\_\+virtual\+\_\+part\+\_\+cnt}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+virtual\+\_\+part\+\_\+cnt}{g\_virtual\_part\_cnt}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32} g\+\_\+virtual\+\_\+part\+\_\+cnt = \hyperlink{config_8h_a43dab00ac48747d01d881d1f0697f259}{V\+I\+R\+T\+U\+A\+L\+\_\+\+P\+A\+R\+T\+\_\+\+C\+NT}}
+
+\mbox{\Hypertarget{global_8cpp_a1029101cba9111a80e85537fe5a7fac6}\label{global_8cpp_a1029101cba9111a80e85537fe5a7fac6}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+wh\+\_\+update@{g\+\_\+wh\+\_\+update}}
+\index{g\+\_\+wh\+\_\+update@{g\+\_\+wh\+\_\+update}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+wh\+\_\+update}{g\_wh\_update}}
+{\footnotesize\ttfamily bool g\+\_\+wh\+\_\+update = \hyperlink{config_8h_a52c95e43cd63bd4c4d775a7b4a560e26}{W\+H\+\_\+\+U\+P\+D\+A\+TE}}
+
+\mbox{\Hypertarget{global_8cpp_a94aba543b5390f728f5e5a2132ce6cad}\label{global_8cpp_a94aba543b5390f728f5e5a2132ce6cad}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+write\+\_\+perc@{g\+\_\+write\+\_\+perc}}
+\index{g\+\_\+write\+\_\+perc@{g\+\_\+write\+\_\+perc}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+write\+\_\+perc}{g\_write\_perc}}
+{\footnotesize\ttfamily double g\+\_\+write\+\_\+perc = \hyperlink{config_8h_ac638b800d9fd00e676e57ea3d3bcfda1}{W\+R\+I\+T\+E\+\_\+\+P\+E\+RC}}
+
+\mbox{\Hypertarget{global_8cpp_a327d554a06899a7906a6cda0471d4869}\label{global_8cpp_a327d554a06899a7906a6cda0471d4869}} 
+\index{global.\+cpp@{global.\+cpp}!g\+\_\+zipf\+\_\+theta@{g\+\_\+zipf\+\_\+theta}}
+\index{g\+\_\+zipf\+\_\+theta@{g\+\_\+zipf\+\_\+theta}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{g\+\_\+zipf\+\_\+theta}{g\_zipf\_theta}}
+{\footnotesize\ttfamily double g\+\_\+zipf\+\_\+theta = \hyperlink{config_8h_a08c50eff33aff018f459cf8e053fb119}{Z\+I\+P\+F\+\_\+\+T\+H\+E\+TA}}
+
+\mbox{\Hypertarget{global_8cpp_ae6ad432d465d240cf321183b194cec77}\label{global_8cpp_ae6ad432d465d240cf321183b194cec77}} 
+\index{global.\+cpp@{global.\+cpp}!glob\+\_\+manager@{glob\+\_\+manager}}
+\index{glob\+\_\+manager@{glob\+\_\+manager}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{glob\+\_\+manager}{glob\_manager}}
+{\footnotesize\ttfamily \hyperlink{classManager}{Manager}$\ast$ glob\+\_\+manager}
+
+\mbox{\Hypertarget{global_8cpp_a4ee569cdb953b518e86d8902ead5c542}\label{global_8cpp_a4ee569cdb953b518e86d8902ead5c542}} 
+\index{global.\+cpp@{global.\+cpp}!mem\+\_\+allocator@{mem\+\_\+allocator}}
+\index{mem\+\_\+allocator@{mem\+\_\+allocator}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{mem\+\_\+allocator}{mem\_allocator}}
+{\footnotesize\ttfamily \hyperlink{classmem__alloc}{mem\+\_\+alloc} mem\+\_\+allocator}
+
+\mbox{\Hypertarget{global_8cpp_a08b0b22e00b889cfbfe6c186d273fdd4}\label{global_8cpp_a08b0b22e00b889cfbfe6c186d273fdd4}} 
+\index{global.\+cpp@{global.\+cpp}!occ\+\_\+man@{occ\+\_\+man}}
+\index{occ\+\_\+man@{occ\+\_\+man}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{occ\+\_\+man}{occ\_man}}
+{\footnotesize\ttfamily \hyperlink{classOptCC}{Opt\+CC} occ\+\_\+man}
+
+\mbox{\Hypertarget{global_8cpp_a4d59733effad59b54bbd4e5d6016c538}\label{global_8cpp_a4d59733effad59b54bbd4e5d6016c538}} 
+\index{global.\+cpp@{global.\+cpp}!output\+\_\+file@{output\+\_\+file}}
+\index{output\+\_\+file@{output\+\_\+file}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{output\+\_\+file}{output\_file}}
+{\footnotesize\ttfamily char$\ast$ output\+\_\+file = N\+U\+LL}
+
+\mbox{\Hypertarget{global_8cpp_a3389387744b64ec79515181125bafc21}\label{global_8cpp_a3389387744b64ec79515181125bafc21}} 
+\index{global.\+cpp@{global.\+cpp}!part\+\_\+lock\+\_\+man@{part\+\_\+lock\+\_\+man}}
+\index{part\+\_\+lock\+\_\+man@{part\+\_\+lock\+\_\+man}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{part\+\_\+lock\+\_\+man}{part\_lock\_man}}
+{\footnotesize\ttfamily \hyperlink{classPlock}{Plock} part\+\_\+lock\+\_\+man}
+
+\mbox{\Hypertarget{global_8cpp_a50bf39e2527021308f2222a6b3581c5a}\label{global_8cpp_a50bf39e2527021308f2222a6b3581c5a}} 
+\index{global.\+cpp@{global.\+cpp}!query\+\_\+queue@{query\+\_\+queue}}
+\index{query\+\_\+queue@{query\+\_\+queue}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{query\+\_\+queue}{query\_queue}}
+{\footnotesize\ttfamily \hyperlink{classQuery__queue}{Query\+\_\+queue}$\ast$ query\+\_\+queue}
+
+\mbox{\Hypertarget{global_8cpp_a5925d216740c89f43482df806fd14e8c}\label{global_8cpp_a5925d216740c89f43482df806fd14e8c}} 
+\index{global.\+cpp@{global.\+cpp}!stats@{stats}}
+\index{stats@{stats}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{stats}{stats}}
+{\footnotesize\ttfamily \hyperlink{classStats}{Stats} stats}
+
+\mbox{\Hypertarget{global_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}\label{global_8cpp_a9ca9869868fe7e7a38a921cc7de4103f}} 
+\index{global.\+cpp@{global.\+cpp}!tid@{tid}}
+\index{tid@{tid}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{tid}{tid}}
+{\footnotesize\ttfamily \+\_\+\+\_\+thread int tid = 0}
+
+\mbox{\Hypertarget{global_8cpp_a11d5cf613009f8dee1df4d19f609a7ee}\label{global_8cpp_a11d5cf613009f8dee1df4d19f609a7ee}} 
+\index{global.\+cpp@{global.\+cpp}!vll\+\_\+man@{vll\+\_\+man}}
+\index{vll\+\_\+man@{vll\+\_\+man}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{vll\+\_\+man}{vll\_man}}
+{\footnotesize\ttfamily \hyperlink{classVLLMan}{V\+L\+L\+Man} vll\+\_\+man}
+
+\mbox{\Hypertarget{global_8cpp_a3d9e8a0b9e23c1a2433918c527aa8bfc}\label{global_8cpp_a3d9e8a0b9e23c1a2433918c527aa8bfc}} 
+\index{global.\+cpp@{global.\+cpp}!warmup\+\_\+bar@{warmup\+\_\+bar}}
+\index{warmup\+\_\+bar@{warmup\+\_\+bar}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{warmup\+\_\+bar}{warmup\_bar}}
+{\footnotesize\ttfamily pthread\+\_\+barrier\+\_\+t warmup\+\_\+bar}
+
+\mbox{\Hypertarget{global_8cpp_ac67ca3065e0f87d0943ff7548565b06d}\label{global_8cpp_ac67ca3065e0f87d0943ff7548565b06d}} 
+\index{global.\+cpp@{global.\+cpp}!warmup\+\_\+finish@{warmup\+\_\+finish}}
+\index{warmup\+\_\+finish@{warmup\+\_\+finish}!global.\+cpp@{global.\+cpp}}
+\subsubsection{\texorpdfstring{warmup\+\_\+finish}{warmup\_finish}}
+{\footnotesize\ttfamily bool volatile warmup\+\_\+finish = false}
+

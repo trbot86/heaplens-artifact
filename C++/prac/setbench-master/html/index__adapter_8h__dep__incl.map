@@ -1,0 +1,22 @@
+<map id="macrobench/storage/index/index_adapter.h" name="macrobench/storage/index/index_adapter.h">
+<area shape="rect" id="node2" href="$all__indexes_8h.html" title="macrobench/storage\l/index/all_indexes.h" alt="" coords="1655,95,1795,136"/>
+<area shape="rect" id="node3" href="$test__wl_8cpp.html" title="macrobench/benchmarks\l/test_wl.cpp" alt="" coords="5,348,173,389"/>
+<area shape="rect" id="node4" href="$tpcc__txn_8cpp.html" title="macrobench/benchmarks\l/tpcc_txn.cpp" alt="" coords="619,348,787,389"/>
+<area shape="rect" id="node5" href="$tpcc__wl_8cpp.html" title="macrobench/benchmarks\l/tpcc_wl.cpp" alt="" coords="1224,348,1392,389"/>
+<area shape="rect" id="node6" href="$ycsb__txn_8cpp.html" title="macrobench/benchmarks\l/ycsb_txn.cpp" alt="" coords="1800,348,1968,389"/>
+<area shape="rect" id="node7" href="$ycsb__wl_8cpp.html" title="macrobench/benchmarks\l/ycsb_wl.cpp" alt="" coords="1992,348,2160,389"/>
+<area shape="rect" id="node8" href="$wl_8h.html" title="macrobench/system/wl.h" alt="" coords="1180,184,1348,211"/>
+<area shape="rect" id="node18" href="$txn_8cpp.html" title="macrobench/system/txn.cpp" alt="" coords="2184,355,2371,382"/>
+<area shape="rect" id="node21" href="$wl_8cpp.html" title="macrobench/system/wl.cpp" alt="" coords="2026,266,2209,293"/>
+<area shape="rect" id="node9" href="$test_8h.html" title="macrobench/benchmarks\l/test.h" alt="" coords="408,259,576,300"/>
+<area shape="rect" id="node12" href="$thread_8cpp.html" title="macrobench/system/thread.cpp" alt="" coords="389,355,595,382"/>
+<area shape="rect" id="node13" href="$tpcc_8h.html" title="macrobench/benchmarks\l/tpcc.h" alt="" coords="837,259,1005,300"/>
+<area shape="rect" id="node14" href="$tpcc__query_8cpp.html" title="macrobench/benchmarks\l/tpcc_query.cpp" alt="" coords="811,348,979,389"/>
+<area shape="rect" id="node15" href="$ycsb_8h.html" title="macrobench/benchmarks\l/ycsb.h" alt="" coords="1681,259,1849,300"/>
+<area shape="rect" id="node16" href="$ycsb__query_8cpp.html" title="macrobench/benchmarks\l/ycsb_query.cpp" alt="" coords="1416,348,1584,389"/>
+<area shape="rect" id="node17" href="$vll_8cpp.html" title="macrobench/concurrency\l_control/vll.cpp" alt="" coords="1608,348,1776,389"/>
+<area shape="rect" id="node19" href="$query_8cpp.html" title="macrobench/system/query.cpp" alt="" coords="1233,266,1434,293"/>
+<area shape="rect" id="node20" href="$stats_8cpp.html" title="macrobench/system/stats.cpp" alt="" coords="1458,266,1657,293"/>
+<area shape="rect" id="node10" href="$test__txn_8cpp.html" title="macrobench/benchmarks\l/test_txn.cpp" alt="" coords="197,348,365,389"/>
+<area shape="rect" id="node11" href="$macrobench_2system_2main_8cpp.html" title="macrobench/system/main.cpp" alt="" coords="1003,355,1200,382"/>
+</map>

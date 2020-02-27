@@ -1,0 +1,161 @@
+\hypertarget{structabtree__ns_1_1SCXRecord}{}\section{abtree\+\_\+ns\+:\+:S\+C\+X\+Record$<$ D\+E\+G\+R\+EE, K $>$ Struct Template Reference}
+\label{structabtree__ns_1_1SCXRecord}\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record$<$ D\+E\+G\+R\+E\+E, K $>$@{abtree\+\_\+ns\+::\+S\+C\+X\+Record$<$ D\+E\+G\+R\+E\+E, K $>$}}
+
+
+{\ttfamily \#include $<$brown\+\_\+ext\+\_\+abtree\+\_\+lf\+\_\+impl.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+template$<$int D\+E\+G\+R\+EE, typename K $>$ \begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>volatile \hyperlink{descriptors_8h_a8a5af2749482b19d7515054489efca22}{mutables\_t} \hyperlink{structabtree__ns_1_1SCXRecord_a828700a9e594bc10b8275561705a49f2}{mutables}\\
+\>int \hyperlink{structabtree__ns_1_1SCXRecord_a69bfa2456660401bf10a86c10778092c}{numberOfNodes}\\
+\>int \hyperlink{structabtree__ns_1_1SCXRecord_ae83141edf6e69d3691efa21ffde9776a}{numberOfNodesToFreeze}\\
+\>\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$ $\ast$ \hyperlink{structabtree__ns_1_1SCXRecord_af82257ea120b285bd7b737c8927c9d90}{newNode}\\
+\>\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$ $\ast$volatile $\ast$ \hyperlink{structabtree__ns_1_1SCXRecord_ab75f0b7eb40e69140e9e570a9b258692}{field}\\
+\>\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$ $\ast$ \hyperlink{structabtree__ns_1_1SCXRecord_a8748b6aeafb8c5d9e4b1854cfb3184e3}{nodes} \mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info}{wrapper\_info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$\\
+\>\>::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{MAX\_NODES}\mbox{]}\\
+\>\hyperlink{structabtree__ns_1_1SCXRecord}{SCXRecord}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$ $\ast$ \hyperlink{structabtree__ns_1_1SCXRecord_a97a778327a41a8e715c36a22332832cb}{scxPtrsSeen} \mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info}{wrapper\_info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$\\
+\>\>::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{MAX\_NODES}\mbox{]}\\
+\>\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$ $\ast$ \hyperlink{structabtree__ns_1_1SCXRecord_a2ce2551c790644f88f8f57d4afbfc2ae}{insertedNodes} \mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info}{wrapper\_info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$\\
+\>\>::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{MAX\_NODES}+1\mbox{]}\\
+\>\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$ $\ast$ \hyperlink{structabtree__ns_1_1SCXRecord_ab66bafb4bde78a1e5e7fac9631fdce22}{deletedNodes} \mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info}{wrapper\_info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{DEGREE}, K $>$\\
+\>\>::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{MAX\_NODES}+1\mbox{]}\\
+\} \hyperlink{structabtree__ns_1_1SCXRecord_a42549d20c90adbf96ebd6bcc83837fd0}{\_\_attribute\_\_} ((packed)) c\\
+
+\end{tabbing}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structabtree__ns_1_1SCXRecord_ac9350d5dbd8d8831c302bad62d5e31bc}{P\+AD}
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const int \hyperlink{structabtree__ns_1_1SCXRecord_a23c9d7401344db0f79a0f504d483b816}{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS} = 0
+\item 
+static const int \hyperlink{structabtree__ns_1_1SCXRecord_acacd3de85ca93c1a139153163fe9d908}{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED} = 1
+\item 
+static const int \hyperlink{structabtree__ns_1_1SCXRecord_a853e35695f909947c9a0015f1d801cad}{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED} = 2
+\item 
+static const int \hyperlink{structabtree__ns_1_1SCXRecord_afbda1dbb6ba9982a911014053e34362f}{size} = sizeof(c)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_a42549d20c90adbf96ebd6bcc83837fd0}\label{structabtree__ns_1_1SCXRecord_a42549d20c90adbf96ebd6bcc83837fd0}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+attribute\+\_\+\+\_\+@{\+\_\+\+\_\+attribute\+\_\+\+\_\+}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+attribute\+\_\+\+\_\+()}{\_\_attribute\_\_()}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+template$<$int D\+E\+G\+R\+EE, typename K $>$ \\
+struct abtree\+\_\+ns\+::\+S\+C\+X\+Record\+::@70 \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\+\_\+\+\_\+attribute\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{(packed)}]{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_ab66bafb4bde78a1e5e7fac9631fdce22}\label{structabtree__ns_1_1SCXRecord_ab66bafb4bde78a1e5e7fac9631fdce22}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!deleted\+Nodes@{deleted\+Nodes}}
+\index{deleted\+Nodes@{deleted\+Nodes}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{deleted\+Nodes}{deletedNodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::deleted\+Nodes\mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_ab75f0b7eb40e69140e9e570a9b258692}\label{structabtree__ns_1_1SCXRecord_ab75f0b7eb40e69140e9e570a9b258692}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!field@{field}}
+\index{field@{field}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{field}{field}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ volatile$\ast$ \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::field}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_a2ce2551c790644f88f8f57d4afbfc2ae}\label{structabtree__ns_1_1SCXRecord_a2ce2551c790644f88f8f57d4afbfc2ae}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!inserted\+Nodes@{inserted\+Nodes}}
+\index{inserted\+Nodes@{inserted\+Nodes}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{inserted\+Nodes}{insertedNodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::inserted\+Nodes\mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_a828700a9e594bc10b8275561705a49f2}\label{structabtree__ns_1_1SCXRecord_a828700a9e594bc10b8275561705a49f2}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!mutables@{mutables}}
+\index{mutables@{mutables}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{mutables}{mutables}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+volatile \hyperlink{descriptors_8h_a8a5af2749482b19d7515054489efca22}{mutables\+\_\+t} \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::mutables}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_af82257ea120b285bd7b737c8927c9d90}\label{structabtree__ns_1_1SCXRecord_af82257ea120b285bd7b737c8927c9d90}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!new\+Node@{new\+Node}}
+\index{new\+Node@{new\+Node}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{new\+Node}{newNode}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::new\+Node}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_a8748b6aeafb8c5d9e4b1854cfb3184e3}\label{structabtree__ns_1_1SCXRecord_a8748b6aeafb8c5d9e4b1854cfb3184e3}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!nodes@{nodes}}
+\index{nodes@{nodes}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{nodes}{nodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::nodes\mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_a69bfa2456660401bf10a86c10778092c}\label{structabtree__ns_1_1SCXRecord_a69bfa2456660401bf10a86c10778092c}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!number\+Of\+Nodes@{number\+Of\+Nodes}}
+\index{number\+Of\+Nodes@{number\+Of\+Nodes}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{number\+Of\+Nodes}{numberOfNodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+int \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::number\+Of\+Nodes}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_ae83141edf6e69d3691efa21ffde9776a}\label{structabtree__ns_1_1SCXRecord_ae83141edf6e69d3691efa21ffde9776a}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!number\+Of\+Nodes\+To\+Freeze@{number\+Of\+Nodes\+To\+Freeze}}
+\index{number\+Of\+Nodes\+To\+Freeze@{number\+Of\+Nodes\+To\+Freeze}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{number\+Of\+Nodes\+To\+Freeze}{numberOfNodesToFreeze}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+int \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::number\+Of\+Nodes\+To\+Freeze}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_ac9350d5dbd8d8831c302bad62d5e31bc}\label{structabtree__ns_1_1SCXRecord_ac9350d5dbd8d8831c302bad62d5e31bc}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!P\+AD@{P\+AD}}
+\index{P\+AD@{P\+AD}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{P\+AD}{PAD}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::P\+AD}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_a97a778327a41a8e715c36a22332832cb}\label{structabtree__ns_1_1SCXRecord_a97a778327a41a8e715c36a22332832cb}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!scx\+Ptrs\+Seen@{scx\+Ptrs\+Seen}}
+\index{scx\+Ptrs\+Seen@{scx\+Ptrs\+Seen}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{scx\+Ptrs\+Seen}{scxPtrsSeen}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1SCXRecord}{S\+C\+X\+Record}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::scx\+Ptrs\+Seen\mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info}{wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::\hyperlink{scxrecord_8h_abd2aacdca9cb2a1a30f3392256b96ea3}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_afbda1dbb6ba9982a911014053e34362f}\label{structabtree__ns_1_1SCXRecord_afbda1dbb6ba9982a911014053e34362f}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!size@{size}}
+\index{size@{size}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+const int \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::size = sizeof(c)\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_a853e35695f909947c9a0015f1d801cad}\label{structabtree__ns_1_1SCXRecord_a853e35695f909947c9a0015f1d801cad}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED}}
+\index{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED}{STATE\_ABORTED}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+const int \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::S\+T\+A\+T\+E\+\_\+\+A\+B\+O\+R\+T\+ED = 2\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_acacd3de85ca93c1a139153163fe9d908}\label{structabtree__ns_1_1SCXRecord_acacd3de85ca93c1a139153163fe9d908}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED}}
+\index{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED@{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED}{STATE\_COMMITTED}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+const int \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::S\+T\+A\+T\+E\+\_\+\+C\+O\+M\+M\+I\+T\+T\+ED = 1\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{structabtree__ns_1_1SCXRecord_a23c9d7401344db0f79a0f504d483b816}\label{structabtree__ns_1_1SCXRecord_a23c9d7401344db0f79a0f504d483b816}} 
+\index{abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}!S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS@{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS}}
+\index{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS@{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS}!abtree\+\_\+ns\+::\+S\+C\+X\+Record@{abtree\+\_\+ns\+::\+S\+C\+X\+Record}}
+\subsubsection{\texorpdfstring{S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS}{STATE\_INPROGRESS}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+const int \hyperlink{structabtree__ns_1_1SCXRecord}{abtree\+\_\+ns\+::\+S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::S\+T\+A\+T\+E\+\_\+\+I\+N\+P\+R\+O\+G\+R\+E\+SS = 0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/brown\+\_\+ext\+\_\+abtree\+\_\+rq\+\_\+lf/\hyperlink{brown__ext__abtree__rq__lf_2brown__ext__abtree__lf__impl_8h}{brown\+\_\+ext\+\_\+abtree\+\_\+lf\+\_\+impl.\+h}\end{DoxyCompactItemize}

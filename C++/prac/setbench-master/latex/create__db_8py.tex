@@ -1,0 +1,49 @@
+\hypertarget{create__db_8py}{}\section{microbench/unused/create\+\_\+db.py File Reference}
+\label{create__db_8py}\index{microbench/unused/create\+\_\+db.\+py@{microbench/unused/create\+\_\+db.\+py}}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacecreate__db}{create\+\_\+db}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacecreate__db_a0db532a727d6ffe9852f154e5d148a06}{create\+\_\+db.\+process\+\_\+chunk} (start\+\_\+ix)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+string \hyperlink{namespacecreate__db_a3627484d56c47b0a96fdb9ff199694df}{create\+\_\+db.\+D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME} = \char`\"{}results.\+db\char`\"{}
+\item 
+int \hyperlink{namespacecreate__db_a2da1873dcc0f1772f769b24a8afb0cc9}{create\+\_\+db.\+N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS} = 4
+\item 
+int \hyperlink{namespacecreate__db_af0cf695fe45d12d416c1722b2fd80b0c}{create\+\_\+db.\+P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE} = 100
+\item 
+list \hyperlink{namespacecreate__db_af3656325d8df791e2e0e62165f52e0d0}{create\+\_\+db.\+columns}
+\item 
+\hyperlink{namespacecreate__db_a28aa7edc413f11b3b8aa50029c43c98f}{create\+\_\+db.\+ignore\+\_\+warnings\+\_\+on} = set(\mbox{[}\char`\"{}\char`\"{}\mbox{]})
+\item 
+\hyperlink{namespacecreate__db_acaffbe61c8fe2c0d0db0765f1d0a2b24}{create\+\_\+db.\+conn} = sqlite3.\+connect(D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME)
+\begin{DoxyCompactList}\small\item\em try to remove old database try\+: res = check\+\_\+output(\char`\"{}rm \char`\"{} + D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME, shell=True) except Called\+Process\+Error, e\+: print D\+B\+\_\+\+F\+I\+L\+E\+N\+A\+ME + \char`\"{} not found\char`\"{} \end{DoxyCompactList}\item 
+\hyperlink{namespacecreate__db_a8caadce67a98b8a3d859ceae2775bf63}{create\+\_\+db.\+cursor} = conn.\+cursor()
+\item 
+string \hyperlink{namespacecreate__db_a753b199ce11002d6f6c93550a6bf31ec}{create\+\_\+db.\+create\+\_\+table\+\_\+string} = \char`\"{}C\+R\+E\+A\+TE T\+A\+B\+LE results (\char`\"{}
+\item 
+bool \hyperlink{namespacecreate__db_a4335e951e2857562798d08f99d34703c}{create\+\_\+db.\+first} = True
+\item 
+string \hyperlink{namespacecreate__db_a3618610b83bddd5732bbdb1707b93c54}{create\+\_\+db.\+prefix} = \textquotesingle{}\textquotesingle{}
+\item 
+\hyperlink{namespacecreate__db_aa349dd30992f59754d744dd90a252664}{create\+\_\+db.\+res} = check\+\_\+output(\char`\"{}ls data/step$\ast$\char`\"{}, shell=True)
+\item 
+\hyperlink{namespacecreate__db_ae907838b4f6feec6455ce38eba8a26fe}{create\+\_\+db.\+files} = res.\+strip().split(\char`\"{}\textbackslash{}n\char`\"{})
+\item 
+\hyperlink{namespacecreate__db_a08369a5d92b58607a6d7b5f2c5412e7e}{create\+\_\+db.\+pool} = Thread\+Pool(N\+U\+M\+\_\+\+P\+R\+O\+C\+E\+S\+S\+O\+RS)
+\item 
+int \hyperlink{namespacecreate__db_aa299b331ef2c005b58a6f17618a9ea8e}{create\+\_\+db.\+startix} = 0
+\item 
+\hyperlink{namespacecreate__db_a293646c9cd089d3131426e96b401b18e}{create\+\_\+db.\+endix} = len(files)
+\item 
+\hyperlink{namespacecreate__db_a7926ceddf2e86e190ed055e87168b4d5}{create\+\_\+db.\+results} = pool.\+map(process\+\_\+chunk, range(startix, endix, P\+A\+R\+A\+L\+L\+E\+L\+\_\+\+C\+H\+U\+N\+K\+\_\+\+S\+I\+ZE))
+\item 
+int \hyperlink{namespacecreate__db_af3731854a38e468a950476abf08b486e}{create\+\_\+db.\+k} = 0
+\end{DoxyCompactItemize}

@@ -1,0 +1,114 @@
+\hypertarget{classRow__tictoc}{}\section{Row\+\_\+tictoc Class Reference}
+\label{classRow__tictoc}\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+
+
+{\ttfamily \#include $<$row\+\_\+tictoc.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classRow__tictoc_a44d46cc09bdf8f078f992075a2e126c9}{init} (\hyperlink{classrow__t}{row\+\_\+t} $\ast$row)
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classRow__tictoc_a6a5b77a305775780a23dc7227ccef937}{access} (\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$txn, \hyperlink{global_8h_a1a7f6ca1462293fe053b5ae74a6c4eda}{Ts\+Type} type, \hyperlink{classrow__t}{row\+\_\+t} $\ast$local\+\_\+row)
+\item 
+void \hyperlink{classRow__tictoc_a6af47480f6f4230236f47b2f2b2de429}{write\+\_\+data} (\hyperlink{classrow__t}{row\+\_\+t} $\ast$data, \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} wts)
+\item 
+void \hyperlink{classRow__tictoc_a8cfc065bb14c25213e614798ba8b3b4a}{write\+\_\+ptr} (\hyperlink{classrow__t}{row\+\_\+t} $\ast$data, \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} wts, char $\ast$\&data\+\_\+to\+\_\+free)
+\item 
+bool \hyperlink{classRow__tictoc_a49259f37a6c3ab9f74fe861b7f4ba8f6}{renew\+\_\+lease} (\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} wts, \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} rts)
+\item 
+bool \hyperlink{classRow__tictoc_a0e3056dff2f6ebc21de23fbd3ac35ea6}{try\+\_\+renew} (\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} wts, \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} rts, \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \&new\+\_\+rts, uint64\+\_\+t thd\+\_\+id)
+\item 
+void \hyperlink{classRow__tictoc_a534c6fe17f2cf8fffc7a1b06eef67b03}{lock} ()
+\item 
+bool \hyperlink{classRow__tictoc_a726f11ccc49c55ff64160a8c638bedad}{try\+\_\+lock} ()
+\item 
+void \hyperlink{classRow__tictoc_a0a67be119cc8f17c09c14b4a0294ba73}{release} ()
+\item 
+\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \hyperlink{classRow__tictoc_a8e4797ac556c6ebf9b58d986dbbea0ac}{get\+\_\+wts} ()
+\item 
+\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \hyperlink{classRow__tictoc_aadea8708aa6c023efc6eb3f81d7c8299}{get\+\_\+rts} ()
+\item 
+void \hyperlink{classRow__tictoc_a7e83376689a8f6504419779ee7348dee}{get\+\_\+ts\+\_\+word} (bool \&\hyperlink{classRow__tictoc_a534c6fe17f2cf8fffc7a1b06eef67b03}{lock}, uint64\+\_\+t \&rts, uint64\+\_\+t \&wts)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classRow__tictoc_a6a5b77a305775780a23dc7227ccef937}\label{classRow__tictoc_a6a5b77a305775780a23dc7227ccef937}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!access@{access}}
+\index{access@{access}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{access()}{access()}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} Row\+\_\+tictoc\+::access (\begin{DoxyParamCaption}\item[{\hyperlink{classtxn__man}{txn\+\_\+man} $\ast$}]{txn,  }\item[{\hyperlink{global_8h_a1a7f6ca1462293fe053b5ae74a6c4eda}{Ts\+Type}}]{type,  }\item[{\hyperlink{classrow__t}{row\+\_\+t} $\ast$}]{local\+\_\+row }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_aadea8708aa6c023efc6eb3f81d7c8299}\label{classRow__tictoc_aadea8708aa6c023efc6eb3f81d7c8299}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!get\+\_\+rts@{get\+\_\+rts}}
+\index{get\+\_\+rts@{get\+\_\+rts}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{get\+\_\+rts()}{get\_rts()}}
+{\footnotesize\ttfamily \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} Row\+\_\+tictoc\+::get\+\_\+rts (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a7e83376689a8f6504419779ee7348dee}\label{classRow__tictoc_a7e83376689a8f6504419779ee7348dee}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!get\+\_\+ts\+\_\+word@{get\+\_\+ts\+\_\+word}}
+\index{get\+\_\+ts\+\_\+word@{get\+\_\+ts\+\_\+word}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{get\+\_\+ts\+\_\+word()}{get\_ts\_word()}}
+{\footnotesize\ttfamily void Row\+\_\+tictoc\+::get\+\_\+ts\+\_\+word (\begin{DoxyParamCaption}\item[{bool \&}]{lock,  }\item[{uint64\+\_\+t \&}]{rts,  }\item[{uint64\+\_\+t \&}]{wts }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a8e4797ac556c6ebf9b58d986dbbea0ac}\label{classRow__tictoc_a8e4797ac556c6ebf9b58d986dbbea0ac}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!get\+\_\+wts@{get\+\_\+wts}}
+\index{get\+\_\+wts@{get\+\_\+wts}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{get\+\_\+wts()}{get\_wts()}}
+{\footnotesize\ttfamily \hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} Row\+\_\+tictoc\+::get\+\_\+wts (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a44d46cc09bdf8f078f992075a2e126c9}\label{classRow__tictoc_a44d46cc09bdf8f078f992075a2e126c9}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!init@{init}}
+\index{init@{init}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily void Row\+\_\+tictoc\+::init (\begin{DoxyParamCaption}\item[{\hyperlink{classrow__t}{row\+\_\+t} $\ast$}]{row }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a534c6fe17f2cf8fffc7a1b06eef67b03}\label{classRow__tictoc_a534c6fe17f2cf8fffc7a1b06eef67b03}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!lock@{lock}}
+\index{lock@{lock}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{lock()}{lock()}}
+{\footnotesize\ttfamily void Row\+\_\+tictoc\+::lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a0a67be119cc8f17c09c14b4a0294ba73}\label{classRow__tictoc_a0a67be119cc8f17c09c14b4a0294ba73}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!release@{release}}
+\index{release@{release}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{release()}{release()}}
+{\footnotesize\ttfamily void Row\+\_\+tictoc\+::release (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a49259f37a6c3ab9f74fe861b7f4ba8f6}\label{classRow__tictoc_a49259f37a6c3ab9f74fe861b7f4ba8f6}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!renew\+\_\+lease@{renew\+\_\+lease}}
+\index{renew\+\_\+lease@{renew\+\_\+lease}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{renew\+\_\+lease()}{renew\_lease()}}
+{\footnotesize\ttfamily bool Row\+\_\+tictoc\+::renew\+\_\+lease (\begin{DoxyParamCaption}\item[{\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t}}]{wts,  }\item[{\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t}}]{rts }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a726f11ccc49c55ff64160a8c638bedad}\label{classRow__tictoc_a726f11ccc49c55ff64160a8c638bedad}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!try\+\_\+lock@{try\+\_\+lock}}
+\index{try\+\_\+lock@{try\+\_\+lock}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{try\+\_\+lock()}{try\_lock()}}
+{\footnotesize\ttfamily bool Row\+\_\+tictoc\+::try\+\_\+lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a0e3056dff2f6ebc21de23fbd3ac35ea6}\label{classRow__tictoc_a0e3056dff2f6ebc21de23fbd3ac35ea6}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!try\+\_\+renew@{try\+\_\+renew}}
+\index{try\+\_\+renew@{try\+\_\+renew}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{try\+\_\+renew()}{try\_renew()}}
+{\footnotesize\ttfamily bool Row\+\_\+tictoc\+::try\+\_\+renew (\begin{DoxyParamCaption}\item[{\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t}}]{wts,  }\item[{\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t}}]{rts,  }\item[{\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t} \&}]{new\+\_\+rts,  }\item[{uint64\+\_\+t}]{thd\+\_\+id }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a6af47480f6f4230236f47b2f2b2de429}\label{classRow__tictoc_a6af47480f6f4230236f47b2f2b2de429}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!write\+\_\+data@{write\+\_\+data}}
+\index{write\+\_\+data@{write\+\_\+data}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{write\+\_\+data()}{write\_data()}}
+{\footnotesize\ttfamily void Row\+\_\+tictoc\+::write\+\_\+data (\begin{DoxyParamCaption}\item[{\hyperlink{classrow__t}{row\+\_\+t} $\ast$}]{data,  }\item[{\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t}}]{wts }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classRow__tictoc_a8cfc065bb14c25213e614798ba8b3b4a}\label{classRow__tictoc_a8cfc065bb14c25213e614798ba8b3b4a}} 
+\index{Row\+\_\+tictoc@{Row\+\_\+tictoc}!write\+\_\+ptr@{write\+\_\+ptr}}
+\index{write\+\_\+ptr@{write\+\_\+ptr}!Row\+\_\+tictoc@{Row\+\_\+tictoc}}
+\subsubsection{\texorpdfstring{write\+\_\+ptr()}{write\_ptr()}}
+{\footnotesize\ttfamily void Row\+\_\+tictoc\+::write\+\_\+ptr (\begin{DoxyParamCaption}\item[{\hyperlink{classrow__t}{row\+\_\+t} $\ast$}]{data,  }\item[{\hyperlink{global_8h_aaf095dfc9b10f757c968fe146ad7e724}{ts\+\_\+t}}]{wts,  }\item[{char $\ast$\&}]{data\+\_\+to\+\_\+free }\end{DoxyParamCaption})}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+macrobench/concurrency\+\_\+control/\hyperlink{row__tictoc_8h}{row\+\_\+tictoc.\+h}\item 
+macrobench/concurrency\+\_\+control/\hyperlink{row__tictoc_8cpp}{row\+\_\+tictoc.\+cpp}\end{DoxyCompactItemize}

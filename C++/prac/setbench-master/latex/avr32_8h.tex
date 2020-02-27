@@ -1,0 +1,57 @@
+\hypertarget{avr32_8h}{}\section{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/avr32.h File Reference}
+\label{avr32_8h}\index{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/avr32.\+h@{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/gcc/avr32.\+h}}
+{\ttfamily \#include \char`\"{}../all\+\_\+atomic\+\_\+load\+\_\+store.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../ordered.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../test\+\_\+and\+\_\+set\+\_\+t\+\_\+is\+\_\+ao\+\_\+t.\+h\char`\"{}}\newline
+Include dependency graph for avr32.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{avr32_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{avr32_8h_ad5f311a090d1e6e1bb35a6e68ee35fad}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}
+\item 
+\#define \hyperlink{avr32_8h_a98ec53065c0dfd18bc1013c500da377c}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} \hyperlink{avr32_8h_a9f485bd63ce5c6a017ec241906e2f651}{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full} (volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$addr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{avr32_8h_a634397de6de764015b30cdff3ff00b06}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{avr32_8h_a98ec53065c0dfd18bc1013c500da377c}\label{avr32_8h_a98ec53065c0dfd18bc1013c500da377c}} 
+\index{avr32.\+h@{avr32.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!avr32.\+h@{avr32.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}{AO\_HAVE\_compare\_and\_swap\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+
+\mbox{\Hypertarget{avr32_8h_ad5f311a090d1e6e1bb35a6e68ee35fad}\label{avr32_8h_ad5f311a090d1e6e1bb35a6e68ee35fad}} 
+\index{avr32.\+h@{avr32.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}!avr32.\+h@{avr32.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}{AO\_HAVE\_test\_and\_set\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+test\+\_\+and\+\_\+set\+\_\+full}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{avr32_8h_a634397de6de764015b30cdff3ff00b06}\label{avr32_8h_a634397de6de764015b30cdff3ff00b06}} 
+\index{avr32.\+h@{avr32.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!avr32.\+h@{avr32.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full()}{AO\_compare\_and\_swap\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{avr32_8h_a9f485bd63ce5c6a017ec241906e2f651}\label{avr32_8h_a9f485bd63ce5c6a017ec241906e2f651}} 
+\index{avr32.\+h@{avr32.\+h}!A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full@{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full}}
+\index{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full@{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full}!avr32.\+h@{avr32.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full()}{AO\_test\_and\_set\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{test__and__set__t__is__char_8h_a7d99a16c4eab47ba80ab6138d7d98ac1}{A\+O\+\_\+\+T\+S\+\_\+\+V\+A\+L\+\_\+t} A\+O\+\_\+test\+\_\+and\+\_\+set\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{test__and__set__t__is__char_8h_a5890c21b549264c75c2cad08bf4f6ba9}{A\+O\+\_\+\+T\+S\+\_\+t} $\ast$}]{addr }\end{DoxyParamCaption})}
+

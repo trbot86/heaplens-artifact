@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classNode.html" title="Node\&lt; K, V, DEGREE \&gt;" alt="" coords="5,46,173,73"/>
+<area shape="rect" id="node2" href="$classNodeExternal.html" title="NodeExternal\&lt; K, V,\l DEGREE \&gt;" alt="" coords="221,5,364,47"/>
+<area shape="rect" id="node3" href="$classNodeInternal.html" title="NodeInternal\&lt; K, V,\l DEGREE \&gt;" alt="" coords="223,71,362,112"/>
+</map>

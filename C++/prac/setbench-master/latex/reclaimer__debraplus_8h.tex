@@ -1,0 +1,115 @@
+\hypertarget{reclaimer__debraplus_8h}{}\section{common/recordmgr/reclaimer\+\_\+debraplus.h File Reference}
+\label{reclaimer__debraplus_8h}\index{common/recordmgr/reclaimer\+\_\+debraplus.\+h@{common/recordmgr/reclaimer\+\_\+debraplus.\+h}}
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include \char`\"{}plaf.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}globals.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}blockbag.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}allocator\+\_\+interface.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}reclaimer\+\_\+interface.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}arraylist.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}hashtable.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}record\+\_\+manager\+\_\+single\+\_\+type.\+h\char`\"{}}\newline
+Include dependency graph for reclaimer\+\_\+debraplus.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{reclaimer__debraplus_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{reclaimer__debraplus_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classreclaimer__debraplus}{reclaimer\+\_\+debraplus$<$ T, Pool $>$}
+\item 
+struct \hyperlink{structreclaimer__debraplus_1_1rebind}{reclaimer\+\_\+debraplus$<$ T, Pool $>$\+::rebind$<$ \+\_\+\+Tp1 $>$}
+\item 
+struct \hyperlink{structreclaimer__debraplus_1_1rebind2}{reclaimer\+\_\+debraplus$<$ T, Pool $>$\+::rebind2$<$ \+\_\+\+Tp1, \+\_\+\+Tp2 $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{reclaimer__debraplus_8h_ac7c8438eebabedac33b7502799110403}{D\+E\+B\+R\+A\+\_\+\+D\+I\+S\+A\+B\+L\+E\+\_\+\+R\+E\+A\+D\+O\+N\+L\+Y\+\_\+\+O\+PT}
+\item 
+\#define \hyperlink{reclaimer__debraplus_8h_aca964161e32e69d6dade81d199dc1f27}{E\+P\+O\+C\+H\+\_\+\+I\+N\+C\+R\+E\+M\+E\+NT}~2
+\item 
+\#define \hyperlink{reclaimer__debraplus_8h_a2751352a9ff68fdd2ad23649c2b24ac2}{B\+I\+T\+S\+\_\+\+E\+P\+O\+CH}(ann)~((ann)\&$\sim$(\hyperlink{reclaimer__ebr__tree__q_8h_aca964161e32e69d6dade81d199dc1f27}{E\+P\+O\+C\+H\+\_\+\+I\+N\+C\+R\+E\+M\+E\+NT}-\/1))
+\item 
+\#define \hyperlink{reclaimer__debraplus_8h_a08a236d42739eab6cef331340429785d}{Q\+U\+I\+E\+S\+C\+E\+NT}(ann)~((ann)\&1)
+\item 
+\#define \hyperlink{reclaimer__debraplus_8h_a8aee033433d74b2af536fff7ffd14548}{G\+E\+T\+\_\+\+W\+I\+T\+H\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT}(ann)~((ann)$\vert$1)
+\item 
+\#define \hyperlink{reclaimer__debraplus_8h_acf4537d4d6f9b9e293ba4d3d89808163}{N\+E\+U\+T\+R\+A\+L\+I\+Z\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+L\+D\+\_\+\+I\+N\+\_\+\+B\+L\+O\+C\+KS}~4
+\item 
+\#define \hyperlink{reclaimer__debraplus_8h_a857e8c3767c51a68498f229d4d2d8d0c}{M\+A\+X\+\_\+\+P\+R\+O\+T\+E\+C\+T\+\_\+\+E\+V\+E\+N\+\_\+\+I\+F\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT}~7
+\item 
+\#define \hyperlink{reclaimer__debraplus_8h_a3d9d7f60de8e0e1fa6daeb45de72bf1c}{M\+I\+N\+I\+M\+U\+M\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+N\+E\+W\+\_\+\+E\+P\+O\+C\+H\+\_\+\+CR}~100
+\item 
+\#define \hyperlink{reclaimer__debraplus_8h_a2161c4e307a0838a158293df5d5726a8}{N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+E\+P\+O\+C\+H\+\_\+\+B\+A\+G\+S\+\_\+\+CR}~3
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{reclaimer__debraplus_8h_a2751352a9ff68fdd2ad23649c2b24ac2}\label{reclaimer__debraplus_8h_a2751352a9ff68fdd2ad23649c2b24ac2}} 
+\index{reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}!B\+I\+T\+S\+\_\+\+E\+P\+O\+CH@{B\+I\+T\+S\+\_\+\+E\+P\+O\+CH}}
+\index{B\+I\+T\+S\+\_\+\+E\+P\+O\+CH@{B\+I\+T\+S\+\_\+\+E\+P\+O\+CH}!reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}}
+\subsubsection{\texorpdfstring{B\+I\+T\+S\+\_\+\+E\+P\+O\+CH}{BITS\_EPOCH}}
+{\footnotesize\ttfamily \#define B\+I\+T\+S\+\_\+\+E\+P\+O\+CH(\begin{DoxyParamCaption}\item[{}]{ann }\end{DoxyParamCaption})~((ann)\&$\sim$(\hyperlink{reclaimer__ebr__tree__q_8h_aca964161e32e69d6dade81d199dc1f27}{E\+P\+O\+C\+H\+\_\+\+I\+N\+C\+R\+E\+M\+E\+NT}-\/1))}
+
+\mbox{\Hypertarget{reclaimer__debraplus_8h_ac7c8438eebabedac33b7502799110403}\label{reclaimer__debraplus_8h_ac7c8438eebabedac33b7502799110403}} 
+\index{reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}!D\+E\+B\+R\+A\+\_\+\+D\+I\+S\+A\+B\+L\+E\+\_\+\+R\+E\+A\+D\+O\+N\+L\+Y\+\_\+\+O\+PT@{D\+E\+B\+R\+A\+\_\+\+D\+I\+S\+A\+B\+L\+E\+\_\+\+R\+E\+A\+D\+O\+N\+L\+Y\+\_\+\+O\+PT}}
+\index{D\+E\+B\+R\+A\+\_\+\+D\+I\+S\+A\+B\+L\+E\+\_\+\+R\+E\+A\+D\+O\+N\+L\+Y\+\_\+\+O\+PT@{D\+E\+B\+R\+A\+\_\+\+D\+I\+S\+A\+B\+L\+E\+\_\+\+R\+E\+A\+D\+O\+N\+L\+Y\+\_\+\+O\+PT}!reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}}
+\subsubsection{\texorpdfstring{D\+E\+B\+R\+A\+\_\+\+D\+I\+S\+A\+B\+L\+E\+\_\+\+R\+E\+A\+D\+O\+N\+L\+Y\+\_\+\+O\+PT}{DEBRA\_DISABLE\_READONLY\_OPT}}
+{\footnotesize\ttfamily \#define D\+E\+B\+R\+A\+\_\+\+D\+I\+S\+A\+B\+L\+E\+\_\+\+R\+E\+A\+D\+O\+N\+L\+Y\+\_\+\+O\+PT}
+
+\mbox{\Hypertarget{reclaimer__debraplus_8h_aca964161e32e69d6dade81d199dc1f27}\label{reclaimer__debraplus_8h_aca964161e32e69d6dade81d199dc1f27}} 
+\index{reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}!E\+P\+O\+C\+H\+\_\+\+I\+N\+C\+R\+E\+M\+E\+NT@{E\+P\+O\+C\+H\+\_\+\+I\+N\+C\+R\+E\+M\+E\+NT}}
+\index{E\+P\+O\+C\+H\+\_\+\+I\+N\+C\+R\+E\+M\+E\+NT@{E\+P\+O\+C\+H\+\_\+\+I\+N\+C\+R\+E\+M\+E\+NT}!reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}}
+\subsubsection{\texorpdfstring{E\+P\+O\+C\+H\+\_\+\+I\+N\+C\+R\+E\+M\+E\+NT}{EPOCH\_INCREMENT}}
+{\footnotesize\ttfamily \#define E\+P\+O\+C\+H\+\_\+\+I\+N\+C\+R\+E\+M\+E\+NT~2}
+
+\mbox{\Hypertarget{reclaimer__debraplus_8h_a8aee033433d74b2af536fff7ffd14548}\label{reclaimer__debraplus_8h_a8aee033433d74b2af536fff7ffd14548}} 
+\index{reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}!G\+E\+T\+\_\+\+W\+I\+T\+H\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT@{G\+E\+T\+\_\+\+W\+I\+T\+H\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT}}
+\index{G\+E\+T\+\_\+\+W\+I\+T\+H\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT@{G\+E\+T\+\_\+\+W\+I\+T\+H\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT}!reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}}
+\subsubsection{\texorpdfstring{G\+E\+T\+\_\+\+W\+I\+T\+H\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT}{GET\_WITH\_QUIESCENT}}
+{\footnotesize\ttfamily \#define G\+E\+T\+\_\+\+W\+I\+T\+H\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT(\begin{DoxyParamCaption}\item[{}]{ann }\end{DoxyParamCaption})~((ann)$\vert$1)}
+
+\mbox{\Hypertarget{reclaimer__debraplus_8h_a857e8c3767c51a68498f229d4d2d8d0c}\label{reclaimer__debraplus_8h_a857e8c3767c51a68498f229d4d2d8d0c}} 
+\index{reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}!M\+A\+X\+\_\+\+P\+R\+O\+T\+E\+C\+T\+\_\+\+E\+V\+E\+N\+\_\+\+I\+F\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT@{M\+A\+X\+\_\+\+P\+R\+O\+T\+E\+C\+T\+\_\+\+E\+V\+E\+N\+\_\+\+I\+F\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT}}
+\index{M\+A\+X\+\_\+\+P\+R\+O\+T\+E\+C\+T\+\_\+\+E\+V\+E\+N\+\_\+\+I\+F\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT@{M\+A\+X\+\_\+\+P\+R\+O\+T\+E\+C\+T\+\_\+\+E\+V\+E\+N\+\_\+\+I\+F\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT}!reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+P\+R\+O\+T\+E\+C\+T\+\_\+\+E\+V\+E\+N\+\_\+\+I\+F\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT}{MAX\_PROTECT\_EVEN\_IF\_QUIESCENT}}
+{\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+P\+R\+O\+T\+E\+C\+T\+\_\+\+E\+V\+E\+N\+\_\+\+I\+F\+\_\+\+Q\+U\+I\+E\+S\+C\+E\+NT~7}
+
+\mbox{\Hypertarget{reclaimer__debraplus_8h_a3d9d7f60de8e0e1fa6daeb45de72bf1c}\label{reclaimer__debraplus_8h_a3d9d7f60de8e0e1fa6daeb45de72bf1c}} 
+\index{reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}!M\+I\+N\+I\+M\+U\+M\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+N\+E\+W\+\_\+\+E\+P\+O\+C\+H\+\_\+\+CR@{M\+I\+N\+I\+M\+U\+M\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+N\+E\+W\+\_\+\+E\+P\+O\+C\+H\+\_\+\+CR}}
+\index{M\+I\+N\+I\+M\+U\+M\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+N\+E\+W\+\_\+\+E\+P\+O\+C\+H\+\_\+\+CR@{M\+I\+N\+I\+M\+U\+M\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+N\+E\+W\+\_\+\+E\+P\+O\+C\+H\+\_\+\+CR}!reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}}
+\subsubsection{\texorpdfstring{M\+I\+N\+I\+M\+U\+M\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+N\+E\+W\+\_\+\+E\+P\+O\+C\+H\+\_\+\+CR}{MINIMUM\_OPERATIONS\_BEFORE\_NEW\_EPOCH\_CR}}
+{\footnotesize\ttfamily \#define M\+I\+N\+I\+M\+U\+M\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N\+S\+\_\+\+B\+E\+F\+O\+R\+E\+\_\+\+N\+E\+W\+\_\+\+E\+P\+O\+C\+H\+\_\+\+CR~100}
+
+\mbox{\Hypertarget{reclaimer__debraplus_8h_acf4537d4d6f9b9e293ba4d3d89808163}\label{reclaimer__debraplus_8h_acf4537d4d6f9b9e293ba4d3d89808163}} 
+\index{reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}!N\+E\+U\+T\+R\+A\+L\+I\+Z\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+L\+D\+\_\+\+I\+N\+\_\+\+B\+L\+O\+C\+KS@{N\+E\+U\+T\+R\+A\+L\+I\+Z\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+L\+D\+\_\+\+I\+N\+\_\+\+B\+L\+O\+C\+KS}}
+\index{N\+E\+U\+T\+R\+A\+L\+I\+Z\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+L\+D\+\_\+\+I\+N\+\_\+\+B\+L\+O\+C\+KS@{N\+E\+U\+T\+R\+A\+L\+I\+Z\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+L\+D\+\_\+\+I\+N\+\_\+\+B\+L\+O\+C\+KS}!reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}}
+\subsubsection{\texorpdfstring{N\+E\+U\+T\+R\+A\+L\+I\+Z\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+L\+D\+\_\+\+I\+N\+\_\+\+B\+L\+O\+C\+KS}{NEUTRALIZE\_THRESHOLD\_IN\_BLOCKS}}
+{\footnotesize\ttfamily \#define N\+E\+U\+T\+R\+A\+L\+I\+Z\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+L\+D\+\_\+\+I\+N\+\_\+\+B\+L\+O\+C\+KS~4}
+
+\mbox{\Hypertarget{reclaimer__debraplus_8h_a2161c4e307a0838a158293df5d5726a8}\label{reclaimer__debraplus_8h_a2161c4e307a0838a158293df5d5726a8}} 
+\index{reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}!N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+E\+P\+O\+C\+H\+\_\+\+B\+A\+G\+S\+\_\+\+CR@{N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+E\+P\+O\+C\+H\+\_\+\+B\+A\+G\+S\+\_\+\+CR}}
+\index{N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+E\+P\+O\+C\+H\+\_\+\+B\+A\+G\+S\+\_\+\+CR@{N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+E\+P\+O\+C\+H\+\_\+\+B\+A\+G\+S\+\_\+\+CR}!reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}}
+\subsubsection{\texorpdfstring{N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+E\+P\+O\+C\+H\+\_\+\+B\+A\+G\+S\+\_\+\+CR}{NUMBER\_OF\_EPOCH\_BAGS\_CR}}
+{\footnotesize\ttfamily \#define N\+U\+M\+B\+E\+R\+\_\+\+O\+F\+\_\+\+E\+P\+O\+C\+H\+\_\+\+B\+A\+G\+S\+\_\+\+CR~3}
+
+\mbox{\Hypertarget{reclaimer__debraplus_8h_a08a236d42739eab6cef331340429785d}\label{reclaimer__debraplus_8h_a08a236d42739eab6cef331340429785d}} 
+\index{reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}!Q\+U\+I\+E\+S\+C\+E\+NT@{Q\+U\+I\+E\+S\+C\+E\+NT}}
+\index{Q\+U\+I\+E\+S\+C\+E\+NT@{Q\+U\+I\+E\+S\+C\+E\+NT}!reclaimer\+\_\+debraplus.\+h@{reclaimer\+\_\+debraplus.\+h}}
+\subsubsection{\texorpdfstring{Q\+U\+I\+E\+S\+C\+E\+NT}{QUIESCENT}}
+{\footnotesize\ttfamily \#define Q\+U\+I\+E\+S\+C\+E\+NT(\begin{DoxyParamCaption}\item[{}]{ann }\end{DoxyParamCaption})~((ann)\&1)}
+

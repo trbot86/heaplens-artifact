@@ -1,0 +1,72 @@
+\hypertarget{classbst__hohlock__ns_1_1Node}{}\section{bst\+\_\+hohlock\+\_\+ns\+:\+:Node$<$ K, V $>$ Class Template Reference}
+\label{classbst__hohlock__ns_1_1Node}\index{bst\+\_\+hohlock\+\_\+ns\+::\+Node$<$ K, V $>$@{bst\+\_\+hohlock\+\_\+ns\+::\+Node$<$ K, V $>$}}
+
+
+{\ttfamily \#include $<$bst\+\_\+hohlock\+\_\+impl.\+h$>$}
+
+
+
+Collaboration diagram for bst\+\_\+hohlock\+\_\+ns\+:\+:Node$<$ K, V $>$\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classbst__hohlock__ns_1_1Node__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+volatile int \hyperlink{classbst__hohlock__ns_1_1Node_abf98ca8e1b6e49ca39adc419a270b265}{lock}
+\item 
+V \hyperlink{classbst__hohlock__ns_1_1Node_a126d8d12e8ed894bad584a5e9df85506}{value}
+\item 
+K \hyperlink{classbst__hohlock__ns_1_1Node_a38bc0b89f0b3375db9f1540629fb0a24}{key}
+\item 
+\hyperlink{bst__rwlock__impl_8h_a04158d2a20768fe447133ff555823b05}{nodeptr} \hyperlink{classbst__hohlock__ns_1_1Node_a72ae7c6e54b707177be29b8e96edd009}{left}
+\item 
+\hyperlink{bst__rwlock__impl_8h_a04158d2a20768fe447133ff555823b05}{nodeptr} \hyperlink{classbst__hohlock__ns_1_1Node_a51d55faa8bc2cdb0bd27a5e86658b5bb}{right}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classbst__hohlock__ns_1_1Node_a38bc0b89f0b3375db9f1540629fb0a24}\label{classbst__hohlock__ns_1_1Node_a38bc0b89f0b3375db9f1540629fb0a24}} 
+\index{bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}!key@{key}}
+\index{key@{key}!bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}}
+\subsubsection{\texorpdfstring{key}{key}}
+{\footnotesize\ttfamily template$<$class K , class V $>$ \\
+K \hyperlink{classbst__hohlock__ns_1_1Node}{bst\+\_\+hohlock\+\_\+ns\+::\+Node}$<$ K, V $>$\+::key}
+
+\mbox{\Hypertarget{classbst__hohlock__ns_1_1Node_a72ae7c6e54b707177be29b8e96edd009}\label{classbst__hohlock__ns_1_1Node_a72ae7c6e54b707177be29b8e96edd009}} 
+\index{bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}!left@{left}}
+\index{left@{left}!bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}}
+\subsubsection{\texorpdfstring{left}{left}}
+{\footnotesize\ttfamily template$<$class K , class V $>$ \\
+\hyperlink{bst__rwlock__impl_8h_a04158d2a20768fe447133ff555823b05}{nodeptr} \hyperlink{classbst__hohlock__ns_1_1Node}{bst\+\_\+hohlock\+\_\+ns\+::\+Node}$<$ K, V $>$\+::left}
+
+\mbox{\Hypertarget{classbst__hohlock__ns_1_1Node_abf98ca8e1b6e49ca39adc419a270b265}\label{classbst__hohlock__ns_1_1Node_abf98ca8e1b6e49ca39adc419a270b265}} 
+\index{bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}!lock@{lock}}
+\index{lock@{lock}!bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}}
+\subsubsection{\texorpdfstring{lock}{lock}}
+{\footnotesize\ttfamily template$<$class K , class V $>$ \\
+volatile int \hyperlink{classbst__hohlock__ns_1_1Node}{bst\+\_\+hohlock\+\_\+ns\+::\+Node}$<$ K, V $>$\+::lock}
+
+\mbox{\Hypertarget{classbst__hohlock__ns_1_1Node_a51d55faa8bc2cdb0bd27a5e86658b5bb}\label{classbst__hohlock__ns_1_1Node_a51d55faa8bc2cdb0bd27a5e86658b5bb}} 
+\index{bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}!right@{right}}
+\index{right@{right}!bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}}
+\subsubsection{\texorpdfstring{right}{right}}
+{\footnotesize\ttfamily template$<$class K , class V $>$ \\
+\hyperlink{bst__rwlock__impl_8h_a04158d2a20768fe447133ff555823b05}{nodeptr} \hyperlink{classbst__hohlock__ns_1_1Node}{bst\+\_\+hohlock\+\_\+ns\+::\+Node}$<$ K, V $>$\+::right}
+
+\mbox{\Hypertarget{classbst__hohlock__ns_1_1Node_a126d8d12e8ed894bad584a5e9df85506}\label{classbst__hohlock__ns_1_1Node_a126d8d12e8ed894bad584a5e9df85506}} 
+\index{bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}!value@{value}}
+\index{value@{value}!bst\+\_\+hohlock\+\_\+ns\+::\+Node@{bst\+\_\+hohlock\+\_\+ns\+::\+Node}}
+\subsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily template$<$class K , class V $>$ \\
+V \hyperlink{classbst__hohlock__ns_1_1Node}{bst\+\_\+hohlock\+\_\+ns\+::\+Node}$<$ K, V $>$\+::value}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/brown\+\_\+ext\+\_\+bst\+\_\+hohlock/\hyperlink{bst__hohlock__impl_8h}{bst\+\_\+hohlock\+\_\+impl.\+h}\end{DoxyCompactItemize}

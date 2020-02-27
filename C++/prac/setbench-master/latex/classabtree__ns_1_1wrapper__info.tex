@@ -1,0 +1,119 @@
+\hypertarget{classabtree__ns_1_1wrapper__info}{}\section{abtree\+\_\+ns\+:\+:wrapper\+\_\+info$<$ D\+E\+G\+R\+EE, K $>$ Class Template Reference}
+\label{classabtree__ns_1_1wrapper__info}\index{abtree\+\_\+ns\+::wrapper\+\_\+info$<$ D\+E\+G\+R\+E\+E, K $>$@{abtree\+\_\+ns\+::wrapper\+\_\+info$<$ D\+E\+G\+R\+E\+E, K $>$}}
+
+
+{\ttfamily \#include $<$brown\+\_\+ext\+\_\+abtree\+\_\+lf\+\_\+impl.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{classabtree__ns_1_1wrapper__info_a6babdd3bb46ab432e506401eef25a5b2}{nodes} \mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}
+\item 
+\hyperlink{structabtree__ns_1_1SCXRecord}{S\+C\+X\+Record}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{classabtree__ns_1_1wrapper__info_a531a8a2aaf6256dd25d0b6ca8a1e6ced}{scx\+Ptrs} \mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}
+\item 
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{classabtree__ns_1_1wrapper__info_a5517be33957e4aace41140dad1738ef4}{new\+Node}
+\item 
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$volatile $\ast$ \hyperlink{classabtree__ns_1_1wrapper__info_a768ca52b1b5ec8730ea982e9a8aaeb48}{field}
+\item 
+int \hyperlink{classabtree__ns_1_1wrapper__info_a433955bf061f62ec2942f2eacdd5a299}{state}
+\item 
+char \hyperlink{classabtree__ns_1_1wrapper__info_a43563c0b9d50c77a1619f219e09a6eb0}{number\+Of\+Nodes}
+\item 
+char \hyperlink{classabtree__ns_1_1wrapper__info_a6f82a59bb872ece248f3a6603404f289}{number\+Of\+Nodes\+To\+Freeze}
+\item 
+char \hyperlink{classabtree__ns_1_1wrapper__info_aa902b7a21461bae3975b67ba4f39a6c6}{number\+Of\+Nodes\+Allocated}
+\item 
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{classabtree__ns_1_1wrapper__info_a195b04f001a1df664ccf438f289a6990}{inserted\+Nodes} \mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}
+\item 
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$ $\ast$ \hyperlink{classabtree__ns_1_1wrapper__info_a33d0c34514ac8443085ae78e5702fd15}{deleted\+Nodes} \mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const int \hyperlink{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}{M\+A\+X\+\_\+\+N\+O\+D\+ES} = \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}+2
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a33d0c34514ac8443085ae78e5702fd15}\label{classabtree__ns_1_1wrapper__info_a33d0c34514ac8443085ae78e5702fd15}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!deleted\+Nodes@{deleted\+Nodes}}
+\index{deleted\+Nodes@{deleted\+Nodes}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{deleted\+Nodes}{deletedNodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::deleted\+Nodes\mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a768ca52b1b5ec8730ea982e9a8aaeb48}\label{classabtree__ns_1_1wrapper__info_a768ca52b1b5ec8730ea982e9a8aaeb48}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!field@{field}}
+\index{field@{field}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{field}{field}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ volatile$\ast$ \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::field}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a195b04f001a1df664ccf438f289a6990}\label{classabtree__ns_1_1wrapper__info_a195b04f001a1df664ccf438f289a6990}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!inserted\+Nodes@{inserted\+Nodes}}
+\index{inserted\+Nodes@{inserted\+Nodes}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{inserted\+Nodes}{insertedNodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::inserted\+Nodes\mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}{M\+A\+X\+\_\+\+N\+O\+D\+ES}+1\mbox{]}}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}\label{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!M\+A\+X\+\_\+\+N\+O\+D\+ES@{M\+A\+X\+\_\+\+N\+O\+D\+ES}}
+\index{M\+A\+X\+\_\+\+N\+O\+D\+ES@{M\+A\+X\+\_\+\+N\+O\+D\+ES}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+N\+O\+D\+ES}{MAX\_NODES}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+const int \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::M\+A\+X\+\_\+\+N\+O\+D\+ES = \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}+2\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a5517be33957e4aace41140dad1738ef4}\label{classabtree__ns_1_1wrapper__info_a5517be33957e4aace41140dad1738ef4}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!new\+Node@{new\+Node}}
+\index{new\+Node@{new\+Node}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{new\+Node}{newNode}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::new\+Node}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a6babdd3bb46ab432e506401eef25a5b2}\label{classabtree__ns_1_1wrapper__info_a6babdd3bb46ab432e506401eef25a5b2}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!nodes@{nodes}}
+\index{nodes@{nodes}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{nodes}{nodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1Node}{Node}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::nodes\mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a43563c0b9d50c77a1619f219e09a6eb0}\label{classabtree__ns_1_1wrapper__info_a43563c0b9d50c77a1619f219e09a6eb0}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!number\+Of\+Nodes@{number\+Of\+Nodes}}
+\index{number\+Of\+Nodes@{number\+Of\+Nodes}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{number\+Of\+Nodes}{numberOfNodes}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+char \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::number\+Of\+Nodes}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_aa902b7a21461bae3975b67ba4f39a6c6}\label{classabtree__ns_1_1wrapper__info_aa902b7a21461bae3975b67ba4f39a6c6}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!number\+Of\+Nodes\+Allocated@{number\+Of\+Nodes\+Allocated}}
+\index{number\+Of\+Nodes\+Allocated@{number\+Of\+Nodes\+Allocated}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{number\+Of\+Nodes\+Allocated}{numberOfNodesAllocated}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+char \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::number\+Of\+Nodes\+Allocated}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a6f82a59bb872ece248f3a6603404f289}\label{classabtree__ns_1_1wrapper__info_a6f82a59bb872ece248f3a6603404f289}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!number\+Of\+Nodes\+To\+Freeze@{number\+Of\+Nodes\+To\+Freeze}}
+\index{number\+Of\+Nodes\+To\+Freeze@{number\+Of\+Nodes\+To\+Freeze}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{number\+Of\+Nodes\+To\+Freeze}{numberOfNodesToFreeze}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+char \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::number\+Of\+Nodes\+To\+Freeze}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a531a8a2aaf6256dd25d0b6ca8a1e6ced}\label{classabtree__ns_1_1wrapper__info_a531a8a2aaf6256dd25d0b6ca8a1e6ced}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!scx\+Ptrs@{scx\+Ptrs}}
+\index{scx\+Ptrs@{scx\+Ptrs}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{scx\+Ptrs}{scxPtrs}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+\hyperlink{structabtree__ns_1_1SCXRecord}{S\+C\+X\+Record}$<$\hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE},K$>$$\ast$ \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::scx\+Ptrs\mbox{[}\hyperlink{classabtree__ns_1_1wrapper__info_a8ebdd932eb6c4c88615fbb76b8419d9e}{M\+A\+X\+\_\+\+N\+O\+D\+ES}\mbox{]}}
+
+\mbox{\Hypertarget{classabtree__ns_1_1wrapper__info_a433955bf061f62ec2942f2eacdd5a299}\label{classabtree__ns_1_1wrapper__info_a433955bf061f62ec2942f2eacdd5a299}} 
+\index{abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}!state@{state}}
+\index{state@{state}!abtree\+\_\+ns\+::wrapper\+\_\+info@{abtree\+\_\+ns\+::wrapper\+\_\+info}}
+\subsubsection{\texorpdfstring{state}{state}}
+{\footnotesize\ttfamily template$<$int D\+E\+G\+R\+EE, typename K$>$ \\
+int \hyperlink{classabtree__ns_1_1wrapper__info}{abtree\+\_\+ns\+::wrapper\+\_\+info}$<$ \hyperlink{brown__sigouin__abtree__kcas_2adapter_8h_a5d88b17d70c985f2f2b8e987037fd6dd}{D\+E\+G\+R\+EE}, K $>$\+::state}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+ds/brown\+\_\+ext\+\_\+abtree\+\_\+rq\+\_\+lf/\hyperlink{brown__ext__abtree__rq__lf_2brown__ext__abtree__lf__impl_8h}{brown\+\_\+ext\+\_\+abtree\+\_\+lf\+\_\+impl.\+h}\end{DoxyCompactItemize}

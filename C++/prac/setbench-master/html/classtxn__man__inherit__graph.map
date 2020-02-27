@@ -1,0 +1,5 @@
+<map id="txn_man" name="txn_man">
+<area shape="rect" id="node2" href="$classTestTxnMan.html" title="TestTxnMan" alt="" coords="5,80,100,107"/>
+<area shape="rect" id="node3" href="$classtpcc__txn__man.html" title="tpcc_txn_man" alt="" coords="125,80,229,107"/>
+<area shape="rect" id="node4" href="$classycsb__txn__man.html" title="ycsb_txn_man" alt="" coords="253,80,359,107"/>
+</map>

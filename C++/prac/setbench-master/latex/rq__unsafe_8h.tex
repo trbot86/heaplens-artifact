@@ -1,0 +1,96 @@
+\hypertarget{rq__unsafe_8h}{}\section{common/rq/rq\+\_\+unsafe.h File Reference}
+\label{rq__unsafe_8h}\index{common/rq/rq\+\_\+unsafe.\+h@{common/rq/rq\+\_\+unsafe.\+h}}
+{\ttfamily \#include \char`\"{}rq\+\_\+debugging.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$rwlock.\+h$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+Include dependency graph for rq\+\_\+unsafe.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{rq__unsafe_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{rq__unsafe_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classRQProvider}{R\+Q\+Provider$<$ K, V, Node\+Type, Data\+Structure, Record\+Manager, logical\+Deletion, can\+Retire\+Nodes\+Logically\+Deleted\+By\+Other\+Processes $>$}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{rq__unsafe_8h_ac1e51123328c8f7f9492737e2932b7ed}{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}~32
+\item 
+\#define \hyperlink{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}{casword\+\_\+t}~uintptr\+\_\+t
+\item 
+\#define \hyperlink{rq__unsafe_8h_ae650e3f928535ed242b62626f45383b3}{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}~1024
+\item 
+\#define \hyperlink{rq__unsafe_8h_a9329267133c50fa57b21c8520b54e8b4}{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}~0
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>struct \{\\
+\>\>long long \hyperlink{rq__unsafe_8h_a643fd1eef8dbd00706b939b113a76394}{rq\_lin\_time}\\
+\>\} \\
+\>char \hyperlink{rq__unsafe_8h_a635f5365cabd10672254f452bb7bcf0b}{bytes} \mbox{[}\hyperlink{rq__unsafe_8h_ae650e3f928535ed242b62626f45383b3}{\_\_RQ\_THREAD\_DATA\_SIZE}\mbox{]}\\
+\}; \\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{rq__unsafe_8h_ae650e3f928535ed242b62626f45383b3}\label{rq__unsafe_8h_ae650e3f928535ed242b62626f45383b3}} 
+\index{rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}!\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE@{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}}
+\index{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE@{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}!rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}{\_\_RQ\_THREAD\_DATA\_SIZE}}
+{\footnotesize\ttfamily \#define \+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE~1024}
+
+\mbox{\Hypertarget{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}\label{rq__unsafe_8h_ad45142aaf2ff20a036dc6242b8483e9c}} 
+\index{rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}!casword\+\_\+t@{casword\+\_\+t}}
+\index{casword\+\_\+t@{casword\+\_\+t}!rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}}
+\subsubsection{\texorpdfstring{casword\+\_\+t}{casword\_t}}
+{\footnotesize\ttfamily \#define casword\+\_\+t~uintptr\+\_\+t}
+
+\mbox{\Hypertarget{rq__unsafe_8h_ac1e51123328c8f7f9492737e2932b7ed}\label{rq__unsafe_8h_ac1e51123328c8f7f9492737e2932b7ed}} 
+\index{rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}!M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE@{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}}
+\index{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE@{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}!rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}}
+\subsubsection{\texorpdfstring{M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE}{MAX\_KEYS\_PER\_NODE}}
+{\footnotesize\ttfamily \#define M\+A\+X\+\_\+\+K\+E\+Y\+S\+\_\+\+P\+E\+R\+\_\+\+N\+O\+DE~32}
+
+\mbox{\Hypertarget{rq__unsafe_8h_a9329267133c50fa57b21c8520b54e8b4}\label{rq__unsafe_8h_a9329267133c50fa57b21c8520b54e8b4}} 
+\index{rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}!T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET@{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}}
+\index{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET@{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}!rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}}
+\subsubsection{\texorpdfstring{T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET}{TIMESTAMP\_NOT\_SET}}
+{\footnotesize\ttfamily \#define T\+I\+M\+E\+S\+T\+A\+M\+P\+\_\+\+N\+O\+T\+\_\+\+S\+ET~0}
+
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{rq__unsafe_8h_ac7a18fbace5f4b0b4bef6bfb62f64db0}\label{rq__unsafe_8h_ac7a18fbace5f4b0b4bef6bfb62f64db0}} 
+\subsubsection{\texorpdfstring{"@45}{@45}}
+{\footnotesize\ttfamily union \{ ... \} }
+
+\mbox{\Hypertarget{rq__unsafe_8h_a635f5365cabd10672254f452bb7bcf0b}\label{rq__unsafe_8h_a635f5365cabd10672254f452bb7bcf0b}} 
+\index{rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}!bytes@{bytes}}
+\index{bytes@{bytes}!rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}}
+\subsubsection{\texorpdfstring{bytes}{bytes}}
+{\footnotesize\ttfamily char bytes\mbox{[}\hyperlink{rq__unsafe_8h_ae650e3f928535ed242b62626f45383b3}{\+\_\+\+\_\+\+R\+Q\+\_\+\+T\+H\+R\+E\+A\+D\+\_\+\+D\+A\+T\+A\+\_\+\+S\+I\+ZE}\mbox{]}}
+
+\mbox{\Hypertarget{rq__unsafe_8h_a643fd1eef8dbd00706b939b113a76394}\label{rq__unsafe_8h_a643fd1eef8dbd00706b939b113a76394}} 
+\index{rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}!rq\+\_\+lin\+\_\+time@{rq\+\_\+lin\+\_\+time}}
+\index{rq\+\_\+lin\+\_\+time@{rq\+\_\+lin\+\_\+time}!rq\+\_\+unsafe.\+h@{rq\+\_\+unsafe.\+h}}
+\subsubsection{\texorpdfstring{rq\+\_\+lin\+\_\+time}{rq\_lin\_time}}
+{\footnotesize\ttfamily long long rq\+\_\+lin\+\_\+time}
+

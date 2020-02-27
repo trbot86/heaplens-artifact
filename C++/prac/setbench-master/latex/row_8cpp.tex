@@ -1,0 +1,112 @@
+\hypertarget{row_8cpp}{}\section{macrobench/storage/row.cpp File Reference}
+\label{row_8cpp}\index{macrobench/storage/row.\+cpp@{macrobench/storage/row.\+cpp}}
+{\ttfamily \#include $<$mm\+\_\+malloc.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}global.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}table.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}catalog.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}row.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}txn.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}row\+\_\+lock.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}row\+\_\+ts.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}row\+\_\+mvcc.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}row\+\_\+hekaton.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}row\+\_\+occ.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}row\+\_\+tictoc.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}row\+\_\+silo.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}row\+\_\+vll.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}mem\+\_\+alloc.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}manager.\+h\char`\"{}}\newline
+Include dependency graph for row.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{row_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{row_8cpp_a968ab8c2d37d40f0fa96be5abe08e244}{S\+E\+T\+\_\+\+V\+A\+L\+UE} (uint64\+\_\+t)
+\item 
+\hyperlink{row_8cpp_afd734ef07ac789b558c8c9b34be1daef}{S\+E\+T\+\_\+\+V\+A\+L\+UE} (int64\+\_\+t)
+\item 
+\hyperlink{row_8cpp_a153f91d5f4a70a92c502abd36ee804be}{S\+E\+T\+\_\+\+V\+A\+L\+UE} (double)
+\item 
+\hyperlink{row_8cpp_a3ef94bf0f800dc519bc3953051a870cb}{S\+E\+T\+\_\+\+V\+A\+L\+UE} (\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32})
+\item 
+\hyperlink{row_8cpp_a4f7fb56f3d6a2b251c106e2dd9a0728a}{S\+E\+T\+\_\+\+V\+A\+L\+UE} (\hyperlink{global_8h_a26832e96d77fcdd175f262a96add7394}{S\+Int32})
+\item 
+\hyperlink{row_8cpp_ae47dd26ef5326161a96effd861dc34ed}{G\+E\+T\+\_\+\+V\+A\+L\+UE} (uint64\+\_\+t)
+\item 
+\hyperlink{row_8cpp_a4aa4c9dd50a157838f3e03b1f66ac40f}{G\+E\+T\+\_\+\+V\+A\+L\+UE} (int64\+\_\+t)
+\item 
+\hyperlink{row_8cpp_aa82fddc5e22db3a10801f623ebdf8dc9}{G\+E\+T\+\_\+\+V\+A\+L\+UE} (double)
+\item 
+\hyperlink{row_8cpp_adfe16ac99afb2bba5980447507e376d5}{G\+E\+T\+\_\+\+V\+A\+L\+UE} (\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32})
+\item 
+\hyperlink{row_8cpp_a38a9249b2e3305b96fcd904d6b8f5bc1}{G\+E\+T\+\_\+\+V\+A\+L\+UE} (\hyperlink{global_8h_a26832e96d77fcdd175f262a96add7394}{S\+Int32})
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{row_8cpp_ae47dd26ef5326161a96effd861dc34ed}\label{row_8cpp_ae47dd26ef5326161a96effd861dc34ed}} 
+\index{row.\+cpp@{row.\+cpp}!G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{G\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{GET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily G\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{row_8cpp_a4aa4c9dd50a157838f3e03b1f66ac40f}\label{row_8cpp_a4aa4c9dd50a157838f3e03b1f66ac40f}} 
+\index{row.\+cpp@{row.\+cpp}!G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{G\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{GET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily G\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{int64\+\_\+t}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{row_8cpp_aa82fddc5e22db3a10801f623ebdf8dc9}\label{row_8cpp_aa82fddc5e22db3a10801f623ebdf8dc9}} 
+\index{row.\+cpp@{row.\+cpp}!G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{G\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{GET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily G\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{double}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{row_8cpp_adfe16ac99afb2bba5980447507e376d5}\label{row_8cpp_adfe16ac99afb2bba5980447507e376d5}} 
+\index{row.\+cpp@{row.\+cpp}!G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{G\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{GET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily G\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{row_8cpp_a38a9249b2e3305b96fcd904d6b8f5bc1}\label{row_8cpp_a38a9249b2e3305b96fcd904d6b8f5bc1}} 
+\index{row.\+cpp@{row.\+cpp}!G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{G\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{GET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily G\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{\hyperlink{global_8h_a26832e96d77fcdd175f262a96add7394}{S\+Int32}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{row_8cpp_a968ab8c2d37d40f0fa96be5abe08e244}\label{row_8cpp_a968ab8c2d37d40f0fa96be5abe08e244}} 
+\index{row.\+cpp@{row.\+cpp}!S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{S\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{SET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily S\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{row_8cpp_afd734ef07ac789b558c8c9b34be1daef}\label{row_8cpp_afd734ef07ac789b558c8c9b34be1daef}} 
+\index{row.\+cpp@{row.\+cpp}!S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{S\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{SET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily S\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{int64\+\_\+t}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{row_8cpp_a153f91d5f4a70a92c502abd36ee804be}\label{row_8cpp_a153f91d5f4a70a92c502abd36ee804be}} 
+\index{row.\+cpp@{row.\+cpp}!S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{S\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{SET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily S\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{double}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{row_8cpp_a3ef94bf0f800dc519bc3953051a870cb}\label{row_8cpp_a3ef94bf0f800dc519bc3953051a870cb}} 
+\index{row.\+cpp@{row.\+cpp}!S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{S\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{SET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily S\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{\hyperlink{global_8h_a7e8aeec7b6541935dfc6f608cd5170ce}{U\+Int32}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{row_8cpp_a4f7fb56f3d6a2b251c106e2dd9a0728a}\label{row_8cpp_a4f7fb56f3d6a2b251c106e2dd9a0728a}} 
+\index{row.\+cpp@{row.\+cpp}!S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{S\+E\+T\+\_\+\+V\+A\+L\+UE@{S\+E\+T\+\_\+\+V\+A\+L\+UE}!row.\+cpp@{row.\+cpp}}
+\subsubsection{\texorpdfstring{S\+E\+T\+\_\+\+V\+A\+L\+U\+E()}{SET\_VALUE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily S\+E\+T\+\_\+\+V\+A\+L\+UE (\begin{DoxyParamCaption}\item[{\hyperlink{global_8h_a26832e96d77fcdd175f262a96add7394}{S\+Int32}}]{ }\end{DoxyParamCaption})}
+

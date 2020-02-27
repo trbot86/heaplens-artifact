@@ -1,0 +1,92 @@
+\hypertarget{msftc_2x86__64_8h}{}\section{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/msftc/x86\+\_\+64.h File Reference}
+\label{msftc_2x86__64_8h}\index{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/msftc/x86\+\_\+64.\+h@{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/msftc/x86\+\_\+64.\+h}}
+{\ttfamily \#include \char`\"{}../all\+\_\+aligned\+\_\+atomic\+\_\+load\+\_\+store.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../ordered\+\_\+except\+\_\+wr.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../test\+\_\+and\+\_\+set\+\_\+t\+\_\+is\+\_\+ao\+\_\+t.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}../standard\+\_\+ao\+\_\+double\+\_\+t.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$windows.\+h$>$}\newline
+{\ttfamily \#include $<$intrin.\+h$>$}\newline
+Include dependency graph for x86\+\_\+64.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{msftc_2x86__64_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{msftc_2x86__64_8h_a9fa0fc1a9eadcba085e57bf180a53cef}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}
+\item 
+\#define \hyperlink{msftc_2x86__64_8h_a65fb7f14069ffab2e6329ffc98563770}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}
+\item 
+\#define \hyperlink{msftc_2x86__64_8h_a9c25ee9f67d96eec7f26152cf363fc06}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}
+\item 
+\#define \hyperlink{msftc_2x86__64_8h_a98ec53065c0dfd18bc1013c500da377c}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{msftc_2x86__64_8h_a63b6d5232496fb679621fa985234eff8}{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$p, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} incr)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{msftc_2x86__64_8h_a685167af2036f69b0cfcd31a141d79b0}{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$p)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} \hyperlink{msftc_2x86__64_8h_a204c40d27bb1d43b2f29b15a516ac7db}{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$p)
+\item 
+\hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int \hyperlink{msftc_2x86__64_8h_a634397de6de764015b30cdff3ff00b06}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{msftc_2x86__64_8h_a98ec53065c0dfd18bc1013c500da377c}\label{msftc_2x86__64_8h_a98ec53065c0dfd18bc1013c500da377c}} 
+\index{msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}{AO\_HAVE\_compare\_and\_swap\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+
+\mbox{\Hypertarget{msftc_2x86__64_8h_a65fb7f14069ffab2e6329ffc98563770}\label{msftc_2x86__64_8h_a65fb7f14069ffab2e6329ffc98563770}} 
+\index{msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}!msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}{AO\_HAVE\_fetch\_and\_add1\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}
+
+\mbox{\Hypertarget{msftc_2x86__64_8h_a9fa0fc1a9eadcba085e57bf180a53cef}\label{msftc_2x86__64_8h_a9fa0fc1a9eadcba085e57bf180a53cef}} 
+\index{msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}!msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}{AO\_HAVE\_fetch\_and\_add\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}
+
+\mbox{\Hypertarget{msftc_2x86__64_8h_a9c25ee9f67d96eec7f26152cf363fc06}\label{msftc_2x86__64_8h_a9c25ee9f67d96eec7f26152cf363fc06}} 
+\index{msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}!msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}{AO\_HAVE\_fetch\_and\_sub1\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{msftc_2x86__64_8h_a634397de6de764015b30cdff3ff00b06}\label{msftc_2x86__64_8h_a634397de6de764015b30cdff3ff00b06}} 
+\index{msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full()}{AO\_compare\_and\_swap\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} int A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{msftc_2x86__64_8h_a685167af2036f69b0cfcd31a141d79b0}\label{msftc_2x86__64_8h_a685167af2036f69b0cfcd31a141d79b0}} 
+\index{msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full}!msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full()}{AO\_fetch\_and\_add1\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+add1\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{p }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{msftc_2x86__64_8h_a63b6d5232496fb679621fa985234eff8}\label{msftc_2x86__64_8h_a63b6d5232496fb679621fa985234eff8}} 
+\index{msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full}!msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full()}{AO\_fetch\_and\_add\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+add\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{p,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{incr }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{msftc_2x86__64_8h_a204c40d27bb1d43b2f29b15a516ac7db}\label{msftc_2x86__64_8h_a204c40d27bb1d43b2f29b15a516ac7db}} 
+\index{msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}!A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}}
+\index{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full@{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full}!msftc/x86\+\_\+64.\+h@{msftc/x86\+\_\+64.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full()}{AO\_fetch\_and\_sub1\_full()}}
+{\footnotesize\ttfamily \hyperlink{atomic__ops_8h_a9f6ab6253b6b11bc8c12efe9dde5db2b}{A\+O\+\_\+\+I\+N\+L\+I\+NE} \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} A\+O\+\_\+fetch\+\_\+and\+\_\+sub1\+\_\+full (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{p }\end{DoxyParamCaption})}
+

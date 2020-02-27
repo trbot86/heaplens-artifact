@@ -1,0 +1,106 @@
+\hypertarget{classtable__t}{}\section{table\+\_\+t Class Reference}
+\label{classtable__t}\index{table\+\_\+t@{table\+\_\+t}}
+
+
+{\ttfamily \#include $<$table.\+h$>$}
+
+
+
+Collaboration diagram for table\+\_\+t\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=151pt]{classtable__t__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classtable__t_a5fd9dca2e5f3dcb70c462f3eb94dd2be}{init} (\hyperlink{classCatalog}{Catalog} $\ast$\hyperlink{classtable__t_a5e2b3478c29080f6106331294d94c06a}{schema})
+\item 
+void \hyperlink{classtable__t_a9ec2af3a52db280d8c1c6a78bee7cbd0}{setbench\+\_\+deinit} ()
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classtable__t_a17daa6c0ecb46c33745c1ce88f80a495}{get\+\_\+new\+\_\+row} (\hyperlink{classrow__t}{row\+\_\+t} $\ast$\&row)
+\item 
+\hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} \hyperlink{classtable__t_a81e3bd8f424fc3346629dba6a54eab15}{get\+\_\+new\+\_\+row} (\hyperlink{classrow__t}{row\+\_\+t} $\ast$\&row, uint64\+\_\+t part\+\_\+id, uint64\+\_\+t \&row\+\_\+id)
+\item 
+void \hyperlink{classtable__t_a1d5c3dd5d88ca99b1f9ec01f4befe4e2}{delete\+\_\+row} ()
+\item 
+uint64\+\_\+t \hyperlink{classtable__t_ae65abd8e531e3e86877868ed2851f9df}{get\+\_\+table\+\_\+size} ()
+\item 
+\hyperlink{classCatalog}{Catalog} $\ast$ \hyperlink{classtable__t_a8ac1dd0bce278f742c1caa28fcd35b70}{get\+\_\+schema} ()
+\item 
+const char $\ast$ \hyperlink{classtable__t_a094de1bb6ed142eb1c12044b34ec28e3}{get\+\_\+table\+\_\+name} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCatalog}{Catalog} $\ast$ \hyperlink{classtable__t_a5e2b3478c29080f6106331294d94c06a}{schema}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtable__t_a1d5c3dd5d88ca99b1f9ec01f4befe4e2}\label{classtable__t_a1d5c3dd5d88ca99b1f9ec01f4befe4e2}} 
+\index{table\+\_\+t@{table\+\_\+t}!delete\+\_\+row@{delete\+\_\+row}}
+\index{delete\+\_\+row@{delete\+\_\+row}!table\+\_\+t@{table\+\_\+t}}
+\subsubsection{\texorpdfstring{delete\+\_\+row()}{delete\_row()}}
+{\footnotesize\ttfamily void table\+\_\+t\+::delete\+\_\+row (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classtable__t_a17daa6c0ecb46c33745c1ce88f80a495}\label{classtable__t_a17daa6c0ecb46c33745c1ce88f80a495}} 
+\index{table\+\_\+t@{table\+\_\+t}!get\+\_\+new\+\_\+row@{get\+\_\+new\+\_\+row}}
+\index{get\+\_\+new\+\_\+row@{get\+\_\+new\+\_\+row}!table\+\_\+t@{table\+\_\+t}}
+\subsubsection{\texorpdfstring{get\+\_\+new\+\_\+row()}{get\_new\_row()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} table\+\_\+t\+::get\+\_\+new\+\_\+row (\begin{DoxyParamCaption}\item[{\hyperlink{classrow__t}{row\+\_\+t} $\ast$\&}]{row }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classtable__t_a81e3bd8f424fc3346629dba6a54eab15}\label{classtable__t_a81e3bd8f424fc3346629dba6a54eab15}} 
+\index{table\+\_\+t@{table\+\_\+t}!get\+\_\+new\+\_\+row@{get\+\_\+new\+\_\+row}}
+\index{get\+\_\+new\+\_\+row@{get\+\_\+new\+\_\+row}!table\+\_\+t@{table\+\_\+t}}
+\subsubsection{\texorpdfstring{get\+\_\+new\+\_\+row()}{get\_new\_row()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \hyperlink{global_8h_a78c49a674c810fdd03d20432f7be864a}{RC} table\+\_\+t\+::get\+\_\+new\+\_\+row (\begin{DoxyParamCaption}\item[{\hyperlink{classrow__t}{row\+\_\+t} $\ast$\&}]{row,  }\item[{uint64\+\_\+t}]{part\+\_\+id,  }\item[{uint64\+\_\+t \&}]{row\+\_\+id }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classtable__t_a8ac1dd0bce278f742c1caa28fcd35b70}\label{classtable__t_a8ac1dd0bce278f742c1caa28fcd35b70}} 
+\index{table\+\_\+t@{table\+\_\+t}!get\+\_\+schema@{get\+\_\+schema}}
+\index{get\+\_\+schema@{get\+\_\+schema}!table\+\_\+t@{table\+\_\+t}}
+\subsubsection{\texorpdfstring{get\+\_\+schema()}{get\_schema()}}
+{\footnotesize\ttfamily \hyperlink{classCatalog}{Catalog}$\ast$ table\+\_\+t\+::get\+\_\+schema (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classtable__t_a094de1bb6ed142eb1c12044b34ec28e3}\label{classtable__t_a094de1bb6ed142eb1c12044b34ec28e3}} 
+\index{table\+\_\+t@{table\+\_\+t}!get\+\_\+table\+\_\+name@{get\+\_\+table\+\_\+name}}
+\index{get\+\_\+table\+\_\+name@{get\+\_\+table\+\_\+name}!table\+\_\+t@{table\+\_\+t}}
+\subsubsection{\texorpdfstring{get\+\_\+table\+\_\+name()}{get\_table\_name()}}
+{\footnotesize\ttfamily const char$\ast$ table\+\_\+t\+::get\+\_\+table\+\_\+name (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classtable__t_ae65abd8e531e3e86877868ed2851f9df}\label{classtable__t_ae65abd8e531e3e86877868ed2851f9df}} 
+\index{table\+\_\+t@{table\+\_\+t}!get\+\_\+table\+\_\+size@{get\+\_\+table\+\_\+size}}
+\index{get\+\_\+table\+\_\+size@{get\+\_\+table\+\_\+size}!table\+\_\+t@{table\+\_\+t}}
+\subsubsection{\texorpdfstring{get\+\_\+table\+\_\+size()}{get\_table\_size()}}
+{\footnotesize\ttfamily uint64\+\_\+t table\+\_\+t\+::get\+\_\+table\+\_\+size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\mbox{\Hypertarget{classtable__t_a5fd9dca2e5f3dcb70c462f3eb94dd2be}\label{classtable__t_a5fd9dca2e5f3dcb70c462f3eb94dd2be}} 
+\index{table\+\_\+t@{table\+\_\+t}!init@{init}}
+\index{init@{init}!table\+\_\+t@{table\+\_\+t}}
+\subsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily void table\+\_\+t\+::init (\begin{DoxyParamCaption}\item[{\hyperlink{classCatalog}{Catalog} $\ast$}]{schema }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classtable__t_a9ec2af3a52db280d8c1c6a78bee7cbd0}\label{classtable__t_a9ec2af3a52db280d8c1c6a78bee7cbd0}} 
+\index{table\+\_\+t@{table\+\_\+t}!setbench\+\_\+deinit@{setbench\+\_\+deinit}}
+\index{setbench\+\_\+deinit@{setbench\+\_\+deinit}!table\+\_\+t@{table\+\_\+t}}
+\subsubsection{\texorpdfstring{setbench\+\_\+deinit()}{setbench\_deinit()}}
+{\footnotesize\ttfamily void table\+\_\+t\+::setbench\+\_\+deinit (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classtable__t_a5e2b3478c29080f6106331294d94c06a}\label{classtable__t_a5e2b3478c29080f6106331294d94c06a}} 
+\index{table\+\_\+t@{table\+\_\+t}!schema@{schema}}
+\index{schema@{schema}!table\+\_\+t@{table\+\_\+t}}
+\subsubsection{\texorpdfstring{schema}{schema}}
+{\footnotesize\ttfamily \hyperlink{classCatalog}{Catalog}$\ast$ table\+\_\+t\+::schema}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+macrobench/storage/\hyperlink{table_8h}{table.\+h}\item 
+macrobench/storage/\hyperlink{table_8cpp}{table.\+cpp}\end{DoxyCompactItemize}

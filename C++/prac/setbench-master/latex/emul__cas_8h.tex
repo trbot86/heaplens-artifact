@@ -1,0 +1,101 @@
+\hypertarget{emul__cas_8h}{}\section{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/emul\+\_\+cas.h File Reference}
+\label{emul__cas_8h}\index{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/emul\+\_\+cas.\+h@{common/atomic\+\_\+ops/atomic\+\_\+ops/sysdeps/emul\+\_\+cas.\+h}}
+{\ttfamily \#include \char`\"{}standard\+\_\+ao\+\_\+double\+\_\+t.\+h\char`\"{}}\newline
+Include dependency graph for emul\+\_\+cas.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{emul__cas_8h__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{emul__cas_8h_a6dc4a2a3e24db9d20cfb65ed1f2a6667}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}(addr,  old,  newval)~\hyperlink{emul__cas_8h_a094738a02b8a59f19b2d54987b9f667b}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+emulation}(addr, old, newval)
+\item 
+\#define \hyperlink{emul__cas_8h_a98ec53065c0dfd18bc1013c500da377c}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+\item 
+\#define \hyperlink{emul__cas_8h_a598da265d93b0039b2e213c9d2ad08d4}{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full}(addr,  \hyperlink{dcss__plus_8h_aa0ef3ea06e00e9bcff2d000c6b85fe3b}{old1},  \hyperlink{dcss__plus_8h_a5b804866c13543d14361d31600569ea0}{old2},  newval1,  newval2)
+\item 
+\#define \hyperlink{emul__cas_8h_a0e2b334560e5f9a06567fc59e33a435d}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full}
+\item 
+\#define \hyperlink{emul__cas_8h_a3d577a6957a22ca401b183fbc4bb34f4}{A\+O\+\_\+store\+\_\+full}(addr,  val)~\hyperlink{emul__cas_8h_a615316c80d5bf0e0fb172d6c7d4133a5}{A\+O\+\_\+store\+\_\+full\+\_\+emulation}(addr, val)
+\item 
+\#define \hyperlink{emul__cas_8h_acae01b282aca485176025dd405ebf5b1}{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+full}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{emul__cas_8h_a094738a02b8a59f19b2d54987b9f667b}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+emulation} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val)
+\item 
+int \hyperlink{emul__cas_8h_ac6fb4f6252feec901b044d2e8c59e6f7}{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+emulation} (volatile \hyperlink{structAO__double__t}{A\+O\+\_\+double\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old\+\_\+val1, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} old\+\_\+val2, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val1, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} new\+\_\+val2)
+\item 
+void \hyperlink{emul__cas_8h_a615316c80d5bf0e0fb172d6c7d4133a5}{A\+O\+\_\+store\+\_\+full\+\_\+emulation} (volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$addr, \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} val)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{emul__cas_8h_a6dc4a2a3e24db9d20cfb65ed1f2a6667}\label{emul__cas_8h_a6dc4a2a3e24db9d20cfb65ed1f2a6667}} 
+\index{emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}{AO\_compare\_and\_swap\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full(\begin{DoxyParamCaption}\item[{}]{addr,  }\item[{}]{old,  }\item[{}]{newval }\end{DoxyParamCaption})~\hyperlink{emul__cas_8h_a094738a02b8a59f19b2d54987b9f667b}{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+emulation}(addr, old, newval)}
+
+\mbox{\Hypertarget{emul__cas_8h_a598da265d93b0039b2e213c9d2ad08d4}\label{emul__cas_8h_a598da265d93b0039b2e213c9d2ad08d4}} 
+\index{emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}!A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full@{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full}}
+\index{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full@{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full}!emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full}{AO\_compare\_double\_and\_swap\_double\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full(\begin{DoxyParamCaption}\item[{}]{addr,  }\item[{}]{\hyperlink{dcss__plus_8h_aa0ef3ea06e00e9bcff2d000c6b85fe3b}{old1},  }\item[{}]{\hyperlink{dcss__plus_8h_a5b804866c13543d14361d31600569ea0}{old2},  }\item[{}]{newval1,  }\item[{}]{newval2 }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\hyperlink{emul__cas_8h_ac6fb4f6252feec901b044d2e8c59e6f7}{AO\_compare\_double\_and\_swap\_double\_emulation}(addr, 
+      \hyperlink{dcss_8h_aa0ef3ea06e00e9bcff2d000c6b85fe3b}{old1}, \hyperlink{dcss_8h_a5b804866c13543d14361d31600569ea0}{old2}, \(\backslash\)
+                             newval1, newval2)
+\end{DoxyCode}
+\mbox{\Hypertarget{emul__cas_8h_a98ec53065c0dfd18bc1013c500da377c}\label{emul__cas_8h_a98ec53065c0dfd18bc1013c500da377c}} 
+\index{emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}!emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}{AO\_HAVE\_compare\_and\_swap\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+and\+\_\+swap\+\_\+full}
+
+\mbox{\Hypertarget{emul__cas_8h_a0e2b334560e5f9a06567fc59e33a435d}\label{emul__cas_8h_a0e2b334560e5f9a06567fc59e33a435d}} 
+\index{emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full}!emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full}{AO\_HAVE\_compare\_double\_and\_swap\_double\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+full}
+
+\mbox{\Hypertarget{emul__cas_8h_acae01b282aca485176025dd405ebf5b1}\label{emul__cas_8h_acae01b282aca485176025dd405ebf5b1}} 
+\index{emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}!A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+full}}
+\index{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+full@{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+full}!emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+full}{AO\_HAVE\_store\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+\+H\+A\+V\+E\+\_\+store\+\_\+full}
+
+\mbox{\Hypertarget{emul__cas_8h_a3d577a6957a22ca401b183fbc4bb34f4}\label{emul__cas_8h_a3d577a6957a22ca401b183fbc4bb34f4}} 
+\index{emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}!A\+O\+\_\+store\+\_\+full@{A\+O\+\_\+store\+\_\+full}}
+\index{A\+O\+\_\+store\+\_\+full@{A\+O\+\_\+store\+\_\+full}!emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+store\+\_\+full}{AO\_store\_full}}
+{\footnotesize\ttfamily \#define A\+O\+\_\+store\+\_\+full(\begin{DoxyParamCaption}\item[{}]{addr,  }\item[{}]{val }\end{DoxyParamCaption})~\hyperlink{emul__cas_8h_a615316c80d5bf0e0fb172d6c7d4133a5}{A\+O\+\_\+store\+\_\+full\+\_\+emulation}(addr, val)}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{emul__cas_8h_a094738a02b8a59f19b2d54987b9f667b}\label{emul__cas_8h_a094738a02b8a59f19b2d54987b9f667b}} 
+\index{emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}!A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+emulation@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+emulation}}
+\index{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+emulation@{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+emulation}!emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+emulation()}{AO\_compare\_and\_swap\_emulation()}}
+{\footnotesize\ttfamily int A\+O\+\_\+compare\+\_\+and\+\_\+swap\+\_\+emulation (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{emul__cas_8h_ac6fb4f6252feec901b044d2e8c59e6f7}\label{emul__cas_8h_ac6fb4f6252feec901b044d2e8c59e6f7}} 
+\index{emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}!A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+emulation@{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+emulation}}
+\index{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+emulation@{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+emulation}!emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+emulation()}{AO\_compare\_double\_and\_swap\_double\_emulation()}}
+{\footnotesize\ttfamily int A\+O\+\_\+compare\+\_\+double\+\_\+and\+\_\+swap\+\_\+double\+\_\+emulation (\begin{DoxyParamCaption}\item[{volatile \hyperlink{structAO__double__t}{A\+O\+\_\+double\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old\+\_\+val1,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{old\+\_\+val2,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val1,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{new\+\_\+val2 }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{emul__cas_8h_a615316c80d5bf0e0fb172d6c7d4133a5}\label{emul__cas_8h_a615316c80d5bf0e0fb172d6c7d4133a5}} 
+\index{emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}!A\+O\+\_\+store\+\_\+full\+\_\+emulation@{A\+O\+\_\+store\+\_\+full\+\_\+emulation}}
+\index{A\+O\+\_\+store\+\_\+full\+\_\+emulation@{A\+O\+\_\+store\+\_\+full\+\_\+emulation}!emul\+\_\+cas.\+h@{emul\+\_\+cas.\+h}}
+\subsubsection{\texorpdfstring{A\+O\+\_\+store\+\_\+full\+\_\+emulation()}{AO\_store\_full\_emulation()}}
+{\footnotesize\ttfamily void A\+O\+\_\+store\+\_\+full\+\_\+emulation (\begin{DoxyParamCaption}\item[{volatile \hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t} $\ast$}]{addr,  }\item[{\hyperlink{atomic__ops_8h_a5225fef4d9eee821e82382cd269160dd}{A\+O\+\_\+t}}]{val }\end{DoxyParamCaption})}
+
