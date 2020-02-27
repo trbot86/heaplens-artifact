@@ -69,7 +69,7 @@ ALLOCATORS=new
 
 define make-custom-target =
 ubench_$(1).alloc_$(2).reclaim_$(3).pool_$(4).out: dir_guard
-	$(GPP) main.cpp -g -o $(bin_dir)/ubench_$(1).alloc_$(2).reclaim_$(3).pool_$(4).out -I../ds/$1 -DDS_TYPENAME=$(1) -DALLOC_TYPE=$(2) -DRECLAIM_TYPE=$(3) -DPOOL_TYPE=$(4) $(FLAGS) $(LDFLAGS)
+	$(GPP) main.cpp -g -o $(bin_dir)/ubench_$(1).alloc_$(2).reclaim_$(3).pool_$(4).out -I../ds/$1 -DDS_TYPENAME=$(1) -DRECLAIM_TYPE=$(3) -DPOOL_TYPE=$(4) $(FLAGS) $(LDFLAGS)
 all:: ubench_$(1).alloc_$(2).reclaim_$(3).pool_$(4).out
 endef
 

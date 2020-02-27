@@ -15,8 +15,8 @@
 #include <cxxabi.h>
 
 #define BACKTRACE_DEPTH 2
-#define MAX_THREADS 2
-#define MAX_TRACK 10
+#define MAX_THREADS 100
+#define MAX_TRACK 10000
 #define MAX_TYPE_LENGTH 1000
 #define PADDING 64
 

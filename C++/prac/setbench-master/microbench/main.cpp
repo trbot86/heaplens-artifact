@@ -193,14 +193,18 @@ struct globals_t {
         switch (distribution) {
             case ZIPF: {
                 double zipfTheta = 0.5;
-                keygenZipfData = new KeyGeneratorZipfData(maxkeyToGenerate, zipfTheta);
+                keygenZipfData = new KeyGeneratorZipfData(maxkeyToGenerate, zipfTheta);            
                 for (int i=0;i<MAX_THREADS_POW2;++i) {
+                    #undef new
                     keygens[i] = (KeyGenT *) new KeyGeneratorZipf<test_type>(keygenZipfData, &rngs[i]);
+                    #define new MemStamp(__FILE__, __LINE__) * new
                 }
             } break;
             case UNIFORM: {
                 for (int i=0;i<MAX_THREADS_POW2;++i) {
+                    #undef new
                     keygens[i] = (KeyGenT *) new KeyGeneratorUniform<test_type>(&rngs[i], maxkeyToGenerate);
+                    #define new MemStamp(__FILE__, __LINE__) * new
                 }
             } break;
             default: {

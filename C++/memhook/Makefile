@@ -12,8 +12,8 @@ prac:
 	$(CC) a.cpp -I./ -L./ -Wl,-rpath=./ -pthread -lmemhook -g -o a.out
 
 install:
-	cp libmemhook.so ../lib/
-	cp memhook.h ../include
+	cp libmemhook.so ../prac/setbench-master/lib
+	cp memhook.h ../prac/setbench-master/microbench
 
 clean:
 	rm libmemhook.so info_t_dump.txt
