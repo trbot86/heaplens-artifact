@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   server_clock.h
  * Author: trbot

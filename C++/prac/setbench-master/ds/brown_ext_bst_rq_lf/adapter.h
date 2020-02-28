@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of a lock-free unbalanced binary search tree using LLX/SCX.
  * Trevor Brown, 2018.

@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   rq_unsafe.h
  * Author: trbot

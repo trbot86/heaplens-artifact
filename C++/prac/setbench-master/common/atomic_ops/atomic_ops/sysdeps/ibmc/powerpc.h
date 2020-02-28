@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* FIXME.  This is only a placeholder for the AIX compiler.             */
 /* It doesn't work.  Please send a patch.                               */
 /* Memory model documented at http://www-106.ibm.com/developerworks/    */

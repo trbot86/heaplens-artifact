@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* NEC LE-IT: For 64Bit OS we extend the double type to hold two int64's
 *
 *  x86-64: __m128 serves as placeholder which also requires the compiler

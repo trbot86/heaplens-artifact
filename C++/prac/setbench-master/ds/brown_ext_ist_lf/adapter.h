@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of a lock-free interpolation search tree.
  * Trevor Brown, 2019.

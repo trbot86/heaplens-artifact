@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * C++ record manager implementation (PODC 2015) by Trevor Brown.
  * 

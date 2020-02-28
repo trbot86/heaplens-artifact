@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   stats_config.h
  * Author: trbot

@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of the lock-free external BST of Natarajan and Mittal.
  * Trevor Brown, 2017. (Based on Natarajan's original code.)

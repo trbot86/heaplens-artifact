@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of the internal lock-free BST of Ramachandran and Mittal.
  * This is a heavily modified version of the original authors' implementation.

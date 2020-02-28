@@ -1,3 +1,4 @@
+#include "memhook.h"
 #ifndef DUMMY_ADAPTER_H
 #define DUMMY_ADAPTER_H
 

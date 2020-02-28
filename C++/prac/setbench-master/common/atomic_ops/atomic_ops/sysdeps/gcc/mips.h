@@ -1,3 +1,4 @@
+#include "memhook.h"
 /*
  * Copyright (c) 2005,2007  Thiemo Seufer <ths@networkno.de>
  *

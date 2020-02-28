@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   numa_tools.h
  * Author: t35brown

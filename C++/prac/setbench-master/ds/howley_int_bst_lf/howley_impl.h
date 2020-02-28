@@ -1,3 +1,4 @@
+#include "memhook.h"
 /*   
  *   File: bst_howley.c
  *   Author: Balmau Oana <oana.balmau@epfl.ch>, 

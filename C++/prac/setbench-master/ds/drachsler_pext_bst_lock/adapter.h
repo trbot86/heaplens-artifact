@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of the "logical ordering" BST of Drachsler et al.
  * This is a heavily modified version of the ASCYLIB implementation.

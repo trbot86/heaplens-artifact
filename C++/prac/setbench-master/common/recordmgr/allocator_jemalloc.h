@@ -1,3 +1,4 @@
+#include "memhook.h"
 // note: this does not work, because jemalloc's current release relies on a static TLS block that we can't allocate if we load the library this way... also, loading allocators this way is probably dangerous without ensuring that all data structures carefully use allocate() instead of new. worse, using allocate() is infeasible if you have nodes with variables sizes, as in the istree... the record manager probably needs a redesign to be based on object sizes, rather than types. of course, the size would have to be encoded somewhere...
 
 ///**

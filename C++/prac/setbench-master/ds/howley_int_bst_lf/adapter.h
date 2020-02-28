@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of the internal lock-free BST of Howley et al.
  * This is a heavily modified version of the ASCYLIB implementation.

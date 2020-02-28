@@ -1,3 +1,4 @@
+#include "memhook.h"
 /*
  * Copyright (C) 2009 Bradley Smith <brad@brad-smith.co.uk>
  *

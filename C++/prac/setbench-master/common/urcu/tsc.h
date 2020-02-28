@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Copyright 2015
  * Maya Arbel (mayaarl [at] cs [dot] technion [dot] ac [dot] il).

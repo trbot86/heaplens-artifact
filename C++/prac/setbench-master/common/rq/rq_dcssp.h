@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   rq_dcssp.h
  * Author: trbot

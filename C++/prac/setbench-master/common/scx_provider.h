@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * Modular implementation of LLX and SCX.
  * 

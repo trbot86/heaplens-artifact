@@ -1,3 +1,4 @@
+#include "memhook.h"
 #ifndef BST_HOHLOCK_H
 #define	BST_HOHLOCK_H
 

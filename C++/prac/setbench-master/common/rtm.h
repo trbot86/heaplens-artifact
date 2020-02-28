@@ -1,3 +1,4 @@
+#include "memhook.h"
 #ifndef _RTM_H
 #define _RTM_H 1
 

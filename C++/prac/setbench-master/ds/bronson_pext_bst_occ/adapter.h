@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of the relaxed AVL tree of Bronson et al.,
  * which uses optimistic concurrency control and fine grained locking.

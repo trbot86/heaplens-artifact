@@ -1,3 +1,4 @@
+#include "memhook.h"
 /*
  * Copyright (c) 2007 by NEC LE-IT:               All rights reserved.
  * A transcription of ARMv6 atomic operations for the ARM Realview Toolchain.

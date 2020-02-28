@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of the ASCYLIB ticket lock of David, Guerraoui and Trigonakis.
  * This is a heavily modified version of the ASCYLIB implementation.

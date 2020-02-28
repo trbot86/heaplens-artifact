@@ -1,3 +1,4 @@
+#include "memhook.h"
 #ifndef BST_GLOCK_H
 #define	BST_GLOCK_H
 

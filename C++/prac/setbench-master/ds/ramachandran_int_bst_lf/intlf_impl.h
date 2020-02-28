@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   intlf.h
  * Author: Trevor Brown

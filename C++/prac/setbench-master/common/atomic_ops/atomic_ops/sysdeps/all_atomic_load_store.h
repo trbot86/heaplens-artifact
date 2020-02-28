@@ -1,3 +1,4 @@
+#include "memhook.h"
 /*
  * Copyright (c) 2004 Hewlett-Packard Development Company, L.P.
  *

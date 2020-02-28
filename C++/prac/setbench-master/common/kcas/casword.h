@@ -1,3 +1,4 @@
+#include "memhook.h"
 #pragma once
 
 #include <cassert>

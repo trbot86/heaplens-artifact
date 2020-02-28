@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   hashlist.h
  * Author: trbot

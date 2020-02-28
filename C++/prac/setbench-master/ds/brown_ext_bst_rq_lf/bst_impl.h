@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * C++ implementation of unbalanced binary search tree using LLX/SCX.
  * 

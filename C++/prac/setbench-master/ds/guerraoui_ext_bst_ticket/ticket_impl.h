@@ -1,3 +1,4 @@
+#include "memhook.h"
 /*   
  *   File: bst_tk.c
  *   Author: Vasileios Trigonakis <vasileios.trigonakis@epfl.ch>

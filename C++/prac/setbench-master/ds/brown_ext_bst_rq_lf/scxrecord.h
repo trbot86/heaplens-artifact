@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Preliminary C++ implementation of binary search tree using LLX/SCX.
  * 

@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of the dictionary ADT with a lock-free B-slack tree.
  * Copyright (C) 2016 Trevor Brown

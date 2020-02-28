@@ -1,3 +1,4 @@
+#include "memhook.h"
 #pragma once
 
 #define CASWORD_BITS_TYPE casword_t

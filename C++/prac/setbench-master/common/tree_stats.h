@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * This class lets us write methods to gather tree structure statistics once,
  * and apply them to many data structures.

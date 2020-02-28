@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * @TODO: ADD COMMENT HEADER
  */

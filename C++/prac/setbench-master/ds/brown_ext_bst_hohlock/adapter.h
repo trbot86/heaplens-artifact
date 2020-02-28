@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of a hand-over-hand locking unbalanced external binary search tree.
  * Trevor Brown, 2018.

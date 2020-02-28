@@ -1,3 +1,4 @@
+#include "memhook.h"
 /*   
  *   File: bst_ellen.c
  *   Author: Tudor David <tudor.david@epfl.ch>

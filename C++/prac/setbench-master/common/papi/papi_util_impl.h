@@ -1,3 +1,4 @@
+#include "memhook.h"
 #ifndef PAPI_UTIL_IMPL_H
 #define PAPI_UTIL_IMPL_H
 #include "papi_util.h"

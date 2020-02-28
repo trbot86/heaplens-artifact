@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Simple intrusive lock-free stack using preexisting block objects.
  * operates on elements of the block<T> type defined in blockbag.h.

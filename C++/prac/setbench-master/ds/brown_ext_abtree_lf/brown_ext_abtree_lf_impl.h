@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of the dictionary ADT with a lock-free relaxed (a,b)-tree.
  * Copyright (C) 2016 Trevor Brown

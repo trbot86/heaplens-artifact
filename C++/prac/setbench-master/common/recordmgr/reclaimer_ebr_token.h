@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Variant of EBR using token passing.
  * 

@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   errors.h
  * Author: trbot

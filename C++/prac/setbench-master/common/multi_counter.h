@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   multi_counter.h
  * Author: tbrown

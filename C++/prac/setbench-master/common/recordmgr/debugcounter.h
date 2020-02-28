@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   debugcounter.h
  * Author: trbot

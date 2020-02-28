@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   reportitem.h
  * Author: trbot

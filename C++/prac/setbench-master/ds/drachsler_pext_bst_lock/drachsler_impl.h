@@ -1,3 +1,4 @@
+#include "memhook.h"
 /*   
  *   File: bst-drachsler.c
  *   Author: Tudor David <tudor.david@epfl.ch>

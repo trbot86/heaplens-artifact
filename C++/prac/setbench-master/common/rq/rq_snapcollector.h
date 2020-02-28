@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   rq_rwlock.h
  * Author: trbot

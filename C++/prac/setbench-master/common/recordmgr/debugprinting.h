@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   debugprinting.h
  * Author: trbot

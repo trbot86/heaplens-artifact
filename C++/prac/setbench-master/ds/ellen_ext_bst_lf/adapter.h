@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of the lock-free external BST of Ellen, Fatourou, Ruppert and van Breugel.
  * This is a heavily modified version of the ASCYLIB implementation (see copyright in ellen.h).

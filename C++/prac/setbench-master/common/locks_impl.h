@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   locks_impl.h
  * Author: trbot

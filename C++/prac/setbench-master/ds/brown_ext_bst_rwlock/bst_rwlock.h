@@ -1,3 +1,4 @@
+#include "memhook.h"
 #ifndef BST_RWLOCK_H
 #define	BST_RWLOCK_H
 

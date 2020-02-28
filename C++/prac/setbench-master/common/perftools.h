@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Original wrapper for linux perf-tools by Henrik Mühe
  * https://muehe.org/posts/profiling-only-parts-of-your-code-with-perf/

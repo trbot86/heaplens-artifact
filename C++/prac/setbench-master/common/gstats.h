@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Usage goal:
  *  gstats_all_data::create_stat(name, optional aggregation_and_print_function)

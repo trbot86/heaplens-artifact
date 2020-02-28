@@ -1,3 +1,4 @@
+#include "memhook.h"
 /*
  * Copyright (c) 2009 by Takashi YOSHII. All rights reserved.
  *

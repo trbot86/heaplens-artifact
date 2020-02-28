@@ -1,3 +1,4 @@
+#include "memhook.h"
 /**
  * Implementation of a lock-free relaxed (a,b)-tree using LLX/SCX.
  * Trevor Brown, 2018.

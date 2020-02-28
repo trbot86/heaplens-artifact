@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   descriptors_impl.h
  * Author: tabrown

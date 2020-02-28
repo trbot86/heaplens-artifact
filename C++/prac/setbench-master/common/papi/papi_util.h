@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   papi_util.h
  * Author: Maya Arbel-Raviv

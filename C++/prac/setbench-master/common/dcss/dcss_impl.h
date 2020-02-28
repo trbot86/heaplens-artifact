@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   dcss_impl.h
  * Author: Maya Arbel-Raviv and Trevor Brown

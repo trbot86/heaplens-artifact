@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* 
  * File:   rlu.h
  * Taken from https://github.com/rlu-sync/rlu/ (a1e7e9e  on Aug 23, 2015)

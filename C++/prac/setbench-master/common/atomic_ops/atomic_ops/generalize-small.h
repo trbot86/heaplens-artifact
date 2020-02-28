@@ -1,3 +1,4 @@
+#include "memhook.h"
 /* char_load */
 #if defined(AO_HAVE_char_load_acquire) && !defined(AO_HAVE_char_load)
 #  define AO_char_load(addr) AO_char_load_acquire(addr)

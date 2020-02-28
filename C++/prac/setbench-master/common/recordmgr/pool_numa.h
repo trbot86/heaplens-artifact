@@ -1,3 +1,4 @@
+#include "memhook.h"
                                                                                                                                             /**
  * NUMA aware bounded object pool
  * 
