@@ -31,28 +31,24 @@ int get_slot(thread::id id) {
 		}
 		
 		if(__sync_bool_compare_and_swap(&sarr[iter].occupied, false, true)) {
-			cout << iter << endl;
+			// cout << iter << endl;
 			sarr[iter].id = id;
             it = sarr[iter].offset;
 			return iter;
 		}
-		cout << "failed\n";
+		// cout << "failed\n";
 		iter = (iter+1)%MAX_THREADS;
 	}
 }
 
 ostream& operator << (ostream& os, info_t& info) {
         if(info.file) {
-            os << info.file << endl;
-            os << tmap[info.tindex] << endl;
+            os << info.file << "|" << tmap[info.tindex];
         }
-        else
-            os << "empty" << endl;
-        os << info.line << endl;
-        os << info.timestamp << endl;
-        os << info.size << endl;
-        os << info.addr << endl;
-        os << info.typeofop << endl;
+        else {
+            os << "empty" << "|" << "emptytype";
+        }
+        os << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << info.addr << "|" << info.typeofop << endl;
         return os;
 }
 
@@ -246,6 +242,7 @@ void operator delete(void * mem) {
     
     if(it < MAX_TRACK) {
         myArray[it].timestamp = get_server_clock();
+        myArray[it].size = -1;
         myArray[it].addr = mem;
         myArray[it].typeofop = false;
     }
@@ -266,6 +263,7 @@ void operator delete[](void *mem) {
 
     if(it < MAX_TRACK) {
         myArray[it].timestamp = get_server_clock();
+        myArray[it].size = -1;
         myArray[it].addr = mem;
         myArray[it].typeofop = false;
     }

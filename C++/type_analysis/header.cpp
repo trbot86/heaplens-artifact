@@ -46,4 +46,5 @@ int main() {
   // delete mc2;
   // delete mc.field;
   // delete ([]{return new int; })();
+  return 0;
 }

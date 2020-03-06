@@ -1,4 +1,3 @@
-#include "memhook.h"
 #include <iostream>
 
 struct somerandomstruct {

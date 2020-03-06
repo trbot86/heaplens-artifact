@@ -19,6 +19,8 @@ typedef long long test_type;
 #include <omp.h>
 #include <perftools.h>
 
+#include "memhook.h"
+
 #ifdef PRINT_JEMALLOC_STATS
     #include <jemalloc/jemalloc.h>
     #define DEBUG_PRINT_ARENA_STATS malloc_stats_print(printCallback, NULL, "ag")
@@ -130,8 +132,7 @@ PAD;
     __RLU_INIT_ALL;
 #define DEINIT_ALL \
     __RLU_DEINIT_ALL; \
-    __RCU_DEINIT_ALL;
-    
+    __RCU_DEINIT_ALL; 
     
     
     
@@ -260,7 +261,10 @@ void thread_prefill_with_updates(GlobalsT * g, int __tid) {
             }
         }
         
-        VERBOSE if (cnt&&((cnt % 1000000) == 0)) COUTATOMICTID("op# "<<cnt<<std::endl);
+        // if (cnt&&((cnt % 1000000) == 0)) 
+            // COUTATOMICTID("op# "<<cnt<<std::endl);
+            // cout << "op# " << cnt << std::endl;
+
         test_type key = g->keygens[tid]->next();
         //test_type key = g->rngs[tid].next(MAXKEY) + 1;
         double op = g->rngs[tid].next(100000000) / 1000000.;
@@ -587,7 +591,10 @@ void thread_timed(GlobalsT * g, int __tid) {
             }
         }
         
-        VERBOSE if (cnt&&((cnt % 1000000) == 0)) COUTATOMICTID("op# "<<cnt<<std::endl);
+        // if (cnt&&((cnt % 1000000) == 0)) 
+        // COUTATOMICTID("op# "<<cnt<<std::endl);
+        // cout << "op# " << cnt << std::endl;
+
         test_type key = g->keygens[tid]->next();
         //test_type key = g->rngs[tid].next(MAXKEY) + 1;
 //        printf("    key=%d\n", key);
@@ -682,7 +689,10 @@ void thread_rq(GlobalsT * g, int __tid) {
             }
         }
         
-        VERBOSE if (cnt&&((cnt % 1000000) == 0)) COUTATOMICTID("op# "<<cnt<<std::endl);
+        // if (cnt&&((cnt % 1000000) == 0)) 
+        // COUTATOMICTID("op# "<<cnt<<std::endl);
+        // cout << "op# " << cnt << std::endl;
+
         // TODO: make this respect KeyGenerators for non-uniform distributions
         uint64_t _key = g->rngs[tid].next() % std::max(1, MAXKEY - RQSIZE) + 1;
         assert(_key >= 1);

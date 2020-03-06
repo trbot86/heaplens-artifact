@@ -43,7 +43,7 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 set<string> typenameset;
 
 DeclarationMatcher classMatcher = 
-  cxxRecordDecl().bind("class");
+  cxxRecordDecl(unless(isExpansionInSystemHeader())).bind("class");
 
 StatementMatcher deleteMatcher =
   cxxDeleteExpr().bind("deletecall");
@@ -110,8 +110,8 @@ int main(int argc, const char **argv) {
   MatchFinder Finder;
   
   Finder.addMatcher(classMatcher, &cp);
-  Finder.addMatcher(deleteMatcher, &dp);
-  Finder.addMatcher(newMatcher, &np);  
+  // Finder.addMatcher(deleteMatcher, &dp);
+  // Finder.addMatcher(newMatcher, &np);  
 
   Tool.run(newFrontendActionFactory(&Finder).get());
   // Tool.run(newFrontendActionFactory<SyntaxOnlyAction>().get());

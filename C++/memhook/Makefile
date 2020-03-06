@@ -8,8 +8,14 @@ all:
 link:
 	$(CC) memhook.cpp memalloc.cpp -pthread -Wall -g -o b.out
 
+db:
+	$(CC) savetodb.cpp -lsqlite3 -g -o database.out
+
 prac:
 	$(CC) a.cpp -I./ -L./ -Wl,-rpath=./ -pthread -lmemhook -g -o a.out
+
+sifter:
+	$(CC) -W -Wall -fmessage-length=0 -Os -fomit-frame-pointer analyze.cpp -lsqlite3 -g -o sifter
 
 install:
 	cp libmemhook.so ../prac/setbench-master/lib

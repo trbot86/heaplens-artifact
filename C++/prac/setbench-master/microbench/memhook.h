@@ -16,7 +16,7 @@
 
 #define BACKTRACE_DEPTH 2
 #define MAX_THREADS 100
-#define MAX_TRACK 10000
+#define MAX_TRACK 100000
 #define MAX_TYPE_LENGTH 1000
 #define PADDING 64
 
@@ -75,7 +75,7 @@ class ThreadExiter
       //   exit_funcs.top()();
       //   exit_funcs.pop();
       // }
-      cout << "ThreadExiter dtor\n";
+      // cout << "ThreadExiter dtor\n";
       sarr[iter].offset = it++;
       sarr[iter].occupied = false;
     }

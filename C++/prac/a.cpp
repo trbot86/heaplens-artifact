@@ -1,8 +1,10 @@
-#include "memhook.h"
-
-#include "a.h"
-#include "b.h"
+#include <a.h>
+#include <b.h>
 #include <stdlib.h>
+
+class dumbclass {
+
+};
 
 
 int main() {
