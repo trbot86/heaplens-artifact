@@ -48,7 +48,7 @@ ostream& operator << (ostream& os, info_t& info) {
         else {
             os << "empty" << "|" << "emptytype";
         }
-        os << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << info.addr << "|" << info.typeofop << endl;
+        os << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
         return os;
 }
 

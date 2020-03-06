@@ -71,7 +71,7 @@ void readfromfile(const char *filename, sqlite3 *db)
                 // typeofop = atoi(data.c_str());
                 typeofop = data;
 
-                string command = "INSERT INTO ALLOCS VALUES ('" + file + "'" + "," + line + "," + timestamp + "," + size + "," + address + ", '" + type + "'"  + ");";
+                string command = "INSERT INTO ALLOCS VALUES ('" + file + "'" + ","  + type + "," + line + "," + timestamp + "," + size + "," + address + ", '" + typeofop + ");";
                 // cout << "inserting\n";
                 sqlite3_exec(db, command.c_str(), callback, 0, &zErrMsg);
                 break;
@@ -104,19 +104,21 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    string command = "CREATE TABLE ALLOCS("  \
+    string create = "CREATE TABLE ALLOCS("  \
       "FILE CHAR(50)    NOT NULL," \
+      "TYPE CHAR(100)," \
       "LINE INT    NOT NULL," \
       "TIMESTAMP INT PRIMARY KEY    NOT NULL," \
       "SIZE INT," \
-      "ADDRESS BLOB    NOT NULL," \
-      "TYPE CHAR(100)" \
+      "ADDRESS INT    NOT NULL," \
+      "isNew INT NOT NULL"
       ");";
 
     string gettablename = "SELECT table_name FROM information_schema.tables;";
 
-    string importdb = ".import info_t_dump.txt";
+    string importdb = ".import ../prac/setbench-master/microbench/info_t_dump.txt";
 
+    rc = sqlite3_exec(db, create.c_str(), callback, 0, &zErrMsg);
     rc = sqlite3_exec(db, importdb.c_str(), callback, 0, &zErrMsg);
     if (rc != SQLITE_OK)
     {

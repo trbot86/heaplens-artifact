@@ -42,8 +42,13 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 
 set<string> typenameset;
 
+multimap<string, string> fieldnameset;
+
 DeclarationMatcher classMatcher = 
   cxxRecordDecl(unless(isExpansionInSystemHeader())).bind("class");
+
+DeclarationMatcher fieldMatcher =
+  fieldDecl(unless(isExpansionInSystemHeader())).bind("field");
 
 StatementMatcher deleteMatcher =
   cxxDeleteExpr().bind("deletecall");
@@ -59,6 +64,11 @@ class ClassnamePrinter : public MatchFinder::MatchCallback {
     virtual void run(const MatchFinder::MatchResult &Result) {
       const RecordDecl* rd = Result.Nodes.getNodeAs<clang::RecordDecl>("class");
         typenameset.insert(rd->getDeclName().getAsString());
+        auto field_iter = rd->field_begin();
+
+        for(auto it = field_iter;it != rd->field_end();++it) {
+            fieldnameset.insert(pair<string, string>(rd->getDeclName().getAsString(), it->getDeclName().getAsString()));
+        }
     }
 };
 
@@ -117,13 +127,21 @@ int main(int argc, const char **argv) {
   // Tool.run(newFrontendActionFactory<SyntaxOnlyAction>().get());
   // Tool.run(newFrontendActionFactory<PreprocessOnlyAction>().get());
   
-  ofstream file;
-  file.open("typedump.txt");
+  ofstream typefile;
+  typefile.open("typedump.txt");
+  ofstream fieldfile;
+  fieldfile.open("fielddump.txt");
 
   for(auto i = typenameset.begin();i != typenameset.end();++i) {
-    file << *i << endl;
+    typefile << *i << endl;
   }
 
-  file.close();
+  for(auto i = fieldnameset.begin();i != fieldnameset.end();++i) {
+    fieldfile << (*i).first << " : " << (*i).second << endl;
+  }
+
+  typefile.close();
+  fieldfile.close();
+
   return 0;
 }
