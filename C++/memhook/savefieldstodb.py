@@ -1,0 +1,15 @@
+import sqlite3
+import csv
+from pandas import DataFrame
+
+con = sqlite3.connect("./fielddb")
+cur = con.cursor()
+cur.execute("CREATE TABLE FIELDS(CLASS CHAR(100) , TYPE CHAR(100) NOT NULL, FIELD CHAR (100), PRIMARY KEY (CLASS, TYPE, FIELD));") # use your column names here
+
+dr = csv.reader(open("../type_analysis/fielddump.txt",'r'), delimiter='|') # comma is default delimiter
+# to_db = [(i[0], i[1], i[2], i[3], i[4], i[5], i[6]) forfielddump
+
+cur.executemany("INSERT OR IGNORE INTO FIELDS VALUES (?, ?, ?);", dr)
+
+con.commit()
+con.close()

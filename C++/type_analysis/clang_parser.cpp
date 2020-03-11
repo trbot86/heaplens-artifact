@@ -42,7 +42,7 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 
 set<string> typenameset;
 
-multimap<string, string> fieldnameset;
+multimap<string, pair<string,string> > fieldnameset;
 
 DeclarationMatcher classMatcher = 
   cxxRecordDecl(unless(isExpansionInSystemHeader())).bind("class");
@@ -67,7 +67,11 @@ class ClassnamePrinter : public MatchFinder::MatchCallback {
         auto field_iter = rd->field_begin();
 
         for(auto it = field_iter;it != rd->field_end();++it) {
-            fieldnameset.insert(pair<string, string>(rd->getDeclName().getAsString(), it->getDeclName().getAsString()));
+          // cout << it->getType();
+          // cout << it->getASTContext().getTypeSize(it->getType()) << endl;
+          // cout << (it->getASTContext()).getTypeInfo(it->getType()).Width << endl;
+          // cout << it->getType().getAsString() << endl;
+          fieldnameset.insert(pair<string, pair<string, string> >(rd->getDeclName().getAsString(),pair<string,string> (it->getType().getAsString(), it->getDeclName().getAsString())));
         }
     }
 };
@@ -137,7 +141,7 @@ int main(int argc, const char **argv) {
   }
 
   for(auto i = fieldnameset.begin();i != fieldnameset.end();++i) {
-    fieldfile << (*i).first << " : " << (*i).second << endl;
+    fieldfile << (*i).first << " | " << (*i).second.first << " | " << (*i).second.second << endl;
   }
 
   typefile.close();
