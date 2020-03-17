@@ -43,12 +43,11 @@ int get_slot(thread::id id) {
 
 ostream& operator << (ostream& os, info_t& info) {
         if(info.file) {
-            os << info.file << "|" << tmap[info.tindex];
+            os << info.file << "|" << tmap[info.tindex] << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
         }
         else {
-            os << "empty" << "|" << "emptytype";
+            os << "empty" << "|" << "emptytype" << "|" << info.line << "|" << info.timestamp << "|" << 0 << "|" << (long)info.addr << "|" << info.typeofop << endl;
         }
-        os << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
         return os;
 }
 

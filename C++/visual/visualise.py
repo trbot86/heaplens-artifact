@@ -4,6 +4,7 @@
 
 import sys, sqlite3, matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 con = sqlite3.connect(sys.argv[1])
 
@@ -22,33 +23,43 @@ get_offsets = "SELECT ALLOCS.TYPE, ALLOCS.ADDRESS + FIELDS.SIZE as offset, FIELD
 FROM ALLOCS JOIN FIELDS \
 ON ALLOCS.TYPE = FIELDS.CLASS;"
 
-typename = input("Enter one of the above type:\n")
+# typename = input("Enter one of the above type:\n")
 
-cl_offsets = "SELECT (TEMP.ADDRESS + FIELDS.SIZE)%64 as offset \
-FROM (SELECT * FROM ALLOCS WHERE ALLOCS.TYPE = '" + typename + "' ) AS TEMP JOIN FIELDS ON TEMP.TYPE = FIELDS.CLASS \
-;"
+# cl_offsets = "SELECT (TEMP.ADDRESS + FIELDS.SIZE)%64 as offset \
+# FROM (SELECT * FROM ALLOCS WHERE ALLOCS.TYPE = '" + typename + "' ) AS TEMP JOIN FIELDS ON TEMP.TYPE = FIELDS.CLASS \
+# ;"
 
 simple_join = "CREATE VIEW simple_join AS \
                     SELECT ALLOCS.TYPE, ALLOCS.TIMESTAMP, FIELDS.FIELD, FIELDS.TYPE, FIELDS.SIZE \
                         FROM ALLOCS JOIN FIELDS \
                             ON ALLOCS.TYPE = FIELDS.CLASS;"
 
-pivot_command = "SELECT 'AverageCost' AS Cost_Sorted_By_Production_Days,
-[0], [1], [2], [3], [4]  
-FROM  
-(SELECT DaysToManufacture, StandardCost   
-    FROM Production.Product) AS SourceTable  
-PIVOT  
-(  
-AVG(StandardCost)  
-FOR DaysToManufacture IN ([0], [1], [2], [3], [4])  
-) AS PivotTable;"
+timewise_allocation = "select \
+    (timestamp/1000000 \
+        - (select min(timestamp)/1000000 from allocs)) \
+        as tsdiv, type, \
+    sum(size) as sz \
+from allocs group by tsdiv, type;"
 
-cur.execute(cl_offsets)
+# cur.execute(cl_offsets)
 
-result = cur.fetchall()
+# result = cur.fetchall()
 
-keys, counts = np.unique(result, return_counts=True)
+df = pd.read_sql_query(timewise_allocation, con)
 
-plt.bar(keys, counts)
+print(df)
+
+pivot_table = pd.pivot_table(df,index=['tsdiv'] ,values=['sz'], columns='TYPE', fill_value = 0, aggfunc='first')
+# pivot_table = df.unstack(level=['TYPE'])
+
+# print(pivot_table)
+
+pivot_table = pivot_table[1:]
+
+pivot_table.plot()
 plt.show()
+
+# keys, counts = np.unique(result, return_counts=True)
+
+# plt.bar(keys, counts)
+# plt.show()
