@@ -41,25 +41,25 @@ timewise_allocation = "select \
     sum(size) as sz \
 from allocs group by tsdiv, type;"
 
-# cur.execute(cl_offsets)
-
-# result = cur.fetchall()
-
 df = pd.read_sql_query(timewise_allocation, con)
 
 print(df)
 
 pivot_table = pd.pivot_table(df,index=['tsdiv'] ,values=['sz'], columns='TYPE', fill_value = 0, aggfunc='first')
-# pivot_table = df.unstack(level=['TYPE'])
-
-# print(pivot_table)
 
 pivot_table = pivot_table[1:]
 
-pivot_table.plot()
+pivot_table.columns = ['_'.join(col) for col in pivot_table.columns]
+
+print(pivot_table.cumsum()[0:1000])
+
+pivot_table.cumsum().plot()
 plt.show()
 
 # keys, counts = np.unique(result, return_counts=True)
 
 # plt.bar(keys, counts)
 # plt.show()
+
+
+#############################################################################################################
