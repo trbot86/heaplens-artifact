@@ -70,6 +70,8 @@ typequery = sys.argv[4]
 
 display(xbytes)
 
+get_typenames = "SELECT DISTINCT ALLOCS.TYPE FROM ALLOCS;"
+
 blocklistquery = "select distinct address/" + blocksize + " as blockno from ALLOCS where (" + typequery + ")"
 
 cache_query = "select type ,\
@@ -81,6 +83,10 @@ cache_query = "select type ,\
 from ALLOCS where (" + typequery + ") "
 
 xbytes = int(xbytes)
+
+typedf = pd.read_sql_query(get_typenames, con)
+
+print(typedf)
 
 blocknodf = pd.read_sql_query(blocklistquery, con)
 

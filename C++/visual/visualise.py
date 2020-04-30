@@ -5,6 +5,7 @@
 import sys, sqlite3, matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from typeparser import parsetypeandpointer
 
 con = sqlite3.connect(sys.argv[1])
 
@@ -42,6 +43,8 @@ timewise_allocation = "select \
 from allocs group by tsdiv, type;"
 
 df = pd.read_sql_query(timewise_allocation, con)
+
+df['TYPE'] = df['TYPE'].apply(parsetypeandpointer)
 
 print(df)
 
