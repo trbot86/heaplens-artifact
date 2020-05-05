@@ -130,5 +130,13 @@ colormap = setcolormap()
 
 gnt.set_prop_cycle(color=colormap)
 
-gnt.hlines(barchartdf['clno'], barchartdf['cloff'], barchartdf['cloff']+barchartdf['SIZE'], color=colormap, linewidth=4)
+gnt.hlines(barchartdf['clno'], barchartdf['cloff'], barchartdf['cloff']+barchartdf['SIZE'], color=colormap, linewidth=7)
+
+lastaddr = set()
+
+for i, j , k in zip(barchartdf['clno'], barchartdf['cloff'], barchartdf['ADDRESS']):
+        if not k in lastaddr:
+            plt.text(j, i, str(k) , ha='left', va='center')
+        lastaddr.add(k)
+
 plt.show()

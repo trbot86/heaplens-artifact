@@ -2,9 +2,11 @@ sifter/include contains the headers which have to be included in the main file o
 into your project folder. libmemhook.so must be linked with your project. You may choose to run refactor tool in type_analysis/ to
 change the malloc calls but it holds no guarantees for correct use as it is highly syntax dependant.
 
-testrun.sh will compile the source_refactor tool, run that tool on $1 and dump the refactored code in $2 file.
+memhook/testrun.sh will compile the source_refactor tool, run that tool on $1 and dump the refactored code in $2 file.
 It will then compile $2 with memhook library which contains the runtime memory allocation analysis code.
 a.out is the executable which is generated.
+
+prac/setbench-master/microbench/sifter.sh does a complete toolchain run from running setbench to generating db to visualising it.
 
 TODO:
 -- Integrate the source_refactor tool and memhook with large projects.
@@ -17,9 +19,6 @@ type_analysis:
     clang_parser.cpp : parses test file to collect all record names (i.e. class, struct and union names).
     source_refactor.cpp : parses test file to replace alloc, dealloc calls with respective templated versions.
         memhook.* will later use the templated functions to log type information.
-
-Compilation command for main logger:
-g++ memalloc.cpp memhook.cpp -Wall -pthread -g -o a.out
 
 NOTE:
 

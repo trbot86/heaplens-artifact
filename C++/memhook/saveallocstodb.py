@@ -3,7 +3,7 @@ import csv
 import sys
 from pandas import DataFrame
 
-con = sqlite3.connect("./db_output/" + sys.argv[1])
+con = sqlite3.connect("./db_output/" + sys.argv[1] + '.sqlite')
 cur = con.cursor()
 cur.execute("CREATE TABLE ALLOCS(FILE CHAR(50)    NOT NULL, TYPE CHAR(100), LINE INT    NOT NULL, TIMESTAMP INT  NOT NULL, SIZE INT, ADDRESS INT    NOT NULL, isNew INT NOT NULL);") # use your column names here
 
