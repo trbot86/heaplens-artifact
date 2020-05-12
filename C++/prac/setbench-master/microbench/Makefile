@@ -42,7 +42,7 @@ FLAGS += -DUSE_TREE_STATS
 #FLAGS += -Wno-format
 FLAGS += $(xargs)
 
-LDFLAGS += -L../../../memhook/ -Wl,-rpath=../../../memhook/
+LDFLAGS += -L../../../memhook/ -Wl,-rpath=../../../memhook/ -I../../../memhook/
 LDFLAGS += -I./ -I../ `find ../common -type d | sed s/^/-I/`
 LDFLAGS += -lpthread -lmemhook
 LDFLAGS += -ldl

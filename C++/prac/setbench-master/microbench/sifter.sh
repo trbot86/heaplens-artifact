@@ -38,10 +38,10 @@ rm info_t_dump.txt
 if [ $preload_flag == 'true' ]
 then
     echo_color "preloading jemalloc..."
-    LD_PRELOAD=../lib/libjemalloc.so ./bin/ubench_howley_int_bst_lf.alloc_new.reclaim_none.pool_none.out -i 5 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -nwork 1
+    LD_PRELOAD=../lib/libjemalloc.so ./bin/ubench_howley_int_bst_lf.alloc_new.reclaim_none.pool_none.out -nprefill 4 -i 0 -d 0 -rq 0 -rqsize 1 -k 200000 -nrq 0 -t 3000 -nwork 4
 else
     echo_color "running without any special allocator..."
-    ./bin/ubench_howley_int_bst_lf.alloc_new.reclaim_none.pool_none.out -i 5 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -nwork 1
+    ./bin/ubench_howley_int_bst_lf.alloc_new.reclaim_none.pool_none.out -nprefill 4 -i 0 -d 0 -rq 0 -rqsize 1 -k 200000 -nrq 0 -t 3000 -nwork 4
 fi
 
 cd ../../../memhook
@@ -54,4 +54,6 @@ python3 saveallocstodb.py temp
 
 cd ../visual
 echo_color "starting visualisation routine..."
-python3 bar_chart.py ../memhook/db_output/temp.sqlite 4096 64 "type like \"node_t<long long, void*>\" or type like \"operation_t<long long, void*>\""
+python3 cacheline_in_block.py ../memhook/db_output/temp.sqlite 4096 64 "type like \"node_t<long long, void*>\" or type like \"operation_t<long long, void*>\""
+# python3 set_allocation.py ../memhook/db_output/temp.sqlite 1024 64 "type like \"node_t<long long, void*>\" or type like \"operation_t<long long, void*>\""
+python3 set_allocation.py ../memhook/db_output/temp.sqlite 1024 64 "type like \"node_t<long long, void*>\""

@@ -1,0 +1,14 @@
+L1(d):
+size: 32K
+cline: 64B
+blocksize: 4096B
+setbits: 16
+
+L2:
+size: 1024K
+cline: 64B
+blocksize: 4096B
+setbits: 10
+
+LLC:
+size: 33792K
