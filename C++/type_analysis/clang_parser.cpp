@@ -20,7 +20,8 @@
 #include <clang/AST/ExprCXX.h>
 #include <clang/AST/Type.h>
 // #include <clang/AST/ASTConsumer.h>
-// #include <clang/AST/ASTContext.h>
+#include <clang/AST/ASTContext.h>
+#include <clang/AST/RecordLayout.h>
 // #include <clang/AST/RecursiveASTVisitor.h>
 // #include <clang/Driver/Options.h>
 // #include <clang/Frontend/ASTConsumers.h>
@@ -45,7 +46,7 @@ set<string> typenameset;
 multimap<string, pair<string,string> > fieldnameset;
 
 DeclarationMatcher classMatcher = 
-  cxxRecordDecl(unless(isExpansionInSystemHeader())).bind("class");
+  cxxRecordDecl(unless(isExpansionInSystemHeader()), isTemplateInstantiation()).bind("class");
 
 DeclarationMatcher fieldMatcher =
   fieldDecl(unless(isExpansionInSystemHeader())).bind("field");
@@ -64,13 +65,25 @@ class ClassnamePrinter : public MatchFinder::MatchCallback {
     virtual void run(const MatchFinder::MatchResult &Result) {
       const RecordDecl* rd = Result.Nodes.getNodeAs<clang::RecordDecl>("class");
         typenameset.insert(rd->getDeclName().getAsString());
+        cout << endl;
+        // cout << "visiting: " << rd->getDeclName().getAsString() << endl;
+        cout << rd->getQualifiedNameAsString() << endl;
         auto field_iter = rd->field_begin();
+        auto& context = rd->getASTContext();
+        auto& rl = context.getASTRecordLayout(rd);
+        // auto& rl = (rd->getASTContext()).getASTRecordLayout(rd);
+
+        // for(unsigned i = 0;i < rl.getFieldCount();i++) {
+          // cout << rl.getFieldOffset(i) << endl;
+        // }
 
         for(auto it = field_iter;it != rd->field_end();++it) {
           // cout << it->getType();
-          // cout << it->getASTContext().getTypeSize(it->getType()) << endl;
+          cout << it->getNameAsString() << endl;
+          cout << it->getASTContext().getTypeSize(it->getType())/8 << endl;
+          cout << rl.getFieldOffset(it->getFieldIndex()) << endl;
           // cout << (it->getASTContext()).getTypeInfo(it->getType()).Width << endl;
-          // cout << it->getType().getAsString() << endl;
+          cout << it->getType().getAsString() << endl;
           fieldnameset.insert(pair<string, pair<string, string> >(rd->getDeclName().getAsString(),pair<string,string> (it->getType().getAsString(), it->getDeclName().getAsString())));
         }
     }

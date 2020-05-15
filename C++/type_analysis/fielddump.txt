@@ -1,0 +1,4 @@
+myStruct | float | x
+myStruct | long long | l
+newclass | int | h
+newclass | struct newclass<float>::myStruct | y

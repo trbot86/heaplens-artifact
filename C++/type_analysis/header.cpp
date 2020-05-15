@@ -14,31 +14,61 @@ template < typename T>
 class MyClass
 {
 public:
-  T* field;
+  int a;
+  bool b;
+  bool c;
+  T field;
+  bool d;
+  int e;
+  bool f;
+  long long arr[100];
+  T g;
 };
 
-class A {
-  public:
-  int a;
+template < typename T>
+class newclass {
+  int h;
+  struct myStruct {
+    T x;
+    long long l;
+  };
+
+  myStruct y;
 };
+
+// class A {
+//   public:
+//   bool x;
+//   int a;
+//   int b;
+//   bool c;
+//   bool d;
+//   long l;
+// };
 
 // template <typename T>
-float* func() {
+// float* func() {
   // T* t = new T;
-}
+// }
 
 int main() {
   // MyClass<int> mc;
   // MyClass<double> md;
   // mc.field = new int;
-  int f;
-  f = (unsigned long long)5;
+  // int f;
+  // f = (unsigned long long)5;
   // int a = (int)f;
-  int* r = (int*)malloc(sizeof(int));
-  float* g = (float*)func();
+  // int* r = (int*)malloc(sizeof(int));
+  // float* g = (float*)func();
 
-  MyClass<float>* mclass = (MyClass<float>*)malloc<MyClass<float>>(8);
+  // A* a = new class A;
+  // MyClass<float>* mclass = (MyClass<float>*)malloc<MyClass<float>>(8);
+  // MyClass<float>* mc2 = new MyClass<float>;
+
+  newclass<float>* n = new newclass<float>;
+  // n.x = 0;
   // MyClass<int>* mc2 = new MyClass<int>;
+  // MyClass<long>* mc2 = new MyClass<long>;
   // char* arr = new char[10];
   // string* p = new (arr) string("hi");
   // int* str = (int*)(operator new (sizeof(string)));

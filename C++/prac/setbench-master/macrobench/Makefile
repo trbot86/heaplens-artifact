@@ -39,7 +39,8 @@ CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -I$(data_structure_path) $(data_structure_opts)
 LDFLAGS += $(CFLAGS)
 LDFLAGS += -L. -L../lib -g
-LDFLAGS += -lpthread
+LDFLAGS += -L../../../memhook/ -Wl,-rpath=../../../memhook/ -I../../../memhook/
+LDFLAGS += -lpthread -lmemhook
 #LDFLAGS += -lrt
 #LDFLAGS += -ldl
 
