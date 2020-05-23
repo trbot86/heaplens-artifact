@@ -70,7 +70,7 @@ PAD;
     #define PRINTS(name) { std::cout<<#name<<"="<<STR(name)<<std::endl; }
 #endif
 
-#include "adapter.h" /* data structure adapter header (selected according to the "ds/..." subdirectory in the -I include paths */
+#include "../ds/howley_int_bst_lf/adapter.h" /* data structure adapter header (selected according to the "ds/..." subdirectory in the -I include paths */
 #include "tree_stats.h"
 #define DS_ADAPTER_T ds_adapter<test_type, VALUE_TYPE, RECLAIM<>, ALLOC<>, POOL<> >
 
@@ -297,7 +297,8 @@ void thread_prefill_with_updates(GlobalsT * g, int __tid) {
 }
 
 // note: this function guarantees that exactly expectedSize keys are inserted into the data structure by the end
-void prefillWithInserts(auto g, int64_t expectedSize) {
+template <typename globals_t>
+void prefillWithInserts(globals_t g, int64_t expectedSize) {
     std::cout<<"Info: prefilling using INSERTION ONLY."<<std::endl;
     auto prefillStartTime = std::chrono::high_resolution_clock::now();
     
@@ -471,7 +472,8 @@ void prefillWithUpdates(GlobalsT * g, int64_t expectedSize) {
     GSTATS_CLEAR_VAL(timer_bag_rotation_start, get_server_clock());
 }
 
-size_t * prefillWithArrayConstruction(auto g, int64_t expectedSize) {
+template <typename globals_t>
+size_t * prefillWithArrayConstruction(globals_t g, int64_t expectedSize) {
     std::cout<<"Info: prefilling using ARRAY CONSTRUCTION to expectedSize="<<expectedSize<<" w/MAXKEY="<<MAXKEY<<"."<<std::endl;
     if (MAXKEY < expectedSize) setbench_error("specified key range must be large enough to accommodate the specified prefill size");
     
@@ -517,7 +519,8 @@ size_t * prefillWithArrayConstruction(auto g, int64_t expectedSize) {
     return present;
 }
 
-void createAndPrefillDataStructure(auto g, int64_t expectedSize) {
+template <typename globals_t>
+void createAndPrefillDataStructure(globals_t g, int64_t expectedSize) {
     if (PREFILL_THREADS == 0) {
         g->dsAdapter = new DS_ADAPTER_T(std::max(PREFILL_THREADS, TOTAL_THREADS), g->KEY_MIN, g->KEY_MAX, g->NO_VALUE, g->rngs);
         return;
@@ -852,12 +855,14 @@ void trial(GlobalsT * g) {
     DEINIT_ALL;
 }
 
-void printExecutionTime(auto g) {
+template <typename globals_t>
+void printExecutionTime(globals_t g) {
     auto programExecutionElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - g->programExecutionStartTime).count();
     std::cout<<"total_execution_walltime="<<(programExecutionElapsed/1000.)<<"s"<<std::endl;
 }
 
-void printOutput(auto g) {
+template <typename globals_t>
+void printOutput(globals_t g) {
     std::cout<<"PRODUCING OUTPUT"<<std::endl;
 #ifdef USE_TREE_STATS
     auto timeBeforeTreeStats = std::chrono::high_resolution_clock::now();
@@ -1007,7 +1012,8 @@ void printOutput(auto g) {
 #endif
 }
 
-void main_continued_with_globals(auto g) {
+template <typename globals_t>
+void main_continued_with_globals(globals_t g) {
     g->programExecutionStartTime = std::chrono::high_resolution_clock::now();
 
     // print object sizes, to help debugging/sanity checking memory layouts

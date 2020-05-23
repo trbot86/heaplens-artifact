@@ -10,20 +10,23 @@ T* malloc(size_t size) {
   return (T*)malloc(size);
 }
 
-template < typename T>
+template < typename T, typename Y=int>
 class MyClass
 {
 public:
   int a;
-  bool b;
-  bool c;
-  T field;
-  bool d;
-  int e;
-  bool f;
-  long long arr[100];
+  Y j;
+  // bool b;
+  // bool c;
+  // T field;
+  // bool d;
+  // int e;
+  // bool f;
+  // long long arr[100];
   T g;
 };
+
+#define CLASS myClass<int>
 
 template < typename T>
 class newclass {
@@ -65,9 +68,10 @@ int main() {
   // MyClass<float>* mclass = (MyClass<float>*)malloc<MyClass<float>>(8);
   // MyClass<float>* mc2 = new MyClass<float>;
 
-  newclass<float>* n = new newclass<float>;
+  // newclass<float>* n = new newclass<float>;
   // n.x = 0;
   // MyClass<int>* mc2 = new MyClass<int>;
+  CLASS* arr = new CLASS;
   // MyClass<long>* mc2 = new MyClass<long>;
   // char* arr = new char[10];
   // string* p = new (arr) string("hi");

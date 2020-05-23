@@ -43,7 +43,7 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 
 set<string> typenameset;
 
-multimap<string, pair<string,string> > fieldnameset;
+multimap<string, vector<string> > fieldnameset;
 
 DeclarationMatcher classMatcher = 
   cxxRecordDecl(unless(isExpansionInSystemHeader()), isTemplateInstantiation()).bind("class");
@@ -71,6 +71,7 @@ class ClassnamePrinter : public MatchFinder::MatchCallback {
         auto field_iter = rd->field_begin();
         auto& context = rd->getASTContext();
         auto& rl = context.getASTRecordLayout(rd);
+        // cout << rl.
         // auto& rl = (rd->getASTContext()).getASTRecordLayout(rd);
 
         // for(unsigned i = 0;i < rl.getFieldCount();i++) {
@@ -79,12 +80,13 @@ class ClassnamePrinter : public MatchFinder::MatchCallback {
 
         for(auto it = field_iter;it != rd->field_end();++it) {
           // cout << it->getType();
-          cout << it->getNameAsString() << endl;
+          // cout << it->getNameAsString() << endl;
+          cout << it->getQualifiedNameAsString() << endl;
           cout << it->getASTContext().getTypeSize(it->getType())/8 << endl;
           cout << rl.getFieldOffset(it->getFieldIndex()) << endl;
           // cout << (it->getASTContext()).getTypeInfo(it->getType()).Width << endl;
           cout << it->getType().getAsString() << endl;
-          fieldnameset.insert(pair<string, pair<string, string> >(rd->getDeclName().getAsString(),pair<string,string> (it->getType().getAsString(), it->getDeclName().getAsString())));
+          fieldnameset.insert(pair<string, vector<string> >(rd->getQualifiedNameAsString(),{it->getType().getAsString(), it->getQualifiedNameAsString(), to_string(it->getASTContext().getTypeSize(it->getType())/8), to_string(rl.getFieldOffset(it->getFieldIndex())/8)}));
         }
     }
 };
@@ -154,7 +156,12 @@ int main(int argc, const char **argv) {
   }
 
   for(auto i = fieldnameset.begin();i != fieldnameset.end();++i) {
-    fieldfile << (*i).first << " | " << (*i).second.first << " | " << (*i).second.second << endl;
+    // fieldfile << (*i).first << " | " << (*i).second.first << " | " << (*i).second.second << endl;
+    fieldfile << (*i).first;
+    for(auto i : (*i).second) {
+      fieldfile << "|" << i;
+    }
+    fieldfile << endl;
   }
 
   typefile.close();
