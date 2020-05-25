@@ -1,6 +1,0 @@
-<map id="macrobench/concurrency_control/vll.h" name="macrobench/concurrency_control/vll.h">
-<area shape="rect" id="node2" href="$vll_8cpp.html" title="macrobench/concurrency\l_control/vll.cpp" alt="" coords="5,95,173,136"/>
-<area shape="rect" id="node3" href="$global_8cpp.html" title="macrobench/system/global.cpp" alt="" coords="197,102,400,129"/>
-<area shape="rect" id="node4" href="$macrobench_2system_2main_8cpp.html" title="macrobench/system/main.cpp" alt="" coords="424,102,621,129"/>
-<area shape="rect" id="node5" href="$thread_8cpp.html" title="macrobench/system/thread.cpp" alt="" coords="645,102,851,129"/>
-</map>

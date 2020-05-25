@@ -1,8 +1,0 @@
-<map id="TestWorkload" name="TestWorkload">
-<area shape="rect" id="node2" href="$classworkload.html" title="workload" alt="" coords="5,363,80,389"/>
-<area shape="rect" id="node3" href="$classtable__t.html" title="table_t" alt="" coords="108,184,169,211"/>
-<area shape="rect" id="node7" href="$classindex__base.html" title="index_base" alt="" coords="163,273,251,300"/>
-<area shape="rect" id="node4" href="$classCatalog.html" title="Catalog" alt="" coords="105,95,172,121"/>
-<area shape="rect" id="node5" href="$classColumn.html" title="Column" alt="" coords="105,5,172,32"/>
-<area shape="rect" id="node6" href="$classIndex.html" title="Index" alt="" coords="179,363,234,389"/>
-</map>

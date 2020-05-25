@@ -1,7 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classallocator__interface.html" title="allocator_interface\&lt; T \&gt;" alt="" coords="5,81,165,108"/>
-<area shape="rect" id="node2" href="$classallocator__bump.html" title="allocator_bump\&lt; T \&gt;" alt="" coords="245,5,387,32"/>
-<area shape="rect" id="node3" href="$classallocator__new.html" title="allocator_new\&lt; T \&gt;" alt="" coords="249,56,383,83"/>
-<area shape="rect" id="node4" href="$classallocator__new__segregated.html" title="allocator_new_segregated\&lt; T \&gt;" alt="" coords="213,107,419,133"/>
-<area shape="rect" id="node5" href="$classallocator__once.html" title="allocator_once\&lt; T \&gt;" alt="" coords="247,157,385,184"/>
-</map>

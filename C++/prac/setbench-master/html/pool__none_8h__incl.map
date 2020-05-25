@@ -1,9 +1,0 @@
-<map id="common/recordmgr/pool_none.h" name="common/recordmgr/pool_none.h">
-<area shape="rect" id="node4" href="$blockbag_8h.html" title="blockbag.h" alt="" coords="352,244,437,271"/>
-<area shape="rect" id="node5" href="$blockpool_8h.html" title="blockpool.h" alt="" coords="541,319,629,345"/>
-<area shape="rect" id="node6" href="$plaf_8h.html" title="plaf.h" alt="" coords="598,393,653,420"/>
-<area shape="rect" id="node9" href="$pool__interface_8h.html" title="pool_interface.h" alt="" coords="301,95,416,121"/>
-<area shape="rect" id="node7" href="$lockfreeblockbag_8h.html" title="lockfreeblockbag.h" alt="" coords="336,319,467,345"/>
-<area shape="rect" id="node10" href="$allocator__interface_8h.html" title="allocator_interface.h" alt="" coords="320,169,459,196"/>
-<area shape="rect" id="node11" href="$debug__info_8h.html" title="debug_info.h" alt="" coords="533,244,629,271"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classworkload.html" title="workload" alt="" coords="5,56,80,83"/>
-<area shape="rect" id="node2" href="$classTestWorkload.html" title="TestWorkload" alt="" coords="128,5,231,32"/>
-<area shape="rect" id="node3" href="$classtpcc__wl.html" title="tpcc_wl" alt="" coords="146,56,213,83"/>
-<area shape="rect" id="node4" href="$classycsb__wl.html" title="ycsb_wl" alt="" coords="144,107,215,133"/>
-</map>

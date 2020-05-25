@@ -1,5 +1,0 @@
-<map id="pool_interface&lt; T, Alloc &gt;" name="pool_interface&lt; T, Alloc &gt;">
-<area shape="rect" id="node2" href="$classpool__none.html" title="pool_none\&lt; T, Alloc \&gt;" alt="" coords="5,102,156,129"/>
-<area shape="rect" id="node3" href="$classpool__numa.html" title="pool_numa\&lt; T, Alloc \&gt;" alt="" coords="181,102,335,129"/>
-<area shape="rect" id="node4" href="$classpool__perthread__and__shared.html" title="pool_perthread_and\l_shared\&lt; T, Alloc \&gt;" alt="" coords="360,95,497,136"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="common/atomic_ops/atomic_ops/sysdeps/hpc/hppa.h" name="common/atomic_ops/atomic_ops/sysdeps/hpc/hppa.h">
-<area shape="rect" id="node2" href="$atomic__load__store_8h.html" title="../atomic_load_store.h" alt="" coords="5,95,156,121"/>
-<area shape="rect" id="node3" href="$ordered_8h.html" title="../ordered.h" alt="" coords="181,95,269,121"/>
-<area shape="rect" id="node4" href="$ordered__except__wr_8h.html" title="ordered_except_wr.h" alt="" coords="153,169,296,196"/>
-<area shape="rect" id="node5" href="$read__ordered_8h.html" title="read_ordered.h" alt="" coords="171,244,279,271"/>
-</map>

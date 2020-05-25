@@ -1,9 +1,0 @@
-<map id="common/atomic_ops/atomic_ops/sysdeps/ao_t_is_int.h" name="common/atomic_ops/atomic_ops/sysdeps/ao_t_is_int.h">
-<area shape="rect" id="node2" href="$m68k_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/m68k.h" alt="" coords="5,95,192,136"/>
-<area shape="rect" id="node3" href="$mips_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/mips.h" alt="" coords="216,95,403,136"/>
-<area shape="rect" id="node4" href="$gcc_2powerpc_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/powerpc.h" alt="" coords="427,95,619,136"/>
-<area shape="rect" id="node5" href="$gcc_2x86_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/x86.h" alt="" coords="643,95,829,136"/>
-<area shape="rect" id="node6" href="$hpc_2ia64_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/hpc/ia64.h" alt="" coords="853,95,1040,136"/>
-<area shape="rect" id="node7" href="$msftc_2x86_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/msftc/x86.h" alt="" coords="1064,95,1251,136"/>
-<area shape="rect" id="node8" href="$sunc_2x86_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/sunc/x86.h" alt="" coords="1275,95,1461,136"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="rlu_thread_data" name="rlu_thread_data">
-<area shape="rect" id="node2" href="$structobj__list.html" title="obj_list" alt="" coords="20,95,83,121"/>
-<area shape="rect" id="node3" href="$structwriter__locks.html" title="writer_locks" alt="" coords="5,5,97,32"/>
-<area shape="rect" id="node4" href="$structwait__entry.html" title="wait_entry" alt="" coords="122,95,205,121"/>
-</map>

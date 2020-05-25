@@ -1,8 +1,0 @@
-<map id="common/atomic_ops/atomic_ops/sysdeps/ordered.h" name="common/atomic_ops/atomic_ops/sysdeps/ordered.h">
-<area shape="rect" id="node2" href="$avr32_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/avr32.h" alt="" coords="5,95,192,136"/>
-<area shape="rect" id="node3" href="$cris_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/cris.h" alt="" coords="216,95,403,136"/>
-<area shape="rect" id="node4" href="$gcc_2hppa_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/hppa.h" alt="" coords="427,95,613,136"/>
-<area shape="rect" id="node5" href="$m68k_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/m68k.h" alt="" coords="637,95,824,136"/>
-<area shape="rect" id="node6" href="$sh_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/gcc/sh.h" alt="" coords="848,95,1035,136"/>
-<area shape="rect" id="node7" href="$hpc_2hppa_8h.html" title="common/atomic_ops/atomic\l_ops/sysdeps/hpc/hppa.h" alt="" coords="1059,95,1245,136"/>
-</map>
