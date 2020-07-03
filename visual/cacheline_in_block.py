@@ -6,6 +6,7 @@ import sys, sqlite3, matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.cm import get_cmap
+from matplotlib.lines import Line2D
 
 # pd.set_option('display.max_rows', None)
 
@@ -54,9 +55,11 @@ def insertnewrow():
 def setcolormap():
     global barchartdf
     d = dict([(y,x+1) for x,y in enumerate(sorted(set(barchartdf['TYPE'])))])
+    # print("DICTIONARY: ", d)
     cmap = get_cmap("rainbow", len(d))
     scheme = [(d[x]-1)/len(d) for x in barchartdf['TYPE']]
-    return cmap(scheme)
+    # print(scheme)
+    return d, set(scheme), cmap, cmap(scheme)
 
 
 con = sqlite3.connect(sys.argv[1])
@@ -126,11 +129,18 @@ gnt.set_yticks(ticks=range(0,int(barchartdf['clno'].max()),2), minor=True)
 gnt.grid(which='minor', alpha=0.8)
 gnt.grid(True)
 
-colormap = setcolormap()
+dct, mapping, clrmap, colormap = setcolormap()
+
+custom_lines = [Line2D([0], [0], color=clrmap(x), lw=4) for x in mapping]
+print(mapping)
+print(clrmap)
+print("custom_lines: ", [clrmap(x) for x in mapping])
 
 gnt.set_prop_cycle(color=colormap)
 
 gnt.hlines(barchartdf['clno'], barchartdf['cloff'], barchartdf['cloff']+barchartdf['SIZE'], color=colormap, linewidth=7)
+
+gnt.legend(custom_lines, list(dct.keys()))
 
 lastaddr = set()
 

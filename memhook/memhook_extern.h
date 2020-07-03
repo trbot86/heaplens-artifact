@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <execinfo.h>
 #include <cxxabi.h>
+#include <dlfcn.h>
 
 #define BACKTRACE_DEPTH 2
 #ifndef MAX_THREADS
@@ -23,14 +24,49 @@
 
 using namespace std;
 
+void* (*orig_malloc)(size_t);
+
 struct slot;
-class MemStamp;
 struct info_t;
 class ThreadExiter;
 typedef map<type_index, const char*> type_map;
 typedef set<const char*> filenameset;
 
+void   (*next_free)(void *ptr);
+void * (*next_malloc)(size_t size);
+void * (*next_calloc)(size_t nmemb, size_t size);
+
 extern thread_local int iter;
+
+class MemStamp
+{
+    public:
+        char const * const filename;
+        int const lineNum;
+    public:
+        MemStamp(char const *filename, int lineNum);
+        ~MemStamp();
+};
+
+class MemStampCollector {
+private:
+    slot* sarr;
+    info_t* allArrays;
+
+    int get_slot(thread::id id);
+
+public:
+    MemStampCollector();
+
+    ~MemStampCollector();
+
+    void add(uint64_t timestamp, size_t size, void * addr, bool typeofop);
+    void update(const char * file, unsigned int line, type_index tindex);
+    void threadexit();
+};
+
+
+extern MemStampCollector collector;
 
 /*Iterator for individual thread allocation in
 * tracking data structure
@@ -49,7 +85,6 @@ extern type_map tmap;
 extern filenameset fset;
 
 //Global array for tracking all allocations
-extern info_t* allArrays;
 
 //Local array tracking a thread's allocations
 extern thread_local info_t* myArray;
@@ -57,33 +92,43 @@ extern thread_local info_t* myArray;
 extern thread_local ThreadExiter exiter;
 
 inline uint64_t get_server_clock();
-__attribute__ ((constructor)) void allocArray();
-__attribute__ ((destructor)) void dumpentirestatstofile2();
+// __attribute__ ((constructor)) void allocArray();
+// __attribute__ ((destructor)) void dumpentirestatstofile2();
 void printstats();
 int get_slot(thread::id id);
 // void dumpentirestatstofile(const char* file);
-void dumpstatstofile(const char *file);
+// void dumpstatstofile(const char *file);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);
+
+void   (memhook_free)(void *ptr, bool log);
+void *memhook_malloc(size_t size, bool log);
 
 template <typename T>
 T malloc(size_t size, bool fakearg=true);
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
-    insert_type(p, stamp, type_index(typeid(T)));
+    collector.update(stamp.filename, stamp.lineNum, type_index(typeid(T)));
+    // insert_type(p, stamp, type_index(typeid(T)));
     return p;
 }
 
 template <typename T>
 T malloc(size_t size, bool fakearg) {
-    T ptr = (T)std::malloc(size);
+    T ptr = (T)memhook_malloc(size, true);
+    collector.update(nullptr, 0, type_index(typeid(T)));
     if(ptr == NULL) throw bad_alloc();
 
-    insert_info(size, ptr, type_index(typeid(T)));
-
+    // insert_info(size, ptr, type_index(typeid(T)));
     return ptr;
 }
+
+// void* malloc(size_t size) {
+//     if(!orig_malloc)
+//         orig_malloc = (void* (*) (size_t))dlsym(RTLD_NEXT, "malloc");
+//     return orig_malloc(size);
+// }
 
 #define SIFTER_NEW MemStamp(__FILE__, __LINE__) * new
 #define new SIFTER_NEW

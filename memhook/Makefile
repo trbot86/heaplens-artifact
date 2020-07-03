@@ -3,7 +3,7 @@ Includes= /usr/lib/llvm-6.0/include/
 Libs=
 
 all:
-	$(CC) memhook.cpp -shared -O3 -fPIC -g -o libmemhook.so
+	$(CC) memhook.cpp -shared -fPIC -g -o libmemhook.so
 
 link:
 	$(CC) memhook.cpp memalloc.cpp -pthread -Wall -g -o b.out

@@ -54,7 +54,7 @@ pivot_table = pivot_table[1:]
 
 pivot_table.columns = ['_'.join(col) for col in pivot_table.columns]
 
-print(pivot_table.cumsum()[0:1000])
+# print(pivot_table.cumsum()[0:1000])
 
 pivot_table.cumsum().plot()
 plt.show()

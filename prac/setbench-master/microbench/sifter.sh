@@ -51,6 +51,6 @@ echo_color "saving info_t_dump.txt to allocs.sqlite..."
 python3 ../../../memhook/saveallocstodb.py info_t_dump.txt allocs.sqlite
 
 echo_color "starting visualisation routine..."
-python3 ../../../cacheline_in_block.py allocs.sqlite 4096 64 "type like \"node_t<long long, void*>\" or type like \"operation_t<long long, void*>\""
-# python3 ../../../set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<long long, void*>\" or type like \"operation_t<long long, void*>\""
-python3 ../../../set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<long long, void*>\""
+python3 ../../../visual/cacheline_in_block.py allocs.sqlite 4096 64 "type like \"node_t<long long, void*>\" or type like \"operation_t<long long, void*>\""
+# python3 ../../../visual/set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<long long, void*>\" or type like \"operation_t<long long, void*>\""
+python3 ../../../visual/set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<long long, void*>\""
