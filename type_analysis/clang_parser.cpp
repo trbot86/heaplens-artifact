@@ -46,7 +46,7 @@ set<string> typenameset;
 multimap<string, vector<string> > fieldnameset;
 
 DeclarationMatcher classMatcher = 
-  cxxRecordDecl(unless(isExpansionInSystemHeader()), isTemplateInstantiation()).bind("class");
+  cxxRecordDecl(unless(isExpansionInSystemHeader()), unless(isTemplateInstantiation())).bind("class");
 
 DeclarationMatcher fieldMatcher =
   fieldDecl(unless(isExpansionInSystemHeader())).bind("field");

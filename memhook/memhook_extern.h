@@ -117,7 +117,7 @@ inline T* operator * (const MemStamp &stamp, T *p) {
 template <typename T>
 T malloc(size_t size, bool fakearg) {
     T ptr = (T)memhook_malloc(size, true);
-    collector.update(nullptr, 0, type_index(typeid(T)));
+    collector.update("specialfile", 0, type_index(typeid(T)));
     if(ptr == NULL) throw bad_alloc();
 
     // insert_info(size, ptr, type_index(typeid(T)));

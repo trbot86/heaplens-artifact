@@ -39,15 +39,15 @@ class newclass {
   myStruct y;
 };
 
-// class A {
-//   public:
-//   bool x;
-//   int a;
-//   int b;
-//   bool c;
-//   bool d;
-//   long l;
-// };
+class A {
+  public:
+  bool x;
+  int a;
+  int b;
+  bool c;
+  bool d;
+  long l;
+};
 
 // template <typename T>
 // float* func() {

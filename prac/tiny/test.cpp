@@ -3,6 +3,11 @@
 
 #include "memhook_extern.h"
 
+struct tall {
+int a;
+int b;
+};
+
 int main() {
     // int* p = (int*)malloc<int*>(sizeof(int));
     // for(int i = 0;i < 10000;i++) {

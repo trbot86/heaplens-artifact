@@ -1,0 +1,15 @@
+[
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-g",
+            "-I../../memhook/",
+            "-o",
+            "bin",
+            "test.cpp"
+        ],
+        "directory": "/home/gautam/Desktop/sifter/prac/tiny",
+        "file": "test.cpp"
+    }
+]
