@@ -16,7 +16,7 @@
 
 #define BACKTRACE_DEPTH 2
 #ifndef MAX_THREADS
-    #define MAX_THREADS 16
+    #define MAX_THREADS 8
 #endif
 #define MAX_TRACK 1000000
 #define MAX_TYPE_LENGTH 1000

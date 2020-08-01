@@ -54,7 +54,7 @@
 
 #include "record_manager.h"
 
-// #define USE_PADDING
+#define USE_PADDING
 // #define LARGE_DES
 
 //Encoded in the operation pointer

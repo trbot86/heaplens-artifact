@@ -4,11 +4,11 @@
 // #include <bits/stdc++.h>
 using namespace std;
 
-template <typename T>
-T* malloc(size_t size) {
-  cout << "templated malloc\n";
-  return (T*)malloc(size);
-}
+// template <typename T>
+// T* malloc(size_t size) {
+//   cout << "templated malloc\n";
+//   return (T*)malloc(size);
+// }
 
 template < typename T, typename Y=int>
 class MyClass
@@ -16,9 +16,9 @@ class MyClass
 public:
   int a;
   Y j;
-  // bool b;
-  // bool c;
-  // T field;
+  bool b;
+  bool c;
+  T field;
   // bool d;
   // int e;
   // bool f;
@@ -26,7 +26,7 @@ public:
   T g;
 };
 
-#define CLASS myClass<int>
+// #define CLASS myClass<int>
 
 template < typename T>
 class newclass {
@@ -56,10 +56,11 @@ class A {
 
 int main() {
   // MyClass<int> mc;
+  MyClass<A, newclass<newclass<newclass<A>>>> random;
   // MyClass<double> md;
   // mc.field = new int;
   // int f;
-  // f = (unsigned long long)5;
+  // f = (unsigned long long)5;double
   // int a = (int)f;
   // int* r = (int*)malloc(sizeof(int));
   // float* g = (float*)func();
@@ -68,10 +69,10 @@ int main() {
   // MyClass<float>* mclass = (MyClass<float>*)malloc<MyClass<float>>(8);
   // MyClass<float>* mc2 = new MyClass<float>;
 
-  // newclass<float>* n = new newclass<float>;
+  newclass<float>* n = new newclass<float>;
   // n.x = 0;
   // MyClass<int>* mc2 = new MyClass<int>;
-  CLASS* arr = new CLASS;
+  // CLASS* arr = new CLASS;
   // MyClass<long>* mc2 = new MyClass<long>;
   // char* arr = new char[10];
   // string* p = new (arr) string("hi");

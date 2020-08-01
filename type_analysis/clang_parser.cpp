@@ -46,7 +46,15 @@ set<string> typenameset;
 multimap<string, vector<string> > fieldnameset;
 
 DeclarationMatcher classMatcher = 
-  cxxRecordDecl(unless(isExpansionInSystemHeader()), unless(isTemplateInstantiation())).bind("class");
+  // cxxRecordDecl(unless(isExpansionInSystemHeader()), unless(classTemplateDecl())).bind("class");
+  // cxxRecordDecl(unless(isExpansionInSystemHeader()), hasDefinition(), classTemplateDecl()).bind("class");
+  cxxRecordDecl(unless(isExpansionInSystemHeader())).bind("class");
+
+DeclarationMatcher templateClassMatcher =
+  classTemplateDecl(unless(isExpansionInSystemHeader())).bind("templatedclass");
+
+DeclarationMatcher insttemplatedClassMatcher = 
+  cxxRecordDecl(unless(isExpansionInSystemHeader()), isTemplateInstantiation()).bind("insttemplatedclass");
 
 DeclarationMatcher fieldMatcher =
   fieldDecl(unless(isExpansionInSystemHeader())).bind("field");
@@ -59,15 +67,68 @@ StatementMatcher newMatcher =
 
 StatementMatcher CStyleMallocMatcher = 
   callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray")))));
-  
+
 class ClassnamePrinter : public MatchFinder::MatchCallback {
   public :
     virtual void run(const MatchFinder::MatchResult &Result) {
-      const RecordDecl* rd = Result.Nodes.getNodeAs<clang::RecordDecl>("class");
+      const CXXRecordDecl* rd = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("class");
+      cout << "general class matcher: " << rd->getQualifiedNameAsString() << " ";
+      cout << "DCT: " << (ClassTemplateDecl*)rd->getDescribedClassTemplate() << " ";
+      cout << "TIP: " << (uint64_t)rd->getTemplateInstantiationPattern() << " ";
+      cout << "DEF: " << (uint64_t)rd->getDefinition() << " ";
+      if(rd->getDefinition()) {
+        cout << "CD: " << (uint64_t)rd->getCanonicalDecl() << " ";
+        cout << "IFMC: " << (uint64_t)rd->getInstantiatedFromMemberClass() << " ";
+        cout << "TSK: " << (uint64_t)rd->getTemplateSpecializationKind() << " ";
+        cout << "MSI: " << (uint64_t)rd->getMemberSpecializationInfo () << " ";
+        cout << "HF: " << (uint64_t)rd->hasFriends () << " ";
+        cout << "IL: " << (uint64_t)rd->isLambda () << " ";
+        cout << "ILC: " << (uint64_t)rd->isLocalClass () << " ";
+        cout << "ICN: " << (uint64_t)rd->isInjectedClassName () << " ";
+        cout << "IASOU: " << (uint64_t)rd->isAnonymousStructOrUnion () << " ";
+        cout << "ITDAD: " << (uint64_t)rd->isThisDeclarationADefinition () << " ";
+        cout << "IDT: " << (uint64_t)rd->isDependentType () << " ";
+        cout << "NTPL: " << (uint64_t)rd->getNumTemplateParameterLists () << " ";
+      }
+      // cout << "ADB: " << (uint64_t)rd->hasAnyDependentBases() << " ";
+      cout << "RD: " << (uint64_t)rd << endl;
+
+      if(rd->getDefinition() && !rd->isDependentType()) {
+        typenameset.insert(rd->getDeclName().getAsString());
+        cout << endl;
+        cout << "normal class matcher: " << rd->getQualifiedNameAsString() << endl;
+        auto field_iter = rd->field_begin();
+        auto &context = rd->getASTContext();
+        auto &rl = context.getASTRecordLayout(rd);
+
+        for (auto it = field_iter; it != rd->field_end(); ++it)
+        {
+          //** cout << it->getQualifiedNameAsString() << endl;
+          //** cout << it->getASTContext().getTypeSize(it->getType())/8 << endl;
+          //** cout << rl.getFieldOffset(it->getFieldIndex()) << endl;
+          //** cout << it->getType().getAsString() << endl;
+          fieldnameset.insert(pair<string, vector<string>>(rd->getQualifiedNameAsString(), {it->getType().getAsString(), it->getQualifiedNameAsString(), to_string(it->getASTContext().getTypeSize(it->getType()) / 8), to_string(rl.getFieldOffset(it->getFieldIndex()) / 8)}));
+        }
+      }
+    }
+};
+
+class TemplatedClassPrinter : public MatchFinder::MatchCallback {
+  public :
+    virtual void run(const MatchFinder::MatchResult &Result) {
+      const NamedDecl* nd = Result.Nodes.getNodeAs<clang::NamedDecl>("templatedclass");
+      cout << "templated class matcher: " << nd->getQualifiedNameAsString() << endl;
+    }
+};
+
+class instTemplatedClassnamePrinter : public MatchFinder::MatchCallback {
+  public :
+    virtual void run(const MatchFinder::MatchResult &Result) {
+      const RecordDecl* rd = Result.Nodes.getNodeAs<clang::RecordDecl>("insttemplatedclass");
         typenameset.insert(rd->getDeclName().getAsString());
         cout << endl;
         // cout << "visiting: " << rd->getDeclName().getAsString() << endl;
-        cout << rd->getQualifiedNameAsString() << endl;
+        cout << "instantiated templated class matcher: " << rd->getQualifiedNameAsString() << endl;
         auto field_iter = rd->field_begin();
         auto& context = rd->getASTContext();
         auto& rl = context.getASTRecordLayout(rd);
@@ -81,11 +142,11 @@ class ClassnamePrinter : public MatchFinder::MatchCallback {
         for(auto it = field_iter;it != rd->field_end();++it) {
           // cout << it->getType();
           // cout << it->getNameAsString() << endl;
-          cout << it->getQualifiedNameAsString() << endl;
-          cout << it->getASTContext().getTypeSize(it->getType())/8 << endl;
-          cout << rl.getFieldOffset(it->getFieldIndex()) << endl;
+         //** cout << it->getQualifiedNameAsString() << endl;
+         //** cout << it->getASTContext().getTypeSize(it->getType())/8 << endl;
+         //** cout << rl.getFieldOffset(it->getFieldIndex()) << endl;
           // cout << (it->getASTContext()).getTypeInfo(it->getType()).Width << endl;
-          cout << it->getType().getAsString() << endl;
+         //** cout << it->getType().getAsString() << endl;
           fieldnameset.insert(pair<string, vector<string> >(rd->getQualifiedNameAsString(),{it->getType().getAsString(), it->getQualifiedNameAsString(), to_string(it->getASTContext().getTypeSize(it->getType())/8), to_string(rl.getFieldOffset(it->getFieldIndex())/8)}));
         }
     }
@@ -133,12 +194,16 @@ int main(int argc, const char **argv) {
                  OptionsParser.getSourcePathList());
 
   ClassnamePrinter cp;
+  // TemplatedClassPrinter tcp;
+  // instTemplatedClassnamePrinter itcp;
   DeleteExprPrinter dp;
   NewExprPrinter np;
 
   MatchFinder Finder;
   
   Finder.addMatcher(classMatcher, &cp);
+  // Finder.addMatcher(templateClassMatcher, &tcp);
+  // Finder.addMatcher(insttemplatedClassMatcher, &itcp);
   // Finder.addMatcher(deleteMatcher, &dp);
   // Finder.addMatcher(newMatcher, &np);  
 

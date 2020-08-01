@@ -100,7 +100,8 @@ insertnewrow()
 
 rownum = int(math.ceil(math.sqrt(setnum)))
 
-hmap = [[(ycount[y*rownum + x] if y*rownum + x < setnum else 0) for x in range(rownum)] for y in range(rownum+1)]
+# hmap = [[(ycount[y*rownum + x] if y*rownum + x < setnum else 0) for x in range(rownum)] for y in range(rownum+1)]
+hmap = [[(ycount[y*rownum + x] if y*rownum + x < setnum else 0) for x in range(rownum)] for y in range(rownum)]
 
 print(hmap)
 
@@ -136,4 +137,5 @@ fig, gnt = plt.subplots()
 # plt.show()
 
 plt.imshow(hmap, cmap='hot', interpolation='nearest')
+plt.clim(vmin=0)
 plt.show()

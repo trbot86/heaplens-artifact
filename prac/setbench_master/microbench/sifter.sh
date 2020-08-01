@@ -29,28 +29,32 @@ done
 if [ $make_flag == 'true' ]
 then
     echo_color "Fresh compilation started..."
-    make ubench_howley_int_bst_lf.alloc_new.reclaim_none.pool_none.out
+    make ubench_brown_ext_abtree_lf.alloc_new.reclaim_none.pool_none.out
 fi
 
 echo_color "removing previous info dump..."
-rm info_t_dump.txt
+rm info_t_dump.txt new_info_t_dump.txt
 
 if [ $preload_flag == 'true' ]
 then
     echo_color "preloading jemalloc..."
-    LD_PRELOAD=../lib/libjemalloc.so ./bin/ubench_howley_int_bst_lf.alloc_new.reclaim_none.pool_none.out -nprefill 4 -i 0 -d 0 -rq 0 -rqsize 1 -k 200000 -nrq 0 -t 3000 -nwork 4
+    LD_PRELOAD=../lib/libjemalloc.so ./bin/ubench_brown_ext_abtree_lf.alloc_new.reclaim_none.pool_none.out -nprefill 4 -i 0 -d 0 -rq 0 -rqsize 1 -k 200000 -nrq 0 -t 3000 -nwork 4
 else
     echo_color "running without any special allocator..."
-    ./bin/ubench_howley_int_bst_lf.alloc_new.reclaim_none.pool_none.out -nprefill 4 -i 0 -d 0 -rq 0 -rqsize 1 -k 200000 -nrq 0 -t 3000 -nwork 4
+    ./bin/ubench_brown_ext_abtree_lf.alloc_new.reclaim_none.pool_none.out -nprefill 4 -i 0 -d 0 -rq 0 -rqsize 1 -k 200000 -nrq 0 -t 3000 -nwork 4
 fi
+
+echo_color "removing spaces from class names in info_t_dump.txt"
+python3 ../../../type_analysis/trim_allocs_name.py ./info_t_dump.txt
 
 echo_color "removing previous temp db..."
 rm allocs.sqlite 2>/dev/null
 
 echo_color "saving info_t_dump.txt to allocs.sqlite..."
-python3 ../../../memhook/saveallocstodb.py info_t_dump.txt allocs.sqlite
+python3 ../../../memhook/saveallocstodb.py new_info_t_dump.txt allocs.sqlite
 
 echo_color "starting visualisation routine..."
-python3 ../../../visual/cacheline_in_block.py allocs.sqlite 4096 64 "type like \"node_t<long long, void*>\" or type like \"operation_t<long long, void*>\""
-# python3 ../../../visual/set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<long long, void*>\" or type like \"operation_t<long long, void*>\""
-python3 ../../../visual/set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<long long, void*>\""
+python3 ../../../visual/cacheline_in_block.py allocs.sqlite 4096 64 "type like \"node_t<longlong,void*>\" or type like \"operation_t<longlong,void*>\""
+# python3 ../../../visual/set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<longlong,void*>\" or type like \"operation_t<longlong,void*>\""
+python3 ../../../visual/set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<longlong,void*>\""
+# python3 field_block_view.py ../prac/setbench_master/microbench/allocs.sqlite ../prac/setbench_master/microbench/fields.sqlite 1024 64 "type like \"node_t<longlong,void*>\""

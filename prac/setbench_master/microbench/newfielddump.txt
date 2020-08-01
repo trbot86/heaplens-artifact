@@ -1,0 +1,381 @@
+gstats_t::gstats_t(constint)::(anonymousclass)|int|(anonymous)|4|0
+gstats_t::gstats_t(constint)::(anonymousclass)|volatile _Bool &|(anonymous)|8|8
+gstats_t::gstats_t(constint)::(anonymousclass)|const int|(anonymous)|4|16
+gstats_t::gstats_t(constint)::(anonymousclass)|class gstats_t *|(anonymous)|8|24
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<longlong>*const,constint)::(anonymousclass)|int|(anonymous)|4|0
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<longlong>*const,constint)::(anonymousclass)|stat_metrics<long long> *|(anonymous)|8|8
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<longlong>*const,constint)::(anonymousclass)|const gstats_stat_id|(anonymous)|4|16
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<longlong>*const,constint)::(anonymousclass)|volatile _Bool &|(anonymous)|8|24
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<longlong>*const,constint)::(anonymousclass)|const int|(anonymous)|4|32
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<longlong>*const,constint)::(anonymousclass)|stat_metrics<long long> *const|(anonymous)|8|40
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<longlong>*const,constint)::(anonymousclass)|class gstats_t *|(anonymous)|8|48
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<double>*const,constint)::(anonymousclass)|int|(anonymous)|4|0
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<double>*const,constint)::(anonymousclass)|stat_metrics<long long> *|(anonymous)|8|8
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<double>*const,constint)::(anonymousclass)|const gstats_stat_id|(anonymous)|4|16
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<double>*const,constint)::(anonymousclass)|volatile _Bool &|(anonymous)|8|24
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<double>*const,constint)::(anonymousclass)|const int|(anonymous)|4|32
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<double>*const,constint)::(anonymousclass)|stat_metrics<double> *const|(anonymous)|8|40
+gstats_t::get_histogram_log(constgstats_stat_id,stat_metrics<double>*const,constint)::(anonymousclass)|class gstats_t *|(anonymous)|8|48
+gstats_t::compute_before_printing()::(anonymousclass)|class gstats_t *|(anonymous)|8|0
+gstats_t::compute_before_printing()::(anonymousclass)|int|(anonymous)|4|8
+gstats_t::compute_before_printing()::(anonymousclass)|class gstats_t *|(anonymous)|8|0
+gstats_t::compute_before_printing()::(anonymousclass)|int|(anonymous)|4|8
+gstats_t::compute_before_printing()::(anonymousclass)|class gstats_t *|(anonymous)|8|0
+gstats_t::compute_before_printing()::(anonymousclass)|int|(anonymous)|4|8
+gstats_t::compute_before_printing()::(anonymousclass)|class gstats_t *|(anonymous)|8|0
+gstats_t::compute_before_printing()::(anonymousclass)|int|(anonymous)|4|8
+gstats_t::compute_before_printing()::(anonymousclass)|class gstats_t *|(anonymous)|8|0
+gstats_t::compute_before_printing()::(anonymousclass)|int|(anonymous)|4|8
+gstats_t::compute_before_printing()::(anonymousclass)|class gstats_t *|(anonymous)|8|0
+gstats_t::compute_before_printing()::(anonymousclass)|int|(anonymous)|4|8
+KeyGeneratorUniform<longlong>|volatile char [128]|___padding12|128|0
+KeyGeneratorUniform<longlong>|class RandomFNV1A *|rng|8|128
+KeyGeneratorUniform<longlong>|int|maxKey|4|136
+KeyGeneratorUniform<longlong>|volatile char [128]|___padding13|128|140
+KeyGeneratorZipf<longlong>|volatile char [128]|___padding16|128|0
+KeyGeneratorZipf<longlong>|class KeyGeneratorZipfData *|data|8|128
+KeyGeneratorZipf<longlong>|class RandomFNV1A *|rng|8|136
+KeyGeneratorZipf<longlong>|volatile char [128]|___padding17|128|144
+KeyGeneratorZipfData|volatile char [128]|___padding14|128|0
+KeyGeneratorZipfData|int|maxKey|4|128
+KeyGeneratorZipfData|double|theta|8|136
+KeyGeneratorZipfData|double|c|8|144
+KeyGeneratorZipfData|double *|sum_probs|8|152
+KeyGeneratorZipfData|volatile char [128]|___padding15|128|160
+MemStamp|const char *const|filename|8|0
+MemStamp|const int|lineNum|4|8
+MemStampCollector|struct slot *|sarr|8|0
+MemStampCollector|struct info_t *|allArrays|8|8
+NumaTools|volatile char [128]|___padding41|128|0
+NumaTools|int|callsPerUpdate|4|128
+NumaTools|int|numNodes|4|132
+NumaTools|int|numCPUs|4|136
+NumaTools|int *|cpuToNode|8|144
+NumaTools|volatile char [128]|___padding42|128|152
+RWLock|volatile size_t|lock|8|0
+RandomFNV1A|union RandomFNV1A::(anonymous at ../common/random_fnv1a.h:16:5)|(anonymous)|128|0
+RandomFNV1A::(anonymousunion)|volatile char [128]|___padding6|128|0
+RandomFNV1A::(anonymousunion)|uint64_t|seed|8|0
+RecordManagerSet<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|volatile char [128]|___padding80|128|392
+RecordManagerSet<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|record_manager_single_type<struct node_t<long long, void *>, class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> > > *const|mgr|8|520
+RecordManagerSet<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|volatile char [128]|___padding81|128|528
+RecordManagerSet<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,operation_t<longlong,void*>>|volatile char [128]|___padding80|128|128
+RecordManagerSet<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,operation_t<longlong,void*>>|record_manager_single_type<union operation_t<long long, void *>, class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> > > *const|mgr|8|256
+RecordManagerSet<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,operation_t<longlong,void*>>|volatile char [128]|___padding81|128|264
+RecordManagerSet<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|volatile char [128]|___padding79|128|0
+RecordManagerSetPostPadded<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|volatile char [128]|___padding82|128|656
+RecoveryMgr<void*>|volatile char [128]|___padding24|128|0
+RecoveryMgr<void*>|const int|NUM_PROCESSES|4|128
+RecoveryMgr<void*>|const int|neutralizeSignal|4|132
+RecoveryMgr<void*>|volatile char [128]|___padding25|128|136
+RecoveryMgr<record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|volatile char [128]|___padding24|128|0
+RecoveryMgr<record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|const int|NUM_PROCESSES|4|128
+RecoveryMgr<record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|const int|neutralizeSignal|4|132
+RecoveryMgr<record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|volatile char [128]|___padding25|128|136
+TreeStats<ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler>|volatile char [128]|___padding18|128|0
+TreeStats<ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler>|size_t [1024]|internalsAtDepth|8192|128
+TreeStats<ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler>|size_t [1024]|leavesAtDepth|8192|8320
+TreeStats<ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler>|size_t [1024]|keysAtDepth|8192|16512
+TreeStats<ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler>|size_t|sumOfKeys|8|24704
+TreeStats<ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler>|size_t [1024]|bytesAtDepth|8192|24712
+TreeStats<ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler>|volatile char [128]|___padding19|128|32904
+_memrecl_counters|volatile char [128]|___padding20|128|0
+_memrecl_counters|long|allocated|8|128
+_memrecl_counters|long|deallocated|8|136
+_memrecl_counters|long|fromPool|8|144
+_memrecl_counters|long|toPool|8|152
+_memrecl_counters|long|given|8|160
+_memrecl_counters|long|taken|8|168
+_memrecl_counters|long|retired|8|176
+_memrecl_counters|volatile char [128]|___padding21|128|184
+allocator_interface<void>|volatile char [128]|___padding32|128|0
+allocator_interface<void>|class debugInfo *const|debug|8|128
+allocator_interface<void>|const int|NUM_PROCESSES|4|136
+allocator_interface<operation_t<longlong,void*>>|volatile char [128]|___padding32|128|0
+allocator_interface<operation_t<longlong,void*>>|class debugInfo *const|debug|8|128
+allocator_interface<operation_t<longlong,void*>>|const int|NUM_PROCESSES|4|136
+allocator_interface<node_t<longlong,void*>>|volatile char [128]|___padding32|128|0
+allocator_interface<node_t<longlong,void*>>|class debugInfo *const|debug|8|128
+allocator_interface<node_t<longlong,void*>>|const int|NUM_PROCESSES|4|136
+allocator_new<void>|volatile char [128]|___padding35|128|140
+allocator_new<node_t<longlong,void*>>|volatile char [128]|___padding35|128|140
+allocator_new<operation_t<longlong,void*>>|volatile char [128]|___padding35|128|140
+block<operation_t<longlong,void*>>|block<union operation_t<long long, void *> > *|next|8|0
+block<operation_t<longlong,void*>>|size_t|nextCount|8|8
+block<operation_t<longlong,void*>>|size_t|size|8|16
+block<operation_t<longlong,void*>>|union operation_t<long long, void *> *[40]|data|320|24
+block<node_t<longlong,void*>>|block<struct node_t<long long, void *> > *|next|8|0
+block<node_t<longlong,void*>>|size_t|nextCount|8|8
+block<node_t<longlong,void*>>|size_t|size|8|16
+block<node_t<longlong,void*>>|struct node_t<long long, void *> *[40]|data|320|24
+blockpool<operation_t<longlong,void*>>|volatile char [128]|___padding26|128|0
+blockpool<operation_t<longlong,void*>>|block<union operation_t<long long, void *> > *[32]|pool|256|128
+blockpool<operation_t<longlong,void*>>|int|poolSize|4|384
+blockpool<operation_t<longlong,void*>>|long|debugAllocated|8|392
+blockpool<operation_t<longlong,void*>>|long|debugPoolDeallocated|8|400
+blockpool<operation_t<longlong,void*>>|long|debugPoolAllocated|8|408
+blockpool<operation_t<longlong,void*>>|long|debugFreed|8|416
+blockpool<operation_t<longlong,void*>>|volatile char [128]|___padding27|128|424
+blockpool<node_t<longlong,void*>>|volatile char [128]|___padding26|128|0
+blockpool<node_t<longlong,void*>>|block<struct node_t<long long, void *> > *[32]|pool|256|128
+blockpool<node_t<longlong,void*>>|int|poolSize|4|384
+blockpool<node_t<longlong,void*>>|long|debugAllocated|8|392
+blockpool<node_t<longlong,void*>>|long|debugPoolDeallocated|8|400
+blockpool<node_t<longlong,void*>>|long|debugPoolAllocated|8|408
+blockpool<node_t<longlong,void*>>|long|debugFreed|8|416
+blockpool<node_t<longlong,void*>>|volatile char [128]|___padding27|128|424
+child_cas_op_t<longlong,void*>|_Bool|is_left|1|0
+child_cas_op_t<longlong,void*>|node_t<long long, void *> *|expected|8|8
+child_cas_op_t<longlong,void*>|node_t<long long, void *> *|update|8|16
+debugInfo|volatile char [128]|___padding22|128|0
+debugInfo|const int|NUM_PROCESSES|4|128
+debugInfo|struct _memrecl_counters [256]|c|79872|136
+debugInfo|volatile char [128]|___padding23|128|80008
+ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|void *const|NO_VALUE|8|0
+ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|howley<long long, void *, record_manager<class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> >, node_t<long long, void *>, operation_t<long long, void *> > > *const|ds|8|8
+ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler|long long|minKey|8|0
+ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler|long long|maxKey|8|8
+ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler::ChildIterator|_Bool|leftDone|1|0
+ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler::ChildIterator|_Bool|rightDone|1|1
+ds_adapter<longlong,void*,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>::NodeHandler::ChildIterator|ds_adapter<long long, void *, class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> > >::NodeHandler::NodePtrType|node|8|8
+find_result<void*>|void *|val|8|0
+find_result<void*>|int|code|4|8
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding91|128|0
+globals_t<KeyGeneratorUniform<longlong>>|void *const|NO_VALUE|8|128
+globals_t<KeyGeneratorUniform<longlong>>|const test_type|KEY_MIN|8|136
+globals_t<KeyGeneratorUniform<longlong>>|const test_type|KEY_MAX|8|144
+globals_t<KeyGeneratorUniform<longlong>>|const long long|PREFILL_INTERVAL_MILLIS|8|152
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding92|128|160
+globals_t<KeyGeneratorUniform<longlong>>|long|elapsedMillis|8|288
+globals_t<KeyGeneratorUniform<longlong>>|long long|prefillKeySum|8|296
+globals_t<KeyGeneratorUniform<longlong>>|long long|prefillSize|8|304
+globals_t<KeyGeneratorUniform<longlong>>|std::chrono::time_point<std::chrono::high_resolution_clock>|programExecutionStartTime|8|312
+globals_t<KeyGeneratorUniform<longlong>>|std::chrono::time_point<std::chrono::high_resolution_clock>|endTime|8|320
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding93|128|328
+globals_t<KeyGeneratorUniform<longlong>>|std::chrono::time_point<std::chrono::high_resolution_clock>|startTime|8|456
+globals_t<KeyGeneratorUniform<longlong>>|long long|startClockTicks|8|464
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding94|128|472
+globals_t<KeyGeneratorUniform<longlong>>|long|elapsedMillisNapping|8|600
+globals_t<KeyGeneratorUniform<longlong>>|volatile long long|prefillIntervalElapsedMillis|8|608
+globals_t<KeyGeneratorUniform<longlong>>|std::chrono::time_point<std::chrono::high_resolution_clock>|prefillStartTime|8|616
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding95|128|624
+globals_t<KeyGeneratorUniform<longlong>>|volatile test_type|garbage|8|752
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding96|128|760
+globals_t<KeyGeneratorUniform<longlong>>|ds_adapter<test_type, void *, reclaimer_none<>, allocator_new<>, pool_none<> > *|dsAdapter|8|888
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding97|128|896
+globals_t<KeyGeneratorUniform<longlong>>|class KeyGeneratorZipfData *|keygenZipfData|8|1024
+globals_t<KeyGeneratorUniform<longlong>>|class KeyGeneratorUniform<long long> *[256]|keygens|2048|1032
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding98|128|3080
+globals_t<KeyGeneratorUniform<longlong>>|class RandomFNV1A [256]|rngs|32768|3208
+globals_t<KeyGeneratorUniform<longlong>>|volatile _Bool|start|1|35976
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding99|128|35977
+globals_t<KeyGeneratorUniform<longlong>>|volatile _Bool|done|1|36105
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding100|128|36106
+globals_t<KeyGeneratorUniform<longlong>>|volatile int|running|4|36236
+globals_t<KeyGeneratorUniform<longlong>>|volatile char [128]|___padding101|128|36240
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding91|128|0
+globals_t<KeyGeneratorZipf<longlong>>|void *const|NO_VALUE|8|128
+globals_t<KeyGeneratorZipf<longlong>>|const test_type|KEY_MIN|8|136
+globals_t<KeyGeneratorZipf<longlong>>|const test_type|KEY_MAX|8|144
+globals_t<KeyGeneratorZipf<longlong>>|const long long|PREFILL_INTERVAL_MILLIS|8|152
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding92|128|160
+globals_t<KeyGeneratorZipf<longlong>>|long|elapsedMillis|8|288
+globals_t<KeyGeneratorZipf<longlong>>|long long|prefillKeySum|8|296
+globals_t<KeyGeneratorZipf<longlong>>|long long|prefillSize|8|304
+globals_t<KeyGeneratorZipf<longlong>>|std::chrono::time_point<std::chrono::high_resolution_clock>|programExecutionStartTime|8|312
+globals_t<KeyGeneratorZipf<longlong>>|std::chrono::time_point<std::chrono::high_resolution_clock>|endTime|8|320
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding93|128|328
+globals_t<KeyGeneratorZipf<longlong>>|std::chrono::time_point<std::chrono::high_resolution_clock>|startTime|8|456
+globals_t<KeyGeneratorZipf<longlong>>|long long|startClockTicks|8|464
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding94|128|472
+globals_t<KeyGeneratorZipf<longlong>>|long|elapsedMillisNapping|8|600
+globals_t<KeyGeneratorZipf<longlong>>|volatile long long|prefillIntervalElapsedMillis|8|608
+globals_t<KeyGeneratorZipf<longlong>>|std::chrono::time_point<std::chrono::high_resolution_clock>|prefillStartTime|8|616
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding95|128|624
+globals_t<KeyGeneratorZipf<longlong>>|volatile test_type|garbage|8|752
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding96|128|760
+globals_t<KeyGeneratorZipf<longlong>>|ds_adapter<test_type, void *, reclaimer_none<>, allocator_new<>, pool_none<> > *|dsAdapter|8|888
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding97|128|896
+globals_t<KeyGeneratorZipf<longlong>>|class KeyGeneratorZipfData *|keygenZipfData|8|1024
+globals_t<KeyGeneratorZipf<longlong>>|class KeyGeneratorZipf<long long> *[256]|keygens|2048|1032
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding98|128|3080
+globals_t<KeyGeneratorZipf<longlong>>|class RandomFNV1A [256]|rngs|32768|3208
+globals_t<KeyGeneratorZipf<longlong>>|volatile _Bool|start|1|35976
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding99|128|35977
+globals_t<KeyGeneratorZipf<longlong>>|volatile _Bool|done|1|36105
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding100|128|36106
+globals_t<KeyGeneratorZipf<longlong>>|volatile int|running|4|36236
+globals_t<KeyGeneratorZipf<longlong>>|volatile char [128]|___padding101|128|36240
+gstats_output_item|enum gstats_enum_output_method|method|4|0
+gstats_output_item|enum gstats_enum_aggregation_function|func|4|4
+gstats_output_item|enum gstats_enum_aggregation_granularity|granularity|4|8
+gstats_output_item|int|num_buckets_if_histogram_lin|4|12
+gstats_t|volatile char [128]|___padding2|128|0
+gstats_t|const int|NUM_PROCESSES|4|128
+gstats_t|std::map<gstats_stat_id, std::string>|id_to_name|48|136
+gstats_t|std::map<std::string, gstats_stat_id>|name_to_id|48|184
+gstats_t|class gstats_t::gstats_thread_data *|thread_data|8|232
+gstats_t|gstats_stat_id|num_stats|4|240
+gstats_t|std::multimap<gstats_stat_id, gstats_output_item>|output_config|48|248
+gstats_t|std::vector<stat_metrics<double> *>|arrays_to_delete|24|296
+gstats_t|volatile int|arrays_to_delete_lock|4|320
+gstats_t|enum gstats_enum_data_type [128]|data_types|512|324
+gstats_t|stat_metrics<double> *[128]|computed_gstats_total|1024|840
+gstats_t|stat_metrics<double> *[128]|computed_gstats_by_index|1024|1864
+gstats_t|stat_metrics<double> *[128]|computed_gstats_by_thread|1024|2888
+gstats_t|int [128]|num_indices|512|3912
+gstats_t|_Bool|already_computed_stats|1|4424
+gstats_t|volatile char [128]|___padding3|128|4425
+gstats_t::gstats_thread_data|volatile char [128]|___padding0|128|0
+gstats_t::gstats_thread_data|char [524288]|data|524288|128
+gstats_t::gstats_thread_data|int [128]|offset|512|524416
+gstats_t::gstats_thread_data|int [128]|capacity|512|524928
+gstats_t::gstats_thread_data|int [128]|size|512|525440
+gstats_t::gstats_thread_data|volatile char [128]|___padding1|128|525952
+gstats_t::histogram_lin_dims|double|first_min|8|0
+gstats_t::histogram_lin_dims|double|first_max|8|8
+gstats_t::histogram_lin_dims|double|first_bucket_size|8|16
+gstats_t::histogram_lin_dims|double|cnt_min|8|24
+gstats_t::histogram_lin_dims|double|cnt_max|8|32
+gstats_t::histogram_lin_dims|double|cnt_bucket_size|8|40
+gstats_t::histogram_lin_dims|double|min_min|8|48
+gstats_t::histogram_lin_dims|double|min_max|8|56
+gstats_t::histogram_lin_dims|double|min_bucket_size|8|64
+gstats_t::histogram_lin_dims|double|max_min|8|72
+gstats_t::histogram_lin_dims|double|max_max|8|80
+gstats_t::histogram_lin_dims|double|max_bucket_size|8|88
+gstats_t::histogram_lin_dims|double|sum_min|8|96
+gstats_t::histogram_lin_dims|double|sum_max|8|104
+gstats_t::histogram_lin_dims|double|sum_bucket_size|8|112
+gstats_t::histogram_lin_dims|double|avg_min|8|120
+gstats_t::histogram_lin_dims|double|avg_max|8|128
+gstats_t::histogram_lin_dims|double|avg_bucket_size|8|136
+gstats_t::histogram_lin_dims|double|variance_min|8|144
+gstats_t::histogram_lin_dims|double|variance_max|8|152
+gstats_t::histogram_lin_dims|double|variance_bucket_size|8|160
+gstats_t::histogram_lin_dims|double|stdev_min|8|168
+gstats_t::histogram_lin_dims|double|stdev_max|8|176
+gstats_t::histogram_lin_dims|double|stdev_bucket_size|8|184
+gstats_t::histogram_lin_dims|double|none_min|8|192
+gstats_t::histogram_lin_dims|double|none_max|8|200
+gstats_t::histogram_lin_dims|double|none_bucket_size|8|208
+gstats_t::stat_metrics<double>|double|first|8|0
+gstats_t::stat_metrics<double>|double|cnt|8|8
+gstats_t::stat_metrics<double>|double|min|8|16
+gstats_t::stat_metrics<double>|double|max|8|24
+gstats_t::stat_metrics<double>|double|sum|8|32
+gstats_t::stat_metrics<double>|double|avg|8|40
+gstats_t::stat_metrics<double>|double|variance|8|48
+gstats_t::stat_metrics<double>|double|stdev|8|56
+gstats_t::stat_metrics<double>|double|none|8|64
+gstats_t::stat_metrics<longlong>|long long|first|8|0
+gstats_t::stat_metrics<longlong>|long long|cnt|8|8
+gstats_t::stat_metrics<longlong>|long long|min|8|16
+gstats_t::stat_metrics<longlong>|long long|max|8|24
+gstats_t::stat_metrics<longlong>|long long|sum|8|32
+gstats_t::stat_metrics<longlong>|long long|avg|8|40
+gstats_t::stat_metrics<longlong>|long long|variance|8|48
+gstats_t::stat_metrics<longlong>|long long|stdev|8|56
+gstats_t::stat_metrics<longlong>|long long|none|8|64
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|volatile char [128]|___padding85|128|0
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|const unsigned int|idx_id|4|128
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|volatile char [128]|___padding86|128|132
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|node_t<long long, void *> *|root|8|264
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|volatile char [128]|___padding87|128|272
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|const int|NUM_THREADS|4|400
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|const long long|KEY_MIN|8|408
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|const long long|KEY_MAX|8|416
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|void *const|NO_VALUE|8|424
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|volatile char [128]|___padding88|128|432
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|class record_manager<class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> >, struct node_t<long long, void *>, union operation_t<long long, void *> > *const|recmgr|8|560
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|volatile char [128]|___padding89|128|568
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|int [256]|init|1024|696
+howley<longlong,void*,record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>>|volatile char [128]|___padding90|128|1720
+info_t|const char *|file|8|0
+info_t|struct std::type_index|tindex|8|8
+info_t|unsigned int|line|4|16
+info_t|uint64_t|timestamp|8|24
+info_t|size_t|size|8|32
+info_t|void *|addr|8|40
+info_t|_Bool|typeofop|1|48
+info_t|char [64]|padding|64|49
+node_t<longlong,void*>|long long|key|8|0
+node_t<longlong,void*>|void *|value|8|8
+node_t<longlong,void*>|operation_t<long long, void *> *volatile|op|8|16
+node_t<longlong,void*>|node_t<long long, void *> *volatile|left|8|24
+node_t<longlong,void*>|node_t<long long, void *> *volatile|right|8|32
+node_t<longlong,void*>|volatile char [24]|pad|24|40
+operation_t<longlong,void*>|child_cas_op_t<long long, void *>|child_cas_op|24|0
+operation_t<longlong,void*>|relocate_op_t<long long, void *>|relocate_op|56|0
+operation_t<longlong,void*>|uint8_t [64]|padding|64|0
+pool_interface<void,allocator_interface<void>>|volatile char [128]|___padding34|128|0
+pool_interface<void,allocator_interface<void>>|class debugInfo *const|debug|8|128
+pool_interface<void,allocator_interface<void>>|const int|NUM_PROCESSES|4|136
+pool_interface<void,allocator_interface<void>>|blockpool<void> **|blockpools|8|144
+pool_interface<void,allocator_interface<void>>|class allocator_interface<void> *|alloc|8|152
+pool_interface<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>|volatile char [128]|___padding34|128|0
+pool_interface<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>|class debugInfo *const|debug|8|128
+pool_interface<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>|const int|NUM_PROCESSES|4|136
+pool_interface<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>|blockpool<union operation_t<long long, void *> > **|blockpools|8|144
+pool_interface<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>|class allocator_new<union operation_t<long long, void *> > *|alloc|8|152
+pool_interface<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>|volatile char [128]|___padding34|128|0
+pool_interface<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>|class debugInfo *const|debug|8|128
+pool_interface<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>|const int|NUM_PROCESSES|4|136
+pool_interface<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>|blockpool<struct node_t<long long, void *> > **|blockpools|8|144
+pool_interface<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>|class allocator_new<struct node_t<long long, void *> > *|alloc|8|152
+pool_none<void,allocator_interface<void>>|volatile char [128]|___padding37|128|160
+pool_none<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>|volatile char [128]|___padding37|128|160
+pool_none<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>|volatile char [128]|___padding37|128|160
+reclaimer_interface<void,pool_interface<void,allocator_interface<void>>>|volatile char [128]|___padding44|128|0
+reclaimer_interface<void,pool_interface<void,allocator_interface<void>>>|RecoveryMgr<void *> *|recoveryMgr|8|128
+reclaimer_interface<void,pool_interface<void,allocator_interface<void>>>|class debugInfo *const|debug|8|136
+reclaimer_interface<void,pool_interface<void,allocator_interface<void>>>|const int|NUM_PROCESSES|4|144
+reclaimer_interface<void,pool_interface<void,allocator_interface<void>>>|class pool_interface<void, class allocator_interface<void> > *|pool|8|152
+reclaimer_interface<node_t<longlong,void*>,pool_none<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>>|volatile char [128]|___padding44|128|0
+reclaimer_interface<node_t<longlong,void*>,pool_none<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>>|RecoveryMgr<void *> *|recoveryMgr|8|128
+reclaimer_interface<node_t<longlong,void*>,pool_none<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>>|class debugInfo *const|debug|8|136
+reclaimer_interface<node_t<longlong,void*>,pool_none<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>>|const int|NUM_PROCESSES|4|144
+reclaimer_interface<node_t<longlong,void*>,pool_none<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>>|class pool_none<struct node_t<long long, void *>, class allocator_new<struct node_t<long long, void *> > > *|pool|8|152
+reclaimer_interface<operation_t<longlong,void*>,pool_none<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>>|volatile char [128]|___padding44|128|0
+reclaimer_interface<operation_t<longlong,void*>,pool_none<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>>|RecoveryMgr<void *> *|recoveryMgr|8|128
+reclaimer_interface<operation_t<longlong,void*>,pool_none<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>>|class debugInfo *const|debug|8|136
+reclaimer_interface<operation_t<longlong,void*>,pool_none<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>>|const int|NUM_PROCESSES|4|144
+reclaimer_interface<operation_t<longlong,void*>,pool_none<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>>|class pool_none<union operation_t<long long, void *>, class allocator_new<union operation_t<long long, void *> > > *|pool|8|152
+reclaimer_none<void,pool_interface<void,allocator_interface<void>>>|volatile char [128]|___padding45|128|160
+reclaimer_none<node_t<longlong,void*>,pool_none<node_t<longlong,void*>,allocator_new<node_t<longlong,void*>>>>|volatile char [128]|___padding45|128|160
+reclaimer_none<operation_t<longlong,void*>,pool_none<operation_t<longlong,void*>,allocator_new<operation_t<longlong,void*>>>>|volatile char [128]|___padding45|128|160
+record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|volatile char [128]|___padding83|128|0
+record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|RecordManagerSetPostPadded<class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> >, struct node_t<long long, void *>, union operation_t<long long, void *> > *|rmset|8|128
+record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|int [256]|init|1024|136
+record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|const int|NUM_PROCESSES|4|1160
+record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|RecoveryMgr<record_manager<class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> >, struct node_t<long long, void *>, union operation_t<long long, void *> >::SelfType> *const|recoveryMgr|8|1168
+record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>|volatile char [128]|___padding84|128|1176
+record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>::MemoryReclamationGuard|const int|tid|4|0
+record_manager<reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>,node_t<longlong,void*>,operation_t<longlong,void*>>::MemoryReclamationGuard|record_manager<class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> >, struct node_t<long long, void *>, union operation_t<long long, void *> > *|recmgr|8|8
+record_manager_single_type<operation_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|volatile char [128]|___padding77|128|0
+record_manager_single_type<operation_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|record_manager_single_type<union operation_t<long long, void *>, class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> > >::classAlloc *|alloc|8|128
+record_manager_single_type<operation_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|record_manager_single_type<union operation_t<long long, void *>, class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> > >::classPool *|pool|8|136
+record_manager_single_type<operation_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|record_manager_single_type<union operation_t<long long, void *>, class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> > >::classReclaim *|reclaim|8|144
+record_manager_single_type<operation_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|const int|NUM_PROCESSES|4|152
+record_manager_single_type<operation_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|class debugInfo|debugInfoRecord|80136|160
+record_manager_single_type<operation_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|RecoveryMgr<void *> *const|recoveryMgr|8|80296
+record_manager_single_type<operation_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|volatile char [128]|___padding78|128|80304
+record_manager_single_type<node_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|volatile char [128]|___padding77|128|0
+record_manager_single_type<node_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|record_manager_single_type<struct node_t<long long, void *>, class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> > >::classAlloc *|alloc|8|128
+record_manager_single_type<node_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|record_manager_single_type<struct node_t<long long, void *>, class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> > >::classPool *|pool|8|136
+record_manager_single_type<node_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|record_manager_single_type<struct node_t<long long, void *>, class reclaimer_none<void, class pool_interface<void, class allocator_interface<void> > >, class allocator_new<void>, class pool_none<void, class allocator_interface<void> > >::classReclaim *|reclaim|8|144
+record_manager_single_type<node_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|const int|NUM_PROCESSES|4|152
+record_manager_single_type<node_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|class debugInfo|debugInfoRecord|80136|160
+record_manager_single_type<node_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|RecoveryMgr<void *> *const|recoveryMgr|8|80296
+record_manager_single_type<node_t<longlong,void*>,reclaimer_none<void,pool_interface<void,allocator_interface<void>>>,allocator_new<void>,pool_none<void,allocator_interface<void>>>|volatile char [128]|___padding78|128|80304
+relocate_op_t<longlong,void*>|volatile int|state|4|0
+relocate_op_t<longlong,void*>|node_t<long long, void *> *|dest|8|8
+relocate_op_t<longlong,void*>|operation_t<long long, void *> *|dest_op|8|16
+relocate_op_t<longlong,void*>|long long|remove_key|8|24
+relocate_op_t<longlong,void*>|void *|remove_value|8|32
+relocate_op_t<longlong,void*>|long long|replace_key|8|40
+relocate_op_t<longlong,void*>|void *|replace_value|8|48
+slot|volatile _Bool|occupied|1|0
+slot|class thread::id|id|8|8
+slot|int|offset|4|16
+slot|char [128]|padding|128|20

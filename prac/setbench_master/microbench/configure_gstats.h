@@ -49,7 +49,7 @@
       __AND gstats_output_item(PRINT_RAW, MIN, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, MAX, TOTAL) \
     }) \
-    gstats_handle_stat(LONG_LONG, limbo_reclamation_event_size, 10000, { \
+    gstats_handle_stat(LONG_LONG, limbo_reclamation_event_size, 1000, { \
             gstats_output_item(PRINT_HISTOGRAM_LOG, NONE, FULL_DATA) \
       __AND gstats_output_item(PRINT_RAW, SUM, TOTAL) \
     }) \
@@ -116,7 +116,7 @@
     /*gstats_handle_stat(LONG_LONG, num_isearch, 1, { \
             gstats_output_item(PRINT_RAW, SUM, TOTAL) \
     })*/ \
-    /*gstats_handle_stat(DOUBLE, visited_in_isearch, 100000, { \
+    /*gstats_handle_stat(DOUBLE, visited_in_isearch, 10000, { \
             gstats_output_item(PRINT_RAW, SUM, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, AVERAGE, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, STDEV, TOTAL) \
@@ -150,7 +150,7 @@
     }) \
     gstats_handle_stat(LONG_LONG, timersplit_guard, 1, {}) */ \
     gstats_handle_stat(LONG_LONG, timersplit_epoch, 1, {}) \
-    gstats_handle_stat(LONG_LONG, num_prop_epoch_latency, 10000, { \
+    gstats_handle_stat(LONG_LONG, num_prop_epoch_latency, 1000, { \
             gstats_output_item(PRINT_HISTOGRAM_LOG, NONE, FULL_DATA) \
       __AND gstats_output_item(PRINT_RAW, AVERAGE, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, STDEV, TOTAL) \
@@ -163,7 +163,7 @@
     }) \
     gstats_handle_stat(LONG_LONG, timersplit_token_received, 1, {}) \
     gstats_handle_stat(LONG_LONG, timer_bag_rotation_start, 1, {}) \
-    gstats_handle_stat(LONG_LONG, token_received_time_split_ms, 10000, { \
+    gstats_handle_stat(LONG_LONG, token_received_time_split_ms, 1000, { \
             gstats_output_item(PRINT_HISTOGRAM_LOG, NONE, FULL_DATA) \
       /*__AND gstats_output_item(PRINT_RAW, NONE, FULL_DATA)*/ \
     }) \
@@ -176,7 +176,7 @@
     gstats_handle_stat(LONG_LONG, bag_rotation_end_time_us, 100, { \
             /*gstats_output_item(PRINT_RAW, NONE, FULL_DATA)*/ \
     }) \
-    gstats_handle_stat(LONG_LONG, bag_rotation_duration_split_ms, 10000, { \
+    gstats_handle_stat(LONG_LONG, bag_rotation_duration_split_ms, 1000, { \
             gstats_output_item(PRINT_HISTOGRAM_LOG, NONE, FULL_DATA) \
     }) \
     gstats_handle_stat(LONG_LONG, bag_curr_size, 1, { \
@@ -188,21 +188,21 @@
     gstats_handle_stat(LONG_LONG, token_counts, 1, { \
             gstats_output_item(PRINT_RAW, FIRST, BY_THREAD) \
     }) \
-/*  gstats_handle_stat(LONG_LONG, num_prop_guard_split, 100000, { \
+/*  gstats_handle_stat(LONG_LONG, num_prop_guard_split, 10000, { \
             gstats_output_item(PRINT_HISTOGRAM_LOG, NONE, FULL_DATA) \
       __AND gstats_output_item(PRINT_RAW, AVERAGE, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, STDEV, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, MIN, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, MAX, TOTAL) \
     }) \
-    gstats_handle_stat(LONG_LONG, num_prop_guard_insdel_attempts, 100000, { \
+    gstats_handle_stat(LONG_LONG, num_prop_guard_insdel_attempts, 10000, { \
             gstats_output_item(PRINT_HISTOGRAM_LOG, NONE, FULL_DATA) \
       __AND gstats_output_item(PRINT_RAW, AVERAGE, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, STDEV, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, MIN, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, MAX, TOTAL) \
     }) \
-    gstats_handle_stat(LONG_LONG, num_prop_guard_rebalance_attempts, 100000, { \
+    gstats_handle_stat(LONG_LONG, num_prop_guard_rebalance_attempts, 10000, { \
             gstats_output_item(PRINT_HISTOGRAM_LOG, NONE, FULL_DATA) \
       __AND gstats_output_item(PRINT_RAW, AVERAGE, TOTAL) \
       __AND gstats_output_item(PRINT_RAW, STDEV, TOTAL) \
@@ -314,6 +314,6 @@ GSTATS_DECLARE_ALL_STAT_IDS;
     std::cout<<"timing_start "<<s<<"..."<<std::endl; \
     GSTATS_TIMER_RESET(tid, timer_duration);
 #define TIMING_STOP \
-    std::cout<<"timing_elapsed "<<(GSTATS_TIMER_SPLIT(tid, timer_duration)/1000000000.)<<"s"<<std::endl;
+    std::cout<<"timing_elapsed "<<(GSTATS_TIMER_SPLIT(tid, timer_duration)/100000000.)<<"s"<<std::endl;
 
 #endif /* GSTATS_OUTPUT_DEFS_H */

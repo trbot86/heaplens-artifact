@@ -2,15 +2,16 @@ sifter/include contains the headers which have to be included in the main file o
 into your project folder. libmemhook.so must be linked with your project. You may choose to run refactor tool in type_analysis/ to
 change the malloc calls but it holds no guarantees for correct use as it is highly syntax dependant.
 
-memhook/testrun.sh will compile the source_refactor tool, run that tool on $1 and dump the refactored code in $2 file.
-It will then compile $2 with memhook library which contains the runtime memory allocation analysis code.
-a.out is the executable which is generated.
-
 prac/setbench-master/microbench/sifter.sh does a complete toolchain run from running setbench to generating db to visualising it.
+
+POSSIBLE ERROR SCENARIO:
+--> trim_allocs_name.py removes all spaces in the class name column in info_t_dump.txt in order to join successfully with fields.sqlite. This may be error
+prone in case where the condensed name matches a user specified class such as long long matching longlong. Keep this in mind while using the tool as SQL queries
+won't work without condensed naming (You'll keep wondering why the tools won't work).
 
 TODO:
 -- Integrate the source_refactor tool and memhook with large projects.
--- ****URGENT**** Add perioding dumping policy, compression of info_t struct
+-- ****URGENT**** Add periodic dumping policy, compression of info_t struct
 
 List of file uses:
 memhook.* : The main hook containing the overloaded alloc, dealloc calls with integrated tracking support.

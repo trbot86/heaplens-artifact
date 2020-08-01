@@ -1,11 +1,11 @@
 [
     {
         "arguments": [
-            "c++",
+            "g++",
             "-c",
             "-g",
-            "-I../ds/howley_int_bst_lf",
-            "-DDS_TYPENAME=howley_int_bst_lf",
+            "-I../ds/brown_ext_abtree_lf",
+            "-DDS_TYPENAME=brown_ext_abtree_lf",
             "-DRECLAIM_TYPE=none",
             "-DPOOL_TYPE=none",
             "-DUSE_LIBNUMA",
@@ -48,10 +48,10 @@
             "-I../common/urcu",
             "-mrtm",
             "-o",
-            "bin/ubench_howley_int_bst_lf.alloc_new.reclaim_none.pool_none.out",
+            "bin/ubench_brown_ext_abtree_lf.alloc_new.reclaim_none.pool_none.out",
             "main.cpp"
         ],
-        "directory": "/home/gautam/Desktop/sifter/C++/prac/setbench_master/microbench",
+        "directory": "/home/gautam/Desktop/sifter/prac/setbench_master/microbench",
         "file": "main.cpp"
     }
 ]
