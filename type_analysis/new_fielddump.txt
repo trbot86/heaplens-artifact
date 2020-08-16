@@ -1,0 +1,28 @@
+A|_Bool|x|1|0
+A|int|a|4|4
+A|int|b|4|8
+A|_Bool|c|1|12
+A|_Bool|d|1|13
+A|long|l|8|16
+MyClass<A,newclass<newclass<newclass<A>>>>|int|a|4|0
+MyClass<A,newclass<newclass<newclass<A>>>>|class newclass<class newclass<class newclass<class A> > >|j|72|8
+MyClass<A,newclass<newclass<newclass<A>>>>|_Bool|b|1|80
+MyClass<A,newclass<newclass<newclass<A>>>>|_Bool|c|1|81
+MyClass<A,newclass<newclass<newclass<A>>>>|class A|field|24|88
+MyClass<A,newclass<newclass<newclass<A>>>>|class A|g|24|112
+newclass<A>|int|h|4|0
+newclass<A>|struct newclass<class A>::myStruct|y|32|8
+newclass<newclass<A>>|int|h|4|0
+newclass<newclass<A>>|struct newclass<class newclass<class A> >::myStruct|y|48|8
+newclass<newclass<newclass<A>>>|int|h|4|0
+newclass<newclass<newclass<A>>>|struct newclass<class newclass<class newclass<class A> > >::myStruct|y|64|8
+newclass<float>|int|h|4|0
+newclass<float>|struct newclass<float>::myStruct|y|16|8
+newclass<A>::myStruct|class A|x|24|0
+newclass<A>::myStruct|long long|l|8|24
+newclass<float>::myStruct|float|x|4|0
+newclass<float>::myStruct|long long|l|8|8
+newclass<newclass<A>>::myStruct|class newclass<class A>|x|40|0
+newclass<newclass<A>>::myStruct|long long|l|8|40
+newclass<newclass<newclass<A>>>::myStruct|class newclass<class newclass<class A> >|x|56|0
+newclass<newclass<newclass<A>>>::myStruct|long long|l|8|56

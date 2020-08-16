@@ -36,7 +36,7 @@ def parsetypeandpointer(inpt):
 
 # print(parsetypeandpointer("blockpool<bst_glock_ns::Node<long long, void*>, void* >***"))
 # print(parsetypeandpointer("abtree_ns::Node<11, long long>"))
-# print(parsetypeandpointer("RecoveryMgr<record_manager<reclaimer_none<void, pool_interface<void, allocator_interface<void> > >, allocator_new<void>, pool_none<void, allocator_interface<void> >, abtree_ns::Node<11, long long>> >"))
+# print(parsetypeandpointer("RecoveryMgr<record_manager<reclaimer_none<void, pool_interface<void, allocator_interface<void> > >, allocator_new<void>, pool_none<void, allocator_interface<void> >, abtree_ns::Node<11, long long>> >***"))
 # print(parsetypeandpointer("record_manager<reclaimer_none<void, pool_interface<void, allocator_interface<void> > >, allocator_new<void>, pool_none<void, allocator_interface<void> >, abtree_ns::Node<11, long long>>::MemoryReclamationGuard"))
 # print(parsetypeandpointer("record_manager<reclaimer_none<void, pool_interface<void, allocator_interface<void> > >, allocator_new<void>, pool_none<void, allocator_interface<void> >, abtree_ns::Node<11, long long>>"))
 

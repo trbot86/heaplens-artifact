@@ -59,7 +59,7 @@ def setcolormap():
     cmap = get_cmap("rainbow", len(d))
     scheme = [(d[x]-1)/len(d) for x in barchartdf['TYPE']]
     # print(scheme)
-    return d, set(scheme), cmap, cmap(scheme)
+    return d, sorted(set(scheme)), cmap, cmap(scheme)
 
 
 con = sqlite3.connect(sys.argv[1])

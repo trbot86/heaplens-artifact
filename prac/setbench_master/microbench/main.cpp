@@ -70,7 +70,7 @@ PAD;
     #define PRINTS(name) { std::cout<<#name<<"="<<STR(name)<<std::endl; }
 #endif
 
-#include "../ds/howley_int_bst_lf/adapter.h" /* data structure adapter header (selected according to the "ds/..." subdirectory in the -I include paths */
+#include "adapter.h" /* data structure adapter header (selected according to the "ds/..." subdirectory in the -I include paths */
 #include "tree_stats.h"
 #define DS_ADAPTER_T ds_adapter<test_type, VALUE_TYPE, RECLAIM<>, ALLOC<>, POOL<> >
 

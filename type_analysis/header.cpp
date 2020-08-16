@@ -1,3 +1,7 @@
+// ****************************************************************
+// This file is a sample file to test the limits of the tool in C++
+// ****************************************************************
+
 #include <iostream>
 #include <stdlib.h>
 // #include <string>

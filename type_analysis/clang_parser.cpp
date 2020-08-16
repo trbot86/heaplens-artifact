@@ -43,122 +43,133 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 
 set<string> typenameset;
 
-multimap<string, vector<string> > fieldnameset;
+multimap<string, vector<string>> fieldnameset;
 
-DeclarationMatcher classMatcher = 
-  // cxxRecordDecl(unless(isExpansionInSystemHeader()), unless(classTemplateDecl())).bind("class");
-  // cxxRecordDecl(unless(isExpansionInSystemHeader()), hasDefinition(), classTemplateDecl()).bind("class");
-  cxxRecordDecl(unless(isExpansionInSystemHeader())).bind("class");
+DeclarationMatcher classMatcher =
+    // cxxRecordDecl(unless(isExpansionInSystemHeader()), unless(classTemplateDecl())).bind("class");
+    // cxxRecordDecl(unless(isExpansionInSystemHeader()), hasDefinition(), classTemplateDecl()).bind("class");
+    cxxRecordDecl(unless(isExpansionInSystemHeader())).bind("class");
 
 DeclarationMatcher templateClassMatcher =
-  classTemplateDecl(unless(isExpansionInSystemHeader())).bind("templatedclass");
+    classTemplateDecl(unless(isExpansionInSystemHeader())).bind("templatedclass");
 
-DeclarationMatcher insttemplatedClassMatcher = 
-  cxxRecordDecl(unless(isExpansionInSystemHeader()), isTemplateInstantiation()).bind("insttemplatedclass");
+DeclarationMatcher insttemplatedClassMatcher =
+    cxxRecordDecl(unless(isExpansionInSystemHeader()), isTemplateInstantiation()).bind("insttemplatedclass");
 
 DeclarationMatcher fieldMatcher =
-  fieldDecl(unless(isExpansionInSystemHeader())).bind("field");
+    fieldDecl(unless(isExpansionInSystemHeader())).bind("field");
 
 StatementMatcher deleteMatcher =
-  cxxDeleteExpr().bind("deletecall");
+    cxxDeleteExpr().bind("deletecall");
 
 StatementMatcher newMatcher =
-  cxxNewExpr().bind("newcall");
+    cxxNewExpr().bind("newcall");
 
-StatementMatcher CStyleMallocMatcher = 
-  callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray")))));
+StatementMatcher CStyleMallocMatcher =
+    callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray")))));
 
-class ClassnamePrinter : public MatchFinder::MatchCallback {
-  public :
-    virtual void run(const MatchFinder::MatchResult &Result) {
-      const CXXRecordDecl* rd = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("class");
-      cout << "general class matcher: " << rd->getQualifiedNameAsString() << " ";
-      cout << "DCT: " << (ClassTemplateDecl*)rd->getDescribedClassTemplate() << " ";
-      cout << "TIP: " << (uint64_t)rd->getTemplateInstantiationPattern() << " ";
-      cout << "DEF: " << (uint64_t)rd->getDefinition() << " ";
-      if(rd->getDefinition()) {
-        cout << "CD: " << (uint64_t)rd->getCanonicalDecl() << " ";
-        cout << "IFMC: " << (uint64_t)rd->getInstantiatedFromMemberClass() << " ";
-        cout << "TSK: " << (uint64_t)rd->getTemplateSpecializationKind() << " ";
-        cout << "MSI: " << (uint64_t)rd->getMemberSpecializationInfo () << " ";
-        cout << "HF: " << (uint64_t)rd->hasFriends () << " ";
-        cout << "IL: " << (uint64_t)rd->isLambda () << " ";
-        cout << "ILC: " << (uint64_t)rd->isLocalClass () << " ";
-        cout << "ICN: " << (uint64_t)rd->isInjectedClassName () << " ";
-        cout << "IASOU: " << (uint64_t)rd->isAnonymousStructOrUnion () << " ";
-        cout << "ITDAD: " << (uint64_t)rd->isThisDeclarationADefinition () << " ";
-        cout << "IDT: " << (uint64_t)rd->isDependentType () << " ";
-        cout << "NTPL: " << (uint64_t)rd->getNumTemplateParameterLists () << " ";
+class ClassnamePrinter : public MatchFinder::MatchCallback
+{
+public:
+  virtual void run(const MatchFinder::MatchResult &Result)
+  {
+    const CXXRecordDecl *rd = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("class");
+    cout << "general class matcher: " << rd->getQualifiedNameAsString() << " ";
+    cout << "DCT: " << (ClassTemplateDecl *)rd->getDescribedClassTemplate() << " ";
+    cout << "TIP: " << (uint64_t)rd->getTemplateInstantiationPattern() << " ";
+    cout << "DEF: " << (uint64_t)rd->getDefinition() << " ";
+    if (rd->getDefinition())
+    {
+      cout << "CD: " << (uint64_t)rd->getCanonicalDecl() << " ";
+      cout << "IFMC: " << (uint64_t)rd->getInstantiatedFromMemberClass() << " ";
+      cout << "TSK: " << (uint64_t)rd->getTemplateSpecializationKind() << " ";
+      cout << "MSI: " << (uint64_t)rd->getMemberSpecializationInfo() << " ";
+      cout << "HF: " << (uint64_t)rd->hasFriends() << " ";
+      cout << "IL: " << (uint64_t)rd->isLambda() << " ";
+      cout << "ILC: " << (uint64_t)rd->isLocalClass() << " ";
+      cout << "ICN: " << (uint64_t)rd->isInjectedClassName() << " ";
+      cout << "IASOU: " << (uint64_t)rd->isAnonymousStructOrUnion() << " ";
+      cout << "ITDAD: " << (uint64_t)rd->isThisDeclarationADefinition() << " ";
+      cout << "IDT: " << (uint64_t)rd->isDependentType() << " ";
+      cout << "NTPL: " << (uint64_t)rd->getNumTemplateParameterLists() << " ";
+    }
+    // cout << "ADB: " << (uint64_t)rd->hasAnyDependentBases() << " ";
+    cout << "RD: " << (uint64_t)rd << endl;
+
+    if (rd->getDefinition() && !rd->isDependentType())
+    {
+      typenameset.insert(rd->getDeclName().getAsString());
+      cout << endl;
+      cout << "normal class matcher: " << rd->getQualifiedNameAsString() << endl;
+      auto field_iter = rd->field_begin();
+      auto &context = rd->getASTContext();
+      auto &rl = context.getASTRecordLayout(rd);
+
+      for (auto it = field_iter; it != rd->field_end(); ++it)
+      {
+        //** cout << it->getQualifiedNameAsString() << endl;
+        //** cout << it->getASTContext().getTypeSize(it->getType())/8 << endl;
+        //** cout << rl.getFieldOffset(it->getFieldIndex()) << endl;
+        //** cout << it->getType().getAsString() << endl;
+        fieldnameset.insert(pair<string, vector<string>>(rd->getQualifiedNameAsString(), {it->getType().getAsString(), it->getQualifiedNameAsString(), to_string(it->getASTContext().getTypeSize(it->getType()) / 8), to_string(rl.getFieldOffset(it->getFieldIndex()) / 8)}));
       }
-      // cout << "ADB: " << (uint64_t)rd->hasAnyDependentBases() << " ";
-      cout << "RD: " << (uint64_t)rd << endl;
-
-      if(rd->getDefinition() && !rd->isDependentType()) {
-        typenameset.insert(rd->getDeclName().getAsString());
-        cout << endl;
-        cout << "normal class matcher: " << rd->getQualifiedNameAsString() << endl;
-        auto field_iter = rd->field_begin();
-        auto &context = rd->getASTContext();
-        auto &rl = context.getASTRecordLayout(rd);
-
-        for (auto it = field_iter; it != rd->field_end(); ++it)
-        {
-          //** cout << it->getQualifiedNameAsString() << endl;
-          //** cout << it->getASTContext().getTypeSize(it->getType())/8 << endl;
-          //** cout << rl.getFieldOffset(it->getFieldIndex()) << endl;
-          //** cout << it->getType().getAsString() << endl;
-          fieldnameset.insert(pair<string, vector<string>>(rd->getQualifiedNameAsString(), {it->getType().getAsString(), it->getQualifiedNameAsString(), to_string(it->getASTContext().getTypeSize(it->getType()) / 8), to_string(rl.getFieldOffset(it->getFieldIndex()) / 8)}));
-        }
-      }
     }
+  }
 };
 
-class TemplatedClassPrinter : public MatchFinder::MatchCallback {
-  public :
-    virtual void run(const MatchFinder::MatchResult &Result) {
-      const NamedDecl* nd = Result.Nodes.getNodeAs<clang::NamedDecl>("templatedclass");
-      cout << "templated class matcher: " << nd->getQualifiedNameAsString() << endl;
-    }
+class TemplatedClassPrinter : public MatchFinder::MatchCallback
+{
+public:
+  virtual void run(const MatchFinder::MatchResult &Result)
+  {
+    const NamedDecl *nd = Result.Nodes.getNodeAs<clang::NamedDecl>("templatedclass");
+    cout << "templated class matcher: " << nd->getQualifiedNameAsString() << endl;
+  }
 };
 
-class instTemplatedClassnamePrinter : public MatchFinder::MatchCallback {
-  public :
-    virtual void run(const MatchFinder::MatchResult &Result) {
-      const RecordDecl* rd = Result.Nodes.getNodeAs<clang::RecordDecl>("insttemplatedclass");
-        typenameset.insert(rd->getDeclName().getAsString());
-        cout << endl;
-        // cout << "visiting: " << rd->getDeclName().getAsString() << endl;
-        cout << "instantiated templated class matcher: " << rd->getQualifiedNameAsString() << endl;
-        auto field_iter = rd->field_begin();
-        auto& context = rd->getASTContext();
-        auto& rl = context.getASTRecordLayout(rd);
-        // cout << rl.
-        // auto& rl = (rd->getASTContext()).getASTRecordLayout(rd);
+class instTemplatedClassnamePrinter : public MatchFinder::MatchCallback
+{
+public:
+  virtual void run(const MatchFinder::MatchResult &Result)
+  {
+    const RecordDecl *rd = Result.Nodes.getNodeAs<clang::RecordDecl>("insttemplatedclass");
+    typenameset.insert(rd->getDeclName().getAsString());
+    cout << endl;
+    // cout << "visiting: " << rd->getDeclName().getAsString() << endl;
+    cout << "instantiated templated class matcher: " << rd->getQualifiedNameAsString() << endl;
+    auto field_iter = rd->field_begin();
+    auto &context = rd->getASTContext();
+    auto &rl = context.getASTRecordLayout(rd);
+    // cout << rl.
+    // auto& rl = (rd->getASTContext()).getASTRecordLayout(rd);
 
-        // for(unsigned i = 0;i < rl.getFieldCount();i++) {
-          // cout << rl.getFieldOffset(i) << endl;
-        // }
+    // for(unsigned i = 0;i < rl.getFieldCount();i++) {
+    // cout << rl.getFieldOffset(i) << endl;
+    // }
 
-        for(auto it = field_iter;it != rd->field_end();++it) {
-          // cout << it->getType();
-          // cout << it->getNameAsString() << endl;
-         //** cout << it->getQualifiedNameAsString() << endl;
-         //** cout << it->getASTContext().getTypeSize(it->getType())/8 << endl;
-         //** cout << rl.getFieldOffset(it->getFieldIndex()) << endl;
-          // cout << (it->getASTContext()).getTypeInfo(it->getType()).Width << endl;
-         //** cout << it->getType().getAsString() << endl;
-          fieldnameset.insert(pair<string, vector<string> >(rd->getQualifiedNameAsString(),{it->getType().getAsString(), it->getQualifiedNameAsString(), to_string(it->getASTContext().getTypeSize(it->getType())/8), to_string(rl.getFieldOffset(it->getFieldIndex())/8)}));
-        }
+    for (auto it = field_iter; it != rd->field_end(); ++it)
+    {
+      // cout << it->getType();
+      // cout << it->getNameAsString() << endl;
+      //** cout << it->getQualifiedNameAsString() << endl;
+      //** cout << it->getASTContext().getTypeSize(it->getType())/8 << endl;
+      //** cout << rl.getFieldOffset(it->getFieldIndex()) << endl;
+      // cout << (it->getASTContext()).getTypeInfo(it->getType()).Width << endl;
+      //** cout << it->getType().getAsString() << endl;
+      fieldnameset.insert(pair<string, vector<string>>(rd->getQualifiedNameAsString(), {it->getType().getAsString(), it->getQualifiedNameAsString(), to_string(it->getASTContext().getTypeSize(it->getType()) / 8), to_string(rl.getFieldOffset(it->getFieldIndex()) / 8)}));
     }
+  }
 };
 
-class NewExprPrinter : public MatchFinder::MatchCallback {
-  public:
-    virtual void run(const MatchFinder::MatchResult &Result) {
-      const CXXNewExpr* newex = Result.Nodes.getNodeAs<clang::CXXNewExpr>("newcall");
-      QualType allocType = newex->getAllocatedType();
-      cout << "new: " << allocType.getAsString() << endl;
-    }
+class NewExprPrinter : public MatchFinder::MatchCallback
+{
+public:
+  virtual void run(const MatchFinder::MatchResult &Result)
+  {
+    const CXXNewExpr *newex = Result.Nodes.getNodeAs<clang::CXXNewExpr>("newcall");
+    QualType allocType = newex->getAllocatedType();
+    cout << "new: " << allocType.getAsString() << endl;
+  }
 };
 
 //Callback for all C-Style allocation functions
@@ -171,25 +182,29 @@ class NewExprPrinter : public MatchFinder::MatchCallback {
  * Else, throw error ¯\_(ツ)_/¯
 **/
 
-class CStyleAllocPrinter : public MatchFinder::MatchCallback {
-  public:
-    virtual void run(const MatchFinder::MatchResult &Result) {
-
-    }
+class CStyleAllocPrinter : public MatchFinder::MatchCallback
+{
+public:
+  virtual void run(const MatchFinder::MatchResult &Result)
+  {
+  }
 };
 
-class DeleteExprPrinter : public MatchFinder::MatchCallback {
-  public:
-    virtual void run(const MatchFinder::MatchResult &Result) {
-      const CXXDeleteExpr* delex = Result.Nodes.getNodeAs<clang::CXXDeleteExpr>("deletecall");
-      QualType destroyedType = delex->getDestroyedType();
-      cout << "delete: " << destroyedType.getAsString() << endl;
-    }
+class DeleteExprPrinter : public MatchFinder::MatchCallback
+{
+public:
+  virtual void run(const MatchFinder::MatchResult &Result)
+  {
+    const CXXDeleteExpr *delex = Result.Nodes.getNodeAs<clang::CXXDeleteExpr>("deletecall");
+    QualType destroyedType = delex->getDestroyedType();
+    cout << "delete: " << destroyedType.getAsString() << endl;
+  }
 };
 
-int main(int argc, const char **argv) {
+int main(int argc, const char **argv)
+{
   CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
-  
+
   ClangTool Tool(OptionsParser.getCompilations(),
                  OptionsParser.getSourcePathList());
 
@@ -200,30 +215,33 @@ int main(int argc, const char **argv) {
   NewExprPrinter np;
 
   MatchFinder Finder;
-  
+
   Finder.addMatcher(classMatcher, &cp);
   // Finder.addMatcher(templateClassMatcher, &tcp);
   // Finder.addMatcher(insttemplatedClassMatcher, &itcp);
   // Finder.addMatcher(deleteMatcher, &dp);
-  // Finder.addMatcher(newMatcher, &np);  
+  // Finder.addMatcher(newMatcher, &np);
 
   Tool.run(newFrontendActionFactory(&Finder).get());
   // Tool.run(newFrontendActionFactory<SyntaxOnlyAction>().get());
   // Tool.run(newFrontendActionFactory<PreprocessOnlyAction>().get());
-  
+
   ofstream typefile;
   typefile.open("typedump.txt");
   ofstream fieldfile;
   fieldfile.open("fielddump.txt");
 
-  for(auto i = typenameset.begin();i != typenameset.end();++i) {
+  for (auto i = typenameset.begin(); i != typenameset.end(); ++i)
+  {
     typefile << *i << endl;
   }
 
-  for(auto i = fieldnameset.begin();i != fieldnameset.end();++i) {
+  for (auto i = fieldnameset.begin(); i != fieldnameset.end(); ++i)
+  {
     // fieldfile << (*i).first << " | " << (*i).second.first << " | " << (*i).second.second << endl;
     fieldfile << (*i).first;
-    for(auto i : (*i).second) {
+    for (auto i : (*i).second)
+    {
       fieldfile << "|" << i;
     }
     fieldfile << endl;

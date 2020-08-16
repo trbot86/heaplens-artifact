@@ -13,9 +13,9 @@ cur = con.cursor()
 
 get_typenames = "SELECT DISTINCT ALLOCS.TYPE FROM ALLOCS;"
 
-print("this program shows the cache line offsets for the given type\n")
+print("This program shows the cache line offsets for the given type\n")
 
-print("the types are as follows\n")
+print("The types are as follows:\n")
 
 for t in cur.execute(get_typenames):
     print(t)
