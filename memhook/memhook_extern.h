@@ -73,8 +73,6 @@ extern MemStampCollector collector;
 */
 extern thread_local int it;
 
-extern slot *sarr;
-
 //Keeps the total number of concurrent threads
 extern int arrayCount;
 
@@ -84,20 +82,14 @@ extern type_map tmap;
 
 extern filenameset fset;
 
-//Global array for tracking all allocations
-
 //Local array tracking a thread's allocations
 extern thread_local info_t* myArray;
 
 extern thread_local ThreadExiter exiter;
 
 inline uint64_t get_server_clock();
-// __attribute__ ((constructor)) void allocArray();
-// __attribute__ ((destructor)) void dumpentirestatstofile2();
 void printstats();
 int get_slot(thread::id id);
-// void dumpentirestatstofile(const char* file);
-// void dumpstatstofile(const char *file);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);
 
@@ -123,12 +115,6 @@ T malloc(size_t size, bool fakearg) {
     // insert_info(size, ptr, type_index(typeid(T)));
     return ptr;
 }
-
-// void* malloc(size_t size) {
-//     if(!orig_malloc)
-//         orig_malloc = (void* (*) (size_t))dlsym(RTLD_NEXT, "malloc");
-//     return orig_malloc(size);
-// }
 
 #define SIFTER_NEW MemStamp(__FILE__, __LINE__) * new
 #define new SIFTER_NEW

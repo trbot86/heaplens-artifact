@@ -173,8 +173,6 @@ void *calloc(size_t nmemb, size_t size) {
     return memhook_calloc(nmemb, size, true);
 }
 
-slot *sarr = nullptr;
-
 inline uint64_t get_server_clock() {
 #if defined(__i386__)
     uint64_t ret;

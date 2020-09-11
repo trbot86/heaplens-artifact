@@ -26,3 +26,6 @@ def trim_fields(filename):
     # print(df[:50])
 
     df.to_csv("new_fielddump.txt", index=False, header=None, sep="|")
+
+if __name__ == "__main__":
+    trim_allocs(sys.argv[1])

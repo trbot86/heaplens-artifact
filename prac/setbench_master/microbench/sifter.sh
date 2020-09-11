@@ -45,7 +45,7 @@ else
 fi
 
 echo_color "removing spaces from class names in info_t_dump.txt"
-python3 ../../../type_analysis/trim_allocs_name.py ./info_t_dump.txt
+python3 ../../../type_analysis/trim_name.py ./info_t_dump.txt
 
 echo_color "removing previous temp db..."
 rm allocs.sqlite 2>/dev/null
@@ -54,7 +54,7 @@ echo_color "saving info_t_dump.txt to allocs.sqlite..."
 python3 ../../../memhook/saveallocstodb.py new_info_t_dump.txt allocs.sqlite
 
 echo_color "starting visualisation routine..."
-python3 ../../../visual/cacheline_in_block.py allocs.sqlite 4096 64 "type like \"node_t<longlong,void*>\" or type like \"operation_t<longlong,void*>\""
+# python3 ../../../visual/cacheline_in_block.py allocs.sqlite 4096 64 "type like \"node_t<longlong,void*>\" or type like \"operation_t<longlong,void*>\""
 # python3 ../../../visual/set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<longlong,void*>\" or type like \"operation_t<longlong,void*>\""
-python3 ../../../visual/set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<longlong,void*>\""
+# python3 ../../../visual/set_allocation.py allocs.sqlite 1024 64 "type like \"node_t<longlong,void*>\""
 # python3 field_block_view.py ../prac/setbench_master/microbench/allocs.sqlite ../prac/setbench_master/microbench/fields.sqlite 1024 64 "type like \"node_t<longlong,void*>\""
