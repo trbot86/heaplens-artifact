@@ -173,20 +173,6 @@ void *calloc(size_t nmemb, size_t size) {
     return memhook_calloc(nmemb, size, true);
 }
 
-inline uint64_t get_server_clock() {
-#if defined(__i386__)
-    uint64_t ret;
-    __asm__ __volatile__("rdtsc" : "=A" (ret));
-#elif defined(__x86_64__)
-    unsigned hi, lo;
-    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    uint64_t ret = ( (uint64_t)lo)|( ((uint64_t)hi)<<32 );
-#else 
-    #error Must support RDTSC instruction! Sorry...
-#endif
-    return ret;
-}
-
 //Add checks to next_malloc
 // void allocArray() {
 //     allArrays = (info_t*)next_malloc(MAX_THREADS*MAX_TRACK*sizeof(info_t));

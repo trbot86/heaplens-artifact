@@ -5,6 +5,10 @@
 
 // #warning This binary is being compiled with memhook. Running it will produce a text file that should be provided as an argument to the shell script for step3.
 
+void   (*next_free)(void *ptr);
+void * (*next_malloc)(size_t size);
+void * (*next_calloc)(size_t nmemb, size_t size);
+
 struct slot {
 	volatile bool occupied;
 	thread::id id;

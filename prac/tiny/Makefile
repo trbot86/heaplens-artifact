@@ -1,8 +1,7 @@
 CC = clang++-6.0
 
 all: test.o a.o
-	$(CC) -Wall -g -o bin test.o a.o -lmemhook -ldl -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/
-	./bin
+	$(CC) -Wall -g -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
 
 test.o: test.cpp a.h
 	$(CC) -c test.cpp -I../../memhook/

@@ -1,4 +1,5 @@
 // #define _GNU_SOURCE
+#include "memhook_extern.h"
 #ifndef A_H
 #define A_H
 

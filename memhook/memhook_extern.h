@@ -24,7 +24,7 @@
 
 using namespace std;
 
-void* (*orig_malloc)(size_t);
+// void* (*orig_malloc)(size_t);
 
 struct slot;
 struct info_t;
@@ -32,9 +32,9 @@ class ThreadExiter;
 typedef map<type_index, const char*> type_map;
 typedef set<const char*> filenameset;
 
-void   (*next_free)(void *ptr);
-void * (*next_malloc)(size_t size);
-void * (*next_calloc)(size_t nmemb, size_t size);
+extern void   (*next_free)(void *ptr);
+extern void * (*next_malloc)(size_t size);
+extern void * (*next_calloc)(size_t nmemb, size_t size);
 
 extern thread_local int iter;
 
@@ -87,7 +87,20 @@ extern thread_local info_t* myArray;
 
 extern thread_local ThreadExiter exiter;
 
-inline uint64_t get_server_clock();
+inline uint64_t get_server_clock() {
+#if defined(__i386__)
+    uint64_t ret;
+    __asm__ __volatile__("rdtsc" : "=A" (ret));
+#elif defined(__x86_64__)
+    unsigned hi, lo;
+    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+    uint64_t ret = ( (uint64_t)lo)|( ((uint64_t)hi)<<32 );
+#else 
+    #error Must support RDTSC instruction! Sorry...
+#endif
+    return ret;
+}
+
 void printstats();
 int get_slot(thread::id id);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
