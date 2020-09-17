@@ -97,7 +97,7 @@ void MemStampCollector::add(uint64_t timestamp, size_t size, void * addr, bool t
   }
   
   if(it < MAX_TRACK) {
-    myArray[it].timestamp = get_server_clock();
+    myArray[it].timestamp = memhook_get_server_clock();
     myArray[it].size = size;
     myArray[it].addr = addr;
     myArray[it].typeofop = typeofop;

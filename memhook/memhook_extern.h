@@ -87,7 +87,7 @@ extern thread_local info_t* myArray;
 
 extern thread_local ThreadExiter exiter;
 
-inline uint64_t get_server_clock() {
+inline uint64_t memhook_get_server_clock() {
 #if defined(__i386__)
     uint64_t ret;
     __asm__ __volatile__("rdtsc" : "=A" (ret));

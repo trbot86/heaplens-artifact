@@ -15,8 +15,8 @@ int main() {
     // for(int i = 0;i < 10000;i++) {
     // cout << "hello";
     int* p = (int*)malloc(sizeof(int));
-    float* r = (float*)malloc(sizeof(float));
-    int* q = new int;
+    tall* r = (tall*)malloc<tall*>(sizeof(tall));
+    tall* q = new tall;
     // int* r = new int;
     // printf("flag: %d\n", flag);
     // }

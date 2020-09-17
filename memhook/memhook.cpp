@@ -113,7 +113,7 @@ void *memhook_malloc(size_t size, bool log) {
         throw bad_alloc();
     }
 
-    collector.add(get_server_clock(), size, mem, true);
+    collector.add(memhook_get_server_clock(), size, mem, true);
 
 
     // printf("real malloc called!\n");
@@ -134,7 +134,7 @@ void memhook_free(void *ptr, bool log) {
         fprintf(stdout, "freeing temp memory\n");
     } else {
         next_free(ptr);
-        collector.add(get_server_clock(), 0, ptr, false);
+        collector.add(memhook_get_server_clock(), 0, ptr, false);
     }
 }
 // void *realloc(void *ptr, size_t size) {
