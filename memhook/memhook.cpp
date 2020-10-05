@@ -107,7 +107,8 @@ void *memhook_malloc(size_t size, bool log) {
 
     if (next_malloc == 0) exit(42);
     void * mem = next_malloc(size);
-    if (!mem) exit(71);
+
+    // if (!mem) exit(71);
 
     if(mem == 0) {
         throw bad_alloc();
