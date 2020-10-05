@@ -9,5 +9,8 @@ test.o: test.cpp a.h
 a.o: a.cpp a.h
 	$(CC) -c -g a.cpp -I../../memhook/
 
+preprocessor:
+	$(CC) -E test.cpp -I../../memhook/ > preprocessor_output.cpp
+
 clean:
-	rm bin test.o a.o compile_commands.json info_t_dump.txt
+	rm bin test.o a.o compile_commands.json info_t_dump.txt preprocessor_output.cpp
