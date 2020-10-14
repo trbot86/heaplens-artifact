@@ -48,3 +48,29 @@ cd visual
 python3 cacheline_in_block.py ../../test_project_refactored/allocs.sqlite 4096 64 '1==1'"
 python3 cacheline_in_block.py ../../test_project_refactored/allocs.sqlite 4096 64 'type like \"std::thread\"'"
 python3 cacheline_in_block.py ../../test_project_refactored/allocs.sqlite 2097152 4096 '1==1'"
+
+DEPLOYMENT:
+
+In order to deploy sifter and capture the allocations in a real program, the program needs to be compiled with the memhook interface header, "memhook_interface.h"
+Add the statement '#include "memhook_interface.h"' in the file that contains your main() function.
+
+When building your project, make sure that the libmemhook.so shared object gets linked before any other shared library object that may have the same allocation symbols,
+i.e libc and libstdc++.
+Example of a correct linked order confirmed through ldd:$ ldd bin
+	linux-vdso.so.1 (0x00007ffef5ee9000)
+	libmemhook.so => ../../memhook/libmemhook.so (0x00007ff024658000)
+	libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007ff024454000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007ff0240cb000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007ff023d2d000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007ff023b15000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ff023724000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007ff02495f000)
+
+Here you can see that libmemhook.so is second from the top of the stack, before libstdc++.so and libc.so.
+
+If you are preloading another memory allocator, or any other shared library and would like libmemhook to profile these allocations, make sure that you preload libmemhook, before
+said shared libraries.
+Example: 
+$ LD_PRELOAD="../../memhook/libmemhook.so:../setbench_master/lib/libjemalloc.so" bin
+
+In this example ../setbench_master/lib/libjemalloc.so is a relative path to an instance of the jemalloc shared object.
