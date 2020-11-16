@@ -1,16 +1,22 @@
 CC = clang++-6.0
 
-all: test.o a.o
-	$(CC) -Wall -g -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
+all: test.o a.o d.o
+	$(CC) -Wall -g -o bin test.o a.o d.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
 
-test.o: test.cpp a.h
+test.o: test.cpp
 	$(CC) -c -g test.cpp -I../../memhook/
 
-a.o: a.cpp a.h
-	$(CC) -c -g a.cpp -I../../memhook/
+d.o: d.cpp
+	$(CC) -c -g d.cpp -I../../memhook/
+
+# b.o: b.cpp
+# 	$(CC) -c -g b.cpp -I../../memhook/
+
+a.o: a.cpp b.cpp
+	$(CC) -c -g a.cpp b.cpp -I../../memhook/
 
 preprocessor:
 	$(CC) -E test.cpp -I../../memhook/ > preprocessor_output.cpp
 
 clean:
-	rm bin test.o a.o compile_commands.json info_t_dump.txt preprocessor_output.cpp
+	rm bin *.o *.tmp compile_commands.json info_t_dump.txt preprocessor_output.cpp
