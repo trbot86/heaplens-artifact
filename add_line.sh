@@ -14,6 +14,6 @@ for f in $(for t in '*.h' '*.cpp' '*.c' '*.hpp' '*.cc' '*.hh' ; do find . -name 
     	echo "   skipping file $f..."
     	continue
     fi
-    sed -i "1s/^/#include \"memhook_interface.h\"\n/" $f
+    sed -i "1s/^/#include \"memhook_extern.h\"\n/" $f
 done
 echo "    Done."

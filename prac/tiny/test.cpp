@@ -1,11 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "a.h"
-#include "b.h"
-#include "d.h"
+#include "memhook.h"
 
-#include "memhook_interface.h"
+#include "a.h"
 
 struct tall {
 int a;
@@ -19,13 +17,6 @@ int main() {
     int* p = (int*)malloc(sizeof(int));
     tall* r = (tall*)malloc(sizeof(tall));
     tall* q = new tall;
-    
-    barfoo();
-    
-    if(true) {
-    
-    }
-   
     // int* r = new int;
     // printf("flag: %d\n", flag);
     // }

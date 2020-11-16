@@ -1,6 +1,6 @@
 CFLAGS =
 LDFLAGS =
-CC=clang++-6.0
+CC=g++
 
 #LDFLAGS += -fsanitize=address -static-libasan
 CFLAGS += -DMEMORY_STATS=if\(1\) -DMEMORY_STATS2=if\(0\)
@@ -36,10 +36,10 @@ CFLAGS += -DNOGRAPHITE=1 -DWORKLOAD=$(workload)
 #CFLAGS += -DHASH_PRIMARY_KEYS
 CFLAGS += -DALIGNED_ALLOCATIONS
 CFLAGS += -fno-omit-frame-pointer
-CFLAGS += -I$(data_structure_path) $(data_structure_opts) -L../../../memhook/ -Wl,-rpath=../../../memhook/ -I../../../memhook/
+CFLAGS += -I$(data_structure_path) $(data_structure_opts)
 LDFLAGS += $(CFLAGS)
 LDFLAGS += -L. -L../lib -g
-# LDFLAGS += -L../../../memhook/ -Wl,-rpath=../../../memhook/ -I../../../memhook/
+LDFLAGS += -L../../../memhook/ -Wl,-rpath=../../../memhook/ -I../../../memhook/
 LDFLAGS += -lpthread -lmemhook
 #LDFLAGS += -lrt
 #LDFLAGS += -ldl
