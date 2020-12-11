@@ -3,9 +3,14 @@ CC = clang++-6.0
 all: test.o a.o
 	$(CC) -Wall -g -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
 
-test.o: test.cpp a.h
-	$(CC) -c -g test.cpp -I../../memhook/
+stack: test.o a.o
+	$(CC) -Wall -g -lpthread -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
 
+thread_test: test.o a.o
+	$(CC) -Wall -g -lpthread -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
+
+test.o: test.cpp a.h
+	$(CC) -pthread -c -g test.cpp -I../../memhook/
 a.o: a.cpp a.h
 	$(CC) -c -g a.cpp -I../../memhook/
 
