@@ -1,16 +1,20 @@
-CC = clang++-6.0
+CC = g++ 
+#clang++-6.0
 
-all: test.o a.o d.o
-	$(CC) -Wall -g -o bin test.o a.o d.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
+all: test.o a.o
+	$(CC) -Wall -g -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
 
-stack: test.o a.o
-	$(CC) -Wall -g -lpthread -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
+stack: stack.o
+	$(CC) -Wall -g -pthread -o bin stack.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
 
 thread_test: test.o a.o
-	$(CC) -Wall -g -lpthread -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
+	$(CC) -Wall -g -pthread -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
+
+stack.o: stack.cpp
+	$(CC) -Wall -pthread -c -g -mrdrnd stack.cpp -I../../memhook/
 
 test.o: test.cpp a.h
-	$(CC) -pthread -c -g test.cpp -I../../memhook/
+	$(CC) -c -g test.cpp -I../../memhook/
 a.o: a.cpp a.h
 	$(CC) -c -g a.cpp -I../../memhook/
 

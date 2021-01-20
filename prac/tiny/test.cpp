@@ -20,12 +20,8 @@ int main() {
     tall* r = (tall*)malloc(sizeof(tall));
     tall* q = new tall;
     
-    barfoo();
+    //barfoo();
     
-    if(true) {
-    
-    }
-   
     // int* r = new int;
     // printf("flag: %d\n", flag);
     // }
