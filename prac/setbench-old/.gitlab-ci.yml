@@ -1,0 +1,90 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+    - build
+    - test
+
+before_script:
+    - dos2unix `find . -type f \( -name "*.txt" -o -name "*.sh" \) -print`
+    - chmod 755 `find . -type f -name "*.sh" -print`
+
+compile_microbench:
+    stage: build
+    script:
+        - cd microbench
+        - make -j all
+    artifacts:
+        paths:
+            - microbench/bin
+
+compile_microbench_option_coverage:
+    stage: build
+    script:
+        - cd microbench
+        - echo
+        - echo "#########################################################"
+        - echo "## make -j all"
+        - echo "#########################################################"
+        - make -j all || exit 1
+        - echo
+        - echo "#########################################################"
+        - echo "## use_asserts=1"
+        - echo "#########################################################"
+        - make -j all use_asserts=1 || exit 1
+        - echo
+        - echo "#########################################################"
+        - echo "## use_asserts=1 use_timelines=1"
+        - echo "#########################################################"
+        - make -j all use_asserts=1 use_timelines=1 || exit 1
+        - echo
+        - echo "#########################################################"
+        - echo "## has_libpapi=0"
+        - echo "#########################################################"
+        - make -j all has_libpapi=0 || exit 1
+        - echo
+        - echo "#########################################################"
+        - echo "## has_libpapi=0 has_libnuma=0"
+        - echo "#########################################################"
+        - make -j all has_libnuma=0 has_libpapi=0 || exit 1
+        - echo
+        - echo "#########################################################"
+        - echo "## has_libpapi=0 has_libnuma=0 use_openmp=0"
+        - echo "#########################################################"
+        - make -j all has_libnuma=0 has_libpapi=0 use_openmp=0 || exit 1
+
+compile_microbench_recordmanager_coverage:
+    stage: build
+    script:
+        - cd microbench
+        - echo
+        - echo "#########################################################"
+        - echo "## testing all reclaimers (except for ebr_tree_q, rcu and debraplus, which are not maintained)"
+        - echo "#########################################################"
+        - make -j ubench_brown_ext_abtree_lf.alloc_new.reclaim_ebr_token.pool_none.out ubench_brown_ext_abtree_lf.alloc_new.reclaim_ebr_tree.pool_none.out ubench_brown_ext_abtree_lf.alloc_new.reclaim_debra.pool_none.out ubench_brown_ext_abtree_lf.alloc_new.reclaim_debracap.pool_none.out ubench_brown_ext_abtree_lf.alloc_new.reclaim_none.pool_none.out ubench_brown_ext_abtree_lf.alloc_new.reclaim_hazardptr.pool_none.out RECLAIMERS="ebr_token ebr_tree ebr_tree_q debra debracap none hazardptr"
+        - echo
+        - echo "#########################################################"
+        - echo "## testing all pools (except for per_thread_and_shared, which is not maintained)"
+        - echo "#########################################################"
+        - make -j ubench_brown_ext_abtree_lf.alloc_new.reclaim_debra.pool_none.out ubench_brown_ext_abtree_lf.alloc_new.reclaim_debra.pool_numa.out POOLS="none numa perthread_and_shared"
+
+test_microbench_istree_throughput:
+    stage: test
+    script:
+        - mkdir -p tests
+        - maxthr=`cd microbench/experiments ; ./get_thread_count_max.sh`
+        - thread_pinning=`cd microbench/experiments ; ./get_pinning_cluster.sh`
+        - args="-nwork ${maxthr} -nprefill ${maxthr} -i 5 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 10000 -pin ${thread_pinning}"
+        - f="tests/test_microbench_istree_throughput.txt"
+        - echo maxthr="$maxthr" thread_pinning="$thread_pinning" f="$f" args="$args"
+        - pwd
+        - LD_PRELOAD=./lib/libjemalloc.so timeout 600 numactl --interleave=all time ./microbench/bin/ubench_brown_ext_ist_lf.alloc_new.reclaim_debra.pool_none.out $args | tee $f 2>&1
+        - tput=`cat $f | grep "total through" | cut -d":" -f2 | tr -d " "`
+        - echo "tput=$tput"
+
+# dependencies
+# dos2unix          sudo apt install dos2unix
+# numactl           sudo apt install numactl
+# libnuma           sudo apt install libnuma-dev
+# papi
+# timeout, time

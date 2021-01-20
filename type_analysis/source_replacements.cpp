@@ -34,19 +34,26 @@ StatementMatcher CStyleMallocMatcher =
     // explicitCastExpr(isExpansionInMainFile(), hasDescendant(callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray"))))).bind("callex"))).bind("castex");
     explicitCastExpr(hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName("malloc")))).bind("malloc"))).bind("castex");
 
-class CStyleAllocPrinter : public MatchFinder::MatchCallback
+class IfStmtHandler : public MatchFinder::MatchCallback
 {
 public:
-  CStyleAllocPrinter(Replacements *Replace) : Replace(Replace) {}
+  IfStmtHandler(Replacements *Replace) : Replace(Replace) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
-    if (const ExplicitCastExpr *castex = Result.Nodes.getNodeAs<ExplicitCastExpr>("castex"))
+    std::cout << "in the callback" << std::endl;
+    // The matched 'if' statement was bound to 'ifStmt'.
+    if (const IfStmt *IfS = Result.Nodes.getNodeAs<clang::IfStmt>("ifStmt"))
     {
-      if (const DeclRefExpr *mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc"))
+      const Stmt *Then = IfS->getThen();
+      Replacement Rep(*(Result.SourceManager), Then->getLocStart(), 0,
+                      "// the 'if' part\n");
+      Replace->add(Rep);
+
+      if (const Stmt *Else = IfS->getElse())
       {
-        // Replacement Rep(*(Result.SourceManager), mnode->getLocStart(), 0, "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
-        Replacement Rep(*(Result.SourceManager), mnode, "malloc<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
+        Replacement Rep(*(Result.SourceManager), Else->getLocStart(), 0,
+                        "// the 'else' part\n");
         Replace->add(Rep);
       }
     }
@@ -66,7 +73,14 @@ void copyFile(const std::string &src, const std::string &dst)
 int main(int argc, const char **argv)
 {
   std::string errorMsg;
-  auto compDatabase = CompilationDatabase::autoDetectFromSource(argv[1], errorMsg);
+  auto compDatabase = JSONCompilationDatabase::loadFromFile(argv[1], errorMsg, JSONCommandLineSyntax::AutoDetect);
+
+  //CommonOptionsParser op(argc, argv, ToolingSampleCategory, llvm::cl::OneOrMore);
+
+  // for (auto s : compDatabase->getAllFiles())
+  // {
+  //   std::cout << s << std::endl;
+  // }
 
   std::vector<std::string> fileSources = compDatabase->getAllFiles();
 
@@ -82,8 +96,8 @@ int main(int argc, const char **argv)
     replacementsToUse = &(Tool.getReplacements()[src]);
 
     // Set up AST matcher callbacks.
-    CStyleAllocPrinter HandlerForAlloc(replacementsToUse);
-    Finder.addMatcher(CStyleMallocMatcher, &HandlerForAlloc);
+    IfStmtHandler HandlerForIf(replacementsToUse);
+    Finder.addMatcher(ifStmt(unless(isExpansionInSystemHeader())).bind("ifStmt"), &HandlerForIf);
 
     // Run the tool and collect a list of replacements. We could call runAndSave,
     // which would destructively overwrite the files with their new contents.
@@ -101,27 +115,27 @@ int main(int argc, const char **argv)
       llvm::outs() << r.toString() << "\n";
     }
 
-    // We need a SourceManager to set up the Rewriter.
-    IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
-    DiagnosticsEngine Diagnostics(
-        IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
-        new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts), true);
-    SourceManager Sources(Diagnostics, Tool.getFiles());
+    // // We need a SourceManager to set up the Rewriter.
+    // IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+    // DiagnosticsEngine Diagnostics(
+    //     IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
+    //     new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts), true);
+    // SourceManager Sources(Diagnostics, Tool.getFiles());
 
-    // Apply all replacements to a rewriter.
-    Rewriter Rewrite(Sources, LangOptions());
-    Tool.applyAllReplacements(Rewrite);
+    // // Apply all replacements to a rewriter.
+    // Rewriter Rewrite(Sources, LangOptions());
+    // Tool.applyAllReplacements(Rewrite);
 
-    // Query the rewriter for all the files it has rewritten, dumping their new
-    // contents to stdout.
-    for (Rewriter::buffer_iterator I = Rewrite.buffer_begin(),
-                                   E = Rewrite.buffer_end();
-         I != E; ++I)
-    {
-      const FileEntry *Entry = Sources.getFileEntryForID(I->first);
-      llvm::outs() << "Rewrite buffer for file: " << Entry->getName() << "\n";
-      I->second.write(llvm::outs());
-    }
+    // // Query the rewriter for all the files it has rewritten, dumping their new
+    // // contents to stdout.
+    // for (Rewriter::buffer_iterator I = Rewrite.buffer_begin(),
+    //                                E = Rewrite.buffer_end();
+    //      I != E; ++I)
+    // {
+    //   const FileEntry *Entry = Sources.getFileEntryForID(I->first);
+    //   llvm::outs() << "Rewrite buffer for file: " << Entry->getName() << "\n";
+    //   I->second.write(llvm::outs());
+    // }
   }
 
   return 0;

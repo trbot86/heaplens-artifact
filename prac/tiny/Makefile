@@ -22,4 +22,4 @@ preprocessor:
 	$(CC) -E test.cpp -I../../memhook/ > preprocessor_output.cpp
 
 clean:
-	rm bin *.o *.tmp compile_commands.json info_t_dump.txt preprocessor_output.cpp
+	rm bin test.o a.o compile_commands.json info_t_dump.txt preprocessor_output.cpp
