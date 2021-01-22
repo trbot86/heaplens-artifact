@@ -170,7 +170,7 @@ MemStampCollector::~MemStampCollector() {
 
 void MemStampCollector::add(uint64_t timestamp, size_t size, void * addr, bool typeofop) {
   if(myArray == nullptr) {
-    int result = get_slot(this_thread::get_id());
+    thread_local int result = get_slot(this_thread::get_id());
     it = sarr[result].offset;
     myArray = allArrays + MAX_TRACK*result;
   }
