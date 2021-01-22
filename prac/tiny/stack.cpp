@@ -8,7 +8,7 @@
 
 //#include "memhook_interface.h"
 
-#define THREAD_TEST_NUM 1
+#define THREAD_TEST_NUM 10
 //#include "a.h"
 
 using namespace std;
@@ -27,7 +27,7 @@ private:
     int *int_test_ptr;
     tall *tall_test_ptr;
     char *char_test_ptr;
-
+    int key;
     Node * next;
     Node * prev;
   };
@@ -44,16 +44,17 @@ public:
     //Tall * tall_test_ptr = (tall*)malloc<tall*>(sizeof(tall));
     char * char_ptr = new char;
 
-    printf("finished allocation test\n");
+    //printf("finished allocation test\n");
   }
 
-  void push(){
+  void push(int val){
     pthread_mutex_lock(&lock);
-    printf("inside push function acquired lock \n");
+    //printf("inside push function acquired lock \n");
     if (Top_Node == NULL){
       Top_Node = new struct Node;
       Top_Node->prev = NULL;
       Top_Node->next = NULL;
+      Top_Node->key = val;
       allocate_test();
       pthread_mutex_unlock(&lock);
       return;
@@ -63,48 +64,42 @@ public:
     Top_Node->next=tmp;
     tmp->prev = Top_Node;
     tmp->next = NULL;
+    tmp->key = val;
 
     Top_Node = tmp;
     allocate_test();
     pthread_mutex_unlock(&lock);
   }
 
-  void pop(){
+  int pop(){
     pthread_mutex_lock(&lock);
     Node * tmp = Top_Node;
+    int key_value = -1;
+
     if(Top_Node == NULL){
       pthread_mutex_unlock(&lock);
-      return;
+      return -1;
     }
 
     if(Top_Node->prev == NULL){
+      key_value = Top_Node->key;
       Top_Node = NULL;
-      free(tmp);
       pthread_mutex_unlock(&lock);
-      return;
+      free(tmp);
+      return key_value;
     }
 
     Top_Node = Top_Node->prev;
     Top_Node->next = NULL;
-    free(tmp);
-
     pthread_mutex_unlock(&lock);
+    key_value = tmp->key;
+    free(tmp);
+    return key_value;
   }
 
 };
 
 Stack global_stack;
-
-void * thread_function(void *p){
-  printf("inside thread function \n");
-  global_stack.push();
-
-  sleep(rand());
-  //sleep(5);
-  global_stack.pop();
-  pthread_exit(NULL);
-}
-
 
 void * rand_thread_function(void *p){
 
@@ -116,12 +111,12 @@ void * rand_thread_function(void *p){
 
 
   if((generator()% 103993) >= 51996){
-    global_stack.push();
-    printf("above half \n");
+    global_stack.push(0);
+    //printf("above half \n");
   }
   else{
     global_stack.pop();
-    printf("below half\n");
+    //printf("below half\n");
   }
   pthread_exit(NULL);
   return NULL;
@@ -130,16 +125,25 @@ void * rand_thread_function(void *p){
 
 int main() {
   printf("testing new stack \n");
+  /*
+  for(int i = 0; i < 10; i++){
+  	global_stack.push(i);
+  }
+
+  for(int i = 0; i < 10; i++){
+  	int val = global_stack.pop();
+  	printf("%d \n", val);
+  }*/
 
   pthread_t id[THREAD_TEST_NUM];
-
   for(int i = 0; i < THREAD_TEST_NUM; i++){
     pthread_create(&id[i], NULL, rand_thread_function, NULL);
   }
 
   for(int i = 0; i < THREAD_TEST_NUM; i++){
     pthread_join(id[i], NULL);
+    printf("%d \n", i);
   }
-
-    return 0;
+  
+  return 0;
 }
