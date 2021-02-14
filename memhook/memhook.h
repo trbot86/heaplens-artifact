@@ -30,6 +30,15 @@ class ThreadExiter;
 typedef map<type_index, const char*> type_map;
 typedef set<const char*> filenameset;
 
+class memhook_memory_pool {
+  int array_count;
+  
+  public:
+    virtual void add(info_t* logarray);
+    virtual info_t* pop();
+    virtual void dumptodisk();
+};
+
 /*
 After some further refactoring we might be able to remove this class declaration from memhook.h
 */
