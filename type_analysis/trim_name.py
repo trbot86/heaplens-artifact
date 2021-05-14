@@ -1,3 +1,7 @@
+# Use this file for generating new_fielddump.txt
+# Usage:
+# For generating new_fielddump.txt: python3 -c "import trim_name; trim_name.trim_fields(\"fielddump.txt\");"
+# For generating new_info_t_dump.txt: python3 trim_name.py <path_to_info_t_dump.txt>
 import sys
 import pandas as pd
 

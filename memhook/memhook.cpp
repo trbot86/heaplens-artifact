@@ -21,6 +21,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "memhook_interface.h"
 #include "memhook.h"
 
 #undef new
@@ -34,6 +35,7 @@
         #define mallog_likely(x)       (x)
     #endif
 #endif
+
 static char tmpbuff[1<<20];
 static unsigned long tmppos = 0;
 static unsigned long tmpallocs = 0;
@@ -51,9 +53,10 @@ static unsigned long tmpallocs = 0;
 // static void * (*next_realloc)(void *ptr, size_t size) = 0;
 // static void * (*next_reallocf)(void *ptr, size_t size) = 0;
 // static void * (*next_reallocarray)(void *ptr, size_t nmemb, size_t size) = 0;
+
 static volatile int initialized = 0;
-__attribute__((constructor))
-static void init() {
+
+__attribute__((constructor)) static void init() {
     fprintf(stdout, "loading rtld_next functions...\n");
     next_malloc         = (void * (*)(size_t ))dlsym(RTLD_NEXT, "malloc");
     if (!next_malloc) exit(43);
@@ -86,8 +89,9 @@ static void init() {
         exit(1);
     }
 }
+
 void *memhook_malloc(size_t size, bool log) {
-    if ((!initialized)) {
+    if (!initialized) {
         if (tmppos + size < sizeof(tmpbuff)) {
             void *retptr = tmpbuff + tmppos;
             tmppos += size;
@@ -150,7 +154,7 @@ void memhook_free(void *ptr, bool log) {
 //     return next_realloc(ptr, size);
 // }
 void *memhook_calloc(size_t nmemb, size_t size, bool log) {
-    if ((!initialized)) {
+        if ((!initialized)) {
         // printf("nmemb*size=%lu\n", (nmemb*size));
         void *ptr = malloc(nmemb*size);
         // printf("nmemb*size=%lu\n", (nmemb*size));
@@ -161,42 +165,21 @@ void *memhook_calloc(size_t nmemb, size_t size, bool log) {
     return next_calloc(nmemb, size);
 }
 
-void *malloc(size_t size) {
-    return memhook_malloc(size, true);
+extern "C" {
+
+    void *malloc(size_t size) {
+        return memhook_malloc(size, true);
+    }
+
+
+    void free(void *ptr) {
+        return memhook_free(ptr, true);
+    }
+
+    void *calloc(size_t nmemb, size_t size) {
+        return memhook_calloc(nmemb, size, true);
+    }
 }
-
-
-void free(void *ptr) {
-    return memhook_free(ptr, true);
-}
-
-void *calloc(size_t nmemb, size_t size) {
-    return memhook_calloc(nmemb, size, true);
-}
-
-//Add checks to next_malloc
-// void allocArray() {
-//     allArrays = (info_t*)next_malloc(MAX_THREADS*MAX_TRACK*sizeof(info_t));
-//     sarr = (slot*)next_malloc(MAX_THREADS*sizeof(slot));
-// }
-
-// int get_slot(thread::id id) {
-// 	while(true) {
-// 		while(sarr[iter].occupied) {
-// 			// cout << "while" << endl;
-// 			iter = (iter+1)%MAX_THREADS;
-// 		}
-		
-// 		if(__sync_bool_compare_and_swap(&sarr[iter].occupied, false, true)) {
-// 			// cout << iter << endl;
-// 			sarr[iter].id = id;
-//             it = sarr[iter].offset;
-// 			return iter;
-// 		}
-// 		// cout << "failed\n";
-// 		iter = (iter+1)%MAX_THREADS;
-// 	}
-// }
 
 ostream& operator << (ostream& os, info_t& info) {
         if(info.file) {
@@ -288,32 +271,6 @@ void printstats() {
 //     }
 // }
 
-void insert_type(void *p, const MemStamp &stamp,const type_index tindex) {
-    if(it < MAX_TRACK) {
-        myArray[it].file = stamp.filename;
-        myArray[it].line = stamp.lineNum;
-        myArray[it].tindex = tindex;
-        it++;
-    }
-}
-
-//Helper for malloc
-void insert_info(size_t size, void* ptr, type_index tindex) {
-    // if(!myArray) {
-    //     int result = get_slot(this_thread::get_id());
-    //     myArray = allArrays + MAX_TRACK*result;
-    // }
-    
-    if(it < MAX_TRACK) {
-        myArray[it].tindex = tindex;
-        // myArray[it].timestamp = get_server_clock();
-        // myArray[it].size = size;
-        // myArray[it].addr = ptr;
-        // myArray[it].typeofop = true;
-        it++;
-    }
-}
-
 /**********************
  * TODO:
  * Add bound checking for number of allocations
@@ -343,10 +300,10 @@ void *operator new[] (size_t size) {
     return mem;
 }
 
-void operator delete(void * mem) {
+void operator delete(void * mem)  _GLIBCXX_USE_NOEXCEPT {
     return memhook_free(mem, true);
 }
 
-void operator delete[](void *mem) {
+void operator delete[](void *mem)  _GLIBCXX_USE_NOEXCEPT {
     return memhook_free(mem, true);
 }

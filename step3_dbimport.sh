@@ -1,7 +1,7 @@
 #!/bin/bash
-
-if [ "$#" -ne "2" ] ; then
-    echo "USAGE: %0 INPUT_FOLDER_PATH C_CPP_MAINFILE_PATH"
+set -x
+if [ "$#" -ne "3" ] ; then
+    echo "USAGE: %0 INPUT_FOLDER_PATH NAME_OF_INFO_T_DUMP.TXT C_CPP_MAINFILE_PATH"
     echo "    input folder should be the copied source folder (that resulted from step1)"
     exit 1
 fi
@@ -13,7 +13,7 @@ target=$(pwd)
 
 
 cd $base
-infile=$1/info_t_dump.txt
+infile=$1/$2
 outfile=$1/allocs.sqlite
 
 rows=$(cat $infile | wc -l)
@@ -28,8 +28,8 @@ echo
 
 cd $target
 
-echo "Running type_analysis/tool on $2... "
-$base/type_analysis/tool $2 > /dev/null
+echo "Running type_analysis/tool on $3... "
+$base/type_analysis/tool $3 > /dev/null
 if [ "$?" -ne "0" ]; then echo "    ERROR running type analysis tool" ; exit 1 ; fi
 echo "    Done."
 echo
@@ -50,3 +50,4 @@ echo
 
 echo "Now you can visualize results using python scripts in visual/"
 echo
+set +x

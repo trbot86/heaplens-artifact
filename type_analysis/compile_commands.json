@@ -1,0 +1,13 @@
+[
+    {
+        "arguments": [
+            "clang",
+            "-c",
+            "-o",
+            "header_c",
+            "header.c"
+        ],
+        "directory": "/home/gautam/Desktop/sifter/type_analysis",
+        "file": "header.c"
+    }
+]

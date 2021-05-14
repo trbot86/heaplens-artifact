@@ -1,3 +1,4 @@
+This project is compatible to be used with both C and C++.
 sifter/include contains the headers which have to be included in the main file of your project. sifter/lib contains the .so for libmemhook which may be copied
 into your project folder. libmemhook.so must be linked with your project. You may choose to run refactor tool in type_analysis/ to
 change the malloc calls but it holds no guarantees for correct use as it is highly syntax dependant.
@@ -15,16 +16,19 @@ TODO:
 
 List of file uses:
 memhook.* : The main hook containing the overloaded alloc, dealloc calls with integrated tracking support.
-memalloc.cpp : test file
 type_analysis:
     clang_parser.cpp : parses test file to collect all record names (i.e. class, struct and union names).
     source_refactor.cpp : parses test file to replace alloc, dealloc calls with respective templated versions.
         memhook.* will later use the templated functions to log type information.
-
+info_t_dump.txt:
+list of alloc, frees in the following format:
+	filename|type|line number|timestamp|memory size|address|typeofop
+	typeofop = 1 if alloc
+	typeofop = 0 if free
 NOTE:
 
-Always keep MAX_THREADS > 1 as it is highly likely that the parent thread will get slot first,
-and will never give up the only slot if MAX_THREADS = 1 as it is the last thread to exit, resulting in infinite loop for
+Always keep MEMHOOK_MAX_THREADS > 1 as it is highly likely that the parent thread will get slot first,
+and will never give up the only slot if MEMHOOK_MAX_THREADS = 1 as it is the last thread to exit, resulting in infinite loop for
 child threads.
 
 

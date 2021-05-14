@@ -1,4 +1,4 @@
-CC = g++ 
+CC = gcc
 #clang++-6.0
 
 all: test.o a.o
@@ -13,10 +13,10 @@ thread_test: test.o a.o
 stack.o: stack.cpp
 	$(CC) -Wall -pthread -c -g -mrdrnd stack.cpp -I../../memhook/
 
-test.o: test.cpp a.h
-	$(CC) -c -g test.cpp -I../../memhook/
-a.o: a.cpp a.h
-	$(CC) -c -g a.cpp -I../../memhook/
+test.o: test.c a.h
+	$(CC) -c -g test.c -I../../memhook/
+a.o: a.c a.h
+	$(CC) -c -g a.c -I../../memhook/
 
 preprocessor:
 	$(CC) -E test.cpp -I../../memhook/ > preprocessor_output.cpp

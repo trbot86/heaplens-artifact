@@ -1,5 +1,7 @@
 // mention Curtis Bartley
-#pragma once
+#ifndef __MEMHOOK_H
+#define __MEMHOOK_H
+// #pragma once
 
 #include <iostream>
 #include <new>
@@ -14,13 +16,14 @@
 #include <cxxabi.h>
 #include <dlfcn.h>
 
-#define BACKTRACE_DEPTH 2
-#ifndef MAX_THREADS
-    #define MAX_THREADS 8
+#define MEMHOOK_BACKTRACE_DEPTH 2
+#ifndef MEMHOOK_MAX_THREADS
+    #define MEMHOOK_MAX_THREADS 8
 #endif
-#define MAX_TRACK 1000000
-#define MAX_TYPE_LENGTH 1000
-#define PADDING 64
+#define MEMHOOK_MAX_TRACK 1000000
+#define MEMHOOK_MAX_TYPE_LENGTH 1000
+#define MEMHOOK_MAX_RETRY 10
+// #define PADDING 64
 
 using namespace std;
 
@@ -37,36 +40,6 @@ class memhook_memory_pool {
     virtual void add(info_t* logarray);
     virtual info_t* pop();
     virtual void dumptodisk();
-};
-
-/*
-After some further refactoring we might be able to remove this class declaration from memhook.h
-*/
-class MemStamp
-{
-    public:
-        char const * const filename;
-        int const lineNum;
-    public:
-        MemStamp(char const *filename, int lineNum);
-        ~MemStamp();
-};
-
-class MemStampCollector {
-private:
-    slot* sarr;
-    info_t* allArrays;
-
-    int get_slot(thread::id id);
-
-public:
-    MemStampCollector();
-
-    ~MemStampCollector();
-
-    void add(uint64_t timestamp, size_t size, void * addr, bool typeofop);
-    void update(const char * file, unsigned int line, type_index tindex);
-    void threadexit();
 };
 
 inline uint64_t memhook_get_server_clock() {
@@ -91,7 +64,7 @@ void insert_info(size_t size, void* ptr, type_index tindex);
 void   (memhook_free)(void *ptr, bool log);
 void *memhook_malloc(size_t size, bool log);
 
-// #warning This binary is being compiled with memhook. Running it will produce a text file that should be provided as an argument to the shell script for step3.
+#warning This binary is being compiled with memhook. Running it will produce a text file (info_t_dump.txt) that should be provided as an argument to the shell script for step3.
 
 void   (*next_free)(void *ptr);
 void * (*next_malloc)(size_t size);
@@ -116,7 +89,7 @@ struct info_t {
     size_t size;
     void* addr;
     bool typeofop;
-    char padding[PADDING];
+    // char padding[PADDING];
 
     info_t() : file(nullptr), tindex(typeid(void)), line(0), timestamp(0), size(0), addr(nullptr) {}
 };
@@ -127,16 +100,19 @@ thread_local int iter = 0;
 * tracking data structure
 */
 
-thread_local int it;
+thread_local int it = 0;
 thread_local info_t* myArray = nullptr;
+thread_local int max_retry = 0;
 
 ostream& operator << (ostream& os, info_t& info);
 
 int MemStampCollector::get_slot(thread::id id) {
-  while(true) {
-    while(sarr[iter].occupied) {
+  max_retry = 0;
+  while(max_retry < MEMHOOK_MAX_RETRY) {
+    while(sarr[iter].occupied && (max_retry < MEMHOOK_MAX_RETRY)) {
       // cout << "while" << endl;
-      iter = (iter+1)%MAX_THREADS;
+      iter = (iter+1)%MEMHOOK_MAX_THREADS;
+      max_retry++;
     }
     
     if(__sync_bool_compare_and_swap(&sarr[iter].occupied, false, true)) {
@@ -146,24 +122,37 @@ int MemStampCollector::get_slot(thread::id id) {
       return iter;
     }
     // cout << "failed\n";
-    iter = (iter+1)%MAX_THREADS;
+    iter = (iter+1)%MEMHOOK_MAX_THREADS;
+    max_retry++;
   }
+  return -1;
 }
 
 
 MemStampCollector::MemStampCollector() {
-  allArrays = (info_t*)next_calloc(1, MAX_THREADS*MAX_TRACK*sizeof(info_t));
-  sarr = (slot*)next_calloc(1, MAX_THREADS*sizeof(slot));
+  allArrays = (info_t*)next_calloc(1, MEMHOOK_MAX_THREADS*MEMHOOK_MAX_TRACK*sizeof(info_t));
+
+  if(allArrays == NULL) {
+    printf("[Integer overflow]: either calloc failed or integer overflow. reduce MEMHOOK_MAX_TRACK or MEMHOOK_MAX_THREADS\n");
+    exit(0);
+  }
+
+  sarr = (slot*)next_calloc(1, MEMHOOK_MAX_THREADS*sizeof(slot));
+
+  if(sarr == NULL) {
+    printf("[Integer Overflow]: either calloc failed or integer overflow. reduce MAX_THREADS\n");
+  }
 }
 
 MemStampCollector::~MemStampCollector() {
   it = INT_MAX;
-  ofstream myfile("info_t_dump.txt", ios_base::out | ios_base::app);
-
+  stringstream threadid_ss;
+  threadid_ss << this_thread::get_id();
+  ofstream myfile(threadid_ss.str() + "_info_t_dump.txt", ios_base::out | ios_base::app);
   int status;
   char *demangled_name;
 
-  for (int i = 0; i < MAX_TRACK * MAX_THREADS; i++)
+  for (int i = 0; i < MEMHOOK_MAX_TRACK * MEMHOOK_MAX_THREADS; i++)
   {
     if (allArrays[i].addr == nullptr)
       continue;
@@ -181,22 +170,34 @@ void MemStampCollector::add(uint64_t timestamp, size_t size, void * addr, bool t
   if(myArray == nullptr) {
     thread_local int result = get_slot(this_thread::get_id());
     it = sarr[result].offset;
-    myArray = allArrays + MAX_TRACK*result;
+    myArray = allArrays + MEMHOOK_MAX_TRACK*result;
   }
   
-  if(it < MAX_TRACK) {
+  if(it >= 0 && it < MEMHOOK_MAX_TRACK) {
     myArray[it].timestamp = memhook_get_server_clock();
     myArray[it].size = size;
     myArray[it].addr = addr;
     myArray[it].typeofop = typeofop;
     it++;
   }
+  else {
+    //printf("[MEMHOOK_MAX_TRACK overflow or MEMHOOK_MAX_RETRY exceeded it: %d]\n", it);
+    // it = 0;
+  }
 }
 
 void MemStampCollector::update(const char * file, unsigned int line, type_index tindex) {      
-    myArray[it-1].file = file;
-    myArray[it-1].line = line;
-    myArray[it-1].tindex = tindex;
+    //NORMALLY UPDATE SHOULD BE CALLED AFTER ADD, BUT IN MEMHOOK_MALLOC WHILE INITIALISED IS FALSE, ADD IS NOT CALLED
+    //BECAUSE OF THIS, UPDATE CAN BE CALLED WHEN IT-1 < 0. WE SHOULD IGNORE SUCH CALLS (WHICH MAINLY OCCUR DURING DL_INIT)
+    if(it-1 < MEMHOOK_MAX_TRACK && it-1 >= 0) {
+      myArray[it-1].file = file;
+      myArray[it-1].line = line;
+      myArray[it-1].tindex = tindex;
+    }
+    else {
+      //printf("[it: %d]\n", it);
+      // it = 0;
+    }
 }
 
 void MemStampCollector::threadexit() {
@@ -218,11 +219,10 @@ class ThreadExiter
     ~ThreadExiter()
     {
       collector.threadexit();
-      // sarr[iter].occupied = false;
     }
     void add()
     {
-      // exit_funcs.push(std::move(func));
+
     }
   };
 
@@ -234,3 +234,4 @@ thread_local bool setup = false;
 filenameset fset;
 
 thread_local ThreadExiter exiter;
+#endif

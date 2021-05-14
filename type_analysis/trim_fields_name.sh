@@ -1,3 +1,4 @@
+# Deprecated
 cat fielddump.txt | while read line ; do
     echo -n $line | cut -d"|" -f3 | rev | cut -d":" -f3- | rev | tr -d " " | tr -d "\n"
     echo -n "|"
