@@ -1,13 +1,24 @@
 [
     {
         "arguments": [
-            "clang++-6.0",
+            "gcc",
             "-c",
             "-g",
             "-I../../memhook/",
-            "test.cpp"
+            "test.c"
         ],
         "directory": "/home/gautam/Desktop/sifter/prac/tiny",
-        "file": "test.cpp"
+        "file": "test.c"
+    },
+    {
+        "arguments": [
+            "gcc",
+            "-c",
+            "-g",
+            "-I../../memhook/",
+            "a.c"
+        ],
+        "directory": "/home/gautam/Desktop/sifter/prac/tiny",
+        "file": "a.c"
     }
 ]

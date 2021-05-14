@@ -2,7 +2,7 @@ __pycache__
 fielddump.txt
 newfielddump.txt
 typedump.txt
-info_t_dump.txt
+*_info_t_dump.txt
 new_info_t_dump.txt
 *.sqlite
 tool

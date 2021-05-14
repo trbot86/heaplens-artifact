@@ -56,10 +56,33 @@ StatementMatcher deleteMatcher =
 StatementMatcher newMatcher =
   cxxNewExpr().bind("newcall");
 
-StatementMatcher CStyleMallocMatcher =
+StatementMatcher generalMallocMatcher =
+callExpr(callee(functionDecl(hasName("malloc")))).bind("malloc");
+
+//matches explict cast malloc expression
+StatementMatcher explicitCastMallocMatcher =
   // declRefExpr(hasDeclaration(functionDecl(hasName("malloc"))))
   // explicitCastExpr(isExpansionInMainFile(), hasDescendant(callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray"))))).bind("callex"))).bind("castex");
-  explicitCastExpr(hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName("malloc")))).bind("malloc"))).bind("castex");
+  // explicitCastExpr(hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName("malloc")))).bind("malloc"))).bind("castex");
+  explicitCastExpr(hasDescendant(callExpr(callee(functionDecl(hasName("malloc")))).bind("malloc"))).bind("castex");
+
+//matches sizeof within malloc without explicit casts
+//***********************************************
+//  Matches malloc invocations with sizeof as any sub-expressions
+//  Eg. malloc(100*sizeof(int))
+//***********************************************
+// sizeOfExpr(hasAncestor(callExpr(callee(functionDecl(hasName("malloc")))).bind("sizeofmalloc")));
+//***********************************************
+//  Matches malloc invocations with sizeof as direct sub-expression
+//  Eg. matches malloc(sizeof(int)) but NOT malloc(100*sizeof(int))
+StatementMatcher sizeofMallocMatcher =
+// sizeOfExpr(hasParent(callExpr(callee(functionDecl(hasName("malloc")))).bind("sizeofmalloc")));
+// expr(anyOf(sizeOfExpr(has(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type")))),sizeOfExpr(has(expr(hasType(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type"))))))));
+expr(anyOf(sizeOfExpr(allOf(hasParent(callExpr(callee(functionDecl(hasName("malloc")))).bind("sizeofmalloc")), has(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type"))))),sizeOfExpr(allOf(hasParent(callExpr(callee(functionDecl(hasName("malloc")))).bind("sizeofmalloc")), has(expr(hasType(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type")))))))));
+
+//matches malloc lhs without explicit casts
+StatementMatcher lhsofMallocMatcher = 
+binaryOperator(hasOperatorName("="), hasRHS(ignoringImpCasts(callExpr(callee(functionDecl(hasName("malloc"))))))).bind("lhsmallocexpr");
 
 class ClassnamePrinter : public MatchFinder::MatchCallback {
   public :
@@ -78,19 +101,19 @@ class NewExprPrinter : public MatchFinder::MatchCallback {
     }
 };
 
-//Callback for all C-Style allocation functions
 /**
  * Figure out how to get types:
- * If it is a C++ project, typecasts in malloc are not compulsory.
+ * If it is a C project, typecasts in malloc are not compulsory.
  * First check if typecast is there. If it's there, problem solved.
- * If not, check the type of lhs of binary operator (if malloc is assigned to pointer)
- * Else, check inside the malloc for sizeof() and figure out the type used.
+ * If not, check inside the malloc for sizeof() and figure out the type used.
+ * Else, check the type of lhs of binary operator (if malloc is assigned to pointer)
  * Else, throw error ¯\_(ツ)_/¯
 **/
 
-class CStyleAllocPrinter : public MatchFinder::MatchCallback {
+//Callback for all C-Style allocation functions
+class explicitCastAllocPrinter : public MatchFinder::MatchCallback {
   public:
-    CStyleAllocPrinter(Rewriter &Rewrite) : Rewrite(Rewrite) {}
+    explicitCastAllocPrinter(Rewriter &Rewrite) : Rewrite(Rewrite) {}
 
     virtual void run(const MatchFinder::MatchResult &Result) {
       //ASTContext* context = Result.Context;
@@ -99,21 +122,68 @@ class CStyleAllocPrinter : public MatchFinder::MatchCallback {
       const ExplicitCastExpr* castex = Result.Nodes.getNodeAs<ExplicitCastExpr>("castex");
       const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
 
-      Rewrite.InsertTextAfterToken(mnode->getLocStart(), "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
-      Rewrite.overwriteChangedFiles();
+    //***************************************
+      // Rewrite.InsertTextAfterToken(mnode->getLocStart(), "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
+      // Rewrite.overwriteChangedFiles();
+    //***************************************
+
       //Print various metadata
-      // cout << "malloc" << endl;
-      /*cout << castex->getCastKindName() << endl;
-        cout << castex->getSubExprAsWritten()->getType().getAsString() << endl;
-        cout << castex->getTypeInfoAsWritten()->getType().getAsString() << endl;
-        SourceLocation sl = castex->getLocStart();
-        sl.dump(context->getSourceManager());
-      */
+      cout << "malloc" << endl;
+      cout << castex->getCastKindName() << endl;
+      cout << castex->getSubExprAsWritten()->getType().getAsString() << endl;
+      cout << castex->getTypeInfoAsWritten()->getType().getAsString() << endl;
+      // SourceLocation sl = castex->getLocStart();
+      // sl.dump(context->getSourceManager());
+      
 
     }
 
   private:
     Rewriter &Rewrite;
+};
+
+//Handler for Explicit Cast mallocs
+class CStyleAllocPrinter : public MatchFinder::MatchCallback {
+  public:
+   CStyleAllocPrinter(Rewriter &Rewrite) : Rewrite(Rewrite) {}
+
+  virtual void run(const MatchFinder::MatchResult &Result) {
+    const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
+  }
+
+  private:
+  Rewriter& Rewrite;
+};
+
+//Handler for sizeof malloc expressions
+class sizeOfMallocPrinter : public MatchFinder::MatchCallback {
+  public:
+   sizeOfMallocPrinter(Rewriter &Rewrite) : Rewrite(Rewrite) {}
+
+  virtual void run(const MatchFinder::MatchResult &Result) {
+    
+    const clang::Type* node = Result.Nodes.getNodeAs<clang::Type>("sizeof-arg-type");
+    //*************************************************ASK PROF ABOUT THIS**********************************************
+    cout << "SIZEOF TYPE: " << node->getAsCXXRecordDecl()->getNameAsString() << endl;
+    //******************************************************************************************************************
+
+  }
+
+  private:
+  Rewriter& Rewrite;
+};
+
+//Handler for lhs of malloc expressions
+class lhsOfMallocMatcher : public MatchFinder::MatchCallback {
+  public:
+   lhsOfMallocMatcher(Rewriter &Rewrite) : Rewrite(Rewrite) {}
+
+  virtual void run(const MatchFinder::MatchResult &Result) {
+    const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
+  }
+
+  private:
+  Rewriter& Rewrite;
 };
 
 class DeleteExprPrinter : public MatchFinder::MatchCallback {
@@ -127,7 +197,8 @@ class DeleteExprPrinter : public MatchFinder::MatchCallback {
 
 class MyASTConsumer : public ASTConsumer {
 public:
-  MyASTConsumer(Rewriter &R) : HandlerForAlloc(R) {
+  MyASTConsumer(Rewriter &R) : generalHandlerForAlloc(R), explicitCastHandlerForAlloc(R), sizeOfMallocHandler(R), lhsOfMallocHandler(R) {
+    //**********************************************************************
     // Add a simple matcher for finding 'if' statements.
     // Matcher.addMatcher(ifStmt().bind("ifStmt"), &HandlerForAlloc);
 
@@ -150,7 +221,12 @@ public:
     //                 hasRHS(expr(hasType(isInteger()))))))
     //         .bind("forLoop"),
     //     &HandlerForFor);
-    Matcher.addMatcher(CStyleMallocMatcher, &HandlerForAlloc);
+    //*************************************************************************
+
+    Matcher.addMatcher(generalMallocMatcher, &generalHandlerForAlloc);
+    Matcher.addMatcher(explicitCastMallocMatcher, &explicitCastHandlerForAlloc);
+    Matcher.addMatcher(sizeofMallocMatcher, &sizeOfMallocHandler);
+    Matcher.addMatcher(lhsofMallocMatcher, &lhsOfMallocHandler);
   }
 
   void HandleTranslationUnit(ASTContext &Context) override {
@@ -159,7 +235,10 @@ public:
   }
 
 private:
-  CStyleAllocPrinter HandlerForAlloc;
+  CStyleAllocPrinter generalHandlerForAlloc;
+  explicitCastAllocPrinter explicitCastHandlerForAlloc;
+  sizeOfMallocPrinter sizeOfMallocHandler;
+  lhsOfMallocMatcher lhsOfMallocHandler;
   MatchFinder Matcher;
 };
 
@@ -174,7 +253,7 @@ public:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
                                                  StringRef file) override {
     TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-    return llvm::make_unique<MyASTConsumer>(TheRewriter);
+    return make_unique<MyASTConsumer>(TheRewriter);
   }
 
 private:
@@ -197,18 +276,6 @@ int main(int argc, const char **argv) {
 
   ClangTool Tool(OptionsParser.getCompilations(),
                  OptionsParser.getSourcePathList());
-
-  // ClassnamePrinter cp;
-  // DeleteExprPrinter dp;
-  // NewExprPrinter np;
-  // CStyleAllocPrinter ap;
-
-  // MatchFinder Finder;
-
-  // Finder.addMatcher(classMatcher, &cp);
-  // Finder.addMatcher(deleteMatcher, &dp);
-  // Finder.addMatcher(newMatcher, &np);
-  // Finder.addMatcher(CStyleMallocMatcher, &ap);
 
   // Tool.run(newFrontendActionFactory(&Finder).get());
   Tool.run(newFrontendActionFactory<MyFrontendAction>().get());

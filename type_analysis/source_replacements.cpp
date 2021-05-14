@@ -46,13 +46,13 @@ public:
     if (const IfStmt *IfS = Result.Nodes.getNodeAs<clang::IfStmt>("ifStmt"))
     {
       const Stmt *Then = IfS->getThen();
-      Replacement Rep(*(Result.SourceManager), Then->getLocStart(), 0,
+      Replacement Rep(*(Result.SourceManager), Then->getBeginLoc(), 0,
                       "// the 'if' part\n");
       Replace->add(Rep);
 
       if (const Stmt *Else = IfS->getElse())
       {
-        Replacement Rep(*(Result.SourceManager), Else->getLocStart(), 0,
+        Replacement Rep(*(Result.SourceManager), Else->getEndLoc(), 0,
                         "// the 'else' part\n");
         Replace->add(Rep);
       }
