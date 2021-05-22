@@ -1,5 +1,5 @@
 This project is compatible to be used with both C and C++.
-sifter/include contains the headers which have to be included in the main file of your project. sifter/lib contains the .so for libmemhook which may be copied
+sifter/include contains the headers which have to be included in the main file of your project. sifter/memhook/ contains the .so for libmemhook which may be copied
 into your project folder. libmemhook.so must be linked with your project. You may choose to run refactor tool in type_analysis/ to
 change the malloc calls but it holds no guarantees for correct use as it is highly syntax dependant.
 

@@ -22,6 +22,7 @@ struct stru {
 typedef struct struj {
   int ak;
   int soj;
+  struct stru stj;
 } struj;
 
 // template < typename T, typename Y=int>
@@ -79,12 +80,14 @@ int main() {
   // f = (unsigned long long)5;double
   // int a = (int)f;
   int* r;
+  struj sjj;
 
   int * t = (int*)malloc(sizeof(int));
 
-  r = (int*)malloc(sizeof(int));
+  r = (int*)malloc(100*sizeof(int));
 
-  int* s = malloc(100);
+  int* s = (int*)malloc(100);
+  struj* z = (struj *)malloc(sizeof(sjj.stj));
   // t += 0x5;
   // printf("%d", t);
   // float* g = (float*)func();

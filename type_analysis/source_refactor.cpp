@@ -76,9 +76,11 @@ StatementMatcher explicitCastMallocMatcher =
 //  Matches malloc invocations with sizeof as direct sub-expression
 //  Eg. matches malloc(sizeof(int)) but NOT malloc(100*sizeof(int))
 StatementMatcher sizeofMallocMatcher =
-// sizeOfExpr(hasParent(callExpr(callee(functionDecl(hasName("malloc")))).bind("sizeofmalloc")));
-// expr(anyOf(sizeOfExpr(has(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type")))),sizeOfExpr(has(expr(hasType(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type"))))))));
-expr(anyOf(sizeOfExpr(allOf(hasParent(callExpr(callee(functionDecl(hasName("malloc")))).bind("sizeofmalloc")), has(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type"))))),sizeOfExpr(allOf(hasParent(callExpr(callee(functionDecl(hasName("malloc")))).bind("sizeofmalloc")), has(expr(hasType(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type")))))))));
+    // sizeOfExpr(hasParent(callExpr(callee(functionDecl(hasName("malloc")))).bind("sizeofmalloc")));
+    // expr(anyOf(sizeOfExpr(has(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type")))),sizeOfExpr(has(expr(hasType(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type"))))))));
+    expr(sizeOfExpr(allOf(hasAncestor(callExpr(callee(functionDecl(hasName("malloc")))).bind("sizeofmalloc")), hasArgumentOfType(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type"))))));
+    //*************ASK ABOUT LONG AND UNSIGNED LONG MATCHES************
+    // sizeOfExpr(hasArgumentOfType(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type"))));
 
 //matches malloc lhs without explicit casts
 StatementMatcher lhsofMallocMatcher = 
@@ -134,8 +136,6 @@ class explicitCastAllocPrinter : public MatchFinder::MatchCallback {
       cout << castex->getTypeInfoAsWritten()->getType().getAsString() << endl;
       // SourceLocation sl = castex->getLocStart();
       // sl.dump(context->getSourceManager());
-      
-
     }
 
   private:
@@ -161,11 +161,29 @@ class sizeOfMallocPrinter : public MatchFinder::MatchCallback {
    sizeOfMallocPrinter(Rewriter &Rewrite) : Rewrite(Rewrite) {}
 
   virtual void run(const MatchFinder::MatchResult &Result) {
+    const clang::CallExpr* mallocnode = Result.Nodes.getNodeAs<clang::CallExpr>("sizeofmalloc");
+    const clang::Type* typenode = Result.Nodes.getNodeAs<clang::Type>("sizeof-arg-type");
+    static PrintingPolicy print_policy((Result.Context)->getLangOpts());
+    print_policy.FullyQualifiedName = 1;
+    print_policy.SuppressScope = 0;
+    // print_policy.PrintCanonicalTypes = 1;
     
-    const clang::Type* node = Result.Nodes.getNodeAs<clang::Type>("sizeof-arg-type");
-    //*************************************************ASK PROF ABOUT THIS**********************************************
-    cout << "SIZEOF TYPE: " << node->getAsCXXRecordDecl()->getNameAsString() << endl;
-    //******************************************************************************************************************
+    SourceManager* SrcMgr = Result.SourceManager;
+    FullSourceLoc functionDeclFullLocation = Result.Context->getFullLoc(mallocnode->getExprLoc());
+    if (functionDeclFullLocation.isValid())
+        // cout << "Found FunctionDecl at " << functionDeclFullLocation.getManager().getFilename(functionDeclFullLocation).data
+        cout << "Found FunctionDecl at " << functionDeclFullLocation.getLineNumber() << functionDeclFullLocation.getFileEntry()->getName().str() << endl;
+
+    cout << "*******SIZEOF TYPE: *******" << endl;
+    typenode->dump();
+
+    if(typenode->isBuiltinType()) {
+      cout << typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy) << endl;
+    }
+    else if(typenode->isRecordType()) {
+      cout << typenode->getAsCXXRecordDecl()->getNameAsString() << endl;
+    }
+    cout << "*******" << endl;
 
   }
 
