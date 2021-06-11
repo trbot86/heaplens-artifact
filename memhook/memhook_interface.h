@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "threadexiter.h"
 //#include <execinfo.h>
 //#include <cxxabi.h>
 //#include <dlfcn.h>
@@ -53,8 +54,8 @@ public:
     //void threadexit();
 };
 
-
 extern MemStampCollector collector;
+extern thread_local ThreadExiter exiter;
 
 void *memhook_malloc(size_t size, bool log);
 
