@@ -12,6 +12,8 @@
  *  Matchers:
  *  match any malloc with sizeof inside as argument
  *  callExpr(callee(functionDecl(hasName("malloc"))), has(sizeOfExpr(hasType(qualType()))))
+ * 
+ *  
  *
  *  TODO:
  *  1) Add functionality to register new allocator/deallocator names for static analyser. (Eg. tcmalloc, jemalloc)
@@ -36,6 +38,8 @@
 #include <clang/AST/Type.h>
 #include <clang/Basic/Diagnostic.h>
 
+#define MAX_FILE_PATH 200
+
 using namespace std;
 using namespace llvm;
 using namespace clang;
@@ -44,6 +48,21 @@ using namespace clang::driver;
 using namespace clang::tooling;
 
 static llvm::cl::OptionCategory MatcherSampleCategory("Matcher Sample");
+
+map<pair<string,int>, string> malloctypeset;
+
+void printtofile() {
+  ofstream malloctypefile;
+  malloctypefile.open("malloc_type_dump.txt");
+
+  for (auto i = malloctypeset.begin(); i != malloctypeset.end(); ++i)
+  {
+      malloctypefile << (*i).first.first << "|" << (*i).first.second << "|" << (*i).second << endl;
+  }
+
+  malloctypefile.close();
+  return;
+}
 
 set<string> typenameset;
 
@@ -84,7 +103,8 @@ StatementMatcher sizeofMallocMatcher =
 
 //matches malloc lhs without explicit casts
 StatementMatcher lhsofMallocMatcher = 
-binaryOperator(hasOperatorName("="), hasRHS(ignoringImpCasts(callExpr(callee(functionDecl(hasName("malloc"))))))).bind("lhsmallocexpr");
+// binaryOperator(hasOperatorName("="), hasRHS(ignoringImpCasts(callExpr(callee(functionDecl(hasName("malloc"))))))).bind("lhsmallocexpr");
+ binaryOperator(hasOperatorName("="), hasRHS(ignoringImpCasts(callExpr(callee(functionDecl(hasName("malloc")))))), hasLHS(hasType(type().bind("typeofnode")))).bind("lhsmallocexpr");
 
 class ClassnamePrinter : public MatchFinder::MatchCallback {
   public :
@@ -170,18 +190,25 @@ class sizeOfMallocPrinter : public MatchFinder::MatchCallback {
     
     SourceManager* SrcMgr = Result.SourceManager;
     FullSourceLoc functionDeclFullLocation = Result.Context->getFullLoc(mallocnode->getExprLoc());
+
+    SmallString<MAX_FILE_PATH> pathVector;
+    functionDeclFullLocation.getManager().getFileManager().makeAbsolutePath(pathVector);
+
     if (functionDeclFullLocation.isValid())
-        // cout << "Found FunctionDecl at " << functionDeclFullLocation.getManager().getFilename(functionDeclFullLocation).data
-        cout << "Found FunctionDecl at " << functionDeclFullLocation.getLineNumber() << functionDeclFullLocation.getFileEntry()->getName().str() << endl;
+      // cout << "Found FunctionDecl at " << functionDeclFullLocation.getLineNumber() << functionDeclFullLocation.getFileEntry()->getName().str() << endl;
+      // cout << "Found FunctionDecl at " << functionDeclFullLocation.getLineNumber() << functionDeclFullLocation.getManager().getFilename(functionDeclFullLocation).str() << endl;
+      cout << "Found FunctionDecl at " << functionDeclFullLocation.getLineNumber() << ": "<< pathVector.c_str() << endl;
 
     cout << "*******SIZEOF TYPE: *******" << endl;
     typenode->dump();
 
     if(typenode->isBuiltinType()) {
       cout << typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy) << endl;
+      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy)));
     }
     else if(typenode->isRecordType()) {
-      cout << typenode->getAsCXXRecordDecl()->getNameAsString() << endl;
+      cout << typenode->getAsRecordDecl()->getQualifiedNameAsString() << endl;
+      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAsRecordDecl()->getQualifiedNameAsString()));
     }
     cout << "*******" << endl;
 
@@ -198,6 +225,7 @@ class lhsOfMallocMatcher : public MatchFinder::MatchCallback {
 
   virtual void run(const MatchFinder::MatchResult &Result) {
     const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
+    const clang::Type* typenode = Result.Nodes.getNodeAs<clang::Type>("typenode");
   }
 
   private:
@@ -298,6 +326,6 @@ int main(int argc, const char **argv) {
   // Tool.run(newFrontendActionFactory(&Finder).get());
   Tool.run(newFrontendActionFactory<MyFrontendAction>().get());
 
-  // typedump("typedump.txt");
+  printtofile();
   return 0;
 }

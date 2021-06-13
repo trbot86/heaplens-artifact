@@ -24,6 +24,11 @@ typedef struct struj {
   int soj;
 } struj;
 
+union t {
+  struct struj j;
+  int k;
+};
+
 // template < typename T, typename Y=int>
 // class MyClass
 // {
@@ -87,6 +92,7 @@ int main() {
   r = malloc(100);
 
   int* s = malloc(sizeof(struct stru));
+  struct stru* q = malloc(sizeof(t));
   // t += 0x5;
   // printf("%d", t);
   // float* g = (float*)func();
