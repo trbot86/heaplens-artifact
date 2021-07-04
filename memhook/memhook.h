@@ -193,7 +193,9 @@ void MemStampCollector::update(const char * file, unsigned int line, type_index*
       myArray[it-1].file = file;
       myArray[it-1].line = line;
       if(tindex)
-      myArray[it-1].tindex = *tindex;
+        myArray[it-1].tindex = *tindex;
+      else
+        myArray[it-1].tindex = type_index(typeid(void));
     }
     else {
       //printf("[it: %d]\n", it);

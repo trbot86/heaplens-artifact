@@ -1,4 +1,3 @@
-/home/gautam/Desktop/sifter/type_analysis/header.c|88|int
-/home/gautam/Desktop/sifter/type_analysis/header.c|89|int
-/home/gautam/Desktop/sifter/type_analysis/header.c|91|int
-/home/gautam/Desktop/sifter/type_analysis/header.c|94|stru
+/home/gautam/Desktop/sifter/type_analysis/header.cpp|86|int
+/home/gautam/Desktop/sifter/type_analysis/header.cpp|88|int
+/home/gautam/Desktop/sifter/type_analysis/header.cpp|91|stru

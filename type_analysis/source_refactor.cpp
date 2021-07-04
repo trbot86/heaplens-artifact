@@ -204,11 +204,13 @@ class sizeOfMallocPrinter : public MatchFinder::MatchCallback {
 
     if(typenode->isBuiltinType()) {
       cout << typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy) << endl;
-      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy)));
+      // malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy)));
+      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy)));
     }
     else if(typenode->isRecordType()) {
       cout << typenode->getAsRecordDecl()->getQualifiedNameAsString() << endl;
-      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAsRecordDecl()->getQualifiedNameAsString()));
+      // malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAsRecordDecl()->getQualifiedNameAsString()));
+      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAsRecordDecl()->getQualifiedNameAsString()));
     }
     cout << "*******" << endl;
 

@@ -26,10 +26,10 @@ replacer_experimental: source_replacements.cpp
         -Wl,--start-group -lclangAST -lclangASTMatchers -lclangAnalysis -lclangBasic -lclangDriver -lclangEdit -lclangFrontend -lclangFrontendTool -lclangLex -lclangParse -lclangSema -lclangEdit -lclangRewrite -lclangRewriteFrontend -lclangStaticAnalyzerFrontend -lclangStaticAnalyzerCheckers -lclangStaticAnalyzerCore -lclangCrossTU -lclangIndex -lclangSerialization -lclangToolingCore -lclangTooling -lclangFormats -Wl,--end-group `llvm-config-10 --ldflags --libs --system-libs` -o replacer
 
 header: header.cpp
-	$(CC) ./header.cpp -g -o header -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
+	$(CC) /home/gautam/Desktop/sifter/type_analysis/header.cpp -g -o header -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 header_c: header.c
-	$(C_CC) header.c -o header_c -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
+	$(C_CC) /home/gautam/Desktop/sifter/type_analysis/header.cpp -g -o header_c -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 clean:
 	rm tool refactor replacer header header_c

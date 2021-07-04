@@ -168,7 +168,7 @@ void *memhook_calloc(size_t nmemb, size_t size, char* file, int line, bool log) 
 extern "C" {
 
     void *malloc_s(size_t size, char* filepath, int line) {
-        printf("%s", filepath);
+        // printf("%s", filepath);
         return memhook_malloc(size, filepath, line, true);
     }
 
