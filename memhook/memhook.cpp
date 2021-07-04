@@ -90,7 +90,7 @@ __attribute__((constructor)) static void init() {
     }
 }
 
-void *memhook_malloc(size_t size, bool log) {
+void *memhook_malloc(size_t size, char* file, int line, bool log) {
     if (!initialized) {
         if (tmppos + size < sizeof(tmpbuff)) {
             void *retptr = tmpbuff + tmppos;
@@ -119,7 +119,7 @@ void *memhook_malloc(size_t size, bool log) {
     }
 
     collector.add(memhook_get_server_clock(), size, mem, true);
-
+    collector.update(file, line, NULL);
 
     // printf("real malloc called!\n");
     return mem;
@@ -153,10 +153,10 @@ void memhook_free(void *ptr, bool log) {
 // //     // }
 //     return next_realloc(ptr, size);
 // }
-void *memhook_calloc(size_t nmemb, size_t size, bool log) {
+void *memhook_calloc(size_t nmemb, size_t size, char* file, int line, bool log) {
         if ((!initialized)) {
         // printf("nmemb*size=%lu\n", (nmemb*size));
-        void *ptr = malloc(nmemb*size);
+        void *ptr = memhook_malloc(nmemb*size, file, line, false);
         // printf("nmemb*size=%lu\n", (nmemb*size));
         if (ptr) memset(ptr, 0, nmemb*size);
         if (!ptr) exit(70);
@@ -167,8 +167,9 @@ void *memhook_calloc(size_t nmemb, size_t size, bool log) {
 
 extern "C" {
 
-    void *malloc(size_t size) {
-        return memhook_malloc(size, true);
+    void *malloc_s(size_t size, char* filepath, int line) {
+        printf("%s", filepath);
+        return memhook_malloc(size, filepath, line, true);
     }
 
 
@@ -176,14 +177,14 @@ extern "C" {
         return memhook_free(ptr, true);
     }
 
-    void *calloc(size_t nmemb, size_t size) {
-        return memhook_calloc(nmemb, size, true);
-    }
+    // void *calloc(size_t nmemb, size_t size) {
+    //     return memhook_calloc(nmemb, size, true);
+    // }
 }
 
 ostream& operator << (ostream& os, info_t& info) {
         if(info.file) {
-            os << info.file << "|" << tmap[info.tindex] << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
+            os << info.file << "|" << tmap[info.tindex.name()] << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
         }
         else {
             os << "empty" << "|" << "emptytype" << "|" << info.line << "|" << info.timestamp << "|" << 0 << "|" << (long)info.addr << "|" << info.typeofop << endl;
@@ -280,7 +281,7 @@ void printstats() {
  **********************/
 void * operator new(size_t size) {
 
-    void* mem = memhook_malloc(size == 0?1:size, true);
+    void* mem = memhook_malloc(size == 0?1:size, NULL, 0, true);
 
     if(mem == 0) {
         throw bad_alloc();
@@ -291,7 +292,7 @@ void * operator new(size_t size) {
 
 void *operator new[] (size_t size) {
 
-    void* mem = memhook_malloc(size == 0?1:size, true);
+    void* mem = memhook_malloc(size == 0?1:size, NULL, 0, true);
     
     if(mem == 0) {
         throw bad_alloc();

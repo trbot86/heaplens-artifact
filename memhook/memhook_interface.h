@@ -32,7 +32,7 @@ using namespace std;
 struct slot;
 struct info_t;
 
-void *memhook_malloc(size_t size, bool log);
+// void *memhook_malloc(size_t size, bool log);
 
 #ifdef __cplusplus
 class MemStamp
@@ -58,7 +58,7 @@ public:
     ~MemStampCollector();
 
     void add(uint64_t timestamp, size_t size, void * addr, bool typeofop);
-    void update(const char * file, unsigned int line, type_index tindex);
+    void update(const char * file, unsigned int line, type_index* tindex);
     void threadexit();
 };
 
@@ -69,20 +69,34 @@ T malloc(size_t size, bool fakearg=true);
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
-    collector.update(stamp.filename, stamp.lineNum, type_index(typeid(T)));
+    type_index t = type_index(typeid(T));
+    collector.update(stamp.filename, stamp.lineNum, &t);
     return p;
 }
 
-template <typename T>
-T malloc(size_t size, bool fakearg) {
-    T ptr = (T)memhook_malloc(size, true);
-    collector.update("specialfile", 0, type_index(typeid(T)));
-    if(ptr == NULL) throw bad_alloc();
-    return ptr;
+// template <typename T>
+// T malloc(size_t size, bool fakearg) {
+//     T ptr = (T)memhook_malloc(size, true);
+//     type_index t = type_index(typeid(T));
+//     collector.update("specialfile", 0, &t);
+//     if(ptr == NULL) throw bad_alloc();
+//     return ptr;
+// }
+
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void* malloc_s(size_t, char*, int);
+
+#ifdef __cplusplus
 }
 #endif
 
 #define SIFTER_NEW MemStamp(__FILE__, __LINE__) * new
 #define new SIFTER_NEW
 
+#define malloc(s) malloc_s(s, __FILE__, __LINE__)
 #endif          //__MEMHOOK_INTERFACE_H

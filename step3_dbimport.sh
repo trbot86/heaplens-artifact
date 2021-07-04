@@ -19,7 +19,7 @@ outfile=$1/allocs.sqlite
 rows=$(cat $infile | wc -l)
 echo "Importing $rows allocations into new sqlite db: \"$outfile\" ... "
 rm $outfile 2>/dev/null
-python3 memhook/saveallocstodb.py $infile $outfile
+python3 memhook/saveallocstodb.py $infile $outfile ALLOCS
 if [ "$?" -ne "0" ]; then echo "    ERROR importing allocations" ; exit 1 ; fi
 echo "    Done."
 echo
@@ -43,7 +43,7 @@ outfile=$1/fields.sqlite
 rows=$(cat $infile | wc -l)
 echo "Importing fields into sqlite db: \"$outfile\" ... "
 rm $outfile 2>/dev/null
-python3 memhook/savefieldstodb.py $infile $outfile
+python3 memhook/savefieldstodb.py $infile $outfile FIELDS
 if [ "$?" -ne "0" ]; then echo "    ERROR importing fields" ; exit 1 ; fi
 echo "Done."
 echo

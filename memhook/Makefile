@@ -1,4 +1,4 @@
-CC=clang++-6.0
+CC=clang++
 Includes= /usr/lib/llvm-6.0/include/
 Libs=
 

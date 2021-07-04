@@ -4,6 +4,7 @@
 
 // #include <iostream>
 #include <stdlib.h>
+#include "memhook_interface.h"
 // #include <string>
 // #include <bits/stdc++.h>
 // using namespace std;
@@ -25,21 +26,21 @@ typedef struct struj {
   struct stru stj;
 } struj;
 
-// template < typename T, typename Y=int>
-// class MyClass
-// {
-// public:
-//   int a;
-//   Y j;
-//   bool b;
-//   bool c;
-//   T field;
-//   // bool d;
-//   // int e;
-//   // bool f;
-//   // long long arr[100];
-//   T g;
-// };
+template < typename T, typename Y=int>
+class MyClass
+{
+public:
+  int a;
+  Y j;
+  bool b;
+  bool c;
+  T field;
+  // bool d;
+  // int e;
+  // bool f;
+  // long long arr[100];
+  T g;
+};
 
 // #define CLASS myClass<int>
 
@@ -94,7 +95,7 @@ int main() {
 
   // A* a = new class A;
   // MyClass<float>* mclass = (MyClass<float>*)malloc<MyClass<float>>(8);
-  // MyClass<float>* mc2 = new MyClass<float>;
+  MyClass<float>* mc2 = new MyClass<float>;
 
   // newclass<float>* n = new newclass<float>;
   // n.x = 0;

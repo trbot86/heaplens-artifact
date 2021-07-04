@@ -30,7 +30,7 @@ using namespace std;
 struct slot;
 struct info_t;
 class ThreadExiter;
-typedef map<type_index, const char*> type_map;
+typedef map<const char*, const char*> type_map;
 typedef set<const char*> filenameset;
 
 class memhook_memory_pool {
@@ -62,7 +62,7 @@ void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);
 
 void   (memhook_free)(void *ptr, bool log);
-void *memhook_malloc(size_t size, bool log);
+void *memhook_malloc(size_t size, char* file, int line, bool log);
 
 #warning This binary is being compiled with memhook. Running it will produce a text file (info_t_dump.txt) that should be provided as an argument to the shell script for step3.
 
@@ -156,10 +156,10 @@ MemStampCollector::~MemStampCollector() {
   {
     if (allArrays[i].addr == nullptr)
       continue;
-    else if (allArrays[i].file && allArrays[i].typeofop && !tmap.count(allArrays[i].tindex))
+    else if (allArrays[i].file && allArrays[i].typeofop && !tmap.count(allArrays[i].tindex.name()))
     {
       demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
-      tmap[allArrays[i].tindex] = demangled_name;
+      tmap[allArrays[i].tindex.name()] = demangled_name;
     }
 
     myfile << allArrays[i];
@@ -186,13 +186,14 @@ void MemStampCollector::add(uint64_t timestamp, size_t size, void * addr, bool t
   }
 }
 
-void MemStampCollector::update(const char * file, unsigned int line, type_index tindex) {      
+void MemStampCollector::update(const char * file, unsigned int line, type_index* tindex) {      
     //NORMALLY UPDATE SHOULD BE CALLED AFTER ADD, BUT IN MEMHOOK_MALLOC WHILE INITIALISED IS FALSE, ADD IS NOT CALLED
     //BECAUSE OF THIS, UPDATE CAN BE CALLED WHEN IT-1 < 0. WE SHOULD IGNORE SUCH CALLS (WHICH MAINLY OCCUR DURING DL_INIT)
     if(it-1 < MEMHOOK_MAX_TRACK && it-1 >= 0) {
       myArray[it-1].file = file;
       myArray[it-1].line = line;
-      myArray[it-1].tindex = tindex;
+      if(tindex)
+      myArray[it-1].tindex = *tindex;
     }
     else {
       //printf("[it: %d]\n", it);

@@ -247,10 +247,10 @@ void MemStampCollector::add(uint64_t timestamp, size_t size, void * addr, bool t
 
 }
 
-void MemStampCollector::update(const char * file, unsigned int line, type_index tindex) {      
+void MemStampCollector::update(const char * file, unsigned int line, type_index* tindex) {      
     myArray[it-1].file = file;
     myArray[it-1].line = line;
-    myArray[it-1].tindex = tindex;
+    myArray[it-1].tindex = *tindex;
 }
 
 void MemStampCollector::threadexit() {
