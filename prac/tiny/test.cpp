@@ -1,35 +1,60 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
+#include "memhook_interface.h"
 
-#include "memhook.h"
-
-#include "a.h"
-
+#define THREAD_COUNT 4
+/*
 struct tall {
 int a;
 int b;
-};
+};*/
 
-int main() {
-    // int* p = (int*)malloc<int*>(sizeof(int));
-    // for(int i = 0;i < 10000;i++) {
-    // cout << "hello";
+
+/*class ThreadExiter
+{
+public:
+    ThreadExiter(){
+        printf("Constructor call \n");
+    }
+
+    void test(){
+    	//printf("hello \n");
+    }
+
+    ~ThreadExiter(){
+        printf("Destructor call \n");
+    }
+
+};*/
+
+//thread_local ThreadExiter thread_obj;
+
+
+void * rand_thread_function(void *p){
+
+    int* q = (int*)malloc(sizeof(int));
+    //thread_obj.test();
+    //printf("thread function called\n") ;
+    malloc(50);
+    //pthread_exit(NULL);
+    //return NULL;
+}
+
+int main(int agrc, char **argv) {
+    
     int* p = (int*)malloc(sizeof(int));
-    tall* r = (tall*)malloc(sizeof(tall));
-    tall* q = new tall;
-<<<<<<< HEAD
-    
-    //barfoo();
-    
-=======
->>>>>>> 27ab9c8e4aaa333b7401d70f1b109dc2ddc6c981
-    // int* r = new int;
-    // printf("flag: %d\n", flag);
-    // }
 
-    // for(int i = 0;i < 10000;i++) {
-    // int* r = (int*)malloc(sizeof(int));
-    // printf("flag: %d  %d\n", flag,s*r);
-    // }
+     pthread_t id[THREAD_COUNT];
+
+    for(int i = 0; i < THREAD_COUNT; i++){
+      pthread_create(&id[i], NULL, rand_thread_function, NULL);
+    }
+
+    /*
+    for(int i = 0; i < THREAD_COUNT; i++){
+      pthread_join(id[i], NULL);
+      }*/
+
     return 0;
 }

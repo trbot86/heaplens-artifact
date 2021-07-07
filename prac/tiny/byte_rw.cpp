@@ -1,11 +1,26 @@
-#include <stdio.h>
-#include <pthread.h>
+#include <iostream>
+#include <new>
+#include <typeinfo>
+#include <typeindex>
+#include <bits/stdc++.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
+#include <execinfo.h>
+#include <cxxabi.h>
 #include <dlfcn.h>
-#include <stddef.h>
-#include <stdlib.h>
+#include <pthread.h>
+#include <vector>
+#include <stdio.h>
+#include <aio.h>
+
+#define PADDING 64
+
+
+using namespace std;
+
+typedef map<type_index, const char*> type_map;
 struct info_t {
     const char* file;
     type_index tindex;
@@ -38,7 +53,7 @@ int main(){
     //for now assume file_size doesn't exceed 1gb
     struct info_t *data_buffer = (struct info_t*)malloc(file_size);
 
-	fread(data_buffer,byte_size, 1,fd);
+	fread(data_buffer,file_size, 1,fd);
 
 	int num_records = file_size/sizeof(struct info_t);
 

@@ -1,8 +1,8 @@
 CC = g++ 
 #clang++-6.0
 
-all: test.o a.o
-	$(CC) -Wall -g -o bin test.o a.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
+all: test.o
+	$(CC) -Wall -g -o bin test.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lpthread -lmemhook -ldl
 
 stack: stack.o
 	$(CC) -Wall -g -pthread -o bin stack.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lmemhook -ldl
@@ -13,8 +13,8 @@ thread_test: test.o a.o
 stack.o: stack.cpp
 	$(CC) -Wall -pthread -c -g -mrdrnd stack.cpp -I../../memhook/
 
-test.o: test.cpp a.h
-	$(CC) -c -g test.cpp -I../../memhook/
+test.o: test.cpp
+	$(CC) -c -g test.cpp -I../../memhook/ -pthread
 a.o: a.cpp a.h
 	$(CC) -c -g a.cpp -I../../memhook/
 
