@@ -114,7 +114,9 @@ T malloc(size_t size, bool fakearg=true);
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
-    collector.update(stamp.filename, stamp.lineNum, type_index(typeid(T)));
+  //collector.add(0, 0,0x0,1);
+
+    //collector.update(stamp.filename, stamp.lineNum, type_index(typeid(T)));
     // insert_type(p, stamp, type_index(typeid(T)));
     return p;
 }
