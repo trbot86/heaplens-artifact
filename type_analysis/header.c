@@ -4,7 +4,7 @@
 
 // #include <iostream>
 #include <stdlib.h>
-#include "memhook_interface.h"
+// #include "memhook_interface.h"
 // #include <string>
 // #include <bits/stdc++.h>
 // using namespace std;
@@ -81,13 +81,14 @@ int main() {
   // f = (unsigned long long)5;double
   // int a = (int)f;
   int* r;
-  struj sjj;
+  struj* sjj;
 
   int * t = (int*)malloc(sizeof(int));
 
   r = (int*)malloc(100*sizeof(int));
 
-  int* s = (int*)malloc(100);
+  int* s = malloc(100);
+  sjj = (struct sjj*)malloc(200);
   struj* z = (struj *)malloc(sizeof(sjj.stj));
   // t += 0x5;
   // printf("%d", t);

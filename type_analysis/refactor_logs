@@ -1,3 +1,35 @@
+malloc
+BitCast
+void *
+int *
+int *
+Found FunctionDecl at 86: /home/gautam/Desktop/sifter/type_analysis/
+*******SIZEOF TYPE: *******
+int
+*******
+malloc
+BitCast
+void *
+int *
+int *
+Found FunctionDecl at 88: /home/gautam/Desktop/sifter/type_analysis/
+*******SIZEOF TYPE: *******
+int
+*******
+malloc
+BitCast
+void *
+struct sjj *
+struct sjj *
+malloc
+BitCast
+void *
+struj *
+struj *
+Found FunctionDecl at 92: /home/gautam/Desktop/sifter/type_analysis/
+*******SIZEOF TYPE: *******
+stru
+*******
 // ****************************************************************
 // This file is a sample file to test the limits of the tool in C++
 // ****************************************************************
@@ -26,21 +58,21 @@ typedef struct struj {
   struct stru stj;
 } struj;
 
-template < typename T, typename Y=int>
-class MyClass
-{
-public:
-  int a;
-  Y j;
-  bool b;
-  bool c;
-  T field;
-  // bool d;
-  // int e;
-  // bool f;
-  // long long arr[100];
-  T g;
-};
+// template < typename T, typename Y=int>
+// class MyClass
+// {
+// public:
+//   int a;
+//   Y j;
+//   bool b;
+//   bool c;
+//   T field;
+//   // bool d;
+//   // int e;
+//   // bool f;
+//   // long long arr[100];
+//   T g;
+// };
 
 // #define CLASS myClass<int>
 
@@ -81,24 +113,22 @@ int main() {
   // f = (unsigned long long)5;double
   // int a = (int)f;
   int* r;
-  struj sjj;
+  struj* sjj;
 
   int * t = (int*)malloc(sizeof(int));
 
   r = (int*)malloc(100*sizeof(int));
 
-  int* s = (int*)malloc(100);
+  int* s = malloc(100);
+  sjj = (struct sjj*)malloc(200);
   struj* z = (struj *)malloc(sizeof(sjj.stj));
-
-  int * abc;
-  abc = malloc(100);
   // t += 0x5;
   // printf("%d", t);
   // float* g = (float*)func();
 
   // A* a = new class A;
   // MyClass<float>* mclass = (MyClass<float>*)malloc<MyClass<float>>(8);
-  MyClass<float>* mc2 = new MyClass<float>;
+  // MyClass<float>* mc2 = new MyClass<float>;
 
   // newclass<float>* n = new newclass<float>;
   // n.x = 0;

@@ -74,9 +74,9 @@ typequery = sys.argv[4]
 
 display(xbytes)
 
-get_typenames = "SELECT DISTINCT ALLOCS.TYPE FROM ALLOCS;"
+get_typenames = "SELECT DISTINCT ALLOCSWITHTYPES.TYPE FROM ALLOCSWITHTYPES;"
 
-blocklistquery = "select distinct address/" + blocksize + " as blockno from ALLOCS where (" + typequery + ")"
+blocklistquery = "select distinct address/" + blocksize + " as blockno from ALLOCSWITHTYPES where (" + typequery + ")"
 
 cache_query = "select type ,\
     address, \
@@ -84,7 +84,7 @@ cache_query = "select type ,\
     address/" + blocksize + " as blockno ,\
     (address%" + xbytes + ") as cloff ,\
     size \
-from ALLOCS where (" + typequery + ") "
+from ALLOCSWITHTYPES where (" + typequery + ") "
 
 xbytes = int(xbytes)
 

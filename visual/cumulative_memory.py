@@ -11,7 +11,7 @@ con = sqlite3.connect(sys.argv[1])
 
 cur = con.cursor()
 
-get_typenames = "SELECT DISTINCT ALLOCS.TYPE FROM ALLOCS;"
+get_typenames = "SELECT DISTINCT ALLOCSWITHTYPES.TYPE FROM ALLOCSWITHTYPES;"
 
 print("This program shows the cache line offsets for the given type\n")
 
@@ -20,27 +20,27 @@ print("The types are as follows:\n")
 for t in cur.execute(get_typenames):
     print(t)
 
-get_offsets = "SELECT ALLOCS.TYPE, ALLOCS.ADDRESS + FIELDS.SIZE as offset, FIELDS.FIELD, FIELDS.TYPE \
-FROM ALLOCS JOIN FIELDS \
-ON ALLOCS.TYPE = FIELDS.CLASS;"
+get_offsets = "SELECT ALLOCSWITHTYPES.TYPE, ALLOCSWITHTYPES.ADDRESS + FIELDS.SIZE as offset, FIELDS.FIELD, FIELDS.TYPE \
+FROM ALLOCSWITHTYPES JOIN FIELDS \
+ON ALLOCSWITHTYPES.TYPE = FIELDS.CLASS;"
 
 # typename = input("Enter one of the above type:\n")
 
 # cl_offsets = "SELECT (TEMP.ADDRESS + FIELDS.SIZE)%64 as offset \
-# FROM (SELECT * FROM ALLOCS WHERE ALLOCS.TYPE = '" + typename + "' ) AS TEMP JOIN FIELDS ON TEMP.TYPE = FIELDS.CLASS \
+# FROM (SELECT * FROM ALLOCSWITHTYPES WHERE ALLOCSWITHTYPES.TYPE = '" + typename + "' ) AS TEMP JOIN FIELDS ON TEMP.TYPE = FIELDS.CLASS \
 # ;"
 
 simple_join = "CREATE VIEW simple_join AS \
-                    SELECT ALLOCS.TYPE, ALLOCS.TIMESTAMP, FIELDS.FIELD, FIELDS.TYPE, FIELDS.SIZE \
-                        FROM ALLOCS JOIN FIELDS \
-                            ON ALLOCS.TYPE = FIELDS.CLASS;"
+                    SELECT ALLOCSWITHTYPES.TYPE, ALLOCSWITHTYPES.TIMESTAMP, FIELDS.FIELD, FIELDS.TYPE, FIELDS.SIZE \
+                        FROM ALLOCSWITHTYPES JOIN FIELDS \
+                            ON ALLOCSWITHTYPES.TYPE = FIELDS.CLASS;"
 
 timewise_allocation = "select \
     (timestamp/1000000 \
-        - (select min(timestamp)/1000000 from allocs)) \
+        - (select min(timestamp)/1000000 from allocswithtypes)) \
         as tsdiv, type, \
     sum(size) as sz \
-from allocs group by tsdiv, type;"
+from allocswithtypes group by tsdiv, type;"
 
 df = pd.read_sql_query(timewise_allocation, con)
 

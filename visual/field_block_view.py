@@ -154,12 +154,12 @@ def main():
 
     display(xbytes)
 
-    get_allocstypenames = "SELECT DISTINCT ALLOCS.TYPE FROM ALLOCS;"
+    get_allocstypenames = "SELECT DISTINCT ALLOCSWITHTYPES.TYPE FROM ALLOCSWITHTYPES;"
 
     get_fieldstypenames = "SELECT DISTINCT FIELDS.CLASS, FIELDS.FIELD, FIELDS.OFFSET, FIELDS.SIZE FROM FIELDS ORDER BY FIELDS.CLASS, FIELDS.OFFSET;"
 
     blocklistquery = "select distinct address/" + str(blocksize) + "\
-        as blockno from ALLOCS where (" + typequery + ")"
+        as blockno from ALLOCSWITHTYPES where (" + typequery + ")"
 
     cache_query = "select type ,\
         address, \
@@ -168,7 +168,7 @@ def main():
         (address%" + str(xbytes) + ") as cloff ,\
         size \
     from \
-        ALLOCS \
+        ALLOCSWITHTYPES \
     where (" + typequery + ") "
 
     allocstypedf = pd.read_sql_query(get_allocstypenames, allocscon)

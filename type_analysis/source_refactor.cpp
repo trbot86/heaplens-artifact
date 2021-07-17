@@ -104,7 +104,11 @@ StatementMatcher sizeofMallocMatcher =
 //matches malloc lhs without explicit casts
 StatementMatcher lhsofMallocMatcher = 
 // binaryOperator(hasOperatorName("="), hasRHS(ignoringImpCasts(callExpr(callee(functionDecl(hasName("malloc"))))))).bind("lhsmallocexpr");
- binaryOperator(hasOperatorName("="), hasRHS(ignoringImpCasts(callExpr(callee(functionDecl(hasName("malloc")))))), hasLHS(hasType(type().bind("typeofnode")))).bind("lhsmallocexpr");
+//  binaryOperator(hasOperatorName("="), hasRHS(ignoringImpCasts(callExpr(callee(functionDecl(hasName("malloc")))).bind("rhsmalloc"))), hasLHS(hasType(type().bind("typeofnode")))).bind("lhsmallocexpr");
+ binaryOperator(hasOperatorName("="), hasRHS(hasDescendant(callExpr(callee(functionDecl(hasName("malloc")))).bind("lhsmalloc"))), hasLHS(hasType(type().bind("lhs-type"))));
+
+ DeclarationMatcher declMallocMatcher =
+ varDecl(hasDescendant(callExpr(callee(functionDecl(hasName("malloc")))).bind("declmalloc")), hasType(type().bind("decltype")));
 
 class ClassnamePrinter : public MatchFinder::MatchCallback {
   public :
@@ -142,7 +146,9 @@ class explicitCastAllocPrinter : public MatchFinder::MatchCallback {
 
       // const CallExpr* callex = Result.Nodes.getNodeAs<CallExpr>("callex");
       const ExplicitCastExpr* castex = Result.Nodes.getNodeAs<ExplicitCastExpr>("castex");
-      const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
+      const clang::CallExpr* mnode = Result.Nodes.getNodeAs<clang::CallExpr>("malloc");
+
+      FullSourceLoc functionDeclFullLocation = Result.Context->getFullLoc(mnode->getExprLoc());
 
     //***************************************
       // Rewrite.InsertTextAfterToken(mnode->getLocStart(), "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
@@ -153,7 +159,10 @@ class explicitCastAllocPrinter : public MatchFinder::MatchCallback {
       cout << "malloc" << endl;
       cout << castex->getCastKindName() << endl;
       cout << castex->getSubExprAsWritten()->getType().getAsString() << endl;
+      cout << castex->getTypeAsWritten().getAsString() << endl;
       cout << castex->getTypeInfoAsWritten()->getType().getAsString() << endl;
+
+      malloctypeset.insert(pair<pair<string, int>, string>(pair<string, int>(functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), castex->getTypeInfoAsWritten()->getType().getAsString()));
       // SourceLocation sl = castex->getLocStart();
       // sl.dump(context->getSourceManager());
     }
@@ -221,13 +230,91 @@ class sizeOfMallocPrinter : public MatchFinder::MatchCallback {
 };
 
 //Handler for lhs of malloc expressions
-class lhsOfMallocMatcher : public MatchFinder::MatchCallback {
+class lhsOfMallocPrinter : public MatchFinder::MatchCallback {
   public:
-   lhsOfMallocMatcher(Rewriter &Rewrite) : Rewrite(Rewrite) {}
+   lhsOfMallocPrinter(Rewriter &Rewrite) : Rewrite(Rewrite) {}
 
   virtual void run(const MatchFinder::MatchResult &Result) {
-    const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
-    const clang::Type* typenode = Result.Nodes.getNodeAs<clang::Type>("typenode");
+    const clang::CallExpr* mnode = Result.Nodes.getNodeAs<clang::CallExpr>("lhsmalloc");
+    const clang::Type* typenode = Result.Nodes.getNodeAs<clang::Type>("lhs-type");
+
+    static PrintingPolicy print_policy((Result.Context)->getLangOpts());
+    print_policy.FullyQualifiedName = 1;
+    print_policy.SuppressScope = 0;
+    // print_policy.PrintCanonicalTypes = 1;
+    
+    SourceManager* SrcMgr = Result.SourceManager;
+    FullSourceLoc functionDeclFullLocation = Result.Context->getFullLoc(mnode->getExprLoc());
+
+    SmallString<MAX_FILE_PATH> pathVector;
+    functionDeclFullLocation.getManager().getFileManager().makeAbsolutePath(pathVector);
+
+    if (functionDeclFullLocation.isValid())
+      // cout << "Found FunctionDecl at " << functionDeclFullLocation.getLineNumber() << functionDeclFullLocation.getFileEntry()->getName().str() << endl;
+      // cout << "Found FunctionDecl at " << functionDeclFullLocation.getLineNumber() << functionDeclFullLocation.getManager().getFilename(functionDeclFullLocation).str() << endl;
+      cout << "Found lhs matching FunctionDecl at " << functionDeclFullLocation.getLineNumber() << ": "<< pathVector.c_str() << endl;
+
+    cout << "*******SIZEOF TYPE: *******" << endl;
+    typenode->dump();
+
+    if(typenode->isBuiltinType()) {
+      cout << typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy) << endl;
+      // malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy)));
+      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy)));
+    }
+    else if(typenode->isRecordType()) {
+      cout << typenode->getAsRecordDecl()->getQualifiedNameAsString() << endl;
+      // malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAsRecordDecl()->getQualifiedNameAsString()));
+      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAsRecordDecl()->getQualifiedNameAsString()));
+    }
+    cout << "*******" << endl;
+  }
+
+  private:
+  Rewriter& Rewrite;
+};
+
+class declMallocPrinter : public MatchFinder::MatchCallback {
+  public:
+   declMallocPrinter(Rewriter &Rewrite) : Rewrite(Rewrite) {}
+
+  virtual void run(const MatchFinder::MatchResult &Result) {
+    const clang::CallExpr* mnode = Result.Nodes.getNodeAs<clang::CallExpr>("declmalloc");
+    const clang::Type* typenode = Result.Nodes.getNodeAs<clang::Type>("decltype");
+
+    static PrintingPolicy print_policy((Result.Context)->getLangOpts());
+    print_policy.FullyQualifiedName = 1;
+    print_policy.SuppressScope = 0;
+    // print_policy.PrintCanonicalTypes = 1;
+    
+    SourceManager* SrcMgr = Result.SourceManager;
+    FullSourceLoc functionDeclFullLocation = Result.Context->getFullLoc(mnode->getExprLoc());
+
+    SmallString<MAX_FILE_PATH> pathVector;
+    functionDeclFullLocation.getManager().getFileManager().makeAbsolutePath(pathVector);
+
+    if (functionDeclFullLocation.isValid())
+      // cout << "Found FunctionDecl at " << functionDeclFullLocation.getLineNumber() << functionDeclFullLocation.getFileEntry()->getName().str() << endl;
+      // cout << "Found FunctionDecl at " << functionDeclFullLocation.getLineNumber() << functionDeclFullLocation.getManager().getFilename(functionDeclFullLocation).str() << endl;
+      cout << "Found decl matching FunctionDecl at " << functionDeclFullLocation.getLineNumber() << ": "<< pathVector.c_str() << endl;
+
+    cout << "*******SIZEOF TYPE: *******" << endl;
+    typenode->dump();
+
+    if(typenode->isBuiltinType()) {
+      cout << typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy) << endl;
+      // malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy)));
+      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy)));
+    }
+    else if(typenode->isRecordType()) {
+      cout << typenode->getAsRecordDecl()->getQualifiedNameAsString() << endl;
+      // malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAsRecordDecl()->getQualifiedNameAsString()));
+      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getAsRecordDecl()->getQualifiedNameAsString()));
+    }
+    else if(typenode->isPointerType()) {
+      malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(functionDeclFullLocation.getFileEntry()->getName().str(), functionDeclFullLocation.getLineNumber()), typenode->getPointeeType().getAsString()));
+    }
+    cout << "*******" << endl;
   }
 
   private:
@@ -245,7 +332,7 @@ class DeleteExprPrinter : public MatchFinder::MatchCallback {
 
 class MyASTConsumer : public ASTConsumer {
 public:
-  MyASTConsumer(Rewriter &R) : generalHandlerForAlloc(R), explicitCastHandlerForAlloc(R), sizeOfMallocHandler(R), lhsOfMallocHandler(R) {
+  MyASTConsumer(Rewriter &R) : generalHandlerForAlloc(R), explicitCastHandlerForAlloc(R), sizeOfMallocHandler(R), lhsOfMallocHandler(R), declMallocHandler(R) {
     //**********************************************************************
     // Add a simple matcher for finding 'if' statements.
     // Matcher.addMatcher(ifStmt().bind("ifStmt"), &HandlerForAlloc);
@@ -275,6 +362,7 @@ public:
     Matcher.addMatcher(explicitCastMallocMatcher, &explicitCastHandlerForAlloc);
     Matcher.addMatcher(sizeofMallocMatcher, &sizeOfMallocHandler);
     Matcher.addMatcher(lhsofMallocMatcher, &lhsOfMallocHandler);
+    Matcher.addMatcher(declMallocMatcher, &declMallocHandler);
   }
 
   void HandleTranslationUnit(ASTContext &Context) override {
@@ -286,7 +374,8 @@ private:
   CStyleAllocPrinter generalHandlerForAlloc;
   explicitCastAllocPrinter explicitCastHandlerForAlloc;
   sizeOfMallocPrinter sizeOfMallocHandler;
-  lhsOfMallocMatcher lhsOfMallocHandler;
+  lhsOfMallocPrinter lhsOfMallocHandler;
+  declMallocPrinter declMallocHandler;
   MatchFinder Matcher;
 };
 

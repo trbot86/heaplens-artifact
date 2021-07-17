@@ -19,3 +19,11 @@ EXCEPT
 SELECT DISTINCT ALLOCS.TYPE as type
 FROM ALLOCS join fields.FIELDS
 ON ALLOCS.TYPE = fields.FIELDS.CLASS;
+
+create table ALLOCSWITHTYPES as
+select t1.file, t1.type, t2.type as malloctype, t1.line, t1.TIMESTAMP, t1.size, t1.ADDRESS, t1.isNew
+from allocs t1 left join mallocs t2 on t1.file = t2.file and t1.line = t2.line
+
+update ALLOCSWITHTYPES
+set TYPE = malloctype
+where malloctype not NULL

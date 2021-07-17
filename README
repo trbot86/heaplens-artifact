@@ -9,6 +9,7 @@ POSSIBLE ERROR SCENARIO:
 --> trim_allocs_name.py removes all spaces in the class name column in info_t_dump.txt in order to join successfully with fields.sqlite. This may be error
 prone in case where the condensed name matches a user specified class such as long long matching longlong. Keep this in mind while using the tool as SQL queries
 won't work without condensed naming (You'll keep wondering why the tools won't work).
+--> malloc type matching depends on file and line number of malloc call. If absolute file path is not used, then malloc type matching can fail.
 
 TODO:
 -- Integrate the source_refactor tool and memhook with large projects.
@@ -78,3 +79,24 @@ Example:
 $ LD_PRELOAD="../../memhook/libmemhook.so:../setbench_master/lib/libjemalloc.so" bin
 
 In this example ../setbench_master/lib/libjemalloc.so is a relative path to an instance of the jemalloc shared object.
+
+DETAILED WORKFLOW (for general projects):
+1. Copy your project into prac
+2. Run static analysis to generate malloc_type_dump.txt, fielddump.txt, typedump.txt
+	./tool <name of mainfile>.c/cpp
+	./refactor <name of mainfile>.c/cpp
+3. Integrate memhook into project by changing Makefile, and adding memhook_interface.h in each c/cpp/h file.
+4. Compile and run project.
+5. Trim names of object types:
+	python3 trim_name.py info_t_dump.txt new_info_t_dump.txt
+	python3 -c "import trim_name; trim_name.trim_fields(\"fielddump.txt\");"
+6. Import to DB:
+	python3 savefieldstodb.py new_info_t_dump.txt allocs.sqlite ALLOCS
+	python3 savefieldstodb.py new_field_dump.txt allocs.sqlite FIELDS
+	python3 savefieldstodb.py malloc_type_dump.txt allocs.sqlite MALLOCS
+	python3 savefieldstodb.py filename allocs.sqlite ALLOCSWITHTYPES
+7. Run visualisation scripts:
+	python3 field_block_view.py allocsdb fieldsdb blocksize xbytes typequery
+	python3 cacheline_in_block.py allocsdb blocksize xbytes typequery
+	python3 cumulative_memory.py allocsdb allocsdb
+	python3 set_allocation.py allocsdb setnum xbytes typequery
