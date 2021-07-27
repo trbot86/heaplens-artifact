@@ -74,18 +74,20 @@ int main(){
 
   for(unsigned long int i = 0; i < number_of_blocks; i++){
     inmemory_data_ptr[i] = (struct info_t*)malloc(block_size);
+
+    //block_size needs to change when file doesnt have enough bytes
+    //do same for next byte
     fread(inmemory_data_ptr[i], block_size, 1, fd);
   }
 
+  unsigned int long structs_per_block = block_size / sizeof(struct info_t);
   for(unsigned int long i  = 0; i < number_of_blocks; i++){
-    for(unsigned int long j = 0; j < block_size;j++){
+    if(remainders != 0 && i == number_of_blocks - 1){
+      structs_per_block = remainders/sizeof(struct info_t) ;
+    }
+    for(unsigned int long j = 0; j < structs_per_block;j++){
       info_dump << inmemory_data_ptr[i][j].timestamp << "|" << inmemory_data_ptr[i][j].size << "|" << inmemory_data_ptr[i][j].addr << "|" << inmemory_data_ptr[i][j].typeofop << endl;
     }
   }
 
-  /*
-	fread(data_buffer,file_size, 1,fd);
-	for(uint64_t i = 0; i < num_records; i++){
-		info_dump << data_buffer[i].timestamp << "|" << data_buffer[i].size <<"|" << data_buffer[i].addr << "|" << data_buffer[i].typeofop << endl;
-    }*/
 }
