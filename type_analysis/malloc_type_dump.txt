@@ -1,5 +1,11 @@
-/home/gautam/Desktop/sifter/type_analysis/header.c|86|int
-/home/gautam/Desktop/sifter/type_analysis/header.c|88|int *
-/home/gautam/Desktop/sifter/type_analysis/header.c|90|int
-/home/gautam/Desktop/sifter/type_analysis/header.c|91|struct sjj *
-/home/gautam/Desktop/sifter/type_analysis/header.c|92|struj
+/usr/lib/llvm-10/include/llvm/Support/MemAlloc.h|26|void
+header.c|19|int
+header.c|21|int
+header.c|23|int
+header.c|24|struj
+header.c|25|struj
+header.c|26|struj
+header.cpp|86|int
+header.cpp|88|int
+header.cpp|90|int
+header.cpp|91|struj

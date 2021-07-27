@@ -5,7 +5,7 @@ Includes_2=
 Libs= /usr/lib/llvm-10/lib/
 CLANGLIBS=-Wno-unknown-warning-option -lclangTooling -lclangFrontendTool -lclangFrontend -lclangDriver -lclangSerialization -lclangCodeGen -lclangParse -lclangSema -lclangStaticAnalyzerFrontend -lclangStaticAnalyzerCheckers -lclangStaticAnalyzerCore -lclangAnalysis -lclangARCMigrate -lclangRewrite -lclangRewriteFrontend -lclangEdit -lclangAST -lclangASTMatchers -lclangLex -lclangBasic -lclang
 
-all: parser refactor replacer
+all: parser refactor header_c header
 
 run:
 	./tool header.cpp
@@ -29,7 +29,7 @@ header: header.cpp
 	$(CC) /home/gautam/Desktop/sifter/type_analysis/header.cpp -g -o header -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 header_c: header.c
-	$(C_CC) /home/gautam/Desktop/sifter/type_analysis/header.cpp -g -o header_c -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
+	$(C_CC) /home/gautam/Desktop/sifter/type_analysis/header.c -g -o header_c -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 clean:
 	rm tool refactor replacer header header_c

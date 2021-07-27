@@ -4,71 +4,28 @@
 
 // #include <iostream>
 #include <stdlib.h>
-// #include "memhook_interface.h"
+#include "header.h"
 // #include <string>
 // #include <bits/stdc++.h>
 // using namespace std;
 
-// template <typename T>
-// T* malloc(size_t size) {
-//   cout << "templated malloc\n";
-//   return (T*)malloc(size);
-// }
+size_t bar(int param) {
+  return param;
+}
 
-struct stru {
-  int a;
-  int b;
-};
+void foo () {
+  int* r;
+  struj* sjj;
+  int * t = (int*)malloc(sizeof(int));//
 
-typedef struct struj {
-  int ak;
-  int soj;
-  struct stru stj;
-} struj;
+  r = (int*)malloc(100*sizeof(int));//
 
-// template < typename T, typename Y=int>
-// class MyClass
-// {
-// public:
-//   int a;
-//   Y j;
-//   bool b;
-//   bool c;
-//   T field;
-//   // bool d;
-//   // int e;
-//   // bool f;
-//   // long long arr[100];
-//   T g;
-// };
-
-// #define CLASS myClass<int>
-
-// template < typename T>
-// class newclass {
-//   int h;
-//   struct myStruct {
-//     T x;
-//     long long l;
-//   };
-
-//   myStruct y;
-// };
-
-// class A {
-//   public:
-//   bool x;
-//   int a;
-//   int b;
-//   bool c;
-//   bool d;
-//   long l;
-// };
-
-// template <typename T>
-// float* func() {
-  // T* t = new T;
-// }
+  int* s = malloc(100);
+  sjj = (struj*)malloc(200);//
+  struj* z = malloc(sizeof(sjj->stj));
+  struj* afk = malloc(bar(sjj->ak));
+  
+}
 
 int main() {
   // int a = 0;
@@ -80,16 +37,18 @@ int main() {
   // int f;
   // f = (unsigned long long)5;double
   // int a = (int)f;
-  int* r;
-  struj* sjj;
+  
+  // int* r;
+  // struj* sjj;
 
-  int * t = (int*)malloc(sizeof(int));
+  // int * t = (int*)malloc(sizeof(int));
 
-  r = (int*)malloc(100*sizeof(int));
+  // r = (int*)malloc(100*sizeof(int))
 
-  int* s = malloc(100);
-  sjj = (struct sjj*)malloc(200);
-  struj* z = (struj *)malloc(sizeof(sjj.stj));
+  // int* s = malloc(100);
+  // sjj = (struct sjj*)malloc(200);
+  // struj* z = (struj *)malloc(sizeof(sjj.stj));
+  
   // t += 0x5;
   // printf("%d", t);
   // float* g = (float*)func();
