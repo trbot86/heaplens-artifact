@@ -2,6 +2,10 @@
 // This file is a sample file to test the limits of the tool in C++
 // ****************************************************************
 
+//ADD STATIC VARIABLE AND TEST MALLOC
+//kill_msg = malloc(strlen(KILL_MSG_STR)+1);
+//ptr = malloc(limit);
+
 // #include <iostream>
 #include <stdlib.h>
 #include "header.h"
@@ -13,18 +17,22 @@ size_t bar(int param) {
   return param;
 }
 
-void foo () {
+void foo (size_t mem, const size_t abcd) {
   int* r;
   struj* sjj;
+  void* ptr, *ptr2 = NULL;
   int * t = (int*)malloc(sizeof(int));//
 
   r = (int*)malloc(100*sizeof(int));//
 
-  int* s = malloc(100);
+  int* s;
+  s = malloc(100);//
   sjj = (struj*)malloc(200);//
-  struj* z = malloc(sizeof(sjj->stj));
-  struj* afk = malloc(bar(sjj->ak));
+  struj* z = malloc(sizeof(sjj->stj));//
+  struj* afk = malloc(bar(sjj->ak));//
   
+  ptr = malloc(mem);
+  ptr2 = malloc(abcd);
 }
 
 int main() {

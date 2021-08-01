@@ -1,59 +1,6 @@
 [
     {
         "arguments": [
-            "clang++",
-            "-c",
-            "-I/usr/lib/llvm-10/include",
-            "-std=c++14",
-            "-fno-exceptions",
-            "-D_GNU_SOURCE",
-            "-D__STDC_CONSTANT_MACROS",
-            "-D__STDC_FORMAT_MACROS",
-            "-D__STDC_LIMIT_MACROS",
-            "-Wno-unknown-warning-option",
-            "-g",
-            "-o",
-            "tool",
-            "clang_parser.cpp"
-        ],
-        "directory": "/home/gautam/Desktop/sifter/type_analysis",
-        "file": "clang_parser.cpp"
-    },
-    {
-        "arguments": [
-            "clang++",
-            "-c",
-            "-g",
-            "-I../memhook/",
-            "-o",
-            "header",
-            "header.cpp"
-        ],
-        "directory": "/home/gautam/Desktop/sifter/type_analysis",
-        "file": "header.cpp"
-    },
-    {
-        "arguments": [
-            "clang++",
-            "-c",
-            "-I/usr/lib/llvm-10/include",
-            "-std=c++14",
-            "-fno-exceptions",
-            "-D_GNU_SOURCE",
-            "-D__STDC_CONSTANT_MACROS",
-            "-D__STDC_FORMAT_MACROS",
-            "-D__STDC_LIMIT_MACROS",
-            "-Wno-unknown-warning-option",
-            "-g",
-            "-o",
-            "refactor",
-            "source_refactor.cpp"
-        ],
-        "directory": "/home/gautam/Desktop/sifter/type_analysis",
-        "file": "source_refactor.cpp"
-    },
-    {
-        "arguments": [
             "clang",
             "-c",
             "-g",

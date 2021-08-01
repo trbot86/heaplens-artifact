@@ -100,3 +100,6 @@ DETAILED WORKFLOW (for general projects):
 	python3 cacheline_in_block.py allocsdb blocksize xbytes typequery
 	python3 cumulative_memory.py allocsdb allocsdb
 	python3 set_allocation.py allocsdb setnum xbytes typequery
+
+FUTURE DIRECTIONS, NOTES:
+dump ast for easy traversal.
