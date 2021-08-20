@@ -88,6 +88,10 @@ __attribute__((constructor)) static void init() {
         fprintf(stderr, "Error in `dlsym`: %s\n", dlerror());
         exit(1);
     }
+
+
+    char file_path[] = "binary_dump.txt";
+    global_fd = open(file_path,O_RDWR|O_APPEND|O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
 }
 
 void *memhook_malloc(size_t size, char* file, int line, bool log) {
@@ -300,11 +304,11 @@ void *operator new[] (size_t size) {
 
     return mem;
 }
-
-void operator delete(void * mem)  _GLIBCXX_USE_NOEXCEPT {
+/*
+void operator delete(void * mem) {
     return memhook_free(mem, true);
 }
 
 void operator delete[](void *mem)  _GLIBCXX_USE_NOEXCEPT {
     return memhook_free(mem, true);
-}
+    }*/

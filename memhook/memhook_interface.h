@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "threadexiter.h"
 //#include <execinfo.h>
 //#include <cxxabi.h>
 //#include <dlfcn.h>
@@ -63,14 +64,15 @@ public:
 };
 
 extern MemStampCollector collector;
+extern thread_local ThreadExiter exiter;
 
 template <typename T>
 T malloc(size_t size, bool fakearg=true);
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
-    type_index t = type_index(typeid(T));
-    collector.update(stamp.filename, stamp.lineNum, &t);
+  //collector.update(stamp.filename, stamp.lineNum, type_index(typeid(T)));
+    // insert_type(p, stamp, type_index(typeid(T)));
     return p;
 }
 
