@@ -16,7 +16,7 @@ parser: clang_parser.cpp
 	$(CC) $(Includes) clang_parser.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o tool
 
 malloctypedumper: malloctypedumper.cpp
-	$(CC) $(Includes) -DMTDFNAME="\"malloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o malloctypedumper
+	$(CC) $(Includes) -DMTDFNAME="\"_mm_malloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o malloctypedumper
 
 replacer: source_replacements.cpp
 	$(CC) $(Includes) source_replacements.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o replacer

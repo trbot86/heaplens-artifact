@@ -83,7 +83,7 @@ In this example ../setbench_master/lib/libjemalloc.so is a relative path to an i
 DETAILED WORKFLOW (for general projects):
 1. Copy your project into prac
 2. Run static analysis to generate malloc_type_dump.txt, fielddump.txt, typedump.txt
-	./tool <name of mainfile>.c/cpp
+	./malloctypdumper <name of mainfile>.c/cpp
 	./refactor <name of mainfile>.c/cpp
 3. Integrate memhook into project by changing Makefile, and adding memhook_interface.h in each c/cpp/h file.
 4. Compile and run project.
