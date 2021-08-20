@@ -1,134 +1,134 @@
-LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 14 -nprefill 14 -i 90 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
+LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 14 -nprefill 14 -i 50 -d 50 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
 
-total find                    : 1936868
+total find                    : 0
 total rq                      : 0
-total inserts                 : 34924772
-total deletes                 : 1940760
-total updates                 : 36865532
-total queries                 : 1936868
-total ops                     : 38802400
-find throughput               : 645622
+total inserts                 : 18671043
+total deletes                 : 18674345
+total updates                 : 37345388
+total queries                 : 0
+total ops                     : 37345388
+find throughput               : 0
 rq throughput                 : 0
-update throughput             : 12288510
-query throughput              : 645622
-total throughput              : 12934133
+update throughput             : 12448462
+query throughput              : 0
+total throughput              : 12448462
 
-LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 24 -nprefill 24 -i 90 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
+LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 24 -nprefill 24 -i 50 -d 50 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
 
-total find                    : 3126929
+total find                    : 0
 total rq                      : 0
-total inserts                 : 56279286
-total deletes                 : 3122980
-total updates                 : 59402266
-total queries                 : 3126929
-total ops                     : 62529195
-find throughput               : 1042309
+total inserts                 : 27964441
+total deletes                 : 27963215
+total updates                 : 55927656
+total queries                 : 0
+total ops                     : 55927656
+find throughput               : 0
 rq throughput                 : 0
-update throughput             : 19800755
-query throughput              : 1042309
-total throughput              : 20843065
+update throughput             : 18642552
+query throughput              : 0
+total throughput              : 18642552
 
-LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 34 -nprefill 34 -i 90 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
+LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 34 -nprefill 34 -i 50 -d 50 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
 
-total find                    : 4139283
+total find                    : 0
 total rq                      : 0
-total inserts                 : 74514330
-total deletes                 : 4136764
-total updates                 : 78651094
-total queries                 : 4139283
-total ops                     : 82790377
-find throughput               : 1379761
+total inserts                 : 33441972
+total deletes                 : 33433561
+total updates                 : 66875533
+total queries                 : 0
+total ops                     : 66875533
+find throughput               : 0
 rq throughput                 : 0
-update throughput             : 26217031
-query throughput              : 1379761
-total throughput              : 27596792
+update throughput             : 22291844
+query throughput              : 0
+total throughput              : 22291844
 
-LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 44 -nprefill 44 -i 90 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
+LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 44 -nprefill 44 -i 50 -d 50 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
 
-total find                    : 5158063
+total find                    : 0
 total rq                      : 0
-total inserts                 : 92789490
-total deletes                 : 5154403
-total updates                 : 97943893
-total queries                 : 5158063
-total ops                     : 103101956
-find throughput               : 1719354
+total inserts                 : 37888503
+total deletes                 : 37889425
+total updates                 : 75777928
+total queries                 : 0
+total ops                     : 75777928
+find throughput               : 0
 rq throughput                 : 0
-update throughput             : 32647964
-query throughput              : 1719354
-total throughput              : 34367318
+update throughput             : 25259309
+query throughput              : 0
+total throughput              : 25259309
 
-LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 54 -nprefill 54 -i 90 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
+LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 54 -nprefill 54 -i 50 -d 50 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
 
-total find                    : 5857338
+total find                    : 0
 total rq                      : 0
-total inserts                 : 105403947
-total deletes                 : 5855848
-total updates                 : 111259795
-total queries                 : 5857338
-total ops                     : 117117133
-find throughput               : 1952446
+total inserts                 : 38363327
+total deletes                 : 38365021
+total updates                 : 76728348
+total queries                 : 0
+total ops                     : 76728348
+find throughput               : 0
 rq throughput                 : 0
-update throughput             : 37086598
-query throughput              : 1952446
-total throughput              : 39039044
+update throughput             : 25576116
+query throughput              : 0
+total throughput              : 25576116
 
-LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 64 -nprefill 64 -i 90 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
+LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 64 -nprefill 64 -i 50 -d 50 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
 
-total find                    : 6828792
+total find                    : 0
 total rq                      : 0
-total inserts                 : 122941850
-total deletes                 : 6826455
-total updates                 : 129768305
-total queries                 : 6828792
-total ops                     : 136597097
-find throughput               : 2276264
+total inserts                 : 40266187
+total deletes                 : 40255929
+total updates                 : 80522116
+total queries                 : 0
+total ops                     : 80522116
+find throughput               : 0
 rq throughput                 : 0
-update throughput             : 43256101
-query throughput              : 2276264
-total throughput              : 45532365
+update throughput             : 26840705
+query throughput              : 0
+total throughput              : 26840705
 
-LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 74 -nprefill 74 -i 90 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
+LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 74 -nprefill 74 -i 50 -d 50 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
 
-total find                    : 7756770
+total find                    : 0
 total rq                      : 0
-total inserts                 : 139599178
-total deletes                 : 7754455
-total updates                 : 147353633
-total queries                 : 7756770
-total ops                     : 155110403
-find throughput               : 2585590
+total inserts                 : 42553747
+total deletes                 : 42575052
+total updates                 : 85128799
+total queries                 : 0
+total ops                     : 85128799
+find throughput               : 0
 rq throughput                 : 0
-update throughput             : 49117877
-query throughput              : 2585590
-total throughput              : 51703467
+update throughput             : 28376266
+query throughput              : 0
+total throughput              : 28376266
 
-LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 84 -nprefill 84 -i 90 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
+LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 84 -nprefill 84 -i 50 -d 50 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
 
-total find                    : 8512859
+total find                    : 0
 total rq                      : 0
-total inserts                 : 153107308
-total deletes                 : 8509952
-total updates                 : 161617260
-total queries                 : 8512859
-total ops                     : 170130119
-find throughput               : 2837619
+total inserts                 : 44075424
+total deletes                 : 44075198
+total updates                 : 88150622
+total queries                 : 0
+total ops                     : 88150622
+find throughput               : 0
 rq throughput                 : 0
-update throughput             : 53872420
-query throughput              : 2837619
-total throughput              : 56710039
+update throughput             : 29383540
+query throughput              : 0
+total throughput              : 29383540
 
-LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 94 -nprefill 94 -i 90 -d 5 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
+LD_PRELOAD=../../lib/libjemalloc.so LD_LIBRARY_PATH=../../../../memhook ./ubench_ellen_ext_bst_lf.alloc_new.reclaim_debra.pool_none.out -nwork 94 -nprefill 94 -i 50 -d 50 -rq 0 -rqsize 1 -k 2000000 -nrq 0 -t 3000 -pin 0-23,48-71,24-47,72-95
 
-total find                    : 9316020
+total find                    : 0
 total rq                      : 0
-total inserts                 : 167680973
-total deletes                 : 9317830
-total updates                 : 176998803
-total queries                 : 9316020
-total ops                     : 186314823
-find throughput               : 3105340
+total inserts                 : 46014906
+total deletes                 : 46019762
+total updates                 : 92034668
+total queries                 : 0
+total ops                     : 92034668
+find throughput               : 0
 rq throughput                 : 0
-update throughput             : 58999601
-query throughput              : 3105340
-total throughput              : 62104941
+update throughput             : 30678222
+query throughput              : 0
+total throughput              : 30678222
