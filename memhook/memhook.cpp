@@ -21,7 +21,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "memhook_interface.h"
+//#include "memhook_interface.h"
 #include "memhook.h"
 
 #undef new
