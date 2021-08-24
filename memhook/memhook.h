@@ -28,7 +28,7 @@
 #define MEMHOOK_MAX_TYPE_LENGTH 1000
 #define MEMHOOK_MAX_RETRY 10
 #define MEMHOOK_MAX_BUFFER_SIZE 10000
-// #define PADDING 64
+#define PADDING 64
 
 using namespace std;
 
@@ -227,8 +227,8 @@ struct slot {
 MemStamp::MemStamp(char const *filename, int lineNum)
     : filename(filename), lineNum(lineNum) { }
 MemStamp::~MemStamp() { }
-
-/*struct info_t {
+/*
+struct info_t {
     const char* file;
     type_index tindex;
     unsigned int line;
@@ -365,169 +365,7 @@ void MemStampCollector::add(uint64_t timestamp, size_t size, void *addr, bool ty
           printf("suspend returned -1\n");
       }
     }
-}/*
-void MemStampCollector::add(uint64_t timestamp, size_t size, void *addr, bool typeofop){
-  if(thread_first_call){
-        //set up allocation_log buffer
-        allocation_log = (struct info_t **)next_malloc(sizeof(struct info_t*)*number_of_buffers);
-        for(int i = 0; i < 2; i++){
-            allocation_log[i] = (struct info_t*) next_malloc(sizeof(struct info_t)*MAX_BUFFER_SIZE);
-        }
-
-        async_struct_first_buffer = (struct aiocb*)next_malloc(sizeof(struct aiocb));
-        async_struct_second_buffer = (struct aiocb*)next_malloc(sizeof(struct aiocb));
-
-        char file_path[] = "binary_dump.txt";
-        fd = open(file_path,O_WRONLY|O_APPEND|O_CREAT);
-
-        thread_first_call = 0;
-  }
-
-  if(first_buffer_write_ready){
-    if(log_index == (MAX_BUFFER_SIZE/2) && second_buffer_aio_active){
-      //check aio_status of second_buffer
-      //perform flush to disk
-      int aio_status = aio_error(async_struct_second_buffer);
-      if(aio_status == EINPROGRESS){
-        aio_fsync(O_SYNC, async_struct_second_buffer);
-      }
-    }
-    if(log_index == MAX_BUFFER_SIZE){
-       
-       async_struct_first_buffer->aio_buf = allocation_log[buffer_index];
-       async_struct_first_buffer->aio_nbytes = sizeof(struct info_t)*MAX_BUFFER_SIZE;
-       async_struct_first_buffer->aio_fildes = fd;
-       async_struct_first_buffer->aio_offset = 0;
-       async_struct_first_buffer->aio_reqprio = 0;
-       async_struct_first_buffer->aio_sigevent.sigev_notify = SIGEV_NONE;
-
-      aio_write(async_struct_first_buffer);
-
-      first_buffer_aio_active = 1;
-      second_buffer_aio_active = 0;
-      buffer_index = 1;
-      //clear memory at buffer_index 1
-      memset(allocation_log[buffer_index],0,sizeof(struct info_t)*MAX_BUFFER_SIZE);
-      second_buffer_write_ready = 1;
-      first_buffer_write_ready = 0;
-      log_index = 0;
-      return;
-    }
-    
-    //write to first buffer
-    allocation_log[buffer_index][log_index].timestamp = memhook_get_server_clock();
-    allocation_log[buffer_index][log_index].size = size;
-    allocation_log[buffer_index][log_index].addr = addr;
-    allocation_log[buffer_index][log_index].typeofop = typeofop;
-    log_index++;
-    return;
-    //write to first buffer
-  }
-
-  if(second_buffer_write_ready){
-    if(log_index == (MAX_BUFFER_SIZE/2) && first_buffer_aio_active){
-      //check aio_status of first buffer
-      //perform flush to disk
-      int aio_status = aio_error(async_struct_first_buffer);
-      if(aio_status == EINPROGRESS){
-        aio_fsync(O_SYNC, async_struct_first_buffer);
-      }
-    }
-    if(log_index == (MAX_BUFFER_SIZE)){
-       
-       async_struct_second_buffer->aio_buf = allocation_log[buffer_index];
-       async_struct_second_buffer->aio_nbytes = sizeof(struct info_t)*MAX_BUFFER_SIZE;
-       async_struct_second_buffer->aio_fildes = fd;
-       async_struct_second_buffer->aio_offset = 0;
-       async_struct_second_buffer->aio_reqprio = 0;
-       async_struct_second_buffer->aio_sigevent.sigev_notify = SIGEV_NONE;
-
-      aio_write(async_struct_second_buffer);
-
-      first_buffer_aio_active = 0;
-      second_buffer_aio_active = 1;
-      buffer_index = 0;
-      //clear memory at buffer index 0
-      memset(allocation_log[buffer_index],0,sizeof(struct info_t)*MAX_BUFFER_SIZE);
-      second_buffer_write_ready = 0;
-      first_buffer_write_ready = 1;
-      log_index = 0;
-      return;
-    }
-
-    //write to second buffer
-    allocation_log[buffer_index][log_index].timestamp = memhook_get_server_clock();
-    allocation_log[buffer_index][log_index].size = size;
-    allocation_log[buffer_index][log_index].addr = addr;
-    allocation_log[buffer_index][log_index].typeofop = typeofop;
-    log_index++;
-    return;
-  }
-}*/
-/*
-void MemStampCollector::add(uint64_t timestamp, size_t size, void * addr, bool typeofop) {
-  // create logger array if thread was just started
-  if(thread_first_call){
-
-    //allocation_log array created for single thread
-    //two buffers perstack.
-
-    // for optimization change to static define NUMBER_OF_BUFFERS
-    allocation_log = (struct info_t **)next_malloc(sizeof(struct info_t *)*number_of_buffers);
-
-    for(int i = 0; i < number_of_buffers; i++){
-      allocation_log[i] = (struct info_t *) next_malloc(sizeof(struct info_t)*MAX_BUFFER_SIZE);
-    }
-
-    //fd must be opend with "a", otherwise each thread will be creating new info_dump.txt if "w" is used
-    fd = fopen("info_dumpt.txt","a");
-    thread_first_call = 0;
-  }
-
-  if(log_index == (MAX_BUFFER_SIZE)){
-
-    //possibly needs to be thread_local
-    struct aiocb * async_api_struct = (struct aiocb*)malloc(sizeof(struct aiocb));
-    async_api_struct->aio_buf = allocation_log[buffer_index];
-    aysnc_api_sturct->aio_nbytes = sizeof(struct info_t)*MAX_BUFFER_SIZE;
-    aysnc_api_sturct->aio_filedes = fd;
-    async_api_struct->aio_offset = 0;
-    aysnc_api_sturct->aio_reqprio = 0;
-    aysnc_api_sturct->aio_sigevent.sigev_notify = SIGEV_NONE;
-    aio_write(async_api_struct);
-
-    int aio_status = aio_error(async_api_struct);
-
-    if(aio_status == EINPROGRESS){
-      fflush();
-      aio_fsync(O_SYNC, aysnc_api_sturct);
-    }
-
-    buffer_index++;
-    //reset log_index to start of buffer
-    log_index = 0;
-  }
-
-  //use only for generic implementation, no optimization
-  if (buffer_index == number_of_buffers){
-    allocation_log =(struct info_t**)realloc(allocation_log, sizeof(struct info_t *)*2*number_of_buffers);
-    number_of_buffers *= 2;
-    for(int i = buffer_index; i < number_of_buffers; i++){
-      allocation_log[i] =(struct info_t*)next_malloc(sizeof(struct info_t)*MAX_BUFFER_SIZE);
-    }
-  }
-
-  allocation_log[buffer_index][log_index].timestamp = memhook_get_server_clock();
-  allocation_log[buffer_index][log_index].size = size;
-  allocation_log[buffer_index][log_index].addr = addr;
-  allocation_log[buffer_index][log_index].typeofop = typeofop;
-  log_index++;
-  
-  if(log_index != (MAX_BUFFER_SIZE)){
-  	allocation_log[buffer_index][log_index].size = -1;
-  }
-}*/
-
+}
 void MemStampCollector::update(const char * file, unsigned int line, type_index tindex) {
     myArray[it-1].file = file;
     myArray[it-1].line = line;
