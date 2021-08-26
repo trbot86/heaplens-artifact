@@ -58,7 +58,7 @@ public:
 
     ~MemStampCollector();
 
-    void add(uint64_t timestamp, size_t size, void * addr, bool typeofop);
+    void add(uint64_t timestamp, size_t size, void *addr, bool typeofop, char * file, int line, type_index tindex);
     void update(const char * file, unsigned int line, type_index* tindex);
     void threadexit();
 };

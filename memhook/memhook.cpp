@@ -122,7 +122,7 @@ void *memhook_malloc(size_t size, char* file, int line, bool log) {
         throw bad_alloc();
     }
 
-    collector.add(memhook_get_server_clock(), size, mem, true);
+    collector.add(memhook_get_server_clock(), size, mem, true, file, line, type_index(typeid(void)),);
     //collector.update(file, line, 0);
 
     // printf("real malloc called!\n");

@@ -66,7 +66,7 @@ struct thread_record_array{
 };
 
 struct info_t {
-    const char* file;
+    char file[500];
     type_index tindex;
     unsigned int line;
     uint64_t timestamp;
@@ -184,7 +184,7 @@ public:
 
     ~MemStampCollector();
 
-    void add(uint64_t timestamp, size_t size, void * addr, bool typeofop);
+    void add(uint64_t timestamp, size_t size, void *addr, bool typeofop, char * file, int line, type_index tindex);
     void update(const char * file, unsigned int line, type_index tindex);
     void threadexit();
 };
@@ -313,7 +313,7 @@ MemStampCollector::~MemStampCollector() {
     myfile << allArrays[i];
   }*/
 }
-void MemStampCollector::add(uint64_t timestamp, size_t size, void *addr, bool typeofop){
+void MemStampCollector::add(uint64_t timestamp, size_t size, void *addr, bool typeofop, char * file, int line, type_index tindex){
 	if(thread_first_call){
 		allocation_log = (struct info_t **)next_malloc(sizeof(struct info_t*)*number_of_buffers);
         for(int i = 0; i < 2; i++){
@@ -330,10 +330,12 @@ void MemStampCollector::add(uint64_t timestamp, size_t size, void *addr, bool ty
         thread_first_call = 0;
 	}
 
-	  allocation_log[buffer_index][log_index].timestamp = memhook_get_server_clock();
+	allocation_log[buffer_index][log_index].timestamp = memhook_get_server_clock();
     allocation_log[buffer_index][log_index].size = size;
     allocation_log[buffer_index][log_index].addr = addr;
     allocation_log[buffer_index][log_index].typeofop = typeofop;
+    allocation_log[buffer_index][log_index].line = line;
+    allocation_log[buffer_index][log_index].tindex = tindex;
     log_index++;
 
     if(log_index == MEMHOOK_MAX_BUFFER_SIZE){
@@ -367,9 +369,10 @@ void MemStampCollector::add(uint64_t timestamp, size_t size, void *addr, bool ty
     }
 }
 void MemStampCollector::update(const char * file, unsigned int line, type_index tindex) {
-    myArray[it-1].file = file;
+    //this->add(memhook_get_server_clock(), )
+    /*myArray[it-1].file = file;
     myArray[it-1].line = line;
-    myArray[it-1].tindex = tindex;
+    myArray[it-1].tindex = tindex;*/
 }
 
 void MemStampCollector::threadexit() {
