@@ -17,7 +17,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "threadexiter.h"
+#include "memstamp.h"
 //#include <execinfo.h>
 //#include <cxxabi.h>
 //#include <dlfcn.h>
@@ -36,35 +36,10 @@ struct info_t;
 // void *memhook_malloc(size_t size, bool log);
 
 #ifdef __cplusplus
-class MemStamp
-{
-    public:
-        char const * const filename;
-        int const lineNum;
-    public:
-        MemStamp(char const *filename, int lineNum);
-        ~MemStamp();
-};
-
-class MemStampCollector {
-  private:
-  slot* sarr;
-  info_t* allArrays;
-
-  int get_slot(thread::id id);
-
-public:
-    MemStampCollector();
-
-    ~MemStampCollector();
-
-    void add(uint64_t timestamp, size_t size, void *addr, bool typeofop, char * file, int line, type_index tindex);
-    void update(const char * file, unsigned int line, type_index* tindex);
-    void threadexit();
-};
 
 extern MemStampCollector collector;
-extern thread_local ThreadExiter exiter;
+extern thread_local info_t unit_log;
+// extern thread_local ThreadExiter exiter;
 
 template <typename T>
 T malloc(size_t size, bool fakearg=true);
@@ -73,6 +48,11 @@ template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
   //collector.update(stamp.filename, stamp.lineNum, type_index(typeid(T)));
     // insert_type(p, stamp, type_index(typeid(T)));
+    unit_log.file = stamp.filename;
+    unit_log.line = stamp.lineNum;
+    unit_log.tindex = type_index(typeid(T));
+
+    collector.copy(unit_log);
     return p;
 }
 

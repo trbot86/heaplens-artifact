@@ -1,4 +1,3 @@
-// #pragma once
 /**
  * List of functions to overload obtained from mimalloc:
  *      https://github.com/microsoft/mimalloc/blob/master/src/alloc-override.c
@@ -21,7 +20,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include "memhook_interface.h"
+#include "memhook_interface.h"
 #include "memhook.h"
 
 #undef new
@@ -122,9 +121,16 @@ void *memhook_malloc(size_t size, char* file, int line, bool log) {
         throw bad_alloc();
     }
 
-    collector.add(memhook_get_server_clock(), size, mem, true, file, line, type_index(typeid(void)),);
-    //collector.update(file, line, 0);
-
+    //**************INITIALISE INFO_T OBJECT AND COPY LATER***************//
+    // collector.add(memhook_get_server_clock(), size, mem, true);
+    // collector.update(file, line, NULL);
+    
+    unit_log.timestamp = memhook_get_server_clock();
+    unit_log.size = size;
+    unit_log.addr = mem;
+    unit_log.typeofop = true;
+    unit_log.file = file;
+    unit_log.line = line;
     // printf("real malloc called!\n");
     return mem;
 }
@@ -143,7 +149,8 @@ void memhook_free(void *ptr, bool log) {
         fprintf(stdout, "freeing temp memory\n");
     } else {
         next_free(ptr);
-        collector.add(memhook_get_server_clock(), 0, ptr, false);
+        //**************INITIALISE INFO_T OBJECT AND COPY LATER***************//
+        // collector.add(memhook_get_server_clock(), 0, ptr, false);
     }
 }
 // void *realloc(void *ptr, size_t size) {
@@ -173,6 +180,7 @@ extern "C" {
 
     void *malloc_s(size_t size, char* filepath, int line) {
         // printf("%s", filepath);
+        collector.copy(unit_log);
         return memhook_malloc(size, filepath, line, true);
     }
 
@@ -304,11 +312,11 @@ void *operator new[] (size_t size) {
 
     return mem;
 }
-/*
-void operator delete(void * mem) {
+
+void operator delete(void * mem) _GLIBCXX_USE_NOEXCEPT {
     return memhook_free(mem, true);
 }
 
 void operator delete[](void *mem)  _GLIBCXX_USE_NOEXCEPT {
     return memhook_free(mem, true);
-    }*/
+}

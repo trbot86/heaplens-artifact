@@ -1,7 +1,6 @@
 // mention Curtis Bartley
 #ifndef __MEMHOOK_H
 #define __MEMHOOK_H
-// #pragma once
 
 #include <iostream>
 #include <new>
@@ -19,6 +18,8 @@
 #include <vector>
 #include <stdio.h>
 #include <aio.h>
+
+#include "memstamp.h"
 
 #define MEMHOOK_BACKTRACE_DEPTH 2
 #ifndef MEMHOOK_MAX_THREADS
@@ -56,6 +57,8 @@ thread_local int buffer_index = 0;
 //how many buffers
 thread_local int number_of_buffers = 2;
 
+thread_local info_t unit_log;
+
 thread_local int fd;
 
 int global_fd;
@@ -63,19 +66,6 @@ int global_fd;
 struct thread_record_array{
   int buffer_size_nbytes;
   struct info_t *allocation_log;
-};
-
-struct info_t {
-    char file[500];
-    type_index tindex;
-    unsigned int line;
-    uint64_t timestamp;
-    size_t size;
-    void* addr;
-    bool typeofop;
-    //char padding[PADDING];
-
-    info_t() : file(nullptr), tindex(typeid(void)), line(0), timestamp(0), size(0), addr(nullptr) {}
 };
 
 class memhook_memory_pool {
@@ -159,35 +149,41 @@ void memhook_memory_pool::add(info_t *logarray, int buffer_size_nbytes){
   pthread_mutex_unlock(&lock);
 }
 
-/*
-After some further refactoring we might be able to remove this class declaration from memhook.h
-*/
-class MemStamp
-{
+memhook_memory_pool mem_pool_obj;
+
+class ThreadExiter
+  {
     public:
-        char const * const filename;
-        int const lineNum;
-    public:
-        MemStamp(char const *filename, int lineNum);
-        ~MemStamp();
-};
+    //ThreadExiter() = default;
+   
+    // ThreadExiter(ThreadExiter const&) = delete;
+    
+    //void operator=(ThreadExiter const&) = delete;
+    
+    ThreadExiter(){
+      printf("ThreadExiter Constructor has been called - v2\n");
+    }
+    ~ThreadExiter()
+    {
+      printf("ThreadExiter Destructor has been called \n");
 
-class MemStampCollector {
-private:
-    slot* sarr;
-    info_t* allArrays;
+      int next_buffer = (buffer_index + 1) % 2;
 
-    int get_slot(thread::id id);
+      if(aio_error(&async_struct_array[next_buffer]) == EINPROGRESS){
+        async_api_struct_list[0] = &async_struct_array[next_buffer];
 
-public:
-    MemStampCollector();
+        aio_suspend(async_api_struct_list,1,0);
+      }
 
-    ~MemStampCollector();
+      int unfilled_buffer_size = sizeof(struct info_t)* log_index;
+      mem_pool_obj.add(allocation_log[buffer_index], unfilled_buffer_size);
+      //close(fd);
+    }
+    void add()
+    {
 
-    void add(uint64_t timestamp, size_t size, void *addr, bool typeofop, char * file, int line, type_index tindex);
-    void update(const char * file, unsigned int line, type_index tindex);
-    void threadexit();
-};
+    }
+  };
 
 inline uint64_t memhook_get_server_clock() {
 #if defined(__i386__)
@@ -224,9 +220,6 @@ struct slot {
   char padding[128];
 };
 
-MemStamp::MemStamp(char const *filename, int lineNum)
-    : filename(filename), lineNum(lineNum) { }
-MemStamp::~MemStamp() { }
 /*
 struct info_t {
     const char* file;
@@ -253,68 +246,16 @@ thread_local int max_retry = 0;
 
 ostream& operator << (ostream& os, info_t& info);
 
-int MemStampCollector::get_slot(thread::id id) {
-  max_retry = 0;
-  while(max_retry < MEMHOOK_MAX_RETRY) {
-    while(sarr[iter].occupied && (max_retry < MEMHOOK_MAX_RETRY)) {
-      // cout << "while" << endl;
-      iter = (iter+1)%MEMHOOK_MAX_THREADS;
-      max_retry++;
-    }
-    
-    if(__sync_bool_compare_and_swap(&sarr[iter].occupied, false, true)) {
-      // cout << iter << endl;
-      sarr[iter].id = id;
-      it = sarr[iter].offset;
-      return iter;
-    }
-    // cout << "failed\n";
-    iter = (iter+1)%MEMHOOK_MAX_THREADS;
-    max_retry++;
-  }
-  return -1;
-}
-
 
 MemStampCollector::MemStampCollector() {
-  allArrays = (info_t*)next_calloc(1, MEMHOOK_MAX_THREADS*MEMHOOK_MAX_TRACK*sizeof(info_t));
-
-  if(allArrays == NULL) {
-    printf("[Integer overflow]: either calloc failed or integer overflow. reduce MEMHOOK_MAX_TRACK or MEMHOOK_MAX_THREADS\n");
-    exit(0);
-  }
-
-  sarr = (slot*)next_calloc(1, MEMHOOK_MAX_THREADS*sizeof(slot));
-
-  if(sarr == NULL) {
-    printf("[Integer Overflow]: either calloc failed or integer overflow. reduce MAX_THREADS\n");
-  }
+  
 }
 
 MemStampCollector::~MemStampCollector() {
-  //printf("old memstamp collector destructor, empty for now \n");
-  //commented out because we don't want double data to be printed
-  /*it = INT_MAX;
-  ofstream myfile("info_t_dump.txt", ios_base::out | ios_base::app);
-
-  int status;
-  char *demangled_name;
-
-  for (int i = 0; i < MEMHOOK_MAX_TRACK * MEMHOOK_MAX_THREADS; i++)
-  {
-    if (allArrays[i].addr == nullptr)
-      continue;
-    else if (allArrays[i].file && allArrays[i].typeofop && !tmap.count(allArrays[i].tindex.name()))
-    {
-      demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
-      tmap[allArrays[i].tindex.name()] = demangled_name;
-    }
-
-    myfile << allArrays[i];
-  }*/
+  
 }
-void MemStampCollector::add(uint64_t timestamp, size_t size, void *addr, bool typeofop, char * file, int line, type_index tindex){
-	if(thread_first_call){
+void MemStampCollector::copy(info_t &unit_log){
+	if(thread_first_call) {
 		allocation_log = (struct info_t **)next_malloc(sizeof(struct info_t*)*number_of_buffers);
         for(int i = 0; i < 2; i++){
             allocation_log[i] = (struct info_t*) next_malloc(sizeof(struct info_t)*MEMHOOK_MAX_BUFFER_SIZE);
@@ -330,12 +271,13 @@ void MemStampCollector::add(uint64_t timestamp, size_t size, void *addr, bool ty
         thread_first_call = 0;
 	}
 
-	allocation_log[buffer_index][log_index].timestamp = memhook_get_server_clock();
-    allocation_log[buffer_index][log_index].size = size;
-    allocation_log[buffer_index][log_index].addr = addr;
-    allocation_log[buffer_index][log_index].typeofop = typeofop;
-    allocation_log[buffer_index][log_index].line = line;
-    allocation_log[buffer_index][log_index].tindex = tindex;
+	  // allocation_log[buffer_index][log_index].timestamp = memhook_get_server_clock();
+    // allocation_log[buffer_index][log_index].size = size;
+    // allocation_log[buffer_index][log_index].addr = addr;
+    // allocation_log[buffer_index][log_index].typeofop = typeofop;
+    // allocation_log[buffer_index][log_index].line = line;
+    // allocation_log[buffer_index][log_index].tindex = tindex;
+    memcpy(&allocation_log[buffer_index][log_index], &unit_log, sizeof(info_t));
     log_index++;
 
     if(log_index == MEMHOOK_MAX_BUFFER_SIZE){
@@ -368,55 +310,8 @@ void MemStampCollector::add(uint64_t timestamp, size_t size, void *addr, bool ty
       }
     }
 }
-void MemStampCollector::update(const char * file, unsigned int line, type_index tindex) {
-    //this->add(memhook_get_server_clock(), )
-    /*myArray[it-1].file = file;
-    myArray[it-1].line = line;
-    myArray[it-1].tindex = tindex;*/
-}
-
-void MemStampCollector::threadexit() {
-    sarr[iter].offset = it++;
-    __sync_bool_compare_and_swap(&sarr[iter].occupied, true, false);
-}
 
 MemStampCollector collector;
-
-memhook_memory_pool mem_pool_obj;
-
-class ThreadExiter
-  {
-    public:
-    //ThreadExiter() = default;
-   
-    // ThreadExiter(ThreadExiter const&) = delete;
-    
-    //void operator=(ThreadExiter const&) = delete;
-    
-    ThreadExiter(){
-      printf("ThreadExiter Constructor has been called - v2\n");
-    }
-    ~ThreadExiter()
-    {
-      printf("ThreadExiter Destructor has been called \n");
-
-      int next_buffer = (buffer_index + 1) % 2;
-
-      if(aio_error(&async_struct_array[next_buffer]) == EINPROGRESS){
-        async_api_struct_list[0] = &async_struct_array[next_buffer];
-
-        aio_suspend(async_api_struct_list,1,0);
-      }
-
-      int unfilled_buffer_size = sizeof(struct info_t)* log_index;
-      mem_pool_obj.add(allocation_log[buffer_index], unfilled_buffer_size);
-      //close(fd);
-    }
-    void add()
-    {
-
-    }
-  };
 
 //Keeps the total number of concurrent threads
 int arrayCount = 0;

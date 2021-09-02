@@ -16,8 +16,8 @@ thread_test: test.o a.o
 stack.o: stack.cpp
 	$(CC) -Wall -pthread -c -g -mrdrnd stack.cpp -I../../memhook/
 
-test.o: test.cpp
-	$(CC) -c -g test.cpp -I../../memhook/ -pthread
+test.o: test.c
+	$(CC) -c -g test.c -I../../memhook/ -pthread
 a.o: a.cpp a.h
 	$(CC) -c -g a.cpp -I../../memhook/
 

@@ -9,6 +9,7 @@
 // #include <iostream>
 #include <stdlib.h>
 #include "header.h"
+#include "memhook_interface.h"
 // #include <string>
 // #include <bits/stdc++.h>
 // using namespace std;
@@ -77,5 +78,6 @@ int main() {
   // delete mc2;
   // delete mc.field;
   // delete ([]{return new int; })();
+  foo(sizeof(int), sizeof(int));
   return 0;
 }

@@ -25,10 +25,10 @@ replacer_experimental: source_replacements.cpp
 	$(CC) $(Includes) source_replacements.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o replacer
 
 header: header.cpp
-	$(CC) /home/gautam/Desktop/sifter/type_analysis/header.cpp -g -o header -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
+	$(CC) /home/gpathak/sifter/type_analysis/header.cpp -g -o header -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 header_c: header.c
-	$(C_CC) /home/gautam/Desktop/sifter/type_analysis/header.c -g -o header_c -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
+	$(C_CC) /home/gpathak/sifter/type_analysis/header.c -g -o header_c -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 clean:
 	rm tool malloctypedumper replacer header header_c
