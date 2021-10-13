@@ -1,3 +1,4 @@
+#include "memhook_interface.h"
 /**
  *  Basic workflow:
  *  -1) Did a basic parse of the source, printed all AST nodes

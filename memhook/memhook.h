@@ -36,8 +36,8 @@ using namespace std;
 struct slot;
 struct info_t;
 class ThreadExiter;
-typedef map<const char*, const char*> type_map;
-typedef set<const char*> filenameset;
+typedef map<const char*, string> type_map;
+typedef map<const char*, string> filenameset;
 
 thread_local int thread_first_call = 1;
 thread_local int first_filled_buffer_status = 0;
@@ -165,18 +165,20 @@ class ThreadExiter
     }
     ~ThreadExiter()
     {
-      printf("ThreadExiter Destructor has been called \n");
+      printf("ThreadExiter Destructor has been called - v2\n");
 
       int next_buffer = (buffer_index + 1) % 2;
 
-      if(aio_error(&async_struct_array[next_buffer]) == EINPROGRESS){
-        async_api_struct_list[0] = &async_struct_array[next_buffer];
+      if(async_struct_array) {
+        if(aio_error(&async_struct_array[buffer_index]) == EINPROGRESS){
+          async_api_struct_list[0] = &async_struct_array[next_buffer];
 
-        aio_suspend(async_api_struct_list,1,0);
+          aio_suspend(async_api_struct_list,1,0);
+        }
+
+        int unfilled_buffer_size = sizeof(struct info_t)* log_index;
+        mem_pool_obj.add(allocation_log[buffer_index], unfilled_buffer_size);
       }
-
-      int unfilled_buffer_size = sizeof(struct info_t)* log_index;
-      mem_pool_obj.add(allocation_log[buffer_index], unfilled_buffer_size);
       //close(fd);
     }
     void add()
@@ -220,20 +222,6 @@ struct slot {
   char padding[128];
 };
 
-/*
-struct info_t {
-    const char* file;
-    type_index tindex;
-    unsigned int line;
-    uint64_t timestamp;
-    size_t size;
-    void* addr;
-    bool typeofop;
-    // char padding[PADDING];
-
-    info_t() : file(nullptr), tindex(typeid(void)), line(0), timestamp(0), size(0), addr(nullptr) {}
-};*/
-
 thread_local int iter = 0;
 
 /*Iterator for individual thread allocation in
@@ -246,6 +234,9 @@ thread_local int max_retry = 0;
 
 ostream& operator << (ostream& os, info_t& info);
 
+MemStamp::MemStamp(char const *filename, int lineNum)
+    : filename(nullptr), lineNum(lineNum) { }
+MemStamp::~MemStamp() { }
 
 MemStampCollector::MemStampCollector() {
   
@@ -271,12 +262,6 @@ void MemStampCollector::copy(info_t &unit_log){
         thread_first_call = 0;
 	}
 
-	  // allocation_log[buffer_index][log_index].timestamp = memhook_get_server_clock();
-    // allocation_log[buffer_index][log_index].size = size;
-    // allocation_log[buffer_index][log_index].addr = addr;
-    // allocation_log[buffer_index][log_index].typeofop = typeofop;
-    // allocation_log[buffer_index][log_index].line = line;
-    // allocation_log[buffer_index][log_index].tindex = tindex;
     memcpy(&allocation_log[buffer_index][log_index], &unit_log, sizeof(info_t));
     log_index++;
 
@@ -291,12 +276,13 @@ void MemStampCollector::copy(info_t &unit_log){
     	aio_write(&async_struct_array[buffer_index]);
     	aio_fsync(O_SYNC, &async_struct_array[buffer_index]);
 
-      if(first_filled_buffer_status == 0){
-        first_filled_buffer_status = 1;
-        buffer_index = 1;
-        log_index = 0;
-        return;
-      }
+      //NOT NEEDED
+      // if(first_filled_buffer_status == 0){
+      //   first_filled_buffer_status = 1;
+      //   buffer_index = 1;
+      //   log_index = 0;
+      //   return;
+      // }
 
     	buffer_index = (buffer_index + 1) % 2;
     	log_index = 0;

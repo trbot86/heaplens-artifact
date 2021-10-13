@@ -1,3 +1,4 @@
+#include "memhook_interface.h"
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>

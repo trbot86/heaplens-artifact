@@ -1,3 +1,4 @@
+#include "memhook_interface.h"
 #ifndef __HEADER_H
 #define __HEADER_H
 

@@ -1,3 +1,4 @@
+#include "memhook_interface.h"
 #include <iostream>
 #include <new>
 #include <typeinfo>
@@ -28,7 +29,7 @@ using namespace std;
 typedef map<type_index, const char*> type_map;
 struct info_t {
     const char* file;
-    type_index tindex;
+    const char* tindex_name;
     unsigned int line;
     uint64_t timestamp;
     size_t size;
@@ -36,7 +37,7 @@ struct info_t {
     bool typeofop;
   //char padding[PADDING];
 
-    info_t() : file(nullptr), tindex(typeid(void)), line(0), timestamp(0), size(0), addr(nullptr) {}
+    info_t() : file(nullptr), tindex_name(nullptr), line(0), timestamp(0), size(0), addr(nullptr) {}
 };
 
 
@@ -86,7 +87,11 @@ int main(){
       structs_per_block = remainders/sizeof(struct info_t) ;
     }
     for(unsigned int long j = 0; j < structs_per_block;j++){
-      info_dump << inmemory_data_ptr[i][j].timestamp << "|" << inmemory_data_ptr[i][j].size << "|" << inmemory_data_ptr[i][j].addr << "|" << inmemory_data_ptr[i][j].typeofop << endl;
+      // cout<<inmemory_data_ptr[i][j].tindex.hash_code();
+      // if(inmemory_data_ptr[i][j].file == nullptr)
+      // info_dump << "no tindex";
+      // else
+      info_dump << (void*)inmemory_data_ptr[i][j].file << "|" << (void*)inmemory_data_ptr[i][j].tindex_name << "|" << inmemory_data_ptr[i][j].line << "|" << inmemory_data_ptr[i][j].timestamp << "|" << inmemory_data_ptr[i][j].size << "|" << inmemory_data_ptr[i][j].addr << "|" << inmemory_data_ptr[i][j].typeofop << endl;
     }
   }
 

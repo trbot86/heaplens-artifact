@@ -1,3 +1,4 @@
+#include "memhook_interface.h"
 // #define _GNU_SOURCE
 
 #ifndef A_H

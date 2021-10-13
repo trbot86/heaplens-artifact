@@ -1,7 +1,7 @@
 // mention Curtis Bartley
 #ifndef __MEMHOOK_INTERFACE_H
 #define __MEMHOOK_INTERFACE_H
-// #pragma once
+#pragma once
 
 //ASK ABOUT DIFFERENT IMPLEMENTATIONS OF BOOL IN C/C++. WILL THAT BE A PROBLEM?
 #include <stdbool.h>
@@ -46,11 +46,14 @@ T malloc(size_t size, bool fakearg=true);
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
-  //collector.update(stamp.filename, stamp.lineNum, type_index(typeid(T)));
-    // insert_type(p, stamp, type_index(typeid(T)));
     unit_log.file = stamp.filename;
     unit_log.line = stamp.lineNum;
-    unit_log.tindex = type_index(typeid(T));
+    unit_log.tindex_name = typeid(T).name();
+
+    // int status;
+
+    // char* demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
+    // tmap[unit_log.tindex_name] = demangled_name;
 
     collector.copy(unit_log);
     return p;
@@ -77,8 +80,8 @@ void* malloc_s(size_t, char*, int);
 }
 #endif
 
-#define SIFTER_NEW MemStamp(__FILE__, __LINE__) * new
+#define SIFTER_NEW MemStamp((__FILE__), (__LINE__)) * new
 #define new SIFTER_NEW
 
-#define malloc(s) malloc_s(s, __FILE__, __LINE__)
+#define malloc(s) malloc_s((s), (__FILE__), (__LINE__))
 #endif          //__MEMHOOK_INTERFACE_H

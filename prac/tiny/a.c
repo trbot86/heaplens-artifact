@@ -1,3 +1,4 @@
+#include "memhook_interface.h"
 // #pragma once
 #include <stdlib.h>
 #include <dlfcn.h>

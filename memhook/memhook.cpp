@@ -180,8 +180,9 @@ extern "C" {
 
     void *malloc_s(size_t size, char* filepath, int line) {
         // printf("%s", filepath);
+        void* ptr = memhook_malloc(size, filepath, line, true);
         collector.copy(unit_log);
-        return memhook_malloc(size, filepath, line, true);
+        return ptr;
     }
 
 
@@ -196,7 +197,7 @@ extern "C" {
 
 ostream& operator << (ostream& os, info_t& info) {
         if(info.file) {
-            os << info.file << "|" << tmap[info.tindex.name()] << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
+            os << info.file << "|" << tmap[info.tindex_name] << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
         }
         else {
             os << "empty" << "|" << "emptytype" << "|" << info.line << "|" << info.timestamp << "|" << 0 << "|" << (long)info.addr << "|" << info.typeofop << endl;

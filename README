@@ -50,9 +50,9 @@ cd ../sifter
 ./step3_dbimport.sh ../test_project_refactored ../test_project_refactored/workload_timed.cpp
 
 cd visual
-python3 cacheline_in_block.py ../../test_project_refactored/allocs.sqlite 4096 64 '1==1'"
-python3 cacheline_in_block.py ../../test_project_refactored/allocs.sqlite 4096 64 'type like \"std::thread\"'"
-python3 cacheline_in_block.py ../../test_project_refactored/allocs.sqlite 2097152 4096 '1==1'"
+python3 cacheline_in_block.py ../../test_project_refactored/allocs.sqlite 4096 64 '1==1'
+python3 cacheline_in_block.py ../../test_project_refactored/allocs.sqlite 4096 64 'type like \"std::thread\"'
+python3 cacheline_in_block.py ../../test_project_refactored/allocs.sqlite 2097152 4096 '1==1'
 
 DEPLOYMENT:
 

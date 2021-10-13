@@ -1,3 +1,4 @@
+#include "memhook_interface.h"
 // ****************************************************************
 // This file is a sample file to test the limits of the tool in C++
 // ****************************************************************
