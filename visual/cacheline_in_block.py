@@ -92,9 +92,15 @@ typedf = pd.read_sql_query(get_typenames, con)
 
 print(typedf)
 
+print("**************")
+
+print(blocklistquery)
+
 blocknodf = pd.read_sql_query(blocklistquery, con)
 
 print(blocknodf)
+
+print("**************")
 
 blockno = input("Enter block number: ")
 

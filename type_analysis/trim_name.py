@@ -29,7 +29,7 @@ def trim_fields(filename):
     df.iloc[:, 2] = df.iloc[:, 2].str.rsplit(':', n=1).str[1]
     # print(df[:50])
 
-    df.to_csv("new_fielddump.txt", index=False, header=None, sep="|")
+    df.to_csv("new_field_dump.txt", index=False, header=None, sep="|")
 
 if __name__ == "__main__":
     trim_allocs(sys.argv[1])

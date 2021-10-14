@@ -15,7 +15,10 @@ def savefiletodb(execstring, numfields, tablename):
 
     con = sqlite3.connect(outfile)
     cur = con.cursor()
-    cur.execute(execstring) # use your column names here
+
+    # drop old table
+    cur.execute("DROP TABLE IF EXISTS " + tablename)
+    cur.execute(execstring)
 
     dr = csv.reader(open(infile,'r'), delimiter='|') # comma is default delimiter
     # to_db = [(i[0], i[1], i[2], i[3], i[4], i[5], i[6]) forfielddump
@@ -31,6 +34,9 @@ def allocswithtypestablefunc(createstring, updatestring):
 
     con = sqlite3.connect(outfile)
     cur = con.cursor()
+    
+    # drop old table
+    cur.execute("DROP TABLE IF EXISTS ALLOCSWITHTYPES")
     cur.execute(createstring) # use your column names here
     cur.execute(updatestring)
 

@@ -1,4 +1,3 @@
-#include "memhook_interface.h"
 #include <iostream>
 #include <new>
 #include <typeinfo>
@@ -91,7 +90,7 @@ int main(){
       // if(inmemory_data_ptr[i][j].file == nullptr)
       // info_dump << "no tindex";
       // else
-      info_dump << (void*)inmemory_data_ptr[i][j].file << "|" << (void*)inmemory_data_ptr[i][j].tindex_name << "|" << inmemory_data_ptr[i][j].line << "|" << inmemory_data_ptr[i][j].timestamp << "|" << inmemory_data_ptr[i][j].size << "|" << inmemory_data_ptr[i][j].addr << "|" << inmemory_data_ptr[i][j].typeofop << endl;
+      info_dump << (void*)inmemory_data_ptr[i][j].file << "|" << (void*)inmemory_data_ptr[i][j].tindex_name << "|" << inmemory_data_ptr[i][j].line << "|" << inmemory_data_ptr[i][j].timestamp << "|" << inmemory_data_ptr[i][j].size << "|" << (long)inmemory_data_ptr[i][j].addr << "|" << inmemory_data_ptr[i][j].typeofop << endl;
     }
   }
 

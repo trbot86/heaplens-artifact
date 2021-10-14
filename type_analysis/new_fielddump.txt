@@ -1,0 +1,244 @@
+std::Access|enum std::access_t|type|4|0
+std::Access|class std::row_t *|orig_row|8|8
+std::Access|class std::row_t *|data|8|16
+std::Access|class std::row_t *|orig_data|8|24
+std::Arena|char *|_buffer|8|0
+std::Arena|int|_size_in_buffer|4|8
+std::Arena|int|_arena_id|4|12
+std::Arena|int|_block_size|4|16
+std::Arena|std::FreeBlock *|_head|8|24
+std::Arena|char [92]|_pad|92|32
+std::DL_detect|int|V|4|0
+std::DL_detect|struct std::DepThd *|dependency|8|8
+std::DL_detect|pthread_mutex_t|_lock|40|16
+std::DepThd|int|adj|4|0
+std::DepThd|pthread_mutex_t|lock|40|8
+std::DepThd|volatile int64_t|txnid|8|48
+std::DepThd|int|num_locks|4|56
+std::DepThd|char|pad|1|60
+std::DetectData|_Bool *|visited|8|0
+std::DetectData|_Bool *|recStack|8|8
+std::DetectData|_Bool|loop|1|16
+std::DetectData|_Bool|onloop|1|17
+std::DetectData|int|loopstart|4|20
+std::DetectData|int|min_lock_num|4|24
+std::DetectData|uint64_t|min_txnid|8|32
+std::Index|int *|index|8|8487824
+std::Index|volatile char [128]|___padding44|128|8487832
+std::InitSplitMixer|uint64_t|s|8|0
+std::LockEntry|enum std::lock_t|type|4|0
+std::LockEntry|class std::txn_man *|txn|8|8
+std::LockEntry|struct std::LockEntry *|next|8|16
+std::LockEntry|struct std::LockEntry *|prev|8|24
+std::Manager|volatile uint64_t *|_epoch|8|0
+std::Manager|std::ts_t *|_last_epoch_update_time|8|8
+std::Manager|pthread_mutex_t|ts_mutex|40|16
+std::Manager|uint64_t *|timestamp|8|56
+std::Manager|pthread_mutex_t [31]|mutexes|1240|64
+std::Manager|volatile std::ts_t *volatile *volatile|all_ts|8|1304
+std::Manager|class std::txn_man **|_all_txns|8|1312
+std::Manager|volatile std::ts_t|_last_min_ts_time|8|1320
+std::Manager|std::ts_t|_min_ts|8|1328
+std::OptCC|volatile _Bool|lock_all|1|0
+std::OptCC|uint64_t|lock_txn_id|8|8
+std::OptCC|class std::set_ent *|history|8|16
+std::OptCC|class std::set_ent *|active|8|24
+std::OptCC|uint64_t|his_len|8|32
+std::OptCC|uint64_t|active_len|8|40
+std::OptCC|volatile uint64_t|tnc|8|48
+std::OptCC|pthread_mutex_t|latch|40|56
+std::PartMan|pthread_mutex_t|latch|40|0
+std::PartMan|class std::txn_man *|owner|8|40
+std::PartMan|class std::txn_man **|waiters|8|48
+std::PartMan|std::UInt32|waiter_cnt|4|56
+std::Plock|class std::PartMan **|part_mans|8|0
+std::Query_queue|class std::Query_thd **|all_queries|8|0
+std::Query_queue|class std::workload *|_wl|8|8
+std::Query_thd|int|q_idx|4|0
+std::Query_thd|class std::tpcc_query *|queries|8|8
+std::Query_thd|char [52]|pad|52|16
+std::Query_thd|struct drand48_data|buffer|24|72
+std::Random64|union std::Random64::(anonymous at ../common/random_xoshiro256p.h:28:5)|(anonymous)|128|0
+std::Random64::(anonymousunion)|volatile char [128]|___padding38|128|0
+std::Random64::(anonymousunion)|uint64_t [4]|s|32|0
+std::Row_lock|pthread_mutex_t *|latch|8|0
+std::Row_lock|_Bool|blatch|1|8
+std::Row_lock|class std::row_t *|_row|8|16
+std::Row_lock|enum std::lock_t|lock_type|4|24
+std::Row_lock|std::UInt32|owner_cnt|4|28
+std::Row_lock|std::UInt32|waiter_cnt|4|32
+std::Row_lock|struct std::LockEntry *|owners|8|40
+std::Row_lock|struct std::LockEntry *|waiters_head|8|48
+std::Row_lock|struct std::LockEntry *|waiters_tail|8|56
+std::Stats|class std::Stats_thd **|_stats|8|0
+std::Stats|class std::Stats_tmp **|tmp_stats|8|8
+std::Stats|double|dl_detect_time|8|16
+std::Stats|double|dl_wait_time|8|24
+std::Stats|uint64_t|cycle_detect|8|32
+std::Stats|uint64_t|deadlock|8|40
+std::Stats_thd|char [64]|_pad2|64|0
+std::Stats_thd|uint64_t|txn_cnt|8|64
+std::Stats_thd|uint64_t|abort_cnt|8|72
+std::Stats_thd|double|run_time|8|80
+std::Stats_thd|class std::Stats_tmp_index [10]|stats_indexes|480|88
+std::Stats_thd|double|time_man|8|568
+std::Stats_thd|double|time_index|8|576
+std::Stats_thd|double|time_wait|8|584
+std::Stats_thd|double|time_abort|8|592
+std::Stats_thd|double|time_cleanup|8|600
+std::Stats_thd|uint64_t|time_ts_alloc|8|608
+std::Stats_thd|double|time_query|8|616
+std::Stats_thd|uint64_t|wait_cnt|8|624
+std::Stats_thd|uint64_t|debug1|8|632
+std::Stats_thd|uint64_t|debug2|8|640
+std::Stats_thd|uint64_t|debug3|8|648
+std::Stats_thd|uint64_t|debug4|8|656
+std::Stats_thd|uint64_t|debug5|8|664
+std::Stats_thd|uint64_t|latency|8|672
+std::Stats_thd|uint64_t *|all_debug1|8|680
+std::Stats_thd|uint64_t *|all_debug2|8|688
+std::Stats_thd|char [64]|_pad|64|696
+std::Stats_tmp|char [64]|_pad2|64|0
+std::Stats_tmp|class std::Stats_tmp_index [10]|stats_indexes|480|64
+std::Stats_tmp|double|time_man|8|544
+std::Stats_tmp|double|time_index|8|552
+std::Stats_tmp|double|time_wait|8|560
+std::Stats_tmp|char [64]|_pad|64|568
+std::Stats_tmp_index|double|timeContains|8|0
+std::Stats_tmp_index|double|timeInsert|8|8
+std::Stats_tmp_index|double|timeRangeQuery|8|16
+std::Stats_tmp_index|uint64_t|numContains|8|24
+std::Stats_tmp_index|uint64_t|numInsert|8|32
+std::Stats_tmp_index|uint64_t|numRangeQuery|8|40
+std::TestTxnMan|class std::TestWorkload *|_wl|8|680
+std::TestWorkload|class std::Index *|the_index|8|24
+std::TestWorkload|class std::table_t *|the_table|8|32
+std::TestWorkload|uint64_t|time|8|40
+std::TxnQEntry|class std::TxnQEntry *|prev|8|0
+std::TxnQEntry|class std::TxnQEntry *|next|8|8
+std::TxnQEntry|class std::txn_man *|txn|8|16
+std::VLLMan|class std::TxnQEntry *|_txn_queue|8|0
+std::VLLMan|class std::TxnQEntry *|_txn_queue_tail|8|8
+std::VLLMan|int|_txn_queue_size|4|16
+std::VLLMan|pthread_mutex_t|_mutex|40|24
+std::_memrecl_counters|volatile char [128]|___padding0|128|0
+std::_memrecl_counters|long|allocated|8|128
+std::_memrecl_counters|long|deallocated|8|136
+std::_memrecl_counters|long|fromPool|8|144
+std::_memrecl_counters|long|toPool|8|152
+std::_memrecl_counters|long|given|8|160
+std::_memrecl_counters|long|taken|8|168
+std::_memrecl_counters|long|retired|8|176
+std::_memrecl_counters|volatile char [128]|___padding1|128|184
+std::base_query|uint64_t|waiting_time|8|8
+std::base_query|uint64_t|part_num|8|16
+std::base_query|uint64_t *|part_to_access|8|24
+std::debugInfo|volatile char [128]|___padding2|128|0
+std::debugInfo|const int|NUM_PROCESSES|4|128
+std::debugInfo|struct std::_memrecl_counters [256]|c|79872|136
+std::debugInfo|volatile char [128]|___padding3|128|80008
+std::free_block|int|size|4|0
+std::free_block|struct free_block *|next|8|8
+std::index_base|volatile char [128]|___padding33|128|8
+std::index_base|char [32768]|initializedThreads|32768|136
+std::index_base|unsigned long long [4096]|numInserts|32768|32904
+std::index_base|unsigned long long [4096]|numReads|32768|65672
+std::index_base|volatile char [128]|___padding34|128|98440
+std::index_base|volatile std::vwlock [1048576]|LockTab|8388608|98568
+std::index_base|volatile char [128]|___padding35|128|8487176
+std::index_base|long long [30]|lockHistogram|240|8487304
+std::index_base|volatile char [128]|___padding36|128|8487544
+std::index_base|uint64_t|debug_init_is_done|8|8487672
+std::index_base|volatile char [128]|___padding37|128|8487680
+std::index_base|std::string|index_name|4|8487808
+std::index_base|int|index_id|4|8487812
+std::index_base|class std::table_t *|table|8|8487816
+std::itemid_t|enum std::Data_type|type|4|0
+std::itemid_t|void *|location|8|8
+std::itemid_t|class std::itemid_t *|next|8|16
+std::itemid_t|_Bool|valid|1|24
+std::mem_alloc|class std::Arena **|_arenas|8|0
+std::mem_alloc|int|_bucket_cnt|4|8
+std::mem_alloc|int *|pid_arena|8|16
+std::mem_alloc|pthread_mutex_t|map_lock|40|24
+std::myrand|uint64_t|seed|8|0
+std::padded_bool|union std::padded_bool::(anonymous at ../common/recordmgr/record_manager.h:157:5)|(anonymous)|128|0
+std::padded_bool::(anonymousunion)|_Bool|v|1|0
+std::padded_bool::(anonymousunion)|char [128]|padding|128|0
+std::row_t|class std::Row_lock *|manager|8|0
+std::row_t|char *|data|8|8
+std::row_t|class std::table_t *|table|8|16
+std::row_t|uint64_t|_primary_key|8|24
+std::row_t|uint64_t|_part_id|8|32
+std::row_t|uint64_t|_row_id|8|40
+std::set_ent|std::UInt64|tn|8|0
+std::set_ent|class std::txn_man *|txn|8|8
+std::set_ent|std::UInt32|set_size|4|16
+std::set_ent|class std::row_t **|rows|8|24
+std::set_ent|class std::set_ent *|next|8|32
+std::thread_t|uint64_t|_thd_id|8|0
+std::thread_t|class std::workload *|_wl|8|8
+std::thread_t|uint64_t|_host_cid|8|16
+std::thread_t|uint64_t|_cur_cid|8|24
+std::thread_t|std::ts_t|_curr_ts|8|32
+std::thread_t|struct drand48_data|buffer|24|40
+std::thread_t|struct std::thread_t::AbortBufferEntry *|_abort_buffer|8|64
+std::thread_t|int|_abort_buffer_size|4|72
+std::thread_t|int|_abort_buffer_empty_slots|4|76
+std::thread_t|_Bool|_abort_buffer_enable|1|80
+std::thread_t::AbortBufferEntry|std::ts_t|ready_time|8|0
+std::thread_t::AbortBufferEntry|class std::base_query *|query|8|8
+std::tpcc_txn_man|class std::tpcc_wl *|_wl|8|680
+std::tpcc_wl|class std::table_t *|t_warehouse|8|24
+std::tpcc_wl|class std::table_t *|t_district|8|32
+std::tpcc_wl|class std::table_t *|t_customer|8|40
+std::tpcc_wl|class std::table_t *|t_history|8|48
+std::tpcc_wl|class std::table_t *|t_neworder|8|56
+std::tpcc_wl|class std::table_t *|t_order|8|64
+std::tpcc_wl|class std::table_t *|t_orderline|8|72
+std::tpcc_wl|class std::table_t *|t_item|8|80
+std::tpcc_wl|class std::table_t *|t_stock|8|88
+std::tpcc_wl|class std::Index *|i_neworder|8|96
+std::tpcc_wl|class std::Index *|i_item|8|104
+std::tpcc_wl|class std::Index *|i_warehouse|8|112
+std::tpcc_wl|class std::Index *|i_district|8|120
+std::tpcc_wl|class std::Index *|i_customer_id|8|128
+std::tpcc_wl|class std::Index *|i_customer_last|8|136
+std::tpcc_wl|class std::Index *|i_stock|8|144
+std::tpcc_wl|class std::Index *|i_order|8|152
+std::tpcc_wl|class std::Index *|i_orderline|8|160
+std::tpcc_wl|class std::Index *|i_orderline_wd|8|168
+std::tpcc_wl|_Bool **|delivering|8|176
+std::tpcc_wl|uint32_t|next_tid|4|184
+std::tpcc_wl|uint64_t|num_wh|8|192
+std::txn_man|class std::thread_t *|h_thd|8|8
+std::txn_man|class std::workload *|h_wl|8|16
+std::txn_man|class std::myrand *|mrand|8|24
+std::txn_man|uint64_t|abort_cnt|8|32
+std::txn_man|pthread_mutex_t|txn_lock|40|40
+std::txn_man|class std::row_t *volatile|cur_row|8|80
+std::txn_man|volatile _Bool|lock_ready|1|88
+std::txn_man|volatile _Bool|lock_abort|1|89
+std::txn_man|volatile _Bool|ts_ready|1|90
+std::txn_man|volatile int|ready_part|4|92
+std::txn_man|uint64_t|start_ts|8|96
+std::txn_man|uint64_t|end_ts|8|104
+std::txn_man|int|row_cnt|4|112
+std::txn_man|int|wr_cnt|4|116
+std::txn_man|class std::Access **|accesses|8|120
+std::txn_man|int|num_accesses_alloc|4|128
+std::txn_man|enum std::TxnType|vll_txn_type|4|132
+std::txn_man|uint64_t|insert_cnt|8|136
+std::txn_man|class std::row_t *[64]|insert_rows|512|144
+std::txn_man|std::txnid_t|txn_id|8|656
+std::txn_man|std::ts_t|timestamp|8|664
+std::txn_man|_Bool|_write_copy_ptr|1|672
+std::workload|int|(anonymous)|4|8
+std::workload|int|(anonymous)|4|12
+std::workload|_Bool|sim_done|1|16
+std::ycsb_txn_man|uint64_t|row_cnt|8|680
+std::ycsb_txn_man|class std::ycsb_wl *|_wl|8|688
+std::ycsb_wl|class std::Index *|the_index|8|24
+std::ycsb_wl|class std::table_t *|the_table|8|32
+std::ycsb_wl|pthread_mutex_t|insert_lock|40|40
+std::ycsb_wl|uint64_t *|perm|8|80
