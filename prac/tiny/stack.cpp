@@ -7,8 +7,6 @@
 #include <immintrin.h>
 #include <random>
 
-#include "memhook_interface.h"
-
 #define THREAD_TEST_NUM 10
 //#include "a.h"
 

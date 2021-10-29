@@ -28,9 +28,10 @@ list of alloc, frees in the following format:
 	typeofop = 0 if free
 NOTE:
 
-Always keep MEMHOOK_MAX_THREADS > 1 as it is highly likely that the parent thread will get slot first,
-and will never give up the only slot if MEMHOOK_MAX_THREADS = 1 as it is the last thread to exit, resulting in infinite loop for
-child threads.
+# THIS HAS CHANGED TO A DIFFERENT MECHANISM AND IS NOW OBSOLETE
+# Always keep MEMHOOK_MAX_THREADS > 1 as it is highly likely that the parent thread will get slot first,
+# and will never give up the only slot if MEMHOOK_MAX_THREADS = 1 as it is the last thread to exit, resulting in infinite loop for
+# child threads.
 
 
 TODO: make a walk through tutorial along these lines with a simple provided test project.

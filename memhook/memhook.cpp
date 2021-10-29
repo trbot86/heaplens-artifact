@@ -132,6 +132,7 @@ void *memhook_malloc(size_t size, char* file, int line, bool log) {
     unit_log.file = file;
     unit_log.line = line;
     // printf("real malloc called!\n");
+
     return mem;
 }
 
@@ -182,6 +183,7 @@ extern "C" {
         // printf("%s", filepath);
         void* ptr = memhook_malloc(size, filepath, line, true);
         collector.copy(unit_log);
+        threadFiles.insert(filepath);
         return ptr;
     }
 
@@ -195,21 +197,21 @@ extern "C" {
     // }
 }
 
-ostream& operator << (ostream& os, info_t& info) {
-        if(info.file) {
-            os << info.file << "|" << tmap[info.tindex_name] << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
-        }
-        else {
-            os << "empty" << "|" << "emptytype" << "|" << info.line << "|" << info.timestamp << "|" << 0 << "|" << (long)info.addr << "|" << info.typeofop << endl;
-        }
-        return os;
-}
+// ostream& operator << (ostream& os, info_t& info) {
+//         if(info.file) {
+//             os << info.file << "|" << tmap[info.tindex_name] << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
+//         }
+//         else {
+//             os << "empty" << "|" << "emptytype" << "|" << info.line << "|" << info.timestamp << "|" << 0 << "|" << (long)info.addr << "|" << info.typeofop << endl;
+//         }
+//         return os;
+// }
 
-void printstats() {
-    for(int i = 0;i < it;i++) {
-        cout << myArray[i];
-    }
-}
+// void printstats() {
+//     for(int i = 0;i < it;i++) {
+//         cout << myArray[i];
+//     }
+// }
 
 /***********************
  * Does periodic dumping of info_t structs to the disk.

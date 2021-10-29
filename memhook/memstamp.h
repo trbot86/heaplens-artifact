@@ -4,7 +4,7 @@
 using namespace std;
 
 struct info_t {
-    char *file;
+    const char *file;
     const char* tindex_name;
     unsigned int line;
     uint64_t timestamp;
@@ -19,9 +19,7 @@ struct info_t {
 class MemStamp
 {
     public:
-    //Why did we do this?
-        // char const * const filename;
-        char *filename;
+        char const *filename;
         int const lineNum;
     public:
         MemStamp(char const *filename, int lineNum);

@@ -39,10 +39,11 @@ struct info_t;
 
 extern MemStampCollector collector;
 extern thread_local info_t unit_log;
+extern thread_local unordered_set<const char*> threadFiles;
 // extern thread_local ThreadExiter exiter;
 
-template <typename T>
-T malloc(size_t size, bool fakearg=true);
+// template <typename T>
+// T malloc(size_t size, bool fakearg=true);
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
@@ -50,10 +51,7 @@ inline T* operator * (const MemStamp &stamp, T *p) {
     unit_log.line = stamp.lineNum;
     unit_log.tindex_name = typeid(T).name();
 
-    // int status;
-
-    // char* demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
-    // tmap[unit_log.tindex_name] = demangled_name;
+    threadFiles.insert(stamp.filename);
 
     collector.copy(unit_log);
     return p;

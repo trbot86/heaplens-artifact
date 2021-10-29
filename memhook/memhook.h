@@ -23,7 +23,7 @@
 
 #define MEMHOOK_BACKTRACE_DEPTH 2
 #ifndef MEMHOOK_MAX_THREADS
-    #define MEMHOOK_MAX_THREADS 8
+    #define MEMHOOK_MAX_THREADS 1000
 #endif
 #define MEMHOOK_MAX_TRACK 1000000
 #define MEMHOOK_MAX_TYPE_LENGTH 1000
@@ -36,8 +36,8 @@ using namespace std;
 struct slot;
 struct info_t;
 class ThreadExiter;
-typedef map<const char*, string> type_map;
-typedef map<const char*, string> filenameset;
+thread_local unordered_set<const char*> threadFiles;
+unordered_set<const char*> globalFiles;
 
 thread_local int thread_first_call = 1;
 thread_local int first_filled_buffer_status = 0;
@@ -98,6 +98,7 @@ memhook_memory_pool::~memhook_memory_pool(){
 	struct thread_record_array * destructor_mem_array = &memory_pool[0];
 
 	char file_path[] = "binary_dump.txt";
+  char fileset_path[] = "fileset_dump.txt";
   //fd = open(file_path,O_WRONLY|O_APPEND|O_CREAT);
 
 	//instead of doing this, the memory_pool array can keep track of cumulative bytes
@@ -106,6 +107,10 @@ memhook_memory_pool::~memhook_memory_pool(){
 		total_byte_count += memory_pool[i].buffer_size_nbytes;
 		write(global_fd, memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
 	}
+
+  for(auto const& i:globalFiles) {
+    cout << "FILE: " << (void*)(i) << endl;
+  }
   //close(fd);
 }
 /*
@@ -145,6 +150,14 @@ void memhook_memory_pool::add(info_t *logarray, int buffer_size_nbytes){
   this->memory_pool.push_back(thread_record_array());
   memory_pool[memory_pool.size() - 1].allocation_log = logarray;
   memory_pool[memory_pool.size() - 1].buffer_size_nbytes = buffer_size_nbytes;
+
+  for(auto const& i : threadFiles) {
+    globalFiles.insert(i);
+  }
+
+  for(auto const& i:globalFiles) {
+    cout << "FILE: " << (void*)(i) << endl;
+  }
 
   pthread_mutex_unlock(&lock);
 }
@@ -201,7 +214,6 @@ inline uint64_t memhook_get_server_clock() {
     return ret;
 }
 
-type_map tmap;
 int get_slot(thread::id id);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);
@@ -303,8 +315,6 @@ MemStampCollector collector;
 int arrayCount = 0;
 
 thread_local bool setup = false;
-
-filenameset fset;
 
 thread_local ThreadExiter exiter;
 #endif
