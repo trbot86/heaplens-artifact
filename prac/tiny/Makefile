@@ -1,5 +1,5 @@
 CC = g++
-#clang++-6.0
+# CC = clang++-6.0
 
 all: test.o byte_reader
 	$(CC) -Wall -g -o bin test.o -L../../memhook/ -Wl,-rpath=../../memhook/ -I../../memhook/ -lpthread -lmemhook -ldl
@@ -17,7 +17,7 @@ stack.o: stack.cpp
 	$(CC) -Wall -pthread -c -g -mrdrnd stack.cpp -I../../memhook/
 
 test.o: test.c
-	$(CC) -c -g test.c -I../../memhook/ -pthread
+	$(CC) -c -g /home/gspathak/sifter/prac/tiny/test.c -I../../memhook/ -pthread
 a.o: a.cpp a.h
 	$(CC) -c -g a.cpp -I../../memhook/
 

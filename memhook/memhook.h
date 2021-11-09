@@ -59,7 +59,7 @@ thread_local int number_of_buffers = 2;
 
 thread_local info_t unit_log;
 
-thread_local int fd;
+thread_local int fileset_fd;
 
 int global_fd;
 
@@ -99,7 +99,8 @@ memhook_memory_pool::~memhook_memory_pool(){
 
 	char file_path[] = "binary_dump.txt";
   char fileset_path[] = "fileset_dump.txt";
-  //fd = open(file_path,O_WRONLY|O_APPEND|O_CREAT);
+  ofstream fileset;
+  fileset.open(fileset_path);
 
 	//instead of doing this, the memory_pool array can keep track of cumulative bytes
 
@@ -109,8 +110,11 @@ memhook_memory_pool::~memhook_memory_pool(){
 	}
 
   for(auto const& i:globalFiles) {
-    cout << "FILE: " << (void*)(i) << endl;
+    cout << "mempool destructor FILE: " << (void*)(i) << " " << i << endl;
+    fileset << (void*)i << "|" << i << endl;
   }
+
+  fileset.close();
   //close(fd);
 }
 /*
@@ -156,7 +160,7 @@ void memhook_memory_pool::add(info_t *logarray, int buffer_size_nbytes){
   }
 
   for(auto const& i:globalFiles) {
-    cout << "FILE: " << (void*)(i) << endl;
+    cout << "FILE: " << (void*)(i) << " " << i << endl;
   }
 
   pthread_mutex_unlock(&lock);
@@ -190,6 +194,7 @@ class ThreadExiter
         }
 
         int unfilled_buffer_size = sizeof(struct info_t)* log_index;
+        //ADD FILE AND TYPES TO MEMPOOL OBJECT
         mem_pool_obj.add(allocation_log[buffer_index], unfilled_buffer_size);
       }
       //close(fd);
