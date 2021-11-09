@@ -129,8 +129,10 @@ void *memhook_malloc(size_t size, char* file, int line, bool log) {
     unit_log.size = size;
     unit_log.addr = mem;
     unit_log.typeofop = true;
-    unit_log.file = file;
-    unit_log.line = line;
+    if(log == true) {
+        unit_log.file = file;
+        unit_log.line = line;
+    }
     // printf("real malloc called!\n");
 
     return mem;
@@ -182,8 +184,8 @@ extern "C" {
     void *malloc_s(size_t size, char* filepath, int line) {
         // printf("%s", filepath);
         void* ptr = memhook_malloc(size, filepath, line, true);
-        collector.copy(unit_log);
         threadFiles.insert(filepath);
+        collector.copy(unit_log);
         return ptr;
     }
 
@@ -296,7 +298,7 @@ extern "C" {
  **********************/
 void * operator new(size_t size) {
 
-    void* mem = memhook_malloc(size == 0?1:size, NULL, 0, true);
+    void* mem = memhook_malloc(size == 0?1:size, NULL, 0, false);
 
     if(mem == 0) {
         throw bad_alloc();
@@ -307,7 +309,7 @@ void * operator new(size_t size) {
 
 void *operator new[] (size_t size) {
 
-    void* mem = memhook_malloc(size == 0?1:size, NULL, 0, true);
+    void* mem = memhook_malloc(size == 0?1:size, NULL, 0, false);
     
     if(mem == 0) {
         throw bad_alloc();
