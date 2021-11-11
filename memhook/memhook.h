@@ -37,6 +37,8 @@ struct slot;
 struct info_t;
 class ThreadExiter;
 thread_local unordered_set<const char*> threadFiles;
+thread_local unordered_set<const char*> typeFiles;
+unordered_set<const char*> globalTypes;
 unordered_set<const char*> globalFiles;
 
 thread_local int thread_first_call = 1;
@@ -92,15 +94,17 @@ memhook_memory_pool::memhook_memory_pool(){
 }
 
 memhook_memory_pool::~memhook_memory_pool(){
-	int total_byte_count = 0;
+	int total_byte_count = 0, status = 0;
 
 	//confirm this method works with trevor
 	struct thread_record_array * destructor_mem_array = &memory_pool[0];
 
 	char file_path[] = "binary_dump.txt";
   char fileset_path[] = "fileset_dump.txt";
-  ofstream fileset;
+  char typeset_path[] = "typeset_dump.txt";
+  ofstream fileset, typeset;
   fileset.open(fileset_path);
+  typeset.open(typeset_path);
 
 	//instead of doing this, the memory_pool array can keep track of cumulative bytes
 
@@ -110,12 +114,15 @@ memhook_memory_pool::~memhook_memory_pool(){
 	}
 
   for(auto const& i:globalFiles) {
-    cout << "mempool destructor FILE: " << (void*)(i) << " " << i << endl;
     fileset << (void*)i << "|" << i << endl;
   }
 
+  for(auto const& i:globalTypes) {
+    typeset << (void*)i << "|" << abi::__cxa_demangle(i, 0, 0, &status) << endl;
+  }
+
   fileset.close();
-  //close(fd);
+  typeset.close();
 }
 /*
 memhook_memory_pool::~memhook_memory_pool(){
@@ -150,7 +157,7 @@ void memhook_memory_pool::add(info_t *logarray, int buffer_size_nbytes){
   // makes sure that calling thread never calls add function again
   //this.memory_pool.push_back(logarray);
 
-  printf("within mem_pool add \n");
+  // printf("within mem_pool add \n");
   this->memory_pool.push_back(thread_record_array());
   memory_pool[memory_pool.size() - 1].allocation_log = logarray;
   memory_pool[memory_pool.size() - 1].buffer_size_nbytes = buffer_size_nbytes;
@@ -159,8 +166,8 @@ void memhook_memory_pool::add(info_t *logarray, int buffer_size_nbytes){
     globalFiles.insert(i);
   }
 
-  for(auto const& i:globalFiles) {
-    cout << "FILE: " << (void*)(i) << " " << i << endl;
+  for(auto const& i : typeFiles) {
+    globalTypes.insert(i);
   }
 
   pthread_mutex_unlock(&lock);
@@ -252,7 +259,7 @@ thread_local int max_retry = 0;
 ostream& operator << (ostream& os, info_t& info);
 
 MemStamp::MemStamp(char const *filename, int lineNum)
-    : filename(nullptr), lineNum(lineNum) { }
+    : filename(filename), lineNum(lineNum) { }
 MemStamp::~MemStamp() { }
 
 MemStampCollector::MemStampCollector() {
@@ -269,7 +276,7 @@ void MemStampCollector::copy(info_t &unit_log){
             allocation_log[i] = (struct info_t*) next_malloc(sizeof(struct info_t)*MEMHOOK_MAX_BUFFER_SIZE);
         }
 
-        printf("%lu \n", sizeof(struct info_t));
+        // printf("%lu \n", sizeof(struct info_t));
         async_struct_array = (struct aiocb*)next_malloc(sizeof(struct aiocb)*number_of_buffers);
         async_api_struct_list = (struct aiocb **)next_malloc(sizeof(struct aiocb*)*1);
 

@@ -15,6 +15,10 @@ bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.p
 bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py new_field_dump.txt allocs.sqlite FIELDS "
 #generate allocs.sqlite MALLOCS
 bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py malloc_type_dump.txt allocs.sqlite MALLOCS "
+#generate allocs.sqlite FILEMAP
+bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py fileset_dump.txt allocs.sqlite FILEMAP "
+#generate allocs.sqlite TYPEMAP
+bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py typeset_dump.txt allocs.sqlite TYPEMAP "
 #update allocs.sqlite
 bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py filename allocs.sqlite ALLOCSWITHTYPES "
 #run visualisation scripts

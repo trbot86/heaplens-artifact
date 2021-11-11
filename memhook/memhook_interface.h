@@ -28,8 +28,6 @@ using namespace std;
 
 #define PADDING 64
 
-// void* (*orig_malloc)(size_t);
-
 struct slot;
 struct info_t;
 
@@ -40,7 +38,7 @@ struct info_t;
 extern MemStampCollector collector;
 extern thread_local info_t unit_log;
 extern thread_local unordered_set<const char*> threadFiles;
-// extern thread_local ThreadExiter exiter;
+extern thread_local unordered_set<const char*> typeFiles;
 
 // template <typename T>
 // T malloc(size_t size, bool fakearg=true);
@@ -51,7 +49,8 @@ inline T* operator * (const MemStamp &stamp, T *p) {
     unit_log.line = stamp.lineNum;
     unit_log.tindex_name = typeid(T).name();
 
-    threadFiles.insert(stamp.filename);
+    threadFiles.insert(unit_log.file);
+    typeFiles.insert(unit_log.tindex_name);
 
     collector.copy(unit_log);
     return p;
@@ -74,12 +73,12 @@ extern "C" {
 
 void* malloc_s(size_t, char*, int);
 
+#define SIFTER_NEW MemStamp((__FILE__), (__LINE__)) * new
+#define new SIFTER_NEW
+
 #ifdef __cplusplus
 }
 #endif
-
-#define SIFTER_NEW MemStamp((__FILE__), (__LINE__)) * new
-#define new SIFTER_NEW
 
 #define malloc(s) malloc_s((s), (__FILE__), (__LINE__))
 #endif          //__MEMHOOK_INTERFACE_H

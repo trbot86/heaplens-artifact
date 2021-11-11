@@ -47,6 +47,8 @@ if __name__ == "__main__":
     createfieldstable = "CREATE TABLE FIELDS(CLASS CHAR(100), TYPE CHAR(100) NOT NULL, FIELD CHAR (100), SIZE INT, OFFSET INT, PRIMARY KEY (CLASS, TYPE, FIELD));"
     createallocstable = "CREATE TABLE ALLOCS(FILE CHAR(50)    NOT NULL, TYPE CHAR(100), LINE INT    NOT NULL, TIMESTAMP INT  NOT NULL, SIZE INT, ADDRESS INT    NOT NULL, isNew INT NOT NULL);"
     createmallocstable = "CREATE TABLE MALLOCS(FILE CHAR(50)    NOT NULL, LINE INT    NOT NULL,TYPE CHAR(50) NOT NULL);"
+    createfilemaptable = "CREATE TABLE FILEMAP(FILEPTR CHAR(100) NOT NULL, FILE CHAR(100));"
+    createtypemaptable = "CREATE TABLE TYPEMAP(TYPEPTR CHAR(100) NOT NULL, TYPE CHAR(100));"
     createallocswithtypetable = "create table ALLOCSWITHTYPES as \
         select t1.file, t1.type, t2.type as malloctype, t1.line, t1.TIMESTAMP, t1.size, t1.ADDRESS, t1.isNew \
         from allocs t1 left join mallocs t2 on t1.file = t2.file and t1.line = t2.line"
@@ -60,5 +62,9 @@ if __name__ == "__main__":
         savefiletodb(createallocstable, 7, "ALLOCS")
     elif sys.argv[3] == "MALLOCS":
         savefiletodb(createmallocstable, 3, "MALLOCS")
+    elif sys.argv[3] == "FILEMAP":
+        savefiletodb(createfilemaptable, 2, "FILEMAP")
+    elif sys.argv[3] == "TYPEMAP":
+        savefiletodb(createtypemaptable, 2, "TYPEMAP")
     elif sys.argv[3] == "ALLOCSWITHTYPES":
         allocswithtypestablefunc(createallocswithtypetable, updateallocswithtypetable)
