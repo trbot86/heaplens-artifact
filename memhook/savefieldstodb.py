@@ -28,7 +28,7 @@ def savefiletodb(execstring, numfields, tablename):
     con.commit()
     con.close()
 
-def allocswithtypestablefunc(createstring, updatestring):
+def updatetable(createstring, updatestring, tablename, drop):
     infile = sys.argv[1]
     outfile = sys.argv[2]
 
@@ -36,8 +36,10 @@ def allocswithtypestablefunc(createstring, updatestring):
     cur = con.cursor()
     
     # drop old table
-    cur.execute("DROP TABLE IF EXISTS ALLOCSWITHTYPES")
-    cur.execute(createstring) # use your column names here
+    if drop == True:
+        cur.execute("DROP TABLE IF EXISTS " + tablename)
+    if createstring:
+        cur.execute(createstring) # use your column names here
     cur.execute(updatestring)
 
     con.commit()
@@ -49,6 +51,14 @@ if __name__ == "__main__":
     createmallocstable = "CREATE TABLE MALLOCS(FILE CHAR(50)    NOT NULL, LINE INT    NOT NULL,TYPE CHAR(50) NOT NULL);"
     createfilemaptable = "CREATE TABLE FILEMAP(FILEPTR CHAR(100) NOT NULL, FILE CHAR(100));"
     createtypemaptable = "CREATE TABLE TYPEMAP(TYPEPTR CHAR(100) NOT NULL, TYPE CHAR(100));"
+    updateallocstablewithfile = "replace into ALLOCS \
+        (ROWID, file, type, line, TIMESTAMP, address, isNew, size) \
+        select allocs.rowid, filemap.file, allocs.type, allocs.line, allocs.TIMESTAMP, allocs.ADDRESS, allocs.isNew, allocs.SIZE \
+        from allocs left join filemap on allocs.file = filemap.FILEPTR;"
+    updateallocstablewithtype = "replace into ALLOCS \
+        (ROWID, file, type, line, TIMESTAMP, address, isNew, size) \
+        select allocs.rowid, allocs.file, typemap.type, allocs.line, allocs.TIMESTAMP, allocs.ADDRESS, allocs.isNew, allocs.SIZE \
+        from allocs left join typemap on allocs.type = typemap.TYPEPTR;"
     createallocswithtypetable = "create table ALLOCSWITHTYPES as \
         select t1.file, t1.type, t2.type as malloctype, t1.line, t1.TIMESTAMP, t1.size, t1.ADDRESS, t1.isNew \
         from allocs t1 left join mallocs t2 on t1.file = t2.file and t1.line = t2.line"
@@ -66,5 +76,9 @@ if __name__ == "__main__":
         savefiletodb(createfilemaptable, 2, "FILEMAP")
     elif sys.argv[3] == "TYPEMAP":
         savefiletodb(createtypemaptable, 2, "TYPEMAP")
+    elif sys.argv[3] == "UPDATEALLOCSWITHFILE":
+        updatetable("", updateallocstablewithfile, "ALLOCS", False)
+    elif sys.argv[3] == "UPDATEALLOCSWITHTYPE":
+        updatetable("", updateallocstablewithtype, "ALLOCS", False)
     elif sys.argv[3] == "ALLOCSWITHTYPES":
-        allocswithtypestablefunc(createallocswithtypetable, updateallocswithtypetable)
+        updatetable(createallocswithtypetable, updateallocswithtypetable, "ALLOCSWITHTYPES", True)

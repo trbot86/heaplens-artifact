@@ -1,44 +1,28 @@
 [
     {
         "arguments": [
-            "clang++",
+            "clang",
             "-c",
-            "-I/usr/lib/llvm-10/include",
-            "-std=c++14",
-            "-fno-exceptions",
-            "-D_GNU_SOURCE",
-            "-D__STDC_CONSTANT_MACROS",
-            "-D__STDC_FORMAT_MACROS",
-            "-D__STDC_LIMIT_MACROS",
-            "-Wno-unknown-warning-option",
             "-g",
+            "-I../memhook/",
             "-o",
-            "tool",
-            "clang_parser.cpp"
+            "header_c",
+            "header.c"
         ],
-        "directory": "/home/gpathak/sifter/type_analysis",
-        "file": "clang_parser.cpp"
+        "directory": "/home/gspathak/sifter/type_analysis",
+        "file": "header.c"
     },
     {
         "arguments": [
             "clang++",
             "-c",
-            "-I/usr/lib/llvm-10/include",
-            "-std=c++14",
-            "-fno-exceptions",
-            "-D_GNU_SOURCE",
-            "-D__STDC_CONSTANT_MACROS",
-            "-D__STDC_FORMAT_MACROS",
-            "-D__STDC_LIMIT_MACROS",
-            "-DMTDFNAME=\"_mm_malloc\"",
-            "-DDEBUG",
-            "-Wno-unknown-warning-option",
             "-g",
+            "-I../memhook/",
             "-o",
-            "malloctypedumper",
-            "malloctypedumper.cpp"
+            "header",
+            "header.cpp"
         ],
-        "directory": "/home/gpathak/sifter/type_analysis",
-        "file": "malloctypedumper.cpp"
+        "directory": "/home/gspathak/sifter/type_analysis",
+        "file": "header.cpp"
     }
 ]

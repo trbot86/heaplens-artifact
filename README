@@ -11,10 +11,6 @@ prone in case where the condensed name matches a user specified class such as lo
 won't work without condensed naming (You'll keep wondering why the tools won't work).
 --> malloc type matching depends on file and line number of malloc call. If absolute file path is not used, then malloc type matching can fail.
 
-TODO:
--- Integrate the source_refactor tool and memhook with large projects.
--- ****URGENT**** Add periodic dumping policy, compression of info_t struct
-
 List of file uses:
 memhook.* : The main hook containing the overloaded alloc, dealloc calls with integrated tracking support.
 type_analysis:
@@ -32,9 +28,6 @@ NOTE:
 # Always keep MEMHOOK_MAX_THREADS > 1 as it is highly likely that the parent thread will get slot first,
 # and will never give up the only slot if MEMHOOK_MAX_THREADS = 1 as it is the last thread to exit, resulting in infinite loop for
 # child threads.
-
-
-TODO: make a walk through tutorial along these lines with a simple provided test project.
 
 ## start in sifter/
 
@@ -84,8 +77,8 @@ In this example ../setbench_master/lib/libjemalloc.so is a relative path to an i
 DETAILED WORKFLOW (for general projects):
 1. Copy your project into prac
 2. Run static analysis to generate malloc_type_dump.txt, fielddump.txt, typedump.txt
-	./malloctypdumper <name of mainfile>.c/cpp
-	./refactor <name of mainfile>.c/cpp
+	./malloctypdumper compile_commands.json
+	././fieldandtypedumper <name of mainfile>.c/cpp
 3. Integrate memhook into project by changing Makefile, and adding memhook_interface.h in each c/cpp/h file.
 4. Compile and run project.
 5. Trim names of object types:

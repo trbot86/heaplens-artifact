@@ -1,4 +1,3 @@
-#include "memhook_interface.h"
 // ****************************************************************
 // This file is a sample file to test the limits of the tool in C++
 // ****************************************************************
@@ -10,7 +9,7 @@
 // #include <iostream>
 #include <stdlib.h>
 #include "header.h"
-#include "memhook_interface.h"
+// #include "memhook_interface.h"
 // #include <string>
 // #include <bits/stdc++.h>
 // using namespace std;

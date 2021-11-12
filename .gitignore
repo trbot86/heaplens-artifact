@@ -19,3 +19,8 @@ bin
 bin/
 .vscode
 .vscode/
+malloc_type_dump.txt
+fielddump.txt
+typedump.txt
+fileset_dump.txt
+typeset_dump.txt
