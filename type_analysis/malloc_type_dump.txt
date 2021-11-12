@@ -1,4 +1,0 @@
-/home/gspathak/sifter/type_analysis/header.cpp|86|int
-/home/gspathak/sifter/type_analysis/header.cpp|88|int
-/home/gspathak/sifter/type_analysis/header.cpp|90|int
-/home/gspathak/sifter/type_analysis/header.cpp|91|struj

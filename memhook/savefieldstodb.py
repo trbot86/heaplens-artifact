@@ -51,6 +51,7 @@ if __name__ == "__main__":
     createmallocstable = "CREATE TABLE MALLOCS(FILE CHAR(50)    NOT NULL, LINE INT    NOT NULL,TYPE CHAR(50) NOT NULL);"
     createfilemaptable = "CREATE TABLE FILEMAP(FILEPTR CHAR(100) NOT NULL, FILE CHAR(100));"
     createtypemaptable = "CREATE TABLE TYPEMAP(TYPEPTR CHAR(100) NOT NULL, TYPE CHAR(100));"
+    trimtypestable = "UPDATE TYPEMAP SET TYPE = REPLACE(TYPE, ' ', '')"
     updateallocstablewithfile = "replace into ALLOCS \
         (ROWID, file, type, line, TIMESTAMP, address, isNew, size) \
         select allocs.rowid, filemap.file, allocs.type, allocs.line, allocs.TIMESTAMP, allocs.ADDRESS, allocs.isNew, allocs.SIZE \
@@ -76,6 +77,7 @@ if __name__ == "__main__":
         savefiletodb(createfilemaptable, 2, "FILEMAP")
     elif sys.argv[3] == "TYPEMAP":
         savefiletodb(createtypemaptable, 2, "TYPEMAP")
+        updatetable("", trimtypestable, "TYPEMAP", False)
     elif sys.argv[3] == "UPDATEALLOCSWITHFILE":
         updatetable("", updateallocstablewithfile, "ALLOCS", False)
     elif sys.argv[3] == "UPDATEALLOCSWITHTYPE":
