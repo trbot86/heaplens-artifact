@@ -29,6 +29,7 @@
 #include <clang/Frontend/FrontendActions.h>
 // #include <clang/Rewrite/Core/Rewriter.h>
 #include <clang/Tooling/CommonOptionsParser.h>
+#include <clang/Tooling/JSONCompilationDatabase.h>
 #include <clang/Tooling/Tooling.h>
 #include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
@@ -203,10 +204,10 @@ public:
 
 int main(int argc, const char **argv)
 {
-  CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
-
-  ClangTool Tool(OptionsParser.getCompilations(),
-                 OptionsParser.getSourcePathList());
+  string errMsg;
+  auto compDatabase = JSONCompilationDatabase::loadFromFile(argv[1], errMsg, JSONCommandLineSyntax::AutoDetect);
+  ClangTool Tool(*compDatabase,
+                 compDatabase->getAllFiles());
 
   ClassnamePrinter cp;
   // TemplatedClassPrinter tcp;
