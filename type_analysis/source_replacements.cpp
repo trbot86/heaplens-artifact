@@ -1,4 +1,3 @@
-#include "memhook_interface.h"
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>
@@ -20,6 +19,7 @@
 #include <clang/Tooling/JSONCompilationDatabase.h>
 //
 #include <clang/Tooling/Refactoring.h>
+#include <clang/Tooling/Core/Replacement.h>
 #include <clang/Tooling/Tooling.h>
 #include <llvm/Support/raw_ostream.h>
 
@@ -64,6 +64,35 @@ private:
   Replacements *Replace;
 };
 
+class CStyleAllocPrinter : public MatchFinder::MatchCallback {
+  public:
+    CStyleAllocPrinter(Replacements *Replace) : Replace(Replace) {}
+
+    virtual void run(const MatchFinder::MatchResult &Result) {
+      //ASTContext* context = Result.Context;
+
+      // const CallExpr* callex = Result.Nodes.getNodeAs<CallExpr>("callex");
+      const ExplicitCastExpr* castex = Result.Nodes.getNodeAs<ExplicitCastExpr>("castex");
+      const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
+
+      Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 0, "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
+      Replace->add(Rep);
+
+      //Print various metadata
+      // cout << "malloc" << endl;
+      /*cout << castex->getCastKindName() << endl;
+        cout << castex->getSubExprAsWritten()->getType().getAsString() << endl;
+        cout << castex->getTypeInfoAsWritten()->getType().getAsString() << endl;
+        SourceLocation sl = castex->getLocStart();
+        sl.dump(context->getSourceManager());
+      */
+
+    }
+
+  private:
+    Replacements *Replace;
+};
+
 void copyFile(const std::string &src, const std::string &dst)
 {
   std::ifstream source(src, std::ios::binary);
@@ -97,8 +126,11 @@ int main(int argc, const char **argv)
     replacementsToUse = &(Tool.getReplacements()[src]);
 
     // Set up AST matcher callbacks.
-    IfStmtHandler HandlerForIf(replacementsToUse);
-    Finder.addMatcher(ifStmt(unless(isExpansionInSystemHeader())).bind("ifStmt"), &HandlerForIf);
+    // IfStmtHandler HandlerForIf(replacementsToUse);
+    // Finder.addMatcher(ifStmt(unless(isExpansionInSystemHeader())).bind("ifStmt"), &HandlerForIf);
+
+    CStyleAllocPrinter HandlerForAllocs(replacementsToUse);
+    Finder.addMatcher(CStyleMallocMatcher, &HandlerForAllocs);
 
     // Run the tool and collect a list of replacements. We could call runAndSave,
     // which would destructively overwrite the files with their new contents.

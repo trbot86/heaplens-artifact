@@ -3,7 +3,7 @@ C_CC=clang
 Includes=`llvm-config-10 --cxxflags --ldflags`
 Includes_2= 
 LLVMLIBS=`llvm-config-10 --libs --system-libs`
-CLANGLIBS=-Wno-unknown-warning-option -lclangTooling -lclangFrontendTool -lclangFrontend -lclangDriver -lclangSerialization -lclangCodeGen -lclangParse -lclangSema -lclangStaticAnalyzerFrontend -lclangStaticAnalyzerCheckers -lclangStaticAnalyzerCore -lclangAnalysis -lclangARCMigrate -lclangRewrite -lclangRewriteFrontend -lclangEdit -lclangAST -lclangASTMatchers -lclangLex -lclangBasic -lclang
+CLANGLIBS=-Wno-unknown-warning-option -lclangTooling -lclangFrontendTool -lclangFrontend -lclangDriver -lclangSerialization -lclangCodeGen -lclangParse -lclangSema -lclangStaticAnalyzerFrontend -lclangStaticAnalyzerCheckers -lclangStaticAnalyzerCore -lclangAnalysis -lclangARCMigrate -lclangRewrite -lclangRewriteFrontend -lclangEdit -lclangAST -lclangASTMatchers -lclangApplyReplacements -lclangLex -lclangBasic -lclang
 
 all: fieldandtypedumper malloctypedumper header_c header
 
@@ -11,6 +11,9 @@ run:
 	./tool header.cpp
 
 .PHONY: parser malloctypedumper clean run all
+
+byte_reader: byte_rw.cpp
+	$(CC) byte_rw.cpp -g -o byte_rw
 
 fieldandtypedumper: clang_parser.cpp
 	$(CC) $(Includes) clang_parser.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o fieldandtypedumper

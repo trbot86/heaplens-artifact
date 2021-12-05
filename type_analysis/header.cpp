@@ -4,7 +4,7 @@
 
 // #include <iostream>
 #include <stdlib.h>
-// #include "memhook_interface.h"
+#include "memhook_interface.h"
 // #include <string>
 // #include <bits/stdc++.h>
 // using namespace std;
@@ -40,6 +40,15 @@ public:
   // bool f;
   // long long arr[100];
   T g;
+};
+
+class mem_alloc {
+  public:
+  void* alloc(size_t size) {
+    void* ptr;
+    ptr = malloc(size);
+    return ptr;
+  }
 };
 
 // #define CLASS myClass<int>
@@ -90,8 +99,6 @@ int main() {
   int* s = (int*)malloc(100);
   struj* z = (struj *)malloc(sizeof(sjj.stj));
 
-  int * abc;
-  abc = malloc(100);
   // t += 0x5;
   // printf("%d", t);
   // float* g = (float*)func();
@@ -100,6 +107,8 @@ int main() {
   // MyClass<float>* mclass = (MyClass<float>*)malloc<MyClass<float>>(8);
   MyClass<float>* mc2 = new MyClass<float>;
 
+  mem_alloc m;
+  m.alloc(sizeof(char));
   // newclass<float>* n = new newclass<float>;
   // n.x = 0;
   // MyClass<int>* mc2 = new MyClass<int>;

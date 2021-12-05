@@ -20,11 +20,11 @@ bash -c "cd prac/setbench/macrobench/; ../../tiny/byte_rw.bin binary_dump.txt "
 #generate allocs.sqlite table ALLOCS
 bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py info_dump allocs.sqlite ALLOCS "
 
-# #generate allocs.sqlite FIELDS
-# bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py new_field_dump.txt allocs.sqlite FIELDS "
+#generate allocs.sqlite FIELDS
+bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py new_field_dump.txt allocs.sqlite FIELDS "
 
-# #generate allocs.sqlite MALLOCS
-# bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py malloc_type_dump.txt allocs.sqlite MALLOCS "
+#generate allocs.sqlite MALLOCS
+bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py malloc_type_dump.txt allocs.sqlite MALLOCS "
 
 #generate allocs.sqlite FILEMAP
 bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py fileset_dump.txt allocs.sqlite FILEMAP "
