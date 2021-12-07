@@ -97,3 +97,5 @@ DETAILED WORKFLOW (for general projects):
 
 FUTURE DIRECTIONS, NOTES:
 dump ast for easy traversal.
+
+(find /lib/llvm-10/lib/ -type f -name "*.a" -exec nm --print-file-name "{}" \;) 2>1 | grep IncludeCategoryManager
