@@ -14,9 +14,11 @@
 #include <clang/Frontend/FrontendActions.h>
 #include <clang/Frontend/TextDiagnosticPrinter.h>
 #include <clang/Rewrite/Core/Rewriter.h>
+#include <clang/Format/Format.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 //
 #include <clang/Tooling/JSONCompilationDatabase.h>
+#include <clang/Tooling/Inclusions/HeaderIncludes.h>
 //
 #include <clang/Tooling/Refactoring.h>
 #include <clang/Tooling/Core/Replacement.h>
@@ -49,13 +51,13 @@ public:
       const Stmt *Then = IfS->getThen();
       Replacement Rep(*(Result.SourceManager), Then->getBeginLoc(), 0,
                       "// the 'if' part\n");
-      Replace->add(Rep);
+      auto err = Replace->add(Rep);
 
       if (const Stmt *Else = IfS->getElse())
       {
         Replacement Rep(*(Result.SourceManager), Else->getEndLoc(), 0,
                         "// the 'else' part\n");
-        Replace->add(Rep);
+        auto err = Replace->add(Rep);
       }
     }
   }
@@ -76,7 +78,7 @@ class CStyleAllocPrinter : public MatchFinder::MatchCallback {
       const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
 
       Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 0, "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
-      Replace->add(Rep);
+      auto err = Replace->add(Rep);
 
       //Print various metadata
       // cout << "malloc" << endl;
