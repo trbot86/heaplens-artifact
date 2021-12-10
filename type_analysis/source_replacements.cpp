@@ -35,64 +35,145 @@ static llvm::cl::OptionCategory ToolingSampleCategory("Tooling Sample");
 StatementMatcher CStyleMallocMatcher =
     // declRefExpr(hasDeclaration(functionDecl(hasName("malloc"))))
     // explicitCastExpr(isExpansionInMainFile(), hasDescendant(callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray"))))).bind("callex"))).bind("castex");
-    explicitCastExpr(hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName("malloc")))).bind("malloc"))).bind("castex");
+    explicitCastExpr(hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName(MTDFNAME)))).bind("malloc"))).bind("castex");
 
-class IfStmtHandler : public MatchFinder::MatchCallback
+StatementMatcher sizeofMallocMatcher =
+    expr(sizeOfExpr(allOf(hasAncestor(callExpr(callee(functionDecl(hasName(MTDFNAME)))).bind("sizeofmalloc")),
+                          hasArgumentOfType(hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type"))))));
+
+//matches malloc lhs without explicit casts
+StatementMatcher lhsofMallocMatcher =
+    binaryOperator(hasOperatorName("="), anyOf(hasDescendant(callExpr(callee(functionDecl(hasName(MTDFNAME)))).bind("lhsmalloc")), hasRHS(hasDescendant(callExpr(callee(functionDecl(hasName(MTDFNAME)))).bind("lhsmalloc")))),
+                   hasLHS(hasType(type().bind("lhs-type"))));
+
+DeclarationMatcher declMallocMatcher =
+    varDecl(hasDescendant(callExpr(callee(functionDecl(hasName(MTDFNAME)))).bind("declmalloc")),
+            hasType(type().bind("decltype")));
+
+class CStyleAllocPrinter : public MatchFinder::MatchCallback
 {
 public:
-  IfStmtHandler(Replacements *Replace) : Replace(Replace) {}
+  CStyleAllocPrinter(Replacements *Replace) : Replace(Replace) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
-    std::cout << "in the callback" << std::endl;
-    // The matched 'if' statement was bound to 'ifStmt'.
-    if (const IfStmt *IfS = Result.Nodes.getNodeAs<clang::IfStmt>("ifStmt"))
-    {
-      const Stmt *Then = IfS->getThen();
-      Replacement Rep(*(Result.SourceManager), Then->getBeginLoc(), 0,
-                      "// the 'if' part\n");
-      auto err = Replace->add(Rep);
+    //ASTContext* context = Result.Context;
 
-      if (const Stmt *Else = IfS->getElse())
-      {
-        Replacement Rep(*(Result.SourceManager), Else->getEndLoc(), 0,
-                        "// the 'else' part\n");
-        auto err = Replace->add(Rep);
-      }
-    }
+    // const CallExpr* callex = Result.Nodes.getNodeAs<CallExpr>("callex");
+    const ExplicitCastExpr *castex = Result.Nodes.getNodeAs<ExplicitCastExpr>("castex");
+    const DeclRefExpr *mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
+
+    // SourceLocation s = mnode->getBeginLoc();
+    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 5, "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
+    // auto err = Replace->add(Rep);
+
+    //Print various metadata
+    // cout << "malloc" << endl;
+    /*cout << castex->getCastKindName() << endl;
+        cout << castex->getSubExprAsWritten()->getType().getAsString() << endl;
+        cout << castex->getTypeInfoAsWritten()->getType().getAsString() << endl;
+        SourceLocation sl = castex->getLocStart();
+        sl.dump(context->getSourceManager());
+      */
   }
 
 private:
   Replacements *Replace;
 };
 
-class CStyleAllocPrinter : public MatchFinder::MatchCallback {
+class sizeOfMallocPrinter : public MatchFinder::MatchCallback {
   public:
-    CStyleAllocPrinter(Replacements *Replace) : Replace(Replace) {}
+  sizeOfMallocPrinter(Replacements *Replace) : Replace(Replace) {}
 
-    virtual void run(const MatchFinder::MatchResult &Result) {
-      //ASTContext* context = Result.Context;
+  virtual void run(const MatchFinder::MatchResult &Result) {
+    const clang::CallExpr* mnode = Result.Nodes.getNodeAs<clang::CallExpr>("sizeofmalloc");
+    const clang::Type* typenode = Result.Nodes.getNodeAs<clang::Type>("sizeof-arg-type");
 
-      // const CallExpr* callex = Result.Nodes.getNodeAs<CallExpr>("callex");
-      const ExplicitCastExpr* castex = Result.Nodes.getNodeAs<ExplicitCastExpr>("castex");
-      const DeclRefExpr* mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
+    std::string type;
 
-      Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 0, "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
-      auto err = Replace->add(Rep);
+    static PrintingPolicy print_policy((Result.Context)->getLangOpts());
+    print_policy.FullyQualifiedName = 1;
+    print_policy.SuppressScope = 0;
 
-      //Print various metadata
-      // cout << "malloc" << endl;
-      /*cout << castex->getCastKindName() << endl;
-        cout << castex->getSubExprAsWritten()->getType().getAsString() << endl;
-        cout << castex->getTypeInfoAsWritten()->getType().getAsString() << endl;
-        SourceLocation sl = castex->getLocStart();
-        sl.dump(context->getSourceManager());
-      */
-
+    if(typenode->isBuiltinType()) {
+      type = typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy);
+    }
+    else if(typenode->isRecordType()) {
+      type = typenode->getAsRecordDecl()->getQualifiedNameAsString();
+    }
+    else if(typenode->isPointerType()) {
+      type = typenode->getPointeeType().getAsString();
     }
 
+    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 0, "<" + type + ">");
+    auto err = Replace->add(Rep);
+  }
+
   private:
-    Replacements *Replace;
+  Replacements *Replace;
+};
+
+//Handler for lhs of malloc expressions
+class lhsOfMallocPrinter : public MatchFinder::MatchCallback {
+  public:
+
+  virtual void run(const MatchFinder::MatchResult &Result) {
+    const clang::CallExpr* mnode = Result.Nodes.getNodeAs<clang::CallExpr>("lhsmalloc");
+    const clang::Type* typenode = Result.Nodes.getNodeAs<clang::Type>("lhs-type");
+
+    std::string type;
+
+    static PrintingPolicy print_policy((Result.Context)->getLangOpts());
+    print_policy.FullyQualifiedName = 1;
+    print_policy.SuppressScope = 0;
+
+    if(typenode->isBuiltinType()) {
+      type = typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy);
+    }
+    else if(typenode->isRecordType()) {
+      type = typenode->getAsRecordDecl()->getQualifiedNameAsString();
+    }
+    else if(typenode->isPointerType()) {
+      type = typenode->getPointeeType().getAsString();
+    }
+
+    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 0, "<" + type + ">");
+    auto err = Replace->add(Rep);
+  }
+
+  private:
+  Replacements *Replace;
+};
+
+class declMallocPrinter : public MatchFinder::MatchCallback {
+  public:
+
+  virtual void run(const MatchFinder::MatchResult &Result) {
+    const clang::CallExpr* mnode = Result.Nodes.getNodeAs<clang::CallExpr>("declmalloc");
+    const clang::Type* typenode = Result.Nodes.getNodeAs<clang::Type>("decltype");
+
+    std::string type;
+
+    static PrintingPolicy print_policy((Result.Context)->getLangOpts());
+    print_policy.FullyQualifiedName = 1;
+    print_policy.SuppressScope = 0;
+
+    if(typenode->isBuiltinType()) {
+      type = typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy);
+    }
+    else if(typenode->isRecordType()) {
+      type = typenode->getAsRecordDecl()->getQualifiedNameAsString();
+    }
+    else if(typenode->isPointerType()) {
+      type = typenode->getPointeeType().getAsString();
+    }
+
+    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 0, "<" + type + ">");
+    auto err = Replace->add(Rep);
+  }
+
+  private:
+  Replacements *Replace;
 };
 
 void copyFile(const std::string &src, const std::string &dst)
@@ -133,6 +214,9 @@ int main(int argc, const char **argv)
 
     CStyleAllocPrinter HandlerForAllocs(replacementsToUse);
     Finder.addMatcher(CStyleMallocMatcher, &HandlerForAllocs);
+    Finder.addMatcher(sizeofMallocMatcher, &HandlerForAllocs);
+    Finder.addMatcher(lhsofMallocMatcher, &HandlerForAllocs);
+    Finder.addMatcher(declMallocMatcher, &HandlerForAllocs);
 
     // Run the tool and collect a list of replacements. We could call runAndSave,
     // which would destructively overwrite the files with their new contents.
@@ -150,27 +234,6 @@ int main(int argc, const char **argv)
       llvm::outs() << r.toString() << "\n";
     }
 
-    // // We need a SourceManager to set up the Rewriter.
-    // IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
-    // DiagnosticsEngine Diagnostics(
-    //     IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
-    //     new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts), true);
-    // SourceManager Sources(Diagnostics, Tool.getFiles());
-
-    // // Apply all replacements to a rewriter.
-    // Rewriter Rewrite(Sources, LangOptions());
-    // Tool.applyAllReplacements(Rewrite);
-
-    // // Query the rewriter for all the files it has rewritten, dumping their new
-    // // contents to stdout.
-    // for (Rewriter::buffer_iterator I = Rewrite.buffer_begin(),
-    //                                E = Rewrite.buffer_end();
-    //      I != E; ++I)
-    // {
-    //   const FileEntry *Entry = Sources.getFileEntryForID(I->first);
-    //   llvm::outs() << "Rewrite buffer for file: " << Entry->getName() << "\n";
-    //   I->second.write(llvm::outs());
-    // }
   }
 
   return 0;

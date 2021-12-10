@@ -4,7 +4,6 @@
 
 // #include <iostream>
 #include <stdlib.h>
-#include "memhook_interface.h"
 // #include <string>
 // #include <bits/stdc++.h>
 // using namespace std;
