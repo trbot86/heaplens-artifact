@@ -21,7 +21,7 @@
 #include <clang/Tooling/Inclusions/HeaderIncludes.h>
 //
 #include <clang/Tooling/Refactoring.h>
-#include <clang/Tooling/Core/Replacement.h>
+// #include <clang/Tooling/Core/Replacement.h>
 #include <clang/Tooling/Tooling.h>
 #include <llvm/Support/raw_ostream.h>
 
@@ -35,7 +35,8 @@ static llvm::cl::OptionCategory ToolingSampleCategory("Tooling Sample");
 StatementMatcher CStyleMallocMatcher =
     // declRefExpr(hasDeclaration(functionDecl(hasName("malloc"))))
     // explicitCastExpr(isExpansionInMainFile(), hasDescendant(callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray"))))).bind("callex"))).bind("castex");
-    explicitCastExpr(hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName(MTDFNAME)))).bind("malloc"))).bind("castex");
+    // explicitCastExpr(hasDescendant(declRefExpr(hasDeclaration(functionDecl(hasName(MTDFNAME)))).bind("malloc"))).bind("castex");
+    explicitCastExpr(hasDescendant(callExpr(callee(functionDecl(hasName(MTDFNAME)))).bind("malloc"))).bind("castex");
 
 StatementMatcher sizeofMallocMatcher =
     expr(sizeOfExpr(allOf(hasAncestor(callExpr(callee(functionDecl(hasName(MTDFNAME)))).bind("sizeofmalloc")),
@@ -61,7 +62,7 @@ public:
 
     // const CallExpr* callex = Result.Nodes.getNodeAs<CallExpr>("callex");
     const ExplicitCastExpr *castex = Result.Nodes.getNodeAs<ExplicitCastExpr>("castex");
-    const DeclRefExpr *mnode = Result.Nodes.getNodeAs<DeclRefExpr>("malloc");
+    const clang::CallExpr* mnode = Result.Nodes.getNodeAs<clang::CallExpr>("malloc");
 
     // SourceLocation s = mnode->getBeginLoc();
     Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 5, "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
@@ -213,7 +214,8 @@ int main(int argc, const char **argv)
     // Finder.addMatcher(ifStmt(unless(isExpansionInSystemHeader())).bind("ifStmt"), &HandlerForIf);
 
     CStyleAllocPrinter HandlerForAllocs(replacementsToUse);
-    Finder.addMatcher(CStyleMallocMatcher, &HandlerForAllocs);
+    sizeOfMallocPrinter sizeOfMallocHandler(replacementsToUse);
+    // Finder.addMatcher(CStyleMallocMatcher, &HandlerForAllocs);
     Finder.addMatcher(sizeofMallocMatcher, &HandlerForAllocs);
     Finder.addMatcher(lhsofMallocMatcher, &HandlerForAllocs);
     Finder.addMatcher(declMallocMatcher, &HandlerForAllocs);

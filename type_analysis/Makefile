@@ -26,6 +26,9 @@ malloctypedumper: malloctypedumper.cpp
 replacer: source_replacements.cpp
 	$(CC) $(Includes) -DMTDFNAME="\"malloc\"" source_replacements.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o replacer
 
+experimental: source_replacements.cpp
+	$(CC) $(Includes) -DMTDFNAME="\"malloc\"" replacer_experimental.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o experimental
+
 header: header.cpp
 	$(CC) /home/gspathak/sifter/type_analysis/header.cpp -g -o header -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
