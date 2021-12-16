@@ -30,6 +30,8 @@ using namespace clang::ast_matchers;
 using namespace clang::driver;
 using namespace clang::tooling;
 
+using namespace std;
+
 static llvm::cl::OptionCategory ToolingSampleCategory("Tooling Sample");
 
 StatementMatcher CStyleMallocMatcher =
@@ -54,7 +56,7 @@ DeclarationMatcher declMallocMatcher =
 class CStyleAllocPrinter : public MatchFinder::MatchCallback
 {
 public:
-  CStyleAllocPrinter(Replacements *Replace) : Replace(Replace) {}
+  CStyleAllocPrinter(std::map<std::string, tooling::Replacements> &Replacements) : Replacements(Replacements) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
@@ -79,7 +81,7 @@ public:
   }
 
 private:
-  Replacements *Replace;
+  std::map<std::string, tooling::Replacements> &Replacements;
 };
 
 class sizeOfMallocPrinter : public MatchFinder::MatchCallback
@@ -200,48 +202,29 @@ void copyFile(const std::string &src, const std::string &dst)
 int main(int argc, const char **argv)
 {
   std::string errorMsg;
-  auto compDatabase = JSONCompilationDatabase::loadFromFile(argv[1], errorMsg, JSONCommandLineSyntax::AutoDetect);
 
-  //CommonOptionsParser op(argc, argv, ToolingSampleCategory, llvm::cl::OneOrMore);
-
-  // for (auto s : compDatabase->getAllFiles())
-  // {
-  //   std::cout << s << std::endl;
-  // }
-
-  std::vector<std::string> fileSources = compDatabase->getAllFiles();
-
-  RefactoringTool Tool(*compDatabase.get(), src);
+  CommonOptionsParser Cp(argc, argv, ToolingSampleCategory);
+  RefactoringTool Tool(Cp.getCompilations(), Cp.getSourcePathList());
   MatchFinder Finder;
 
-  Replacements *replacementsToUse;
-  replacementsToUse = &(Tool.getReplacements()[src]);
-
-  // Set up AST matcher callbacks.
-  // IfStmtHandler HandlerForIf(replacementsToUse);
-  // Finder.addMatcher(ifStmt(unless(isExpansionInSystemHeader())).bind("ifStmt"), &HandlerForIf);
-
-  CStyleAllocPrinter HandlerForAllocs(replacementsToUse);
-  sizeOfMallocPrinter sizeOfMallocHandler(replacementsToUse);
-  // Finder.addMatcher(CStyleMallocMatcher, &HandlerForAllocs);
+  CStyleAllocPrinter HandlerForAllocs(Tool.getReplacements());
+  // sizeOfMallocPrinter sizeOfMallocHandler(Tool.getReplacements());
+  Finder.addMatcher(CStyleMallocMatcher, &HandlerForAllocs);
   Finder.addMatcher(sizeofMallocMatcher, &HandlerForAllocs);
   Finder.addMatcher(lhsofMallocMatcher, &HandlerForAllocs);
   Finder.addMatcher(declMallocMatcher, &HandlerForAllocs);
 
-  // Run the tool and collect a list of replacements. We could call runAndSave,
-  // which would destructively overwrite the files with their new contents.
-  // However, for demonstration purposes it's interesting to print out the
-  // would-be contents of the rewritten files instead of actually rewriting
-  // them.
   if (int Result = Tool.run(newFrontendActionFactory(&Finder).get()))
   {
     return Result;
   }
 
   llvm::outs() << "Replacements collected by the tool:\n";
-  for (auto &r : Tool.getReplacements()[src])
-  {
-    llvm::outs() << r.toString() << "\n";
+  for (auto& R: Tool.getReplacements()) {
+    cout << R.first;
+    for(auto& i: R.second) {
+      llvm::outs() << i.toString() << "\n";
+    }
   }
 
   return 0;
