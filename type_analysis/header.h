@@ -1,4 +1,4 @@
-#include "memhook_interface.h"
+// #include "memhook_interface.h"
 #ifndef __HEADER_H
 #define __HEADER_H
 
@@ -18,6 +18,17 @@ typedef struct {
   int soj;
   struct stru stj;
 } struj;
+
+void func (size_t mem, const size_t abcd) {
+  int* r;
+  struj* sjj;
+  void* ptr, *ptr2 = NULL;
+  int * t = (int*)malloc(sizeof(int));//
+
+  r = (int*)malloc(100*sizeof(int));//
+  ptr = malloc(mem);
+  ptr2 = malloc(abcd);
+}
 
 // template < typename T, typename Y=int>
 // class MyClass
