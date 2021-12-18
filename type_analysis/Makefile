@@ -27,10 +27,7 @@ replacer: source_replacements.cpp
 	$(CC) $(Includes) -DMTDFNAME="\"malloc\"" source_replacements.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o replacer
 
 experimental: replacer_experimental.cpp
-	$(CC) $(Includes) -DMTDFNAME="\"malloc\"" replacer_experimental.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o experimental
-
-2_experimental: replacer_experimental.cpp
-	$(CC) $(Includes) -DMTDFNAME="\"malloc\"" replacer_experimental_2.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o experimental
+	$(CC) $(Includes) -DMTDFNAME="\"alloc\""  -DMTDFLEN="5" replacer_experimental.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o experimental
 
 header: header.cpp
 	$(CC) /home/gspathak/sifter/type_analysis/header.cpp -g -o header -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl

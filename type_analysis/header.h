@@ -13,6 +13,19 @@ struct stru {
   int b;
 };
 
+#ifdef __cplusplus
+
+class mem_alloc {
+  public:
+  void* alloc(size_t size) {
+    void* ptr;
+    ptr = malloc(size);
+    return ptr;
+  }
+};
+
+#endif
+
 typedef struct {
   int ak;
   int soj;
@@ -28,6 +41,11 @@ void func (size_t mem, const size_t abcd) {
   r = (int*)malloc(100*sizeof(int));//
   ptr = malloc(mem);
   ptr2 = malloc(abcd);
+
+  #ifdef __cplusplus
+  mem_alloc m;
+  m.alloc(sizeof(char));
+  #endif
 }
 
 // template < typename T, typename Y=int>

@@ -67,8 +67,8 @@ public:
     const clang::CallExpr *mnode = Result.Nodes.getNodeAs<clang::CallExpr>("malloc");
 
     // SourceLocation s = mnode->getBeginLoc();
-    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 5, "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
-    // auto err = Replace->add(Rep);
+    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc().getLocWithOffset(MTDFLEN), 0, "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
+    auto err = Replacements[Rep.getFilePath().str()].add(Rep);
 
     //Print various metadata
     // cout << "malloc" << endl;
@@ -84,10 +84,10 @@ private:
   std::map<std::string, tooling::Replacements> &Replacements;
 };
 
-class sizeOfMallocPrinter : public MatchFinder::MatchCallback
+class sizeofMallocPrinter : public MatchFinder::MatchCallback
 {
 public:
-  sizeOfMallocPrinter(Replacements *Replace) : Replace(Replace) {}
+  sizeofMallocPrinter(std::map<std::string, tooling::Replacements> &Replacements) : Replacements(Replacements) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
@@ -113,18 +113,20 @@ public:
       type = typenode->getPointeeType().getAsString();
     }
 
-    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 0, "<" + type + ">");
-    auto err = Replace->add(Rep);
+    Replacement Rep(*(Result.SourceManager), mnode->getExprLoc().getLocWithOffset(MTDFLEN) , 0, "<" + type + ">");
+    auto err = Replacements[Rep.getFilePath().str()].add(Rep);
   }
 
 private:
-  Replacements *Replace;
+  std::map<std::string, tooling::Replacements> &Replacements;
 };
 
 //Handler for lhs of malloc expressions
-class lhsOfMallocPrinter : public MatchFinder::MatchCallback
+class lhsofMallocPrinter : public MatchFinder::MatchCallback
 {
 public:
+  lhsofMallocPrinter(std::map<std::string, tooling::Replacements> &Replacements) : Replacements(Replacements) {}
+
   virtual void run(const MatchFinder::MatchResult &Result)
   {
     const clang::CallExpr *mnode = Result.Nodes.getNodeAs<clang::CallExpr>("lhsmalloc");
@@ -149,17 +151,19 @@ public:
       type = typenode->getPointeeType().getAsString();
     }
 
-    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 0, "<" + type + ">");
-    auto err = Replace->add(Rep);
+    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc().getLocWithOffset(MTDFLEN), 0, "<" + type + ">");
+    auto err = Replacements[Rep.getFilePath().str()].add(Rep);
   }
 
 private:
-  Replacements *Replace;
+  std::map<std::string, tooling::Replacements> &Replacements;
 };
 
 class declMallocPrinter : public MatchFinder::MatchCallback
 {
 public:
+  declMallocPrinter(std::map<std::string, tooling::Replacements> &Replacements) : Replacements(Replacements) {}
+
   virtual void run(const MatchFinder::MatchResult &Result)
   {
     const clang::CallExpr *mnode = Result.Nodes.getNodeAs<clang::CallExpr>("declmalloc");
@@ -184,12 +188,12 @@ public:
       type = typenode->getPointeeType().getAsString();
     }
 
-    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc(), 0, "<" + type + ">");
-    auto err = Replace->add(Rep);
+    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc().getLocWithOffset(MTDFLEN), 0, "<" + type + ">");
+    auto err = Replacements[Rep.getFilePath().str()].add(Rep);
   }
 
 private:
-  Replacements *Replace;
+  std::map<std::string, tooling::Replacements> &Replacements;
 };
 
 void copyFile(const std::string &src, const std::string &dst)
@@ -203,16 +207,19 @@ int main(int argc, const char **argv)
 {
   std::string errorMsg;
 
-  CommonOptionsParser Cp(argc, argv, ToolingSampleCategory);
-  RefactoringTool Tool(Cp.getCompilations(), Cp.getSourcePathList());
+  unique_ptr<CompilationDatabase> compDatabase = CompilationDatabase::autoDetectFromDirectory(argv[1], errorMsg);
+  RefactoringTool Tool(*compDatabase.get(), compDatabase->getAllFiles());
   MatchFinder Finder;
 
-  CStyleAllocPrinter HandlerForAllocs(Tool.getReplacements());
-  // sizeOfMallocPrinter sizeOfMallocHandler(Tool.getReplacements());
-  Finder.addMatcher(CStyleMallocMatcher, &HandlerForAllocs);
-  Finder.addMatcher(sizeofMallocMatcher, &HandlerForAllocs);
-  Finder.addMatcher(lhsofMallocMatcher, &HandlerForAllocs);
-  Finder.addMatcher(declMallocMatcher, &HandlerForAllocs);
+  CStyleAllocPrinter CStyleMallocHandler(Tool.getReplacements());
+  sizeofMallocPrinter sizeofMallocHandler(Tool.getReplacements());
+  lhsofMallocPrinter lhsofMallocHandler(Tool.getReplacements());
+  declMallocPrinter declMallocHandler(Tool.getReplacements());
+
+  // Finder.addMatcher(CStyleMallocMatcher, &CStyleMallocHandler);
+  Finder.addMatcher(sizeofMallocMatcher, &sizeofMallocHandler);
+  // Finder.addMatcher(lhsofMallocMatcher, &lhsofMallocHandler);
+  // Finder.addMatcher(declMallocMatcher, &declMallocHandler);
 
   if (int Result = Tool.run(newFrontendActionFactory(&Finder).get()))
   {
@@ -226,6 +233,20 @@ int main(int argc, const char **argv)
       llvm::outs() << i.toString() << "\n";
     }
   }
+
+  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+    DiagnosticsEngine Diagnostics(
+        IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
+        new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts), true);
+    SourceManager Sources(Diagnostics, Tool.getFiles());
+
+    // Apply all replacements to a rewriter.
+    Rewriter Rewrite(Sources, LangOptions());
+    // for (auto R: Tool.getReplacements()) {
+    //   backupFile(R.first);
+    // }
+    Tool.applyAllReplacements(Rewrite);
+    Rewrite.overwriteChangedFiles();
 
   return 0;
 }

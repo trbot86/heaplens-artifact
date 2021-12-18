@@ -47,12 +47,12 @@ int main() {
   // f = (unsigned long long)5;double
   // int a = (int)f;
   
-  // int* r;
+  int* r;
   // struj* sjj;
 
-  // int * t = (int*)malloc(sizeof(int));
+  int * t = (int*)malloc(sizeof(int));
 
-  // r = (int*)malloc(100*sizeof(int))
+  r = (int*)malloc(100*sizeof(int));
 
   // int* s = malloc(100);
   // sjj = (struct sjj*)malloc(200);

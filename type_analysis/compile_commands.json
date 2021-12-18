@@ -24,5 +24,18 @@
         ],
         "directory": "/home/gspathak/sifter/type_analysis",
         "file": "header.cpp"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-g",
+            "-I../memhook/",
+            "-o",
+            "header_2",
+            "header_2.cpp"
+        ],
+        "directory": "/home/gspathak/sifter/type_analysis",
+        "file": "header_2.cpp"
     }
 ]
