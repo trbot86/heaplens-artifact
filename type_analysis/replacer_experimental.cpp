@@ -114,7 +114,9 @@ public:
     }
 
     Replacement Rep(*(Result.SourceManager), mnode->getExprLoc().getLocWithOffset(MTDFLEN) , 0, "<" + type + ">");
-    auto err = Replacements[Rep.getFilePath().str()].add(Rep);
+    if(auto err = Replacements[Rep.getFilePath().str()].add(Rep)) {
+      cout << "replacements error" << endl;
+    }
   }
 
 private:
@@ -190,6 +192,7 @@ public:
 
     Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc().getLocWithOffset(MTDFLEN), 0, "<" + type + ">");
     auto err = Replacements[Rep.getFilePath().str()].add(Rep);
+    
   }
 
 private:
@@ -208,7 +211,9 @@ int main(int argc, const char **argv)
   std::string errorMsg;
 
   unique_ptr<CompilationDatabase> compDatabase = CompilationDatabase::autoDetectFromDirectory(argv[1], errorMsg);
+
   RefactoringTool Tool(*compDatabase.get(), compDatabase->getAllFiles());
+
   MatchFinder Finder;
 
   CStyleAllocPrinter CStyleMallocHandler(Tool.getReplacements());
@@ -229,24 +234,19 @@ int main(int argc, const char **argv)
   llvm::outs() << "Replacements collected by the tool:\n";
   for (auto& R: Tool.getReplacements()) {
     cout << R.first;
+    R.second.merge(R.second);
     for(auto& i: R.second) {
       llvm::outs() << i.toString() << "\n";
     }
   }
 
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
-    DiagnosticsEngine Diagnostics(
-        IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
-        new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts), true);
-    SourceManager Sources(Diagnostics, Tool.getFiles());
+  // IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  //   DiagnosticsEngine Diagnostics(
+  //       IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
+  //       new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts), true);
+  //   SourceManager Sources(Diagnostics, Tool.getFiles());
 
-    // Apply all replacements to a rewriter.
-    Rewriter Rewrite(Sources, LangOptions());
-    // for (auto R: Tool.getReplacements()) {
-    //   backupFile(R.first);
-    // }
-    Tool.applyAllReplacements(Rewrite);
-    Rewrite.overwriteChangedFiles();
+  //   auto replMap = Tool.getReplacements();
 
   return 0;
 }
