@@ -90,7 +90,7 @@ private:
 class sizeofMallocPrinter : public MatchFinder::MatchCallback
 {
 public:
-  sizeofMallocPrinter(Rewriter &rewriter) : rewriter(rewriter) {}
+  sizeofMallocPrinter(Rewriter &rewriter): rewriter(rewriter) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
@@ -127,7 +127,7 @@ public:
     //     cout << "replacements error" << endl;
     //   }
     // }
-    rewriter.InsertText(mnode->getBeginLoc(), "<" + type + ">", false, false);
+    rewriter.InsertText(mnode->getExprLoc().getLocWithOffset(MTDFLEN), "<" + type + ">", false, false);
   }
 
 private:
@@ -217,87 +217,81 @@ void copyFile(const std::string &src, const std::string &dst)
   dest << source.rdbuf();
 }
 
-// class MyASTConsumer : public ASTConsumer {
-// public:
-//   MyASTConsumer(Rewriter &R) : HandlerForIf(R), HandlerForFor(R) {
-//     MatchFinder.
+class MyASTConsumer : public ASTConsumer {
+public:
+  MyASTConsumer(Rewriter &R) : sizeofMallocHandler(R) {
+    Matcher.addMatcher(sizeofMallocMatcher, &sizeofMallocHandler);
 
-//   void HandleTranslationUnit(ASTContext &Context) override {
-//     // Run the matchers when we have the whole TU parsed.
-//     Matcher.matchAST(Context);
-//   }
+  }
+  void HandleTranslationUnit(ASTContext &Context) override {
+    // Run the matchers when we have the whole TU parsed.
+    Matcher.matchAST(Context);
+  }
 
-// private:
-//   IfStmtHandler HandlerForIf;
-//   IncrementForLoopHandler HandlerForFor;
-//   MatchFinder Matcher;
-// };
+private:
+  // CStyleAllocPrinter CStyleMallocHandler(Tool.getReplacements());
+  sizeofMallocPrinter sizeofMallocHandler;
+  // lhsofMallocPrinter lhsofMallocHandler(Tool.getReplacements());
+  // declMallocPrinter declMallocHandler(Tool.getReplacements());
+  MatchFinder Matcher;
+};
 
-// class MyFrontendAction : public ASTFrontendAction {
-// public:
-//   MyFrontendAction() {}
-//   void EndSourceFileAction() override {
-//     TheRewriter.getEditBuffer(TheRewriter.getSourceMgr().getMainFileID())
-//         .write(llvm::outs());
-//   }
+class MyFrontendAction : public ASTFrontendAction {
+public:
+  MyFrontendAction() {}
+  void EndSourceFileAction() override {
+    TheRewriter.getEditBuffer(TheRewriter.getSourceMgr().getMainFileID())
+        .write(llvm::outs());
+  }
 
-//   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-//                                                  StringRef file) override {
-//     TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-//     return llvm::make_unique<MyASTConsumer>(TheRewriter);
-//   }
+  std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
+                                                 StringRef file) override {
+    TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
+    return make_unique<MyASTConsumer>(TheRewriter);
+  }
 
-// private:
-//   Rewriter TheRewriter;
-// };
+private:
+  Rewriter TheRewriter;
+};
 
 int main(int argc, const char **argv)
 {
   std::string errorMsg;
 
-  // pthread_spin_init(&plock, PTHREAD_PROCESS_PRIVATE);
-  Rewriter rewriter;
-
   unique_ptr<CompilationDatabase> compDatabase = CompilationDatabase::autoDetectFromDirectory(argv[1], errorMsg);
-
-  rewriter.setSourceMgr(compDatabase.);
-
-  RefactoringTool Tool(*compDatabase.get(), compDatabase->getAllFiles());
-
-  MatchFinder Finder;
-
-  CStyleAllocPrinter CStyleMallocHandler(Tool.getReplacements());
-  sizeofMallocPrinter sizeofMallocHandler(rewriter);
-  lhsofMallocPrinter lhsofMallocHandler(Tool.getReplacements());
-  declMallocPrinter declMallocHandler(Tool.getReplacements());
-
-  // Finder.addMatcher(CStyleMallocMatcher, &CStyleMallocHandler);
-  Finder.addMatcher(sizeofMallocMatcher, &sizeofMallocHandler);
-  // Finder.addMatcher(lhsofMallocMatcher, &lhsofMallocHandler);
-  // Finder.addMatcher(declMallocMatcher, &declMallocHandler);
-
-  if (int Result = Tool.run(newFrontendActionFactory(&Finder).get()))
-  {
-    return Result;
-  }
-
-  llvm::outs() << "Replacements collected by the tool:\n";
-  for (auto &R : Tool.getReplacements())
-  {
-    cout << R.first;
-    for (auto &i : R.second)
-    {
-      llvm::outs() << i.toString() << "\n";
-    }
-  }
 
   // IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   //   DiagnosticsEngine Diagnostics(
   //       IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
   //       new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts), true);
-  //   SourceManager Sources(Diagnostics, Tool.getFiles());
 
-  //   auto replMap = Tool.getReplacements();
+  RefactoringTool Tool(*compDatabase.get(), compDatabase->getAllFiles());
+
+  // SourceManager Sources(Diagnostics, Tool.getFiles());
+  
+  MatchFinder Finder;
+
+  // rewriter.setSourceMgr(Sources, );
+
+  // Finder.addMatcher(CStyleMallocMatcher, &CStyleMallocHandler);
+  // Finder.addMatcher(sizeofMallocMatcher, &sizeofMallocHandler);
+  // Finder.addMatcher(lhsofMallocMatcher, &lhsofMallocHandler);
+  // Finder.addMatcher(declMallocMatcher, &declMallocHandler);
+
+  if (int Result = Tool.run(newFrontendActionFactory<MyFrontendAction>().get()))
+  {
+    return Result;
+  }
+
+  // llvm::outs() << "Replacements collected by the tool:\n";
+  // for (auto &R : Tool.getReplacements())
+  // {
+  //   cout << R.first;
+  //   for (auto &i : R.second)
+  //   {
+  //     llvm::outs() << i.toString() << "\n";
+  //   }
+  // }
 
   return 0;
 }
