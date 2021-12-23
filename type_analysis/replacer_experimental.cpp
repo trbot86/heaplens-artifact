@@ -53,6 +53,9 @@ DeclarationMatcher declMallocMatcher =
     varDecl(hasDescendant(callExpr(callee(functionDecl(hasName(MTDFNAME)))).bind("declmalloc")),
             hasType(type().bind("decltype")));
 
+set<pair<string, clang::SourceLocation>> replSet;
+pthread_spinlock_t plock;
+
 class CStyleAllocPrinter : public MatchFinder::MatchCallback
 {
 public:
@@ -87,7 +90,7 @@ private:
 class sizeofMallocPrinter : public MatchFinder::MatchCallback
 {
 public:
-  sizeofMallocPrinter(std::map<std::string, tooling::Replacements> &Replacements) : Replacements(Replacements) {}
+  sizeofMallocPrinter(Rewriter &rewriter) : rewriter(rewriter) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
@@ -113,14 +116,23 @@ public:
       type = typenode->getPointeeType().getAsString();
     }
 
-    Replacement Rep(*(Result.SourceManager), mnode->getExprLoc().getLocWithOffset(MTDFLEN) , 0, "<" + type + ">");
-    if(auto err = Replacements[Rep.getFilePath().str()].add(Rep)) {
-      cout << "replacements error" << endl;
-    }
+    // Replacement Rep(*(Result.SourceManager), mnode->getExprLoc().getLocWithOffset(MTDFLEN), 0, "<" + type + ">");
+    // if (replSet.find({Rep.getFilePath().str(), mnode->getExprLoc().getLocWithOffset(MTDFLEN)}) == replSet.end())
+    // {
+    //   pthread_spin_lock(&plock);
+    //   replSet.insert({Rep.getFilePath().str(), mnode->getExprLoc().getLocWithOffset(MTDFLEN)});
+    //   pthread_spin_unlock(&plock);
+    //   if (auto err = Replacements[Rep.getFilePath().str()].add(Rep))
+    //   {
+    //     cout << "replacements error" << endl;
+    //   }
+    // }
+    rewriter.InsertText(mnode->getBeginLoc(), "<" + type + ">", false, false);
   }
 
 private:
-  std::map<std::string, tooling::Replacements> &Replacements;
+  // std::map<std::string, tooling::Replacements> &Replacements;
+  Rewriter &rewriter;
 };
 
 //Handler for lhs of malloc expressions
@@ -192,7 +204,6 @@ public:
 
     Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc().getLocWithOffset(MTDFLEN), 0, "<" + type + ">");
     auto err = Replacements[Rep.getFilePath().str()].add(Rep);
-    
   }
 
 private:
@@ -206,18 +217,57 @@ void copyFile(const std::string &src, const std::string &dst)
   dest << source.rdbuf();
 }
 
+// class MyASTConsumer : public ASTConsumer {
+// public:
+//   MyASTConsumer(Rewriter &R) : HandlerForIf(R), HandlerForFor(R) {
+//     MatchFinder.
+
+//   void HandleTranslationUnit(ASTContext &Context) override {
+//     // Run the matchers when we have the whole TU parsed.
+//     Matcher.matchAST(Context);
+//   }
+
+// private:
+//   IfStmtHandler HandlerForIf;
+//   IncrementForLoopHandler HandlerForFor;
+//   MatchFinder Matcher;
+// };
+
+// class MyFrontendAction : public ASTFrontendAction {
+// public:
+//   MyFrontendAction() {}
+//   void EndSourceFileAction() override {
+//     TheRewriter.getEditBuffer(TheRewriter.getSourceMgr().getMainFileID())
+//         .write(llvm::outs());
+//   }
+
+//   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
+//                                                  StringRef file) override {
+//     TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
+//     return llvm::make_unique<MyASTConsumer>(TheRewriter);
+//   }
+
+// private:
+//   Rewriter TheRewriter;
+// };
+
 int main(int argc, const char **argv)
 {
   std::string errorMsg;
 
+  // pthread_spin_init(&plock, PTHREAD_PROCESS_PRIVATE);
+  Rewriter rewriter;
+
   unique_ptr<CompilationDatabase> compDatabase = CompilationDatabase::autoDetectFromDirectory(argv[1], errorMsg);
+
+  rewriter.setSourceMgr(compDatabase.);
 
   RefactoringTool Tool(*compDatabase.get(), compDatabase->getAllFiles());
 
   MatchFinder Finder;
 
   CStyleAllocPrinter CStyleMallocHandler(Tool.getReplacements());
-  sizeofMallocPrinter sizeofMallocHandler(Tool.getReplacements());
+  sizeofMallocPrinter sizeofMallocHandler(rewriter);
   lhsofMallocPrinter lhsofMallocHandler(Tool.getReplacements());
   declMallocPrinter declMallocHandler(Tool.getReplacements());
 
@@ -232,10 +282,11 @@ int main(int argc, const char **argv)
   }
 
   llvm::outs() << "Replacements collected by the tool:\n";
-  for (auto& R: Tool.getReplacements()) {
+  for (auto &R : Tool.getReplacements())
+  {
     cout << R.first;
-    R.second.merge(R.second);
-    for(auto& i: R.second) {
+    for (auto &i : R.second)
+    {
       llvm::outs() << i.toString() << "\n";
     }
   }
