@@ -1,3 +1,6 @@
 [submodule "prac/memcached_without_memhook"]
 	path = prac/memcached_without_memhook
 	url = https://github.com/memcached/memcached.git
+[submodule "prac/setbench_bk"]
+	path = prac/setbench_bk
+	url = https://gitlab.com/trbot86/setbench.git
