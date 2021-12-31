@@ -21,7 +21,7 @@ fieldandtypedumper: clang_parser.cpp
 
 malloctypedumper: malloctypedumper.cpp
 	# $(CC) $(Includes) -DMTDFNAME="\"_mm_malloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o malloctypedumper
-	$(CC) $(Includes) -DMTDFNAME="\"malloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o malloctypedumper
+	$(CC) $(Includes) -DMTDFNAME="\"alloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o malloctypedumper
 
 replacer: source_replacements.cpp
 	$(CC) $(Includes) -DMTDFNAME="\"malloc\"" source_replacements.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o replacer

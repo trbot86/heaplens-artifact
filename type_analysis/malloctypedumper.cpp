@@ -53,7 +53,7 @@ map<pair<string,int>, string> malloctypeset;
 
 void printtofile() {
   ofstream malloctypefile;
-  malloctypefile.open("malloc_type_dump.txt");
+  malloctypefile.open("malloc_type_dump.txt", ios_base::app);
 
   for (auto i = malloctypeset.begin(); i != malloctypeset.end(); ++i)
   {

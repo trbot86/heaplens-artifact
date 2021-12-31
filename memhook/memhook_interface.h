@@ -65,6 +65,15 @@ inline T* operator * (const MemStamp &stamp, T *p) {
 //     return ptr;
 // }
 
+template <typename T>
+T malloc(size_t size, bool fakearg) {
+    unit_log.file = "malloc_type_dump.txt";
+    unit_log.line = stamp.lineNum;
+    T ptr = (T)memhook_malloc(size, true);
+    type_index t = type_index(typeid(T));
+    return ptr;
+}
+
 #endif
 
 #ifdef __cplusplus

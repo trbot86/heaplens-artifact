@@ -59,7 +59,7 @@ pthread_spinlock_t plock;
 class CStyleAllocPrinter : public MatchFinder::MatchCallback
 {
 public:
-  CStyleAllocPrinter(std::map<std::string, tooling::Replacements> &Replacements) : Replacements(Replacements) {}
+  CStyleAllocPrinter(Rewriter &rewriter): rewriter(rewriter) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
@@ -70,8 +70,9 @@ public:
     const clang::CallExpr *mnode = Result.Nodes.getNodeAs<clang::CallExpr>("malloc");
 
     // SourceLocation s = mnode->getBeginLoc();
-    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc().getLocWithOffset(MTDFLEN), 0, "<" + castex->getTypeInfoAsWritten()->getType().getAsString() + ">");
-    auto err = Replacements[Rep.getFilePath().str()].add(Rep);
+    std::string type = castex->getTypeInfoAsWritten()->getType().getAsString();
+
+    rewriter.InsertText(mnode->getExprLoc().getLocWithOffset(MTDFLEN), "<" + type + ">", false, false);
 
     //Print various metadata
     // cout << "malloc" << endl;
@@ -84,7 +85,7 @@ public:
   }
 
 private:
-  std::map<std::string, tooling::Replacements> &Replacements;
+  Rewriter &rewriter;
 };
 
 class sizeofMallocPrinter : public MatchFinder::MatchCallback
@@ -139,7 +140,7 @@ private:
 class lhsofMallocPrinter : public MatchFinder::MatchCallback
 {
 public:
-  lhsofMallocPrinter(std::map<std::string, tooling::Replacements> &Replacements) : Replacements(Replacements) {}
+  lhsofMallocPrinter(Rewriter &rewriter): rewriter(rewriter) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
@@ -165,18 +166,17 @@ public:
       type = typenode->getPointeeType().getAsString();
     }
 
-    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc().getLocWithOffset(MTDFLEN), 0, "<" + type + ">");
-    auto err = Replacements[Rep.getFilePath().str()].add(Rep);
-  }
+    rewriter.InsertText(mnode->getExprLoc().getLocWithOffset(MTDFLEN), "<" + type + ">", false, false);
+}
 
 private:
-  std::map<std::string, tooling::Replacements> &Replacements;
+  Rewriter &rewriter;
 };
 
 class declMallocPrinter : public MatchFinder::MatchCallback
 {
 public:
-  declMallocPrinter(std::map<std::string, tooling::Replacements> &Replacements) : Replacements(Replacements) {}
+  declMallocPrinter(Rewriter &rewriter): rewriter(rewriter) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
@@ -202,12 +202,11 @@ public:
       type = typenode->getPointeeType().getAsString();
     }
 
-    Replacement Rep(*(Result.SourceManager), mnode->getBeginLoc().getLocWithOffset(MTDFLEN), 0, "<" + type + ">");
-    auto err = Replacements[Rep.getFilePath().str()].add(Rep);
+    rewriter.InsertText(mnode->getExprLoc().getLocWithOffset(MTDFLEN), "<" + type + ">", false, false);
   }
 
 private:
-  std::map<std::string, tooling::Replacements> &Replacements;
+  Rewriter &rewriter;
 };
 
 void copyFile(const std::string &src, const std::string &dst)
@@ -242,6 +241,7 @@ public:
   void EndSourceFileAction() override {
     TheRewriter.getEditBuffer(TheRewriter.getSourceMgr().getMainFileID())
         .write(llvm::outs());
+    TheRewriter.overwriteChangedFiles();
   }
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
