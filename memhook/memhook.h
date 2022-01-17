@@ -212,7 +212,7 @@ class ThreadExiter
     }
   };
 
-inline uint64_t memhook_get_server_clock() {
+uint64_t memhook_get_server_clock() {
 #if defined(__i386__)
     uint64_t ret;
     __asm__ __volatile__("rdtsc" : "=A" (ret));

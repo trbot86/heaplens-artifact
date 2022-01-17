@@ -93,7 +93,7 @@ __attribute__((constructor)) static void init() {
     global_fd = open(file_path,O_RDWR|O_APPEND|O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
 }
 
-void *memhook_malloc(size_t size, char* file, int line, bool log) {
+void *memhook_malloc(size_t size, char* file = "specialfile", int line = 0, bool log = 1) {
     if (!initialized) {
         if (tmppos + size < sizeof(tmpbuff)) {
             void *retptr = tmpbuff + tmppos;
@@ -133,6 +133,7 @@ void *memhook_malloc(size_t size, char* file, int line, bool log) {
         unit_log.file = file;
         unit_log.line = line;
     }
+
     // printf("real malloc called!\n");
 
     return mem;
@@ -181,6 +182,7 @@ void *memhook_calloc(size_t nmemb, size_t size, char* file, int line, bool log) 
 
 extern "C" {
 
+    //Used for C projects which do not support templating
     void *malloc_s(size_t size, char* filepath, int line) {
         // printf("%s", filepath);
         void* ptr = memhook_malloc(size, filepath, line, true);

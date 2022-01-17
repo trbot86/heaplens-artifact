@@ -31,7 +31,19 @@ using namespace std;
 struct slot;
 struct info_t;
 
-// void *memhook_malloc(size_t size, bool log);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void* malloc_s(size_t, char*, int);
+extern void *memhook_malloc(size_t size, char* file, int line, bool log);
+
+#define SIFTER_NEW MemStamp((__FILE__), (__LINE__)) * new
+#define new SIFTER_NEW
+
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef __cplusplus
 
@@ -45,8 +57,7 @@ extern thread_local unordered_set<const char*> typeFiles;
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
-    unit_log.file = stamp.filename;
-    unit_log.line = stamp.lineNum;
+    unit_log.file = "specialfile";
     unit_log.tindex_name = typeid(T).name();
 
     threadFiles.insert(unit_log.file);
@@ -65,29 +76,20 @@ inline T* operator * (const MemStamp &stamp, T *p) {
 //     return ptr;
 // }
 
-template <typename T>
+template <typename T, char* filename, int line>
 T malloc(size_t size, bool fakearg) {
-    unit_log.file = "malloc_type_dump.txt";
-    unit_log.line = stamp.lineNum;
-    T ptr = (T)memhook_malloc(size, true);
+    T ptr = (T)memhook_malloc(size, filename, line, true);
     type_index t = type_index(typeid(T));
+
+    typeFiles.insert(unit_log.tindex_name);
+
+    collector.copy(unit_log);
     return ptr;
 }
 
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void* malloc_s(size_t, char*, int);
-
-#define SIFTER_NEW MemStamp((__FILE__), (__LINE__)) * new
-#define new SIFTER_NEW
-
-#ifdef __cplusplus
-}
-#endif
+uint64_t memhook_get_server_clock();
 
 #define malloc(s) malloc_s((s), (__FILE__), (__LINE__))
 #endif          //__MEMHOOK_INTERFACE_H

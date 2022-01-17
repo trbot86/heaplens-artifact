@@ -1,6 +1,11 @@
-// #include "memhook_interface.h"
 #ifndef __HEADER_H
 #define __HEADER_H
+
+#include "memhook_interface.h"
+
+#ifdef __cplusplus
+#include <bits/stdc++.h>
+#endif
 
 // template <typename T>
 // T* malloc(size_t size) {
@@ -15,12 +20,30 @@ struct stru {
 
 #ifdef __cplusplus
 
+extern thread_local info_t unit_log;
+extern thread_local unordered_set<const char*> threadFiles;
+extern thread_local unordered_set<const char*> typeFiles;
+
 class mem_alloc {
   public:
   void* alloc(size_t size) {
     void* ptr;
     ptr = malloc(size);
     return ptr;
+  }
+
+  template <class T>
+  T* alloc(size_t size) {
+    void* ptr;
+    unit_log.file = "specialfile";
+    unit_log.tindex_name = typeid(T).name();
+
+    threadFiles.insert(unit_log.file);
+    typeFiles.insert(unit_log.tindex_name);
+
+    collector.copy(unit_log);
+    ptr = malloc(size);
+    return (T*)ptr;
   }
 };
 
@@ -44,7 +67,7 @@ void func (size_t mem, const size_t abcd) {
 
   #ifdef __cplusplus
   mem_alloc m;
-  m.alloc(sizeof(char));
+  m.alloc<char>(sizeof(char));
   #endif
 }
 

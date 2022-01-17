@@ -88,7 +88,7 @@ int main() {
   MyClass<float>* mc2 = new MyClass<float>;
 
   mem_alloc m;
-  m.alloc(sizeof(char));
+  m.alloc<char>(sizeof(char));
   // newclass<float>* n = new newclass<float>;
   // n.x = 0;
   // MyClass<int>* mc2 = new MyClass<int>;

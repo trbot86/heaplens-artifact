@@ -8,6 +8,6 @@
 
 int main() {
   mem_alloc m;
-  m.alloc(sizeof(char));
+  m.alloc<char>(sizeof(char));
   return 0;
 }
