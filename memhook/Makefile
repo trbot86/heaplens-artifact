@@ -2,7 +2,7 @@ CC=clang++
 Includes= /usr/lib/llvm-6.0/include/
 Libs=
 
-all:
+all: memhook.cpp memhook.h memhook_interface.h
 	$(CC) memhook.cpp -shared -fPIC -g -lrt -O2 -o libmemhook.so
 
 link:

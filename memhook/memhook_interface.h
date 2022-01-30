@@ -5,6 +5,7 @@
 
 //ASK ABOUT DIFFERENT IMPLEMENTATIONS OF BOOL IN C/C++. WILL THAT BE A PROBLEM?
 #include <stdbool.h>
+#include <stdint.h>
 #include <stddef.h>
 #ifdef __cplusplus
 
@@ -35,8 +36,7 @@ struct info_t;
 extern "C" {
 #endif
 
-void* malloc_s(size_t, char*, int);
-extern void *memhook_malloc(size_t size, char* file, int line, bool log);
+void* malloc_s(size_t, const char*, int);
 
 #define SIFTER_NEW MemStamp((__FILE__), (__LINE__)) * new
 #define new SIFTER_NEW
@@ -51,6 +51,7 @@ extern MemStampCollector collector;
 extern thread_local info_t unit_log;
 extern thread_local unordered_set<const char*> threadFiles;
 extern thread_local unordered_set<const char*> typeFiles;
+extern void *memhook_malloc(size_t size, const char* file, int line, bool log);
 
 // template <typename T>
 // T malloc(size_t size, bool fakearg=true);
@@ -79,8 +80,9 @@ inline T* operator * (const MemStamp &stamp, T *p) {
 template <typename T, char* filename, int line>
 T malloc(size_t size, bool fakearg) {
     T ptr = (T)memhook_malloc(size, filename, line, true);
-    type_index t = type_index(typeid(T));
 
+    unit_log.tindex_name = typeid(T).name();
+    threadFiles.insert(filename);
     typeFiles.insert(unit_log.tindex_name);
 
     collector.copy(unit_log);

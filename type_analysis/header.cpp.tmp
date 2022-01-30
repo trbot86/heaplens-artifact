@@ -4,6 +4,7 @@
 
 // #include <iostream>
 #include <stdlib.h>
+#include "header.h"
 // #include <string>
 // #include <bits/stdc++.h>
 // using namespace std;
@@ -13,17 +14,6 @@
 //   cout << "templated malloc\n";
 //   return (T*)malloc(size);
 // }
-
-struct stru {
-  int a;
-  int b;
-};
-
-typedef struct struj {
-  int ak;
-  int soj;
-  struct stru stj;
-} struj;
 
 template < typename T, typename Y=int>
 class MyClass
@@ -39,15 +29,6 @@ public:
   // bool f;
   // long long arr[100];
   T g;
-};
-
-class mem_alloc {
-  public:
-  void* alloc(size_t size) {
-    void* ptr;
-    ptr = malloc(size);
-    return ptr;
-  }
 };
 
 // #define CLASS myClass<int>

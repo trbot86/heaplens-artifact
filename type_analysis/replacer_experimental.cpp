@@ -25,6 +25,8 @@
 #include <clang/Tooling/Tooling.h>
 #include <llvm/Support/raw_ostream.h>
 
+#define MAX_FILE_PATH 200
+
 using namespace clang;
 using namespace clang::ast_matchers;
 using namespace clang::driver;
@@ -91,7 +93,7 @@ private:
 class sizeofMallocPrinter : public MatchFinder::MatchCallback
 {
 public:
-  sizeofMallocPrinter(Rewriter &rewriter): rewriter(rewriter) {}
+  sizeofMallocPrinter(Replacements &Replace): Replace(Replace) {}
 
   virtual void run(const MatchFinder::MatchResult &Result)
   {
@@ -128,12 +130,17 @@ public:
     //     cout << "replacements error" << endl;
     //   }
     // }
-    rewriter.InsertText(mnode->getExprLoc().getLocWithOffset(MTDFLEN), "<" + type + ">", false, false);
+
+
+
+    // SmallString<MAX_FILE_PATH> pathVector;
+    // rewriter.getSourceMgr().getFileManager().makeAbsolutePath(pathVector);
+    // std::cout << "FILENAME: " << pathVector.c_str() << endl;
+    // rewriter.InsertText(mnode->getExprLoc().getLocWithOffset(MTDFLEN), "<" + type + ">", false, false);
   }
 
 private:
-  // std::map<std::string, tooling::Replacements> &Replacements;
-  Rewriter &rewriter;
+  std::map<std::string, tooling::Replacements> &Replacements;
 };
 
 //Handler for lhs of malloc expressions
@@ -166,7 +173,16 @@ public:
       type = typenode->getPointeeType().getAsString();
     }
 
-    rewriter.InsertText(mnode->getExprLoc().getLocWithOffset(MTDFLEN), "<" + type + ">", false, false);
+    FullSourceLoc fsrcloc = Result.Context->getFullLoc(mnode->getExprLoc());
+
+    SmallString<MAX_FILE_PATH> pathVector;
+    rewriter.getSourceMgr().getFileManager().makeAbsolutePath(pathVector);
+    std::cout << "FILENAME: " << pathVector.c_str() + fsrcloc.getFileEntry()->getName().str() << endl;
+    std::cout << fsrcloc.getLineNumber
+
+    string filePath = pathVector.c_str() + fsrcloc.getFileEntry()->getName().str();
+
+    rewriter.InsertText(mnode->getExprLoc().getLocWithOffset(MTDFLEN), "<" + type + "," + filePath + "," +  + ">", false, false);
 }
 
 private:

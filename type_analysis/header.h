@@ -13,6 +13,29 @@
 //   return (T*)malloc(size);
 // }
 
+#define MACRO_GET_1(str, i) \
+    (sizeof(str) > (i) ? str[(i)] : 0)
+
+#define MACRO_GET_4(str, i) \
+    MACRO_GET_1(str, i+0),  \
+    MACRO_GET_1(str, i+1),  \
+    MACRO_GET_1(str, i+2),  \
+    MACRO_GET_1(str, i+3)
+
+#define MACRO_GET_16(str, i) \
+    MACRO_GET_4(str, i+0),   \
+    MACRO_GET_4(str, i+4),   \
+    MACRO_GET_4(str, i+8),   \
+    MACRO_GET_4(str, i+12)
+
+#define MACRO_GET_64(str, i) \
+    MACRO_GET_16(str, i+0),  \
+    MACRO_GET_16(str, i+16), \
+    MACRO_GET_16(str, i+32), \
+    MACRO_GET_16(str, i+48)
+
+#define MACRO_GET_STR(str) MACRO_GET_64(str, 0), 0 
+
 struct stru {
   int a;
   int b;
@@ -20,9 +43,9 @@ struct stru {
 
 #ifdef __cplusplus
 
-extern thread_local info_t unit_log;
-extern thread_local unordered_set<const char*> threadFiles;
-extern thread_local unordered_set<const char*> typeFiles;
+// extern thread_local info_t unit_log;
+// extern thread_local unordered_set<const char*> threadFiles;
+// extern thread_local unordered_set<const char*> typeFiles;
 
 class mem_alloc {
   public:
@@ -32,17 +55,19 @@ class mem_alloc {
     return ptr;
   }
 
-  template <class T>
+  template <class T, char... c, int line>
   T* alloc(size_t size) {
     void* ptr;
-    unit_log.file = "specialfile";
+    // unit_log.file = filename;
     unit_log.tindex_name = typeid(T).name();
 
     threadFiles.insert(unit_log.file);
     typeFiles.insert(unit_log.tindex_name);
 
     collector.copy(unit_log);
-    ptr = malloc(size);
+
+    static const string filename = std::string(c...);
+    ptr = memhook_malloc(size, filename.c_str(), line, true);
     return (T*)ptr;
   }
 };
@@ -67,7 +92,7 @@ void func (size_t mem, const size_t abcd) {
 
   #ifdef __cplusplus
   mem_alloc m;
-  m.alloc<char>(sizeof(char));
+  m.alloc(sizeof(char));
   #endif
 }
 
