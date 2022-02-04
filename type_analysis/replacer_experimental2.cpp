@@ -104,6 +104,7 @@ Replacements &getReplacements(RefactoringTool &Tool, StringRef file)
 int main(int argc, const char **argv)
 {
     std::string errorMsg;
+    CommonOptionsParser OptionsParser(argc, argv, ToolingSampleCategory);
 
     unique_ptr<CompilationDatabase> compDatabase = CompilationDatabase::autoDetectFromDirectory(argv[1], errorMsg);
 

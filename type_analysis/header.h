@@ -1,7 +1,7 @@
 #ifndef __HEADER_H
 #define __HEADER_H
 
-#include "memhook_interface.h"
+// #include "memhook_interface.h"
 
 #ifdef __cplusplus
 #include <bits/stdc++.h>
@@ -57,18 +57,18 @@ class mem_alloc {
 
   template <class T, char... c, int line>
   T* alloc(size_t size) {
-    void* ptr;
-    // unit_log.file = filename;
-    unit_log.tindex_name = typeid(T).name();
+    // void* ptr;
+    // // unit_log.file = filename;
+    // unit_log.tindex_name = typeid(T).name();
 
-    threadFiles.insert(unit_log.file);
-    typeFiles.insert(unit_log.tindex_name);
+    // threadFiles.insert(unit_log.file);
+    // typeFiles.insert(unit_log.tindex_name);
 
-    collector.copy(unit_log);
+    // collector.copy(unit_log);
 
-    static const string filename = std::string(c...);
-    ptr = memhook_malloc(size, filename.c_str(), line, true);
-    return (T*)ptr;
+    // static const string filename = std::string(c...);
+    // ptr = memhook_malloc(size, filename.c_str(), line, true);
+    // return (T*)ptr;
   }
 };
 

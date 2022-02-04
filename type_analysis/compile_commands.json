@@ -18,6 +18,7 @@
             "-c",
             "-g",
             "-I../memhook/",
+            "-I/usr/include",
             "-o",
             "header",
             "header.cpp"
@@ -31,6 +32,7 @@
             "-c",
             "-g",
             "-I../memhook/",
+            "-I/usr/include",
             "-o",
             "header_2",
             "header_2.cpp"

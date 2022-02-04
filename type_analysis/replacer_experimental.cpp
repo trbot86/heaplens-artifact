@@ -140,7 +140,7 @@ public:
   }
 
 private:
-  std::map<std::string, tooling::Replacements> &Replacements;
+  std::map<std::string, tooling::Replacements> &Replace;
 };
 
 //Handler for lhs of malloc expressions
@@ -178,7 +178,7 @@ public:
     SmallString<MAX_FILE_PATH> pathVector;
     rewriter.getSourceMgr().getFileManager().makeAbsolutePath(pathVector);
     std::cout << "FILENAME: " << pathVector.c_str() + fsrcloc.getFileEntry()->getName().str() << endl;
-    std::cout << fsrcloc.getLineNumber
+    std::cout << fsrcloc.getLineNumber << endl;
 
     string filePath = pathVector.c_str() + fsrcloc.getFileEntry()->getName().str();
 
@@ -245,7 +245,7 @@ public:
 
 private:
   // CStyleAllocPrinter CStyleMallocHandler(Tool.getReplacements());
-  sizeofMallocPrinter sizeofMallocHandler;
+  sizeofMallocPrinter sizeofMallocHandler(Tool.getReplacements());
   // lhsofMallocPrinter lhsofMallocHandler(Tool.getReplacements());
   // declMallocPrinter declMallocHandler(Tool.getReplacements());
   MatchFinder Matcher;
@@ -257,12 +257,13 @@ public:
   void EndSourceFileAction() override {
     TheRewriter.getEditBuffer(TheRewriter.getSourceMgr().getMainFileID())
         .write(llvm::outs());
-    TheRewriter.overwriteChangedFiles();
+    // TheRewriter.overwriteChangedFiles();
   }
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
                                                  StringRef file) override {
     TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
+    TheRewriter.ReplaceText
     return make_unique<MyASTConsumer>(TheRewriter);
   }
 

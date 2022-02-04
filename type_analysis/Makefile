@@ -31,6 +31,9 @@ experimental: replacer_experimental.cpp
 
 2experimental: replacer_experimental2.cpp
 	$(CC) $(Includes) -DMTDFNAME="\"alloc\""  -DMTDFLEN="5" replacer_experimental2.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o 2experimental
+	
+ctdcheck: ChangeMallocCheck.cpp ChangeMallocCheck.h
+	$(CC) $(Includes) -DMTDFNAME="\"alloc\""  -DMTDFLEN="5" ChangeMallocCheck.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o ctdcheck
 
 header: header.cpp
 	$(CC) /home/gspathak/sifter/type_analysis/header.cpp -g -o header -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
