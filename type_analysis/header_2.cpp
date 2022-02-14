@@ -8,6 +8,6 @@
 
 int main() {
   mem_alloc m;
-  m.alloc(sizeof(char));
+  m.alloc<char, MACRO_GET_STR("header_2.cpp"), 11>(sizeof(char));
   return 0;
 }

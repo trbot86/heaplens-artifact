@@ -20,6 +20,7 @@
 #include <aio.h>
 
 #include "memstamp.h"
+#include "hash.h"
 
 #define MEMHOOK_BACKTRACE_DEPTH 2
 #ifndef MEMHOOK_MAX_THREADS
@@ -36,10 +37,13 @@ using namespace std;
 struct slot;
 struct info_t;
 class ThreadExiter;
-thread_local unordered_set<const char*> threadFiles;
-thread_local unordered_set<const char*> typeFiles;
-unordered_set<const char*> globalTypes;
-unordered_set<const char*> globalFiles;
+// thread_local unordered_set<const char*> threadFiles;
+// thread_local unordered_set<const char*> typeFiles;
+// unordered_set<const char*> globalTypes;
+// unordered_set<const char*> globalFiles;
+
+memhook_hashtable filetable;
+memhook_hashtable typetable;
 
 thread_local int thread_first_call = 1;
 thread_local int first_filled_buffer_status = 0;
@@ -113,37 +117,19 @@ memhook_memory_pool::~memhook_memory_pool(){
 		write(global_fd, memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
 	}
 
-  for(auto const& i:globalFiles) {
-    fileset << (void*)i << "|" << i << endl;
+  for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
+    if(filetable.bucket[i] != NULL)
+    fileset << (void*)filetable.bucket[i] << "|" << filetable.bucket[i] << endl;
   }
 
-  for(auto const& i:globalTypes) {
-    typeset << (void*)i << "|" << abi::__cxa_demangle(i, 0, 0, &status) << endl;
+  for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
+    if(typetable.bucket[i] != NULL)
+    typeset << (void*)typetable.bucket[i] << "|" << abi::__cxa_demangle(typetable.bucket[i], 0, 0, &status) << endl;
   }
 
   fileset.close();
   typeset.close();
 }
-/*
-memhook_memory_pool::~memhook_memory_pool(){
-
-  printf("memory_pool Destructor \n");
-  ofstream dump_file;
-
-  dump_file.open("debug_dump.txt");
-  //really nasty, just used to get functionality restored will disappear after optimization
-  for(int i = 0; i < memory_pool.size(); i ++){
-    for(int j = 0; j < memory_pool[i].number_of_buffers; j++){
-      for(int k = 0; k < MAX_BUFFER_SIZE;k++){
-      	if(memory_pool[i].allocation_log[j][k].timestamp > 0){
-         dump_file << memory_pool[i].allocation_log[j][k].timestamp << "|" << memory_pool[i].allocation_log[j][k].size << "|" << memory_pool[i].allocation_log[j][k].addr << "|" << memory_pool[i].allocation_log[j][k].typeofop << endl;
-        }else {
-        	break;
-        }  
-      }
-    }
-  }
-}*/
 
 //max buffer size is already known
 void memhook_memory_pool::add(info_t *logarray, int buffer_size_nbytes){
@@ -162,14 +148,15 @@ void memhook_memory_pool::add(info_t *logarray, int buffer_size_nbytes){
   memory_pool[memory_pool.size() - 1].allocation_log = logarray;
   memory_pool[memory_pool.size() - 1].buffer_size_nbytes = buffer_size_nbytes;
 
-  for(auto const& i : threadFiles) {
-    globalFiles.insert(i);
-  }
+  // for(auto const& i : threadFiles) {
+  //   globalFiles.insert(i);
+  // }
 
-  for(auto const& i : typeFiles) {
-    globalTypes.insert(i);
-  }
+  // for(auto const& i : typeFiles) {
+  //   globalTypes.insert(i);
+  // }
 
+  
   pthread_mutex_unlock(&lock);
 }
 

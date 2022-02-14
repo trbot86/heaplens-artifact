@@ -182,11 +182,11 @@ void *memhook_calloc(size_t nmemb, size_t size, char* file, int line, bool log) 
 
 extern "C" {
 
-    //Used for C projects which do not support templating
+    //Used for C/C++ projects which do not support templating
     void *malloc_s(size_t size, const char* filepath, int line) {
         // printf("%s", filepath);
-        void* ptr = memhook_malloc(size, filepath, line, true);
-        threadFiles.insert(filepath);
+        unit_log.file = filetable.insert(filepath);
+        void* ptr = memhook_malloc(size, unit_log.file, line, true);
         collector.copy(unit_log);
         return ptr;
     }
@@ -200,96 +200,6 @@ extern "C" {
     //     return memhook_calloc(nmemb, size, true);
     // }
 }
-
-// ostream& operator << (ostream& os, info_t& info) {
-//         if(info.file) {
-//             os << info.file << "|" << tmap[info.tindex_name] << "|" << info.line << "|" << info.timestamp << "|" << info.size << "|" << (long)info.addr << "|" << info.typeofop << endl;
-//         }
-//         else {
-//             os << "empty" << "|" << "emptytype" << "|" << info.line << "|" << info.timestamp << "|" << 0 << "|" << (long)info.addr << "|" << info.typeofop << endl;
-//         }
-//         return os;
-// }
-
-// void printstats() {
-//     for(int i = 0;i < it;i++) {
-//         cout << myArray[i];
-//     }
-// }
-
-/***********************
- * Does periodic dumping of info_t structs to the disk.
- * 
- * 1) First demangle all the type names and store them in the type_name map
- * 2) Store the info_t struct with the type name in disk
- * TODO:
- * Implement DMA operation to store info_t array into disk
- ***********************/
-
-// void dumpentirestatstofile() {
-//     ofstream myfile("info_t_dump.txt", ios_base::out | ios_base::app);
-//     ofstream filemap("filemap", ios_base::out | ios_base::app);
-//     ofstream typemap("typemap", ios_base::out | ios_base::app);
-
-//     int status;
-//     char* demangled_name;
-
-//     for(int i = 0;i < MAX_TRACK*MAX_THREADS;i++) {
-//         while(allArrays[i].addr == nullptr) i++;
-        
-//         if(allArrays[i].file && allArrays[i].typeofop && !tmap.count(allArrays[i].tindex)) {
-//             demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
-//             tmap[allArrays[i].tindex] = demangled_name;
-//         }
-
-//         if(allArrays[i].file && !fset.count(allArrays[i].file)) {
-//             fset.insert(allArrays[i].file);
-//         }
-//     }
-
-//     for(auto i = fset.begin();i != fset.end();i++) {
-//         filemap.write(*i, sizeof(char*));
-//         filemap.write(*i, sizeof(*i));
-//     }
-
-//     for(auto i = tmap.begin();i != tmap.end();i++) {
-//         typemap.write((char*)&(*i).first, sizeof(type_index));
-//         typemap.write((*i).second, sizeof((*i).second));
-//     }
-
-//     myfile.write(reinterpret_cast<char const*>(allArrays), MAX_THREADS*MAX_TRACK*sizeof(info_t));
-// }
-
-// void dumpentirestatstofile2() {
-//     it = INT_MAX;
-//     ofstream myfile("info_t_dump.txt", ios_base::out | ios_base::app);
-
-//     int status;
-//     char* demangled_name;
-
-//     for(int i = 0;i < MAX_TRACK*MAX_THREADS;i++) {
-//         if(allArrays[i].addr == nullptr) continue;
-//         else if(allArrays[i].file && allArrays[i].typeofop && !tmap.count(allArrays[i].tindex)) {
-//             demangled_name = abi::__cxa_demangle(allArrays[i].tindex.name(), 0, 0, &status);
-//             tmap[allArrays[i].tindex] = demangled_name;
-//         }
-
-//         myfile << allArrays[i];
-//     }
-// }
-
-// void dumpstatstofile(const char* file) {
-//     for(int i = 0;i < MAX_TRACK;i++) {
-//         if(!tmap.count(myArray[i].tindex)) {
-//             tmap[myArray[i].tindex] = myArray[i].tindex.name();
-//         }
-//     }
-
-//     ofstream myfile (file, ios_base::out | ios_base::app);
-//     for(int i = 0;i < MAX_TRACK;i++) {
-//         myfile << myArray[i];
-//     }
-// }
 
 /**********************
  * TODO:

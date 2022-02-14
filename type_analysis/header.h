@@ -1,7 +1,7 @@
 #ifndef __HEADER_H
 #define __HEADER_H
 
-// #include "memhook_interface.h"
+#include "memhook_interface.h"
 
 #ifdef __cplusplus
 #include <bits/stdc++.h>
@@ -47,6 +47,9 @@ struct stru {
 // extern thread_local unordered_set<const char*> threadFiles;
 // extern thread_local unordered_set<const char*> typeFiles;
 
+// extern memhook_hashtable filetable;
+// extern memhook_hashtable typetable;
+
 class mem_alloc {
   public:
   void* alloc(size_t size) {
@@ -55,20 +58,19 @@ class mem_alloc {
     return ptr;
   }
 
-  template <class T, char... c, int line>
+  template <class T, int line, char ...filename>
   T* alloc(size_t size) {
-    // void* ptr;
-    // // unit_log.file = filename;
-    // unit_log.tindex_name = typeid(T).name();
+    void* ptr;
+    string filestring = {filename...};
+  
+    unit_log.file = filetable.insert(filestring);
+    unit_log.tindex_name = typetable.insert(typeid(T).name());
 
-    // threadFiles.insert(unit_log.file);
-    // typeFiles.insert(unit_log.tindex_name);
+    ptr = memhook_malloc(size, unit_log.file, line, true);
 
-    // collector.copy(unit_log);
+    collector.copy(unit_log);
 
-    // static const string filename = std::string(c...);
-    // ptr = memhook_malloc(size, filename.c_str(), line, true);
-    // return (T*)ptr;
+    return (T*)ptr;
   }
 };
 
@@ -92,7 +94,7 @@ void func (size_t mem, const size_t abcd) {
 
   #ifdef __cplusplus
   mem_alloc m;
-  m.alloc(sizeof(char));
+  m.alloc<char, MACRO_GET_STR("./header.h"), 95>(sizeof(char));
   #endif
 }
 

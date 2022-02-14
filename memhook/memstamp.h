@@ -19,6 +19,7 @@ struct info_t {
 class MemStamp
 {
     public:
+    //check if this should be char const * or const char *
         char const *filename;
         int const lineNum;
     public:
@@ -28,12 +29,8 @@ class MemStamp
 
 class MemStampCollector {
   private:
-//   slot* sarr;
-//   info_t* allArrays;
 
-//   int get_slot(thread::id id);
-
-public:
+  public:
     MemStampCollector();
 
     ~MemStampCollector();

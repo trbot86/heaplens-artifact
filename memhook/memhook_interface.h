@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "memstamp.h"
+#include "hash.h"
 //#include <execinfo.h>
 //#include <cxxabi.h>
 //#include <dlfcn.h>
@@ -49,8 +50,10 @@ void* malloc_s(size_t, const char*, int);
 
 extern MemStampCollector collector;
 extern thread_local info_t unit_log;
-extern thread_local unordered_set<const char*> threadFiles;
-extern thread_local unordered_set<const char*> typeFiles;
+// extern thread_local unordered_set<const char*> threadFiles;
+// extern thread_local unordered_set<const char*> typeFiles;
+extern memhook_hashtable filetable;
+extern memhook_hashtable typetable;
 extern void *memhook_malloc(size_t size, const char* file, int line, bool log);
 
 // template <typename T>
@@ -58,11 +61,11 @@ extern void *memhook_malloc(size_t size, const char* file, int line, bool log);
 
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
-    unit_log.file = "specialfile";
-    unit_log.tindex_name = typeid(T).name();
+    unit_log.file = filetable.insert(stamp.filename);
+    unit_log.tindex_name = typetable.insert(typeid(T).name());
 
-    threadFiles.insert(unit_log.file);
-    typeFiles.insert(unit_log.tindex_name);
+    // threadFiles.insert(unit_log.file);
+    // typeFiles.insert(unit_log.tindex_name);
 
     collector.copy(unit_log);
     return p;
@@ -77,13 +80,14 @@ inline T* operator * (const MemStamp &stamp, T *p) {
 //     return ptr;
 // }
 
-template <typename T, char* filename, int line>
+template <typename T, int line, char ...filename>
 T malloc(size_t size, bool fakearg) {
-    T ptr = (T)memhook_malloc(size, filename, line, true);
+    string filestring = {filename...};
+    
+    unit_log.file = filetable.insert(filestring);
+    unit_log.tindex_name = typetable.insert(typeid(T).name());
 
-    unit_log.tindex_name = typeid(T).name();
-    threadFiles.insert(filename);
-    typeFiles.insert(unit_log.tindex_name);
+    T ptr = (T)memhook_malloc(size, unit_log.file, line, true);
 
     collector.copy(unit_log);
     return ptr;

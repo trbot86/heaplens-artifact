@@ -5,6 +5,7 @@ typedump.txt
 *_info_t_dump.txt
 new_info_t_dump.txt
 *.sqlite
+*.yaml
 tool
 refactor
 analyze
