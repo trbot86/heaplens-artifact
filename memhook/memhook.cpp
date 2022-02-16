@@ -184,7 +184,7 @@ extern "C" {
 
     //Used for C/C++ projects which do not support templating
     void *malloc_s(size_t size, const char* filepath, int line) {
-        // printf("%s", filepath);
+        printf("%s %p \n", filepath, (void*)filepath);
         unit_log.file = filetable.insert(filepath);
         void* ptr = memhook_malloc(size, unit_log.file, line, true);
         collector.copy(unit_log);

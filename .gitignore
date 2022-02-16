@@ -1,4 +1,6 @@
 __pycache__
+*.so
+*.o
 fielddump.txt
 newfielddump.txt
 typedump.txt

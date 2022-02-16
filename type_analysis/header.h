@@ -94,7 +94,7 @@ void func (size_t mem, const size_t abcd) {
 
   #ifdef __cplusplus
   mem_alloc m;
-  m.alloc<char, MACRO_GET_STR("./header.h"), 95>(sizeof(char));
+  m.alloc<char, 97, MACRO_GET_STR("./header.h")>(sizeof(char));
   #endif
 }
 

@@ -39,8 +39,8 @@ extern "C" {
 
 void* malloc_s(size_t, const char*, int);
 
-#define SIFTER_NEW MemStamp((__FILE__), (__LINE__)) * new
-#define new SIFTER_NEW
+// #define SIFTER_NEW 
+#define new MemStamp((__FILE__), (__LINE__)) * new
 
 #ifdef __cplusplus
 }
@@ -62,10 +62,8 @@ extern void *memhook_malloc(size_t size, const char* file, int line, bool log);
 template <class T>
 inline T* operator * (const MemStamp &stamp, T *p) {
     unit_log.file = filetable.insert(stamp.filename);
+    unit_log.line = stamp.lineNum;
     unit_log.tindex_name = typetable.insert(typeid(T).name());
-
-    // threadFiles.insert(unit_log.file);
-    // typeFiles.insert(unit_log.tindex_name);
 
     collector.copy(unit_log);
     return p;

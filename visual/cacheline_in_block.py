@@ -118,6 +118,9 @@ barchartdf['ADDRESS'] = barchartdf['ADDRESS'].apply(hex)
 
 print(barchartdf)
 
+#CHECK THIS: putting "" where type is None
+barchartdf['TYPE'] = [(x or "") for x in barchartdf['TYPE']]
+
 print("**************")
 
 insertnewrow()

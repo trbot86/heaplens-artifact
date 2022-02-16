@@ -67,7 +67,7 @@ StatementMatcher newMatcher =
     cxxNewExpr().bind("newcall");
 
 StatementMatcher CStyleMallocMatcher =
-    callExpr(callee(functionDecl(anyOf(hasName("malloc"), hasName("realloc"), hasName("calloc"), hasName("reallocArray")))));
+    callExpr(callee(functionDecl(anyOf(hasName(MTDFNAME1), hasName(MTDFNAME2), hasName(MTDFNAME3), hasName(MTDFNAME4), hasName(MTDFNAME5)))));
 
 class ClassnamePrinter : public MatchFinder::MatchCallback
 {

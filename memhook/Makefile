@@ -20,8 +20,8 @@ memhook.o: memhook.cpp $(DEPS)
 # hash.o: hash.cpp hash.h
 # 	$(CC) hash.cpp -shared -fPIC -g -lrt -O2 -c
 
-# hash_test: hash.cpp hash.h
-# 	$(CC) hash.cpp -fPIC -g -lrt -pthread -O2 -o hash_test
+hash_test: hash.cpp hash.h
+	$(CC) hash.cpp -fPIC -g -lrt -pthread -O2 -o hash_test
 
 # link:
 # 	$(CC) memhook.cpp memalloc.cpp -pthread -Wall -g -o b.out

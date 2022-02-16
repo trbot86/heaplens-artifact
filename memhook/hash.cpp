@@ -10,7 +10,7 @@ char* memhook_hashtable::insert(string str) {
 
     for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
         int index = (hashfunction.next(MEMHOOK_HASH_TABLE_SIZE)+i)%MEMHOOK_HASH_TABLE_SIZE;
-        cout << "insert KEY: " << i << " " << index << endl;
+        // cout << "insert KEY: " << i << " " << index << endl;
         char* found = bucket[index];
         
         if(found == NULL) {
@@ -19,7 +19,8 @@ char* memhook_hashtable::insert(string str) {
             CASB(&bucket[index], NULL, ptr);
             return ptr;
         }
-        else if(strcmp(found, str.c_str()) != 0) {
+        else if(strcmp(found, str.c_str()) == 0) {
+            // cout << "found" << endl;
             return found;
         }
     }
@@ -33,7 +34,7 @@ bool memhook_hashtable::contains(string str) {
     
     for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
         int index = (hashfunction.next(MEMHOOK_HASH_TABLE_SIZE)+i)%MEMHOOK_HASH_TABLE_SIZE;
-        cout << "contains KEY: " << i << " " << index << endl;
+        // cout << "contains KEY: " << i << " " << index << endl;
         char* found = bucket[index];
 
         if(found == NULL) return false;
@@ -53,6 +54,7 @@ unsigned long memhook_hashtable::djb2(const string& str) {
 // int main(int argc, char** argv) {
 //     memhook_hashtable mh;
 //     mh.insert("01233");
+//     mh.insert("Hello!");
 //     mh.insert("Hello!");
 
 //     cout << mh.contains("Hello!") << endl;
