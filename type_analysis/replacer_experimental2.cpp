@@ -103,6 +103,7 @@ Replacements &getReplacements(RefactoringTool &Tool, StringRef file)
 
 int main(int argc, const char **argv)
 {
+    cout << LLVM_VERSION_MAJOR << " " << LLVM_VERSION_MINOR << endl;
     std::string errorMsg;
     CommonOptionsParser OptionsParser(argc, argv, ToolingSampleCategory);
 

@@ -98,6 +98,7 @@ memhook_memory_pool::memhook_memory_pool(){
 }
 
 memhook_memory_pool::~memhook_memory_pool(){
+  cout << "MEMHOOK POOL DESTRUCTOR" << endl;
 	int total_byte_count = 0, status = 0;
 
 	//confirm this method works with trevor
@@ -123,8 +124,10 @@ memhook_memory_pool::~memhook_memory_pool(){
   }
 
   for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
-    if(typetable.bucket[i] != NULL)
-    typeset << (void*)typetable.bucket[i] << "|" << abi::__cxa_demangle(typetable.bucket[i], 0, 0, &status) << endl;
+    if(typetable.bucket[i] != NULL) {
+      typeset << (void*)typetable.bucket[i] << "|" << abi::__cxa_demangle(typetable.bucket[i], 0, 0, &status) << endl;
+      // cout << typetable.bucket[i] << endl;
+    }
   }
 
   fileset.close();
@@ -274,6 +277,8 @@ void MemStampCollector::copy(info_t &unit_log){
 	}
 
     memcpy(&allocation_log[buffer_index][log_index], &unit_log, sizeof(info_t));
+    //set unit_log to zero
+    memset(&unit_log, 0, sizeof(unit_log));
     log_index++;
 
     if(log_index == MEMHOOK_MAX_BUFFER_SIZE){

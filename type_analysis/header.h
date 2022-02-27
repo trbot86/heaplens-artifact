@@ -1,7 +1,7 @@
 #ifndef __HEADER_H
 #define __HEADER_H
 
-#include "memhook_interface.h"
+// #include "memhook_interface.h"
 
 #ifdef __cplusplus
 #include <bits/stdc++.h>
@@ -61,7 +61,7 @@ class mem_alloc {
   template <class T, int line, char ...filename>
   T* alloc(size_t size) {
     void* ptr;
-    string filestring = {filename...};
+    std::string filestring = {filename...};
   
     unit_log.file = filetable.insert(filestring);
     unit_log.tindex_name = typetable.insert(typeid(T).name());
@@ -88,7 +88,7 @@ void func (size_t mem, const size_t abcd) {
   void* ptr, *ptr2 = NULL;
   int * t = (int*)malloc(sizeof(int));//
 
-  r = (int*)malloc(100*sizeof(int));//
+  r = (int*)c(100*sizeof(int));//
   ptr = malloc(mem);
   ptr2 = malloc(abcd);
 

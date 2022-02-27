@@ -20,7 +20,7 @@ bash -c "./malloctypedumper compile_commands.json"
 #run clang-apply-replacements (supply directory path where files to refactor reside. Put fixes.yaml in the same folder)
 # clang-apply-replacements ./
 
-#make and run the project
+#add memhook_interface, change Makefile to include memhook.h, make and run the project
 make header
 ./header
 

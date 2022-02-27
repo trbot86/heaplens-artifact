@@ -10,17 +10,17 @@
 
 using namespace std;
 
-typedef char* item_t;
+typedef char* volatile item_t;
 
 class memhook_hashtable {
     public:
     typedef item_t* iterator;
-    Random64 hashfunction;
+    mhRandom64 hashfunction;
     memhook_hashtable() {};
-    char* insert(string str);
-    bool contains(string str);
+    char* insert(const char* str);
+    bool contains(const char* str);
     item_t bucket[MEMHOOK_HASH_TABLE_SIZE] = { NULL };
-    unsigned long djb2(const string& str);
+    unsigned long djb2(const char* str);
 };
 
 

@@ -2,12 +2,16 @@
 # 2nd stage- pivot the data, and group accordingly
 # 3rd stage- plot the data
 
+from random import randint, randrange
 import sys, sqlite3, matplotlib.pyplot as plt
+import tkinter
+import matplotlib
 import numpy as np
 import pandas as pd
 import argparse
 from matplotlib.cm import get_cmap
 from matplotlib.lines import Line2D
+from scipy import rand
 
 # pd.set_option('display.max_rows', None)
 
@@ -18,8 +22,7 @@ def display(var):
     m = re.search("display\s*\(\s*(\w+)\s*\)", cntext, re.MULTILINE)
     print(m.group(1), type(var), var)
 
-def insertnewrow():
-    global barchartdf
+def insertnewrow(barchartdf):
     rows = []
     # print(barchartdf.shape[0])
     for i in range(0, barchartdf.shape[0]):
@@ -49,12 +52,10 @@ def insertnewrow():
                 new_row['SIZE'] = rem
                 rows.append(new_row)
 
-    temp = barchartdf.append(rows)
-    barchartdf = temp
+    return barchartdf.append(rows)
     # quit()
 
-def setcolormap():
-    global barchartdf
+def setcolormap(barchartdf):
     d = dict([(y,x+1) for x,y in enumerate(sorted(set(barchartdf['TYPE'])))])
     # print("DICTIONARY: ", d)
     cmap = get_cmap("rainbow", len(d))
@@ -62,6 +63,56 @@ def setcolormap():
     # print(scheme)
     return d, sorted(set(scheme)), cmap, cmap(scheme)
 
+def renderchart(cache_query):
+    barchartdf = pd.read_sql_query(cache_query, con)
+
+    barchartdf['ADDRESS'] = barchartdf['ADDRESS'].apply(hex)
+
+    print(barchartdf)
+
+    #CHECK THIS: putting "" where type is None
+    barchartdf['TYPE'] = [str(x) for x in barchartdf['TYPE']]
+
+    print("**************")
+
+    #create new rows for cache allocations that span more than one cache line
+    barchartdf = insertnewrow(barchartdf)
+
+    fig, gnt = plt.subplots()
+
+    gnt.set_xlabel('cache offset')
+    gnt.set_ylabel('cacheline')
+
+    plt.xticks(ticks=range(0,int(xbytes),8))
+    plt.yticks(ticks=range(0,int(barchartdf['clno'].max()),8))
+
+    gnt.set_xticks(ticks=range(0,int(xbytes),4), minor=True)
+    gnt.set_yticks(ticks=range(0,int(barchartdf['clno'].max()),2), minor=True)
+
+    gnt.grid(which='minor', alpha=0.8)
+    gnt.grid(True)
+
+    dct, mapping, clrmap, colormap = setcolormap(barchartdf)
+
+    custom_lines = [Line2D([0], [0], color=clrmap(x), lw=4) for x in mapping]
+    print(mapping)
+    print(clrmap)
+    print("custom_lines: ", [clrmap(x) for x in mapping])
+
+    gnt.set_prop_cycle(color=colormap)
+
+    gnt.hlines(barchartdf['clno'], barchartdf['cloff'], barchartdf['cloff']+barchartdf['SIZE'], color=colormap, linewidth=7)
+
+    gnt.legend(custom_lines, list(dct.keys()))
+
+    lastaddr = set()
+
+    for i, j , k in zip(barchartdf['clno'], barchartdf['cloff'], barchartdf['ADDRESS']):
+            if not k in lastaddr:
+                plt.text(j, i, str(k) , ha='left', va='center')
+            lastaddr.add(k)
+
+    plt.show()
 
 con = sqlite3.connect(sys.argv[1])
 
@@ -74,7 +125,7 @@ typequery = sys.argv[4]
 
 display(xbytes)
 
-get_typenames = "SELECT DISTINCT ALLOCSWITHTYPES.TYPE FROM ALLOCSWITHTYPES;"
+get_typenames = "select distinct ALLOCSWITHTYPES.TYPE from ALLOCSWITHTYPES;"
 
 blocklistquery = "select distinct address/" + blocksize + " as blockno from ALLOCSWITHTYPES where (" + typequery + ")"
 
@@ -84,7 +135,8 @@ cache_query = "select type ,\
     address/" + blocksize + " as blockno ,\
     (address%" + xbytes + ") as cloff ,\
     size \
-from ALLOCSWITHTYPES where (" + typequery + ") "
+from ALLOCSWITHTYPES where '1==1' "
+#  where (" + typequery + ") "
 
 xbytes = int(xbytes)
 
@@ -101,62 +153,16 @@ blocknodf = pd.read_sql_query(blocklistquery, con)
 print(blocknodf)
 
 print("**************")
+matplotlib.use('TkAgg')
 
-blockno = input("Enter block number: ")
+while True:
+    blockno = input("Enter block number: ")
+    # blockno = str(blocknodf['blockno'][randint(0, blocknodf.size-1)])
+    print(blockno) 
 
-cache_query += "and blockno like " + blockno 
+    print("**************")
 
-print("**************")
+    print(cache_query)
 
-print(cache_query)
-
-print("**************")
-
-barchartdf = pd.read_sql_query(cache_query, con)
-
-barchartdf['ADDRESS'] = barchartdf['ADDRESS'].apply(hex)
-
-print(barchartdf)
-
-#CHECK THIS: putting "" where type is None
-barchartdf['TYPE'] = [(x or "") for x in barchartdf['TYPE']]
-
-print("**************")
-
-insertnewrow()
-
-fig, gnt = plt.subplots()
-
-gnt.set_xlabel('cache offset')
-gnt.set_ylabel('cacheline')
-
-plt.xticks(ticks=range(0,int(xbytes),8))
-plt.yticks(ticks=range(0,int(barchartdf['clno'].max()),8))
-
-gnt.set_xticks(ticks=range(0,int(xbytes),4), minor=True)
-gnt.set_yticks(ticks=range(0,int(barchartdf['clno'].max()),2), minor=True)
-
-gnt.grid(which='minor', alpha=0.8)
-gnt.grid(True)
-
-dct, mapping, clrmap, colormap = setcolormap()
-
-custom_lines = [Line2D([0], [0], color=clrmap(x), lw=4) for x in mapping]
-print(mapping)
-print(clrmap)
-print("custom_lines: ", [clrmap(x) for x in mapping])
-
-gnt.set_prop_cycle(color=colormap)
-
-gnt.hlines(barchartdf['clno'], barchartdf['cloff'], barchartdf['cloff']+barchartdf['SIZE'], color=colormap, linewidth=7)
-
-gnt.legend(custom_lines, list(dct.keys()))
-
-lastaddr = set()
-
-for i, j , k in zip(barchartdf['clno'], barchartdf['cloff'], barchartdf['ADDRESS']):
-        if not k in lastaddr:
-            plt.text(j, i, str(k) , ha='left', va='center')
-        lastaddr.add(k)
-
-plt.show()
+    print("**************")
+    renderchart(cache_query + "and blockno like " + blockno)

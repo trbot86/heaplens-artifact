@@ -82,7 +82,7 @@ template <typename T, int line, char ...filename>
 T malloc(size_t size, bool fakearg) {
     string filestring = {filename...};
     
-    unit_log.file = filetable.insert(filestring);
+    unit_log.file = filetable.insert(filestring.c_str());
     unit_log.tindex_name = typetable.insert(typeid(T).name());
 
     T ptr = (T)memhook_malloc(size, unit_log.file, line, true);

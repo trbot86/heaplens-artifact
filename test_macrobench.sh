@@ -8,13 +8,13 @@ bash -c "cd prac/setbench/macrobench/; numactl -i all ./bin/rundb_TPCC_brown_ext
 #demarshall data
 bash -c "cd prac/setbench/macrobench/; ../../tiny/byte_rw.bin binary_dump.txt "
 
-# #generate fielddump.txt and typedump.txt
+#generate fielddump.txt and typedump.txt
 # bash -c "cd prac/setbench/macrobench/; ../../../type_analysis/fieldandtypedumper compile_commands.json"
 
-# #generate new_fielddump.txt
+#generate new_fielddump.txt
 # bash -c "cd prac/setbench/macrobench/; python3 -c \"import sys;sys.path.append(\\\"../../../type_analysis/\\\");import trim_name; trim_name.trim_fields(\\\"fielddump.txt\\\")\""
 
-# #generate malloc_type_dump.txt
+#generate malloc_type_dump.txt
 # bash -c "cd prac/setbench/macrobench/; ../../../type_analysis/malloctypedumper compile_commands.json"
 
 #generate allocs.sqlite table ALLOCS
