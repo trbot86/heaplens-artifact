@@ -3,14 +3,17 @@
 # 3rd stage- plot the data
 
 from random import randint, randrange
-import sys, sqlite3, matplotlib.pyplot as plt
-import tkinter
+import tkinter as tk
+from tkinter import messagebox
 import matplotlib
+import sys, sqlite3, matplotlib.pyplot as plt
+matplotlib.use('TkAgg')
+from matplotlib.cm import get_cmap
+from matplotlib.lines import Line2D
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import pandas as pd
 import argparse
-from matplotlib.cm import get_cmap
-from matplotlib.lines import Line2D
 from scipy import rand
 
 # pd.set_option('display.max_rows', None)
@@ -63,20 +66,12 @@ def setcolormap(barchartdf):
     # print(scheme)
     return d, sorted(set(scheme)), cmap, cmap(scheme)
 
-def renderchart(cache_query):
-    barchartdf = pd.read_sql_query(cache_query, con)
+def on_closing():
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            root.destroy()
+            exit()
 
-    barchartdf['ADDRESS'] = barchartdf['ADDRESS'].apply(hex)
-
-    print(barchartdf)
-
-    #CHECK THIS: putting "" where type is None
-    barchartdf['TYPE'] = [str(x) for x in barchartdf['TYPE']]
-
-    print("**************")
-
-    #create new rows for cache allocations that span more than one cache line
-    barchartdf = insertnewrow(barchartdf)
+def renderchart(barchartdf):
 
     fig, gnt = plt.subplots()
 
@@ -95,6 +90,7 @@ def renderchart(cache_query):
     dct, mapping, clrmap, colormap = setcolormap(barchartdf)
 
     custom_lines = [Line2D([0], [0], color=clrmap(x), lw=4) for x in mapping]
+    
     print(mapping)
     print(clrmap)
     print("custom_lines: ", [clrmap(x) for x in mapping])
@@ -112,7 +108,10 @@ def renderchart(cache_query):
                 plt.text(j, i, str(k) , ha='left', va='center')
             lastaddr.add(k)
 
-    plt.show()
+    chart = FigureCanvasTkAgg(fig, root)
+    chart.get_tk_widget().pack()
+    # plt.show()
+    chart.draw()
 
 con = sqlite3.connect(sys.argv[1])
 
@@ -153,16 +152,36 @@ blocknodf = pd.read_sql_query(blocklistquery, con)
 print(blocknodf)
 
 print("**************")
-matplotlib.use('TkAgg')
+
+root = tk.Tk()
 
 while True:
-    blockno = input("Enter block number: ")
-    # blockno = str(blocknodf['blockno'][randint(0, blocknodf.size-1)])
+    # blockno = input("Enter block number: ")
+    # PICK RANDOM BLOCK
+    blockno = str(blocknodf['blockno'][randint(0, blocknodf.size-1)])
+
     print(blockno) 
 
     print("**************")
-
+    # PRINT CACHE QUERY
     print(cache_query)
 
     print("**************")
-    renderchart(cache_query + "and blockno like " + blockno)
+
+    barchartdf = pd.read_sql_query(cache_query + "and blockno like " + blockno, con)
+
+    #create new rows for cache allocations that span more than one cache line
+    barchartdf = insertnewrow(barchartdf)
+
+    barchartdf['ADDRESS'] = barchartdf['ADDRESS'].apply(hex)
+
+    print(barchartdf)
+
+    #putting "" where type is None
+    barchartdf['TYPE'] = [str(x) for x in barchartdf['TYPE']]
+
+    print("**************")
+
+    renderchart(barchartdf)
+    root.protocol("WM_DELETE_WINDOW", on_closing)
+    root.mainloop()
