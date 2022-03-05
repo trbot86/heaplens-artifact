@@ -1,6 +1,6 @@
 from random import randint, randrange
 import tkinter as tk
-from tkinter import RIGHT, Y, Frame, Listbox, Scrollbar, messagebox
+from tkinter import ANCHOR, RIGHT, Y, Frame, Listbox, Scrollbar, messagebox
 import matplotlib
 import sys, sqlite3, matplotlib.pyplot as plt
 
@@ -161,13 +161,14 @@ class StartPage(tk.Frame):
         fig, gnt = plt.subplots()
         self.plot_chart(barchartdf, gnt)
 
-        canvas = FigureCanvasTkAgg(fig, master=toplevel)
+        canvas = FigureCanvasTkAgg(fig, master=root)
         canvas.get_tk_widget().pack(side="top", fill='both', expand=True)
 
         # canvas.draw()
         self.listbox = Listbox(root)
         self.populate_listbox(blocknodf)
         self.listbox.pack(side="right")
+        self.listbox.bind('<Double-1>', lambda x: self.selectblock())
 
         # self.scrollbar = Scrollbar(root)
 
@@ -185,6 +186,10 @@ class StartPage(tk.Frame):
                                     command=lambda: self.plot(canvas, gnt))
         self.plotbutton.pack(side="left")
 
+    def selectblock(self):
+        print("selected: " + self.listbox.get(ANCHOR))
+        self.plot(self.canvas, self.gnt)
+    
     def populate_listbox(self, blocknodf):
         print(blocknodf)
         for i in range(len(blocknodf)):
