@@ -3,7 +3,7 @@
 #define __MEMHOOK_INTERFACE_H
 #pragma once
 
-//ASK ABOUT DIFFERENT IMPLEMENTATIONS OF BOOL IN C/C++. WILL THAT BE A PROBLEM?
+// ASK ABOUT DIFFERENT IMPLEMENTATIONS OF BOOL IN C/C++. WILL THAT BE A PROBLEM?
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -30,16 +30,40 @@ using namespace std;
 
 #define PADDING 64
 
+#define MACRO_GET_1(str, i) \
+    (sizeof(str) > (i) ? str[(i)] : 0)
+
+#define MACRO_GET_4(str, i)      \
+    MACRO_GET_1(str, i + 0),     \
+        MACRO_GET_1(str, i + 1), \
+        MACRO_GET_1(str, i + 2), \
+        MACRO_GET_1(str, i + 3)
+
+#define MACRO_GET_16(str, i)     \
+    MACRO_GET_4(str, i + 0),     \
+        MACRO_GET_4(str, i + 4), \
+        MACRO_GET_4(str, i + 8), \
+        MACRO_GET_4(str, i + 12)
+
+#define MACRO_GET_64(str, i)       \
+    MACRO_GET_16(str, i + 0),      \
+        MACRO_GET_16(str, i + 16), \
+        MACRO_GET_16(str, i + 32), \
+        MACRO_GET_16(str, i + 48)
+
+#define MACRO_GET_STR(str) MACRO_GET_64(str, 0), 0
+
 struct slot;
 struct info_t;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void* malloc_s(size_t, const char*, int);
+    void *malloc_s(size_t, const char *, int);
 
-// #define SIFTER_NEW 
+// #define SIFTER_NEW
 #define new MemStamp((__FILE__), (__LINE__)) * new
 
 #ifdef __cplusplus
@@ -54,13 +78,14 @@ extern thread_local info_t unit_log;
 // extern thread_local unordered_set<const char*> typeFiles;
 extern memhook_hashtable filetable;
 extern memhook_hashtable typetable;
-extern void *memhook_malloc(size_t size, const char* file, int line, bool log);
+extern void *memhook_malloc(size_t size, const char *file, int line, bool log);
 
 // template <typename T>
 // T malloc(size_t size, bool fakearg=true);
 
 template <class T>
-inline T* operator * (const MemStamp &stamp, T *p) {
+inline T *operator*(const MemStamp &stamp, T *p)
+{
     unit_log.file = filetable.insert(stamp.filename);
     unit_log.line = stamp.lineNum;
     unit_log.tindex_name = typetable.insert(typeid(T).name());
@@ -78,10 +103,12 @@ inline T* operator * (const MemStamp &stamp, T *p) {
 //     return ptr;
 // }
 
-template <typename T, int line, char ...filename>
-T malloc(size_t size, bool fakearg) {
+
+template <typename T, int line, char... filename>
+T malloc(size_t size, bool fakearg)
+{
     string filestring = {filename...};
-    
+
     unit_log.file = filetable.insert(filestring.c_str());
     unit_log.tindex_name = typetable.insert(typeid(T).name());
 
@@ -96,4 +123,4 @@ T malloc(size_t size, bool fakearg) {
 uint64_t memhook_get_server_clock();
 
 #define malloc(s) malloc_s((s), (__FILE__), (__LINE__))
-#endif          //__MEMHOOK_INTERFACE_H
+#endif //__MEMHOOK_INTERFACE_H

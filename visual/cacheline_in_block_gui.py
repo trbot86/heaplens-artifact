@@ -117,10 +117,14 @@ def getbarchartdf(blocknodf):
                                 con)
 
     #create new rows for cache allocations that span more than one cache line
+    print("BEFORE INSERTNEWROW")
+    print(barchartdf)
+    
     barchartdf = insertnewrow(barchartdf)
 
     barchartdf['ADDRESS'] = barchartdf['ADDRESS'].apply(hex)
 
+    print("AFTER INSERTNEWROW")
     print(barchartdf)
 
     #putting "" where type is None

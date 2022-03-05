@@ -1,7 +1,7 @@
 #ifndef __HEADER_H
 #define __HEADER_H
 
-// #include "memhook_interface.h"
+#include "memhook_interface.h"
 
 #ifdef __cplusplus
 #include <bits/stdc++.h>
@@ -11,30 +11,7 @@
 // T* malloc(size_t size) {
 //   cout << "templated malloc\n";
 //   return (T*)malloc(size);
-// }
-
-#define MACRO_GET_1(str, i) \
-    (sizeof(str) > (i) ? str[(i)] : 0)
-
-#define MACRO_GET_4(str, i) \
-    MACRO_GET_1(str, i+0),  \
-    MACRO_GET_1(str, i+1),  \
-    MACRO_GET_1(str, i+2),  \
-    MACRO_GET_1(str, i+3)
-
-#define MACRO_GET_16(str, i) \
-    MACRO_GET_4(str, i+0),   \
-    MACRO_GET_4(str, i+4),   \
-    MACRO_GET_4(str, i+8),   \
-    MACRO_GET_4(str, i+12)
-
-#define MACRO_GET_64(str, i) \
-    MACRO_GET_16(str, i+0),  \
-    MACRO_GET_16(str, i+16), \
-    MACRO_GET_16(str, i+32), \
-    MACRO_GET_16(str, i+48)
-
-#define MACRO_GET_STR(str) MACRO_GET_64(str, 0), 0 
+// } 
 
 struct stru {
   int a;
@@ -54,7 +31,7 @@ class mem_alloc {
   public:
   void* alloc(size_t size) {
     void* ptr;
-    ptr = malloc(size);
+    ptr = malloc<void, 57, MACRO_GET_STR("./header.h")>(size);
     return ptr;
   }
 
@@ -86,11 +63,11 @@ void func (size_t mem, const size_t abcd) {
   int* r;
   struj* sjj;
   void* ptr, *ptr2 = NULL;
-  int * t = (int*)malloc(sizeof(int));//
+  int * t = (int*)malloc<int, 89, MACRO_GET_STR("./header.h")>(sizeof(int));//
 
-  r = (int*)c(100*sizeof(int));//
-  ptr = malloc(mem);
-  ptr2 = malloc(abcd);
+  r = (int*)malloc<int, 91, MACRO_GET_STR("./header.h")>(100*sizeof(int));//
+  ptr = malloc<void, 92, MACRO_GET_STR("./header.h")>(mem);
+  ptr2 = malloc<void, 93, MACRO_GET_STR("./header.h")>(abcd);
 
   #ifdef __cplusplus
   mem_alloc m;

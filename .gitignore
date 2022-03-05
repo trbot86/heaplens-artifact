@@ -28,3 +28,5 @@ typedump.txt
 fileset_dump.txt
 typeset_dump.txt
 experimental
+setbench_bk/**
+setbenchbk/**
