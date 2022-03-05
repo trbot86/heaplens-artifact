@@ -1,13 +1,13 @@
 from random import randint, randrange
 import tkinter as tk
-from tkinter import RIGHT, Y, Listbox, Scrollbar, messagebox
+from tkinter import RIGHT, Y, Frame, Listbox, Scrollbar, messagebox
 import matplotlib
 import sys, sqlite3, matplotlib.pyplot as plt
 
 matplotlib.use('TkAgg')
 from matplotlib.cm import get_cmap
 from matplotlib.lines import Line2D
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import numpy as np
 import pandas as pd
 import argparse
@@ -155,16 +155,19 @@ class StartPage(tk.Frame):
         blocknodf = getblocknodf()
         barchartdf = getbarchartdf(blocknodf)
 
+        toplevel = tk.Toplevel(width=2000)
+
+
         fig, gnt = plt.subplots()
         self.plot_chart(barchartdf, gnt)
 
-        canvas = FigureCanvasTkAgg(fig, root)
-        canvas.get_tk_widget().grid()
+        canvas = FigureCanvasTkAgg(fig, master=toplevel)
+        canvas.get_tk_widget().pack(side="top", fill='both', expand=True)
 
         # canvas.draw()
         self.listbox = Listbox(root)
         self.populate_listbox(blocknodf)
-        self.listbox.grid(row=0, column=1)
+        self.listbox.pack(side="right")
 
         # self.scrollbar = Scrollbar(root)
 
@@ -172,10 +175,15 @@ class StartPage(tk.Frame):
         # self.scrollbar.config(command = self.listbox.yview)
         # self.scrollbar.grid(row=0, column=2)
 
+        toolbarFrame = Frame(master=root)
+        toolbarFrame.pack(side="bottom")
+        toolbar = NavigationToolbar2Tk(canvas, toolbarFrame)
+        toolbar.update()
+
         self.plotbutton = tk.Button(master=root,
                                     text="plot",
                                     command=lambda: self.plot(canvas, gnt))
-        self.plotbutton.grid(row=1, column=0)
+        self.plotbutton.pack(side="left")
 
     def populate_listbox(self, blocknodf):
         print(blocknodf)
@@ -289,7 +297,6 @@ def display(var):
     cntext = "".join(inspect.getframeinfo(callingframe, 5)[3])
     m = re.search("display\s*\(\s*(\w+)\s*\)", cntext, re.MULTILINE)
     print(m.group(1), type(var), var)
-
 
 # Driver Code
 con = sqlite3.connect(sys.argv[1])
