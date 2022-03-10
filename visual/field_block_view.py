@@ -10,6 +10,7 @@ import pandas as pd
 import argparse
 from matplotlib.cm import get_cmap
 from matplotlib.lines import Line2D
+from utils import insertnewrow
 
 # pd.set_option('display.max_rows', None)
 
@@ -23,90 +24,89 @@ def display(var):
     print(m.group(1), type(var), var)
 
 
-def insertnewrow(barchartdf, newdf, fieldstypedf, xbytes, fieldtohighlight=None, verbose=False):
-    print("field to highlight: ", fieldtohighlight)
-    typedict = {}
+# def insertnewrow(barchartdf, newdf, fieldstypedf, xbytes, fieldtohighlight=None, verbose=False):
+#     print("field to highlight: ", fieldtohighlight)
+#     typedict = {}
 
-    # Convert field df to dictionary for fast access
-    for i in range(0, fieldstypedf.shape[0]):
-        if fieldstypedf['CLASS'][i] in typedict:
-            typedict[fieldstypedf['CLASS'][i]].append(
-                (fieldstypedf['FIELD'][i], fieldstypedf['OFFSET'][i], fieldstypedf['SIZE'][i]))
-        else:
-            typedict[fieldstypedf['CLASS'][i]] = [
-                (fieldstypedf['FIELD'][i], fieldstypedf['OFFSET'][i], fieldstypedf['SIZE'][i])]
+#     # Convert field df to dictionary for fast access
+#     for i in range(0, fieldstypedf.shape[0]):
+#         if fieldstypedf['CLASS'][i] in typedict:
+#             typedict[fieldstypedf['CLASS'][i]].append(
+#                 (fieldstypedf['FIELD'][i], fieldstypedf['OFFSET'][i], fieldstypedf['SIZE'][i]))
+#         else:
+#             typedict[fieldstypedf['CLASS'][i]] = [
+#                 (fieldstypedf['FIELD'][i], fieldstypedf['OFFSET'][i], fieldstypedf['SIZE'][i])]
 
-    if verbose:
-        print("*********")
-        print(typedict)
-        print(typedict['node_t<longlong,void*>'])
-        print("*********")
+#     if verbose:
+#         print("*********")
+#         print(typedict)
+#         print(typedict['node_t<longlong,void*>'])
+#         print("*********")
 
-    rows = []
+#     rows = []
 
-    if not fieldtohighlight:
-        for i in range(0, barchartdf.shape[0]):
-            if barchartdf['TYPE'][i] in typedict:
-                for cl, off, sz in typedict[barchartdf['TYPE'][i]]:
-                    if verbose:
-                        print(barchartdf['TYPE'][i], cl, off, sz)
-                    # ADDRESS field redundant as clno and offset are already in use
-                    newdf = newdf.append({'CLASS': cl, 'ADDRESS': barchartdf['ADDRESS'][i], 'clno': barchartdf['clno']
-                                        [i], 'blockno': barchartdf['blockno'][i], 'cloff': off, 'SIZE': sz}, ignore_index=True)
-            else:
-                newdf = newdf.append(barchartdf.iloc[i], ignore_index=True)
-    else:
-        for i in range(0, barchartdf.shape[0]):
-            if barchartdf['TYPE'][i] in typedict:
-                    for cl, off, sz in typedict[barchartdf['TYPE'][i]]:
-                        if verbose:
-                            print(barchartdf['TYPE'][i], cl, off, sz)
-                        # ADDRESS field redundant as clno and offset are already in use
-                        if cl == fieldtohighlight:
-                            newdf = newdf.append({'CLASS': cl, 'ADDRESS': barchartdf['ADDRESS'][i], 'clno': barchartdf['clno']
-                                                [i], 'blockno': barchartdf['blockno'][i], 'cloff': off, 'SIZE': sz}, ignore_index=True)
-                        else:
-                            newdf = newdf.append({'CLASS': "nohighlight", 'ADDRESS': barchartdf['ADDRESS'][i], 'clno': barchartdf['clno']
-                                                [i], 'blockno': barchartdf['blockno'][i], 'cloff': off, 'SIZE': sz}, ignore_index=True)
-            else:
-                newdf = newdf.append(barchartdf.iloc[i], ignore_index=True)
+#     if not fieldtohighlight:
+#         for i in range(0, barchartdf.shape[0]):
+#             if barchartdf['TYPE'][i] in typedict:
+#                 for field, off, sz in typedict[barchartdf['TYPE'][i]]:
+#                     if verbose:
+#                         print(barchartdf['TYPE'][i], field, off, sz)
+#                     # ADDRESS redundant as clno and offset are already in use
+#                     newdf = newdf.append({'CLASS': field, 'ADDRESS': barchartdf['ADDRESS'][i], 'clno': barchartdf['clno']
+#                                         [i], 'blockno': barchartdf['blockno'][i], 'cloff': off, 'SIZE': sz}, ignore_index=True)
+#             else:
+#                 newdf = newdf.append(barchartdf.iloc[i], ignore_index=True)
+#     else:
+#         for i in range(0, barchartdf.shape[0]):
+#             if barchartdf['TYPE'][i] in typedict:
+#                     for field, off, sz in typedict[barchartdf['TYPE'][i]]:
+#                         if verbose:
+#                             print(barchartdf['TYPE'][i], field, off, sz)
+#                         # ADDRESS redundant as clno and offset are already in use
+#                         if field == fieldtohighlight:
+#                             newdf = newdf.append({'CLASS': field, 'TYPE':barchartdf['TYPE'][i], 'ADDRESS': barchartdf['ADDRESS'][i], 'clno': barchartdf['clno']
+#                                                 [i], 'blockno': barchartdf['blockno'][i], 'cloff': off, 'SIZE': sz}, ignore_index=True)
+#                         else:
+#                             newdf = newdf.append({'CLASS': "nohighlight", 'TYPE':barchartdf['TYPE'][i], 'ADDRESS': barchartdf['ADDRESS'][i], 'clno': barchartdf['clno']
+#                                                 [i], 'blockno': barchartdf['blockno'][i], 'cloff': off, 'SIZE': sz}, ignore_index=True)
+#             else:
+#                 print("type not in typedict: " + barchartdf.iloc[i])
+#                 newdf = newdf.append(barchartdf.iloc[i], ignore_index=True)
 
 
-    if verbose:
-        print("*********")
-        print("newdf:")
-        print(newdf)
-        print("*********")
+#     if verbose:
+#         print("*********")
+#         print("newdf:")
+#         print(newdf)
+#         print("*********")
 
-    for i in range(0, newdf.shape[0]):
-        if newdf['cloff'][i] + newdf['SIZE'][i] > xbytes:
-            s = newdf.at[i, 'SIZE']
-            newdf.at[i, 'SIZE'] = xbytes - newdf['cloff'][i]
-            new_s = newdf.at[i, 'SIZE']
+#     for i in range(0, newdf.shape[0]):
+#         if newdf['cloff'][i] + newdf['SIZE'][i] > xbytes:
+#             s = newdf.at[i, 'SIZE']
+#             newdf.at[i, 'SIZE'] = xbytes - newdf['cloff'][i]
+#             new_s = newdf.at[i, 'SIZE']
 
-            # print("s = "+ str(s))
-            # print(new_s)
+#             # print("s = "+ str(s))
+#             # print(new_s)
 
-            quo = (s-new_s)//xbytes
-            rem = (s-new_s) % xbytes
-            # print(quo)
-            for j in range(0, quo):
-                new_row = pd.DataFrame(newdf[:][i:i+1]).copy(deep=True)
-                new_row['clno'] = new_row['clno'] + j + 1
-                new_row['cloff'] = 0
-                new_row['SIZE'] = xbytes
-                rows.append(new_row)
+#             quo = (s-new_s)//xbytes
+#             rem = (s-new_s) % xbytes
+#             # print(quo)
+#             for j in range(0, quo):
+#                 new_row = pd.DataFrame(newdf[:][i:i+1]).copy(deep=True)
+#                 new_row['clno'] = new_row['clno'] + j + 1
+#                 new_row['cloff'] = 0
+#                 new_row['SIZE'] = xbytes
+#                 rows.append(new_row)
 
-            if rem != 0:
-                new_row = pd.DataFrame(newdf[:][i:i+1]).copy(deep=True)
-                new_row['clno'] = new_row['clno'] + quo + 1
-                new_row['cloff'] = 0
-                new_row['SIZE'] = rem
-                rows.append(new_row)
+#             if rem != 0:
+#                 new_row = pd.DataFrame(newdf[:][i:i+1]).copy(deep=True)
+#                 new_row['clno'] = new_row['clno'] + quo + 1
+#                 new_row['cloff'] = 0
+#                 new_row['SIZE'] = rem
+#                 rows.append(new_row)
 
-    temp = newdf.append(rows)
-    newdf = temp
-    return newdf
+#     return newdf.append(rows)
 
 # This function gets the unique types in barchartdf and generates a dictionary of type -> unique color index (from 1 to Total number of distinct types)
 # scheme represents the unique color index for every row in barchartdf
