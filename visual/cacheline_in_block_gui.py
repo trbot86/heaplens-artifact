@@ -1,6 +1,7 @@
+from audioop import minmax
 from random import randint, randrange
 import tkinter as tk
-from tkinter import ANCHOR, RIGHT, Y, Frame, Listbox, Scrollbar, messagebox
+from tkinter import *
 import matplotlib
 import sys, sqlite3, matplotlib.pyplot as plt
 from utils import insertnewrow
@@ -29,8 +30,9 @@ def setcolormap(barchartdf):
 
 
 
-def getbarchartdf(blocknodf):
-    blockno = str(blocknodf['blockno'][randint(0, blocknodf.size - 1)])
+def getbarchartdf(blocknodf, blockno="random"):
+    if(blockno=="random"):
+        blockno = str(blocknodf['blockno'][randint(0, blocknodf.size - 1)])
 
     print(blockno)
 
@@ -89,12 +91,15 @@ class StartPage(tk.Frame):
         self.plot_chart(barchartdf, self.gnt)
 
         self.canvas = FigureCanvasTkAgg(fig, master=root)
-        self.canvas.get_tk_widget().pack(side="top", fill='both', expand=True)
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky=(N, S, E, W))
 
+        ##################
+        #     LISTBOX    #
+        ##################
         # canvas.draw()
         self.listbox = Listbox(root)
         self.populate_listbox(blocknodf)
-        self.listbox.pack(side="right")
+        self.listbox.grid(row=0, column=1, sticky=(E, W))
         self.listbox.bind('<Double-1>', lambda x: self.selectblock())
 
         # self.scrollbar = Scrollbar(root)
@@ -103,20 +108,47 @@ class StartPage(tk.Frame):
         # self.scrollbar.config(command = self.listbox.yview)
         # self.scrollbar.grid(row=0, column=2)
 
-        toolbarFrame = Frame(master=root)
-        toolbarFrame.pack(side="bottom")
-        toolbar = NavigationToolbar2Tk(self.canvas, toolbarFrame)
-        toolbar.update()
 
+        ##################
+        #     TOOLBAR    #
+        ##################
+        self.toolbarFrame = Frame(master=root)
+        self.toolbarFrame.grid(row=1, column=0, sticky=(N, S, E, W))
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.toolbarFrame)
+        # self.toolbar.update()
+
+        ##################
+        #     SLIDER     #
+        ##################
+        self.label = tk.Label(root, text='Slider')
+        self.label.grid(row=1, column=2, sticky=(N, S, E, W))
+        self.label.config(width=10)
+        minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
+        self.scaleVar = tk.IntVar()
+        print("min timestamp: ")
+        print(minmaxtimedf)
+        self.scaleVar = tk.IntVar()
+        self.scale = ttk.Scale(root, from_=minmaxtimedf['min(TIMESTAMP)'][0], to=minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVar)
+        self.scale.grid(row=1, column=1, sticky=(E, W))
+        self.scale.config(command=self._callback)
+
+        ##################
+        #  PLOT BUTTON   #
+        ##################
         self.plotbutton = tk.Button(
             master=root,
             text="plot",
-            command=lambda: self.plot(self.canvas, self.gnt))
-        self.plotbutton.pack(side="left")
+            command=lambda: self.plot(self.canvas, self.gnt, isRandom=True))
+        self.plotbutton.grid(row=1, column=3)
+
+    def _callback(self, event):
+        v = self.scaleVar.get()
+        self.label.config(text=v)
+        return
 
     def selectblock(self):
         print("selected: " + self.listbox.get(ANCHOR))
-        self.plot(self.canvas, self.gnt)
+        self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.listbox.get(ANCHOR))
 
     def populate_listbox(self, blocknodf):
         print(blocknodf)
@@ -166,9 +198,12 @@ class StartPage(tk.Frame):
                 plt.text(j, i, str(k), ha='left', va='center')
             lastaddr.add(k)
 
-    def plot(self, canvas, gnt):
+    def plot(self, canvas, gnt, isRandom=True, blockno=None):
         blocknodf = getblocknodf()
-        barchartdf = getbarchartdf(blocknodf)
+        if(isRandom == True):
+            barchartdf = getbarchartdf(blocknodf, "random")
+        else:
+            barchartdf = getbarchartdf(blocknodf, blockno)
         self.plot_chart(barchartdf, gnt)
         canvas.draw()
 
@@ -206,6 +241,8 @@ from ALLOCSWITHTYPES where '1==1' "
 
 #  where (" + typequery + ") "
 
+get_min_max_timestamps = "select min(TIMESTAMP), max(TIMESTAMP) from ALLOCSWITHTYPES; "
+
 xbytes = int(xbytes)
 
 typedf = pd.read_sql_query(get_typenames, con)
@@ -215,5 +252,10 @@ print(typedf)
 print("**************")
 
 root = tk.Tk()
+root.columnconfigure(0, weight=3)
+root.columnconfigure(1, weight=3)
+root.columnconfigure(2, weight=3)
+root.columnconfigure(3, weight=3)
+root.rowconfigure(1, weight=3)
 app = StartPage(master=root)
 app.mainloop()

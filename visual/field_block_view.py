@@ -205,7 +205,7 @@ def main():
     barchartdf['ADDRESS'] = barchartdf['ADDRESS'].apply(hex)
 
     newdf = pd.DataFrame(
-        columns=['CLASS', 'ADDRESS', 'clno', 'blockno', 'cloff', 'SIZE'])
+        columns=['CLASS', 'TYPE', 'ADDRESS', 'clno', 'blockno', 'cloff', 'SIZE'])
 
     if args.verbose:
         print("**************")

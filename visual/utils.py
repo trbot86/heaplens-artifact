@@ -51,11 +51,12 @@ def insertnewrow(barchartdf, newdf, fieldstypedf=None, xbytes=64, fieldtohighlig
         if verbose:
             print("*********")
             print(typedict)
-            print(typedict['node_t<longlong,void*>'])
+            # print(typedict['node_t<longlong,void*>'])
             print("*********")
 
     rows = []
-
+    
+    #TODO: FIX
     #if no particular field to highlight
     if not fieldtohighlight:
         for i in range(0, barchartdf.shape[0]):
