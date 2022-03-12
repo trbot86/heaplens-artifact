@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import *
 import matplotlib
 import sys, sqlite3, matplotlib.pyplot as plt
+from pyrsistent import b
 from utils import insertnewrow
 
 matplotlib.use('TkAgg')
@@ -30,7 +31,8 @@ def setcolormap(barchartdf):
 
 
 
-def getbarchartdf(blocknodf, blockno="random"):
+# def getbarchartdf(blocknodf, blockno="random", timestamp = 40905123453463716):
+def getbarchartdf(blocknodf, blockno="random", timestamp = 40905123444586470):
     if(blockno=="random"):
         blockno = str(blocknodf['blockno'][randint(0, blocknodf.size - 1)])
 
@@ -39,30 +41,61 @@ def getbarchartdf(blocknodf, blockno="random"):
     print("**************")
     # PRINT CACHE QUERY
     print(cache_query)
-
     print("**************")
 
     barchartdf = pd.read_sql_query(cache_query + "and blockno like " + blockno,
                                    con)
 
-    #create new rows for cache allocations that span more than one cache line
-    print("BEFORE INSERTNEWROW")
+    print("BEFORE LATEST TIMESTAMP FILTERING")
+    print("**************")
     print(barchartdf)
+    print("**************")
 
+    #FILTER ACCD. TO LATEST TIMESTAMP
+    latest_allocs_set = {}
+
+    for i in range(0, barchartdf.shape[0]):
+        # print(type(barchartdf['TIMESTAMP'][i]))
+        # print(barchartdf['TIMESTAMP'][i])
+        if barchartdf['TIMESTAMP'][i] < timestamp:
+            if barchartdf['ADDRESS'][i] in latest_allocs_set:
+                if barchartdf['TIMESTAMP'][i] > latest_allocs_set[barchartdf['ADDRESS'][i]]['TIMESTAMP']:
+                    latest_allocs_set[barchartdf['ADDRESS'][i]] = barchartdf.iloc[i]
+            else:
+                latest_allocs_set[barchartdf['ADDRESS'][i]] = barchartdf.iloc[i]
+
+    newdf = pd.DataFrame()
+
+    # for key, val in latest_allocs_set.items():
+    #     if val['isNew'] == 1:
+    #         print(val)
+    #         newdf = newdf.append(val)
+
+    newdf = newdf.append([v for k,v in latest_allocs_set.items() if v['isNew'] == 1], ignore_index=True)
+    print(newdf)
+
+    barchartdf = newdf
+    print("AFTER LATEST TIMESTAMP FILTERING")
+    print("**************")
+    print(barchartdf)
+    print("**************")
+
+    #create new rows for cache allocations that span more than one cache line
     newdf = pd.DataFrame(columns=[
-        'CLASS', 'TYPE', 'ADDRESS', 'clno', 'blockno', 'cloff', 'SIZE'
+        'CLASS', 'TYPE', 'ADDRESS', 'clno', 'blockno', 'cloff', 'SIZE', 'TIMESTAMP', 'isNew'
     ])
     barchartdf = insertnewrow(barchartdf, newdf=newdf, verbose=True)
 
     barchartdf['ADDRESS'] = barchartdf['ADDRESS'].apply(hex)
 
     print("AFTER INSERTNEWROW")
+    print("**************")
     print(barchartdf)
+    print("**************")
 
     #putting "" where type is None
     barchartdf['TYPE'] = [str(x) for x in barchartdf['TYPE']]
 
-    print("**************")
     return barchartdf
 
 
@@ -122,7 +155,7 @@ class StartPage(tk.Frame):
         ##################
         self.label = tk.Label(root, text='Slider')
         self.label.grid(row=1, column=2, sticky=(N, S, E, W))
-        self.label.config(width=10)
+        self.label.config(width=20)
         minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
         self.scaleVar = tk.IntVar()
         print("min timestamp: ")
@@ -236,7 +269,9 @@ cache_query = "select type ,\
     (address%" + blocksize + ")/" + xbytes + " as clno ,\
     address/" + blocksize + " as blockno ,\
     (address%" + xbytes + ") as cloff ,\
-    size \
+    size ,\
+    TIMESTAMP ,\
+    isNew \
 from ALLOCSWITHTYPES where '1==1' "
 
 #  where (" + typequery + ") "
