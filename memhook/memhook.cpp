@@ -24,6 +24,7 @@
 #include "memhook.h"
 
 #undef new
+#undef delete
 
 #ifndef mallog_likely
     #if defined(__GNUC__) || defined(__clang__)
@@ -139,7 +140,7 @@ void *memhook_malloc(size_t size, const char* file = "specialfile", int line = 0
     return mem;
 }
 
-void memhook_free(void *ptr, bool log) {
+void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, bool log = true) {
     // // something wrong if we call free before one of the allocators!
     // if (mallog_unlikely(next_malloc == 0)) {
     //     fprintf(stdout, "Free called before first allocation!\n");
@@ -153,8 +154,15 @@ void memhook_free(void *ptr, bool log) {
         fprintf(stdout, "freeing temp memory\n");
     } else {
         next_free(ptr);
-        //**************INITIALISE INFO_T OBJECT AND COPY LATER***************//
-        // collector.add(memhook_get_server_clock(), 0, ptr, false);
+    }
+
+    unit_log.timestamp = memhook_get_server_clock();
+    unit_log.size = -42;
+    unit_log.addr = ptr;
+    unit_log.typeofop = false;
+    if(log == true) {
+        unit_log.file = file;
+        unit_log.line = line;
     }
 }
 // void *realloc(void *ptr, size_t size) {
@@ -184,7 +192,7 @@ extern "C" {
 
     //Used for C/C++ projects which do not support templating
     void *malloc_s(size_t size, const char* filepath, int line) {
-        printf("%s %p \n", filepath, (void*)filepath);
+        // printf("%s %p \n", filepath, (void*)filepath);
         unit_log.file = filetable.insert(filepath);
         void* ptr = memhook_malloc(size, unit_log.file, line, true);
         collector.copy(unit_log);
@@ -192,8 +200,11 @@ extern "C" {
     }
 
 
-    void free(void *ptr) {
-        return memhook_free(ptr, true);
+    void free_s(void *ptr, const char* filepath, int line) {
+        unit_log.file = filetable.insert(filepath);
+        memhook_free(ptr, unit_log.file, line, true);
+        collector.copy(unit_log);
+        return;
     }
 
     // void *calloc(size_t nmemb, size_t size) {
@@ -231,9 +242,9 @@ void *operator new[] (size_t size) {
 }
 
 void operator delete(void * mem) _GLIBCXX_USE_NOEXCEPT {
-    return memhook_free(mem, true);
+    return memhook_free(mem, NULL, 0, false);
 }
 
 void operator delete[](void *mem)  _GLIBCXX_USE_NOEXCEPT {
-    return memhook_free(mem, true);
+    return memhook_free(mem, NULL, 0, false);
 }

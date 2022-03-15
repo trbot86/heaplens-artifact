@@ -62,9 +62,11 @@ extern "C"
 #endif
 
     void *malloc_s(size_t, const char *, int);
+    void free_s(void *, const char*, int);
 
 // #define SIFTER_NEW
 #define new MemStamp((__FILE__), (__LINE__)) * new
+#define delete MemStamp((__FILE__), (__LINE__)) * delete
 
 #ifdef __cplusplus
 }
@@ -123,4 +125,5 @@ T malloc(size_t size, bool fakearg)
 uint64_t memhook_get_server_clock();
 
 #define malloc(s) malloc_s((s), (__FILE__), (__LINE__))
+#define free(s) free_s((s), (__FILE__), (__LINE__))
 #endif //__MEMHOOK_INTERFACE_H

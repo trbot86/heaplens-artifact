@@ -220,7 +220,7 @@ int get_slot(thread::id id);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);
 
-void   (memhook_free)(void *ptr, bool log);
+void   (memhook_free)(void *ptr, const char* file, int line, bool log);
 void *memhook_malloc(size_t size, const char* file, int line, bool log);
 
 #warning This binary is being compiled with memhook. Running it will produce a text file (info_t_dump.txt) that should be provided as an argument to the shell script for step3.
