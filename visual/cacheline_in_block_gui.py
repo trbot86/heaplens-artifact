@@ -32,7 +32,7 @@ def setcolormap(barchartdf):
 
 
 # def getbarchartdf(blocknodf, blockno="random", timestamp = 40905123453463716):
-def getbarchartdf(blocknodf, blockno="random", timestamp = 40905123444586470):
+def getbarchartdf(blocknodf, blockno="random", timestamp = 40905123403463716):
     if(blockno=="random"):
         blockno = str(blocknodf['blockno'][randint(0, blocknodf.size - 1)])
 
@@ -72,7 +72,6 @@ def getbarchartdf(blocknodf, blockno="random", timestamp = 40905123444586470):
     #         newdf = newdf.append(val)
 
     newdf = newdf.append([v for k,v in latest_allocs_set.items() if v['isNew'] == 1], ignore_index=True)
-    print(newdf)
 
     barchartdf = newdf
     print("AFTER LATEST TIMESTAMP FILTERING")
@@ -131,15 +130,17 @@ class StartPage(tk.Frame):
         ##################
         # canvas.draw()
         self.listbox = Listbox(root)
+        blocknodf.sort_values(by='blockno', inplace=True)
+        blocknodf.reset_index(drop=True, inplace=True)
         self.populate_listbox(blocknodf)
         self.listbox.grid(row=0, column=1, sticky=(E, W))
         self.listbox.bind('<Double-1>', lambda x: self.selectblock())
 
-        # self.scrollbar = Scrollbar(root)
+        self.scrollbar = Scrollbar(root)
 
-        # self.listbox.config(yscrollcommand = self.scrollbar.set)
-        # self.scrollbar.config(command = self.listbox.yview)
-        # self.scrollbar.grid(row=0, column=2)
+        self.listbox.config(yscrollcommand = self.scrollbar.set)
+        self.scrollbar.config(command = self.listbox.yview)
+        self.scrollbar.grid(row=0, column=2)
 
 
         ##################
@@ -194,10 +195,17 @@ class StartPage(tk.Frame):
         gnt.set_ylabel('cacheline')
 
         plt.xticks(ticks=range(0, int(xbytes), 8))
-        plt.yticks(ticks=range(0, int(barchartdf['clno'].max()), 8))
+        if barchartdf.empty:
+            plt.yticks(ticks=range(0, 0, 8))
+        else:
+            plt.yticks(ticks=range(0, int(barchartdf['clno'].max()), 8))
 
         gnt.set_xticks(ticks=range(0, int(xbytes), 4), minor=True)
-        gnt.set_yticks(ticks=range(0, int(barchartdf['clno'].max()), 2),
+        if barchartdf.empty:
+            gnt.set_yticks(ticks=range(0, 0, 2),
+                       minor=True)
+        else:
+            gnt.set_yticks(ticks=range(0, int(barchartdf['clno'].max()), 2),
                        minor=True)
 
         gnt.grid(which='minor', alpha=0.8)

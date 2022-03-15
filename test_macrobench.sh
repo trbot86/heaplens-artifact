@@ -9,13 +9,13 @@ bash -c "cd prac/setbench/macrobench/; numactl -i all ./bin/rundb_TPCC_brown_ext
 bash -c "cd prac/setbench/macrobench/; ../../tiny/byte_rw.bin binary_dump.txt "
 
 #generate fielddump.txt and typedump.txt
-# bash -c "cd prac/setbench/macrobench/; ../../../type_analysis/fieldandtypedumper compile_commands.json"
+bash -c "cd prac/setbench/macrobench/; ../../../type_analysis/fieldandtypedumper compile_commands.json"
 
 #generate new_fielddump.txt
-# bash -c "cd prac/setbench/macrobench/; python3 -c \"import sys;sys.path.append(\\\"../../../type_analysis/\\\");import trim_name; trim_name.trim_fields(\\\"fielddump.txt\\\")\""
+bash -c "cd prac/setbench/macrobench/; python3 -c \"import sys;sys.path.append(\\\"../../../type_analysis/\\\");import trim_name; trim_name.trim_fields(\\\"fielddump.txt\\\")\""
 
-#generate malloc_type_dump.txt
-# bash -c "cd prac/setbench/macrobench/; ../../../type_analysis/malloctypedumper compile_commands.json"
+# generate malloc_type_dump.txt
+bash -c "cd prac/setbench/macrobench/; ../../../type_analysis/malloctypedumper compile_commands.json"
 
 #generate allocs.sqlite table ALLOCS
 bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py info_dump allocs.sqlite ALLOCS "
