@@ -32,7 +32,7 @@ def setcolormap(barchartdf):
 
 
 # def getbarchartdf(blocknodf, blockno="random", timestamp = 40905123453463716):
-def getbarchartdf(blocknodf, blockno="random", timestamp = 40905123403463716):
+def getbarchartdf(blocknodf, blockno="random", timestamp = 43231822340325612):
     if(blockno=="random"):
         blockno = str(blocknodf['blockno'][randint(0, blocknodf.size - 1)])
 
@@ -154,26 +154,41 @@ class StartPage(tk.Frame):
         ##################
         #     SLIDER     #
         ##################
-        self.label = tk.Label(root, text='Slider')
-        self.label.grid(row=1, column=2, sticky=(N, S, E, W))
-        self.label.config(width=20)
-        minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
-        self.scaleVar = tk.IntVar()
-        print("min timestamp: ")
-        print(minmaxtimedf)
-        self.scaleVar = tk.IntVar()
-        self.scale = ttk.Scale(root, from_=minmaxtimedf['min(TIMESTAMP)'][0], to=minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVar)
-        self.scale.grid(row=1, column=1, sticky=(E, W))
-        self.scale.config(command=self._callback)
+        # self.label = tk.Label(root, text='Slider')
+        # self.label.grid(row=1, column=2, sticky=(N, S, E, W))
+        # self.label.config(width=20)
+        # minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
+        # self.scaleVar = tk.IntVar()
+        # print("min timestamp: ")
+        # print(minmaxtimedf)
+        # self.scaleVar = tk.IntVar()
+        # self.scale = ttk.Scale(root, from_=minmaxtimedf['min(TIMESTAMP)'][0], to=minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVar)
+        # self.scale.grid(row=1, column=1, sticky=(E, W))
+        # self.scale.config(command=self._callback)
 
-        ##################
-        #  PLOT BUTTON   #
-        ##################
+        #########################
+        #   BLOCKNO ENTRY BOX   #
+        #########################
+        self.entrybox = tk.Entry(root)
+        self.entrybox.grid(row=0, column=2, sticky=(E, W))
+
+        #########################
+        #  RANDOM PLOT BUTTON   #
+        #########################
+        self.randplotbutton = tk.Button(
+            master=root,
+            text="Plot Random",
+            command=lambda: self.plot(self.canvas, self.gnt, isRandom=True))
+        self.randplotbutton.grid(row=1, column=3)
+        
+        #################################
+        #  SELECTED BLOCK PLOT BUTTON   #
+        #################################
         self.plotbutton = tk.Button(
             master=root,
-            text="plot",
-            command=lambda: self.plot(self.canvas, self.gnt, isRandom=True))
-        self.plotbutton.grid(row=1, column=3)
+            text="Plot Selected",
+            command=lambda: self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.entrybox.get()))
+        self.plotbutton.grid(row=2, column=3)
 
     def _callback(self, event):
         v = self.scaleVar.get()
