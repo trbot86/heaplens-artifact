@@ -66,7 +66,7 @@ extern "C"
 
 // #define SIFTER_NEW
 #define new MemStamp((__FILE__), (__LINE__)) * new
-#define delete MemStamp((__FILE__), (__LINE__)) * delete
+// #define delete MemStamp((__FILE__), (__LINE__)) * delete
 
 #ifdef __cplusplus
 }

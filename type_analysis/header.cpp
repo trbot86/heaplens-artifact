@@ -73,11 +73,11 @@ int main() {
   int* r;
   struj sjj;
 
-  int * t = (int*)malloc<int, 75, MACRO_GET_STR("header.cpp")>(sizeof(int));
+  int * t = (int*)malloc(sizeof(int));
 
-  r = (int*)malloc<int, 77, MACRO_GET_STR("header.cpp")>(100*sizeof(int));
+  r = (int*)malloc(100*sizeof(int));
 
-  int* s = (int*)malloc<int, 79, MACRO_GET_STR("header.cpp")>(100);
+  int* s = (int*)malloc(100);
   struj* z = (struj *)malloc(sizeof(sjj.stj));
 
   auto _latch = (pthread_mutex_t *) _mm_malloc(sizeof(pthread_mutex_t), 64);
@@ -91,7 +91,7 @@ int main() {
   MyClass<float>* mc2 = new MyClass<float>;
 
   mem_alloc m;
-  m.alloc<char, 91, MACRO_GET_STR("header.cpp")>(sizeof(char));
+  m.alloc(sizeof(char));
   // newclass<float>* n = new newclass<float>;
   // n.x = 0;
   // MyClass<int>* mc2 = new MyClass<int>;

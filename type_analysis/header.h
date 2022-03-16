@@ -31,7 +31,7 @@ class mem_alloc {
   public:
   void* alloc(size_t size) {
     void* ptr;
-    ptr = malloc<void, 57, MACRO_GET_STR("./header.h")>(size);
+    ptr = malloc(size);
     return ptr;
   }
 
@@ -63,15 +63,15 @@ void func (size_t mem, const size_t abcd) {
   int* r;
   struj* sjj;
   void* ptr, *ptr2 = NULL;
-  int * t = (int*)malloc<int, 89, MACRO_GET_STR("./header.h")>(sizeof(int));//
+  int * t = (int*)malloc(sizeof(int));//
 
-  r = (int*)malloc<int, 91, MACRO_GET_STR("./header.h")>(100*sizeof(int));//
-  ptr = malloc<void, 92, MACRO_GET_STR("./header.h")>(mem);
-  ptr2 = malloc<void, 93, MACRO_GET_STR("./header.h")>(abcd);
+  r = (int*)malloc(100*sizeof(int));//
+  ptr = malloc(mem);
+  ptr2 = malloc(abcd);
 
   #ifdef __cplusplus
   mem_alloc m;
-  m.alloc<char, 97, MACRO_GET_STR("./header.h")>(sizeof(char));
+  m.alloc(sizeof(char));
   #endif
 }
 

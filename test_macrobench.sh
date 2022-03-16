@@ -2,6 +2,9 @@ set -x
 #delete old info_t, new_info_t_dump.txt, allocs.sqlite
 bash -c "cd prac/setbench/macrobench/; rm info_dump allocs.sqlite binary_dump.txt fielddump.txt new_field_dump.txt fileset_dump.txt typedump.txt typeset_dump.txt malloc_type_dump.txt"
 
+#run static analysis to templatize malloc
+bash -c "cd prac/setbench/macrobench/; ./run-clang-tidy.py -clang-tidy-binary=./clang-tidy -checks=misc-malloc-checker -header-filter=.* -export-fixes=fixes.yaml -j10 -p=./"
+
 # Run macrobench
 bash -c "cd prac/setbench/macrobench/; numactl -i all ./bin/rundb_TPCC_brown_ext_abtree_lf -t10 -s10000000 -r0.9 -w0.1 "
 
@@ -14,12 +17,8 @@ bash -c "cd prac/setbench/macrobench/; ../../../type_analysis/fieldandtypedumper
 #generate new_fielddump.txt
 bash -c "cd prac/setbench/macrobench/; python3 -c \"import sys;sys.path.append(\\\"../../../type_analysis/\\\");import trim_name; trim_name.trim_fields(\\\"fielddump.txt\\\")\""
 
-<<<<<<< Updated upstream
-# generate malloc_type_dump.txt
-=======
 #generate malloc_type_dump.txt
->>>>>>> Stashed changes
-bash -c "cd prac/setbench/macrobench/; ../../../type_analysis/malloctypedumper compile_commands.json"
+# bash -c "cd prac/setbench/macrobench/; ../../../type_analysis/malloctypedumper compile_commands.json"
 
 #generate allocs.sqlite table ALLOCS
 bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py info_dump allocs.sqlite ALLOCS "

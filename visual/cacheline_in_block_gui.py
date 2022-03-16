@@ -49,6 +49,8 @@ def getbarchartdf(blocknodf, blockno="random", timestamp = 43231822340325612):
     print("BEFORE LATEST TIMESTAMP FILTERING")
     print("**************")
     print(barchartdf)
+    print("TIMESTAMP IS: ")
+    print(timestamp)
     print("**************")
 
     #FILTER ACCD. TO LATEST TIMESTAMP
@@ -136,11 +138,11 @@ class StartPage(tk.Frame):
         self.listbox.grid(row=0, column=1, sticky=(E, W))
         self.listbox.bind('<Double-1>', lambda x: self.selectblock())
 
-        self.scrollbar = Scrollbar(root)
+        # self.listbox.config(yscrollcommand = self.scrollbar.set)
 
-        self.listbox.config(yscrollcommand = self.scrollbar.set)
-        self.scrollbar.config(command = self.listbox.yview)
-        self.scrollbar.grid(row=0, column=2)
+        # self.scrollbar = Scrollbar(root)
+        # self.scrollbar.config(command = self.listbox.yview)
+        # self.scrollbar.grid(row=0, column=2)
 
 
         ##################
@@ -154,17 +156,17 @@ class StartPage(tk.Frame):
         ##################
         #     SLIDER     #
         ##################
-        # self.label = tk.Label(root, text='Slider')
-        # self.label.grid(row=1, column=2, sticky=(N, S, E, W))
-        # self.label.config(width=20)
-        # minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
-        # self.scaleVar = tk.IntVar()
-        # print("min timestamp: ")
-        # print(minmaxtimedf)
-        # self.scaleVar = tk.IntVar()
-        # self.scale = ttk.Scale(root, from_=minmaxtimedf['min(TIMESTAMP)'][0], to=minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVar)
-        # self.scale.grid(row=1, column=1, sticky=(E, W))
-        # self.scale.config(command=self._callback)
+        self.label = tk.Label(root, text='Slider')
+        self.label.grid(row=1, column=2, sticky=(N, S, E, W))
+        self.label.config(width=20)
+        self.minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
+        self.scaleVar = tk.IntVar()
+        print("min timestamp: ")
+        print(self.minmaxtimedf)
+        self.scaleVar = tk.IntVar()
+        self.scale = ttk.Scale(root, from_=self.minmaxtimedf['min(TIMESTAMP)'][0], to=self.minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVar)
+        self.scale.grid(row=1, column=1, sticky=(E, W))
+        self.scale.config(command=self._callback)
 
         #########################
         #   BLOCKNO ENTRY BOX   #
@@ -187,7 +189,7 @@ class StartPage(tk.Frame):
         self.plotbutton = tk.Button(
             master=root,
             text="Plot Selected",
-            command=lambda: self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.entrybox.get()))
+            command=lambda: self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.entrybox.get(), timestamp=43231808261299980))
         self.plotbutton.grid(row=2, column=3)
 
     def _callback(self, event):
@@ -254,12 +256,14 @@ class StartPage(tk.Frame):
                 plt.text(j, i, str(k), ha='left', va='center')
             lastaddr.add(k)
 
-    def plot(self, canvas, gnt, isRandom=True, blockno=None):
+    def plot(self, canvas, gnt, isRandom=True, blockno=None, timestamp=None):
+        if not timestamp:
+            timestamp = self.scaleVar.get()
         blocknodf = getblocknodf()
         if(isRandom == True):
-            barchartdf = getbarchartdf(blocknodf, "random")
+            barchartdf = getbarchartdf(blocknodf, "random", timestamp=timestamp)
         else:
-            barchartdf = getbarchartdf(blocknodf, blockno)
+            barchartdf = getbarchartdf(blocknodf, blockno, timestamp=timestamp)
         self.plot_chart(barchartdf, gnt)
         canvas.draw()
 
