@@ -31,16 +31,16 @@ class mem_alloc {
   public:
   void* alloc(size_t size) {
     void* ptr;
-    ptr = malloc(size);
+    ptr = malloc<void, 34, MACRO_GET_STR("./header.h")>(size);
     return ptr;
   }
 
-  template <class T, int line, char ...filename>
+  template <class T, int line, char... filename>
   T* alloc(size_t size) {
     void* ptr;
     std::string filestring = {filename...};
   
-    unit_log.file = filetable.insert(filestring);
+    unit_log.file = filetable.insert(filestring.c_str());
     unit_log.tindex_name = typetable.insert(typeid(T).name());
 
     ptr = memhook_malloc(size, unit_log.file, line, true);
@@ -63,15 +63,15 @@ void func (size_t mem, const size_t abcd) {
   int* r;
   struj* sjj;
   void* ptr, *ptr2 = NULL;
-  int * t = (int*)malloc(sizeof(int));//
+  int * t = (int*)malloc<int, 66, MACRO_GET_STR("./header.h")>(sizeof(int));//
 
-  r = (int*)malloc(100*sizeof(int));//
-  ptr = malloc(mem);
-  ptr2 = malloc(abcd);
+  r = (int*)malloc<int, 68, MACRO_GET_STR("./header.h")>(100*sizeof(int));//
+  ptr = malloc<void, 69, MACRO_GET_STR("./header.h")>(mem);
+  ptr2 = malloc<void, 70, MACRO_GET_STR("./header.h")>(abcd);
 
   #ifdef __cplusplus
   mem_alloc m;
-  m.alloc(sizeof(char));
+  m.alloc<char, 74, MACRO_GET_STR("./header.h")>(sizeof(char));
   #endif
 }
 

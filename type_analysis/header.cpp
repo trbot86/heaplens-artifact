@@ -60,6 +60,10 @@ public:
   // T* t = new T;
 // }
 
+class Column {
+  int j;
+};
+
 int main() {
   // int a = 0;
   // int b = 24;
@@ -73,14 +77,16 @@ int main() {
   int* r;
   struj sjj;
 
-  int * t = (int*)malloc(sizeof(int));
+  int * t = (int*)malloc<int, 76, MACRO_GET_STR("header.cpp")>(sizeof(int));
 
-  r = (int*)malloc(100*sizeof(int));
+  r = (int*)malloc<int, 78, MACRO_GET_STR("header.cpp")>(100*sizeof(int));
 
-  int* s = (int*)malloc(100);
-  struj* z = (struj *)malloc(sizeof(sjj.stj));
+  int* s = (int*)malloc<int, 80, MACRO_GET_STR("header.cpp")>(100);
+  struj* z = (struj *)malloc<struj, 81, MACRO_GET_STR("header.cpp")>(sizeof(sjj.stj));
 
-  auto _latch = (pthread_mutex_t *) _mm_malloc(sizeof(pthread_mutex_t), 64);
+  auto _latch = (pthread_mutex_t *) _mm_malloc<pthread_mutex_t, 83, MACRO_GET_STR("header.cpp")>(sizeof(pthread_mutex_t), 64);
+  int field_cnt = 6;
+  auto columns = new Column [field_cnt];
 
   // t += 0x5;
   // printf("%d", t);
@@ -91,7 +97,7 @@ int main() {
   MyClass<float>* mc2 = new MyClass<float>;
 
   mem_alloc m;
-  m.alloc(sizeof(char));
+  m.alloc<char, 94, MACRO_GET_STR("header.cpp")>(sizeof(char));
   // newclass<float>* n = new newclass<float>;
   // n.x = 0;
   // MyClass<int>* mc2 = new MyClass<int>;

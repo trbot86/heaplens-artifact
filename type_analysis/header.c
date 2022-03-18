@@ -22,18 +22,18 @@ void foo (size_t mem, const size_t abcd) {
   int* r;
   struj* sjj;
   void* ptr, *ptr2 = NULL;
-  int * t = (int*)malloc(sizeof(int));//
+  int * t = (int*)malloc<int, 25, MACRO_GET_STR("header.c")>(sizeof(int));//
 
-  r = (int*)malloc(100*sizeof(int));//
+  r = (int*)malloc<int, 27, MACRO_GET_STR("header.c")>(100*sizeof(int));//
 
   int* s;
-  s = malloc(100);//
-  sjj = (struj*)malloc(200);//
-  struj* z = malloc(sizeof(sjj->stj));//
-  struj* afk = malloc(bar(sjj->ak));//
+  s = malloc<int, 30, MACRO_GET_STR("header.c")>(100);//
+  sjj = (struj*)malloc<struj, 31, MACRO_GET_STR("header.c")>(200);//
+  struj* z = malloc<struj, 32, MACRO_GET_STR("header.c")>(sizeof(sjj->stj));//
+  struj* afk = malloc<struj, 33, MACRO_GET_STR("header.c")>(bar(sjj->ak));//
   
-  ptr = malloc(mem);
-  ptr2 = malloc(abcd);
+  ptr = malloc<void, 35, MACRO_GET_STR("header.c")>(mem);
+  ptr2 = malloc<void, 36, MACRO_GET_STR("header.c")>(abcd);
 }
 
 int main() {
@@ -50,9 +50,9 @@ int main() {
   int* r;
   // struj* sjj;
 
-  int * t = (int*)malloc(sizeof(int));
+  int * t = (int*)malloc<int, 53, MACRO_GET_STR("header.c")>(sizeof(int));
 
-  r = (int*)malloc(100*sizeof(int));
+  r = (int*)malloc<int, 55, MACRO_GET_STR("header.c")>(100*sizeof(int));
 
   // int* s = malloc(100);
   // sjj = (struct sjj*)malloc(200);

@@ -157,7 +157,7 @@ void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, boo
     }
 
     unit_log.timestamp = memhook_get_server_clock();
-    unit_log.size = -42;
+    unit_log.size = 0;
     unit_log.addr = ptr;
     unit_log.typeofop = false;
     if(log == true) {
@@ -231,7 +231,7 @@ void * operator new(size_t size) {
 }
 
 void *operator new[] (size_t size) {
-
+    // cout << "size requested is: " << size << endl;
     void* mem = memhook_malloc(size == 0?1:size, NULL, 0, false);
     
     if(mem == 0) {

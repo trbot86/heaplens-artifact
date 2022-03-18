@@ -65,8 +65,8 @@ def insertnewrow(barchartdf, newdf, fieldstypedf=None, xbytes=64, fieldtohighlig
                     if verbose:
                         print(barchartdf['TYPE'][i], field, off, sz)
                     # ADDRESS redundant as clno and offset are already in use
-                    newdf = newdf.append({'CLASS': field, 'TYPE': barchartdf['TYPE'][i], 'ADDRESS': barchartdf['ADDRESS'][i], 'clno': barchartdf['clno']
-                                        [i], 'blockno': barchartdf['blockno'][i], 'cloff': off, 'SIZE': sz}, ignore_index=True)
+                    newdf = newdf.append({'CLASS': field, 'TYPE': barchartdf['TYPE'][i], 'ADDRESS': barchartdf['ADDRESS'][i], 'clno': barchartdf['clno'][i], 
+                                            'blockno': barchartdf['blockno'][i], 'cloff': off, 'SIZE': sz}, ignore_index=True)
                     print("PRINTTTTTTTTTTTTTTTTTTTTT:")
                     print(newdf)
             else:

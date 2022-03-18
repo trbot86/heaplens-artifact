@@ -115,6 +115,12 @@ class StartPage(tk.Frame):
 
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
+        self.bottomframe = Frame(root)
+        self.bottomframe.grid(row=1, column=0)
+        self.sideframe = Frame(root)
+        self.sideframe.grid(row=0, column=1)
+        self.chartframe = Frame(root)
+        self.chartframe.grid(row=0, column=0)
         self.createWidgets()
 
     def createWidgets(self):
@@ -124,73 +130,74 @@ class StartPage(tk.Frame):
         fig, self.gnt = plt.subplots()
         self.plot_chart(barchartdf, self.gnt)
 
-        self.canvas = FigureCanvasTkAgg(fig, master=root)
+        self.canvas = FigureCanvasTkAgg(fig, master=self.chartframe)
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky=(N, S, E, W))
-
-        ##################
-        #     LISTBOX    #
-        ##################
-        # canvas.draw()
-        self.listbox = Listbox(root)
-        blocknodf.sort_values(by='blockno', inplace=True)
-        blocknodf.reset_index(drop=True, inplace=True)
-        self.populate_listbox(blocknodf)
-        self.listbox.grid(row=0, column=1, sticky=(E, W))
-        self.listbox.bind('<Double-1>', lambda x: self.selectblock())
-
-        # self.listbox.config(yscrollcommand = self.scrollbar.set)
-
-        # self.scrollbar = Scrollbar(root)
-        # self.scrollbar.config(command = self.listbox.yview)
-        # self.scrollbar.grid(row=0, column=2)
-
-
-        ##################
-        #     TOOLBAR    #
-        ##################
-        self.toolbarFrame = Frame(master=root)
-        self.toolbarFrame.grid(row=1, column=0, sticky=(N, S, E, W))
-        self.toolbar = NavigationToolbar2Tk(self.canvas, self.toolbarFrame)
-        # self.toolbar.update()
 
         ##################
         #     SLIDER     #
         ##################
-        self.label = tk.Label(root, text='Slider')
-        self.label.grid(row=1, column=2, sticky=(N, S, E, W))
+        self.label = tk.Label(self.chartframe, text='Slider')
+        self.label.grid(row=2, column=0, sticky=(N, S, E, W))
         self.label.config(width=20)
         self.minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
         self.scaleVar = tk.IntVar()
         print("min timestamp: ")
         print(self.minmaxtimedf)
         self.scaleVar = tk.IntVar()
-        self.scale = ttk.Scale(root, from_=self.minmaxtimedf['min(TIMESTAMP)'][0], to=self.minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVar)
-        self.scale.grid(row=1, column=1, sticky=(E, W))
+        self.scale = ttk.Scale(self.chartframe, from_=self.minmaxtimedf['min(TIMESTAMP)'][0], to=self.minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVar)
+        self.scale.grid(row=1, column=0, sticky=(E, W))
         self.scale.config(command=self._callback)
+
+        ##################
+        #     TOOLBAR    #
+        ##################
+        self.toolbarFrame = Frame(master=self.bottomframe)
+        self.toolbarFrame.grid(row=0, column=0, sticky=(N, S, E, W))
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.toolbarFrame)
+        # self.toolbar.update()
+
+        
+        ##################
+        #     LISTBOX    #
+        ##################
+        # canvas.draw()
+        self.listbox = Listbox(self.sideframe)
+        blocknodf.sort_values(by='blockno', inplace=True)
+        blocknodf.reset_index(drop=True, inplace=True)
+        self.populate_listbox(blocknodf)
+        self.listbox.grid(row=0, column=0, sticky=(E, W))
+        self.listbox.bind('<Double-1>', lambda x: self.selectblock())
+
+        self.scrollbar = Scrollbar(self.sideframe)
+        self.scrollbar.config(command = self.listbox.yview)
+        self.scrollbar.grid(row=0, column=1)
+
+        self.listbox.config(yscrollcommand = self.scrollbar.set)
+        
 
         #########################
         #   BLOCKNO ENTRY BOX   #
         #########################
-        self.entrybox = tk.Entry(root)
-        self.entrybox.grid(row=0, column=2, sticky=(E, W))
+        self.entrybox = tk.Entry(self.sideframe)
+        self.entrybox.grid(row=1, column=0, sticky=(E, W))
 
         #########################
         #  RANDOM PLOT BUTTON   #
         #########################
         self.randplotbutton = tk.Button(
-            master=root,
+            master=self.sideframe,
             text="Plot Random",
             command=lambda: self.plot(self.canvas, self.gnt, isRandom=True))
-        self.randplotbutton.grid(row=1, column=3)
+        self.randplotbutton.grid(row=2, column=0)
         
         #################################
         #  SELECTED BLOCK PLOT BUTTON   #
         #################################
         self.plotbutton = tk.Button(
-            master=root,
+            master=self.sideframe,
             text="Plot Selected",
             command=lambda: self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.entrybox.get(), timestamp=43231808261299980))
-        self.plotbutton.grid(row=2, column=3)
+        self.plotbutton.grid(row=3, column=0)
 
     def _callback(self, event):
         v = self.scaleVar.get()
@@ -316,8 +323,6 @@ print("**************")
 root = tk.Tk()
 root.columnconfigure(0, weight=3)
 root.columnconfigure(1, weight=3)
-root.columnconfigure(2, weight=3)
-root.columnconfigure(3, weight=3)
 root.rowconfigure(1, weight=3)
 app = StartPage(master=root)
 app.mainloop()

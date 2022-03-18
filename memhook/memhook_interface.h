@@ -62,11 +62,11 @@ extern "C"
 #endif
 
     void *malloc_s(size_t, const char *, int);
-    void free_s(void *, const char*, int);
+    void free_s(void *, const char *, int);
 
 // #define SIFTER_NEW
 #define new MemStamp((__FILE__), (__LINE__)) * new
-// #define delete MemStamp((__FILE__), (__LINE__)) * delete
+    // #define delete MemStamp((__FILE__), (__LINE__)) * delete
 
 #ifdef __cplusplus
 }
@@ -105,16 +105,52 @@ inline T *operator*(const MemStamp &stamp, T *p)
 //     return ptr;
 // }
 
+#if !(defined(_WIN32) && defined(_mm_malloc))
+template <typename T, int line, char... filename>
+static __inline__ void* __attribute__((__always_inline__, __nodebug__,
+                                       __malloc__))
+_mm_malloc(size_t __size, size_t __align)
+{
+    string filestring = {filename...};
+
+    unit_log.file = filetable.insert(filestring.c_str());
+    unit_log.tindex_name = typetable.insert(typeid(T).name());
+    if (__align == 1)
+    {
+        void* ptr = memhook_malloc(__size, unit_log.file, line, true);
+        collector.copy(unit_log);
+        return ptr;
+    }
+
+    if (!(__align & (__align - 1)) && __align < sizeof(void *))
+        __align = sizeof(void *);
+
+    void* __mallocedMemory;
+#if defined(__MINGW32__)
+    __mallocedMemory = __mingw_aligned_malloc(__size, __align);
+#elif defined(_WIN32)
+    __mallocedMemory = _aligned_malloc(__size, __align);
+#else
+    if (posix_memalign(&__mallocedMemory, __align, __size)) {
+        collector.copy(unit_log);
+        return 0;
+    }
+#endif
+    collector.copy(unit_log);
+
+    return __mallocedMemory;
+}
+#endif
 
 template <typename T, int line, char... filename>
-T malloc(size_t size, bool fakearg)
+void* malloc(size_t size, bool fakearg=true)
 {
     string filestring = {filename...};
 
     unit_log.file = filetable.insert(filestring.c_str());
     unit_log.tindex_name = typetable.insert(typeid(T).name());
 
-    T ptr = (T)memhook_malloc(size, unit_log.file, line, true);
+    void* ptr = memhook_malloc(size, unit_log.file, line, true);
 
     collector.copy(unit_log);
     return ptr;
