@@ -121,6 +121,7 @@ class StartPage(tk.Frame):
         self.sideframe.grid(row=0, column=1)
         self.chartframe = Frame(root)
         self.chartframe.grid(row=0, column=0)
+
         self.createWidgets()
 
     def createWidgets(self):
@@ -136,17 +137,19 @@ class StartPage(tk.Frame):
         ##################
         #     SLIDER     #
         ##################
-        self.label = tk.Label(self.chartframe, text='Slider')
-        self.label.grid(row=2, column=0, sticky=(N, S, E, W))
-        self.label.config(width=20)
         self.minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
-        self.scaleVar = tk.IntVar()
-        print("min timestamp: ")
-        print(self.minmaxtimedf)
+
         self.scaleVar = tk.IntVar()
         self.scale = ttk.Scale(self.chartframe, from_=self.minmaxtimedf['min(TIMESTAMP)'][0], to=self.minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVar)
         self.scale.grid(row=1, column=0, sticky=(E, W))
         self.scale.config(command=self._callback)
+
+        self.label = tk.Label(self.chartframe, text='Slider')
+        self.label.grid(row=2, column=0, sticky=(N, S, E, W))
+        self.label.config(width=20)
+        
+        print("min timestamp: ")
+        print(self.minmaxtimedf)
 
         ##################
         #     TOOLBAR    #
@@ -321,8 +324,5 @@ print(typedf)
 print("**************")
 
 root = tk.Tk()
-root.columnconfigure(0, weight=3)
-root.columnconfigure(1, weight=3)
-root.rowconfigure(1, weight=3)
 app = StartPage(master=root)
 app.mainloop()

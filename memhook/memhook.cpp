@@ -230,6 +230,21 @@ void * operator new(size_t size) {
     return mem;
 }
 
+//placement new operator. VIOLATES CPP STANDARD
+// void * operator new(size_t size, void* ptr, bool fakearg=true) _GLIBCXX_USE_NOEXCEPT {
+
+//     if(ptr == 0) {
+//         throw bad_alloc();
+//     }
+
+//     unit_log.timestamp = memhook_get_server_clock();
+//     unit_log.size = size;
+//     unit_log.addr = ptr;
+//     unit_log.typeofop = true;
+
+//     return ptr;
+// }
+
 void *operator new[] (size_t size) {
     // cout << "size requested is: " << size << endl;
     void* mem = memhook_malloc(size == 0?1:size, NULL, 0, false);
@@ -242,9 +257,13 @@ void *operator new[] (size_t size) {
 }
 
 void operator delete(void * mem) _GLIBCXX_USE_NOEXCEPT {
-    return memhook_free(mem, NULL, 0, false);
+    memhook_free(mem, NULL, 0, false);
+    collector.copy(unit_log);
+    return;
 }
 
 void operator delete[](void *mem)  _GLIBCXX_USE_NOEXCEPT {
-    return memhook_free(mem, NULL, 0, false);
+    memhook_free(mem, NULL, 0, false);
+    collector.copy(unit_log);
+    return;
 }

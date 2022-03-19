@@ -64,6 +64,14 @@ class Column {
   int j;
 };
 
+class myconstructor {
+  int m;
+  public:
+  myconstructor(int m = -1): m(m) {
+    cout << "m allocated" << endl;
+  }
+};
+
 int main() {
   // int a = 0;
   // int b = 24;
@@ -87,6 +95,7 @@ int main() {
   auto _latch = (pthread_mutex_t *) _mm_malloc<pthread_mutex_t, 83, MACRO_GET_STR("header.cpp")>(sizeof(pthread_mutex_t), 64);
   int field_cnt = 6;
   auto columns = new Column [field_cnt];
+  delete columns;
 
   // t += 0x5;
   // printf("%d", t);
@@ -98,6 +107,8 @@ int main() {
 
   mem_alloc m;
   m.alloc<char, 94, MACRO_GET_STR("header.cpp")>(sizeof(char));
+  int queries[10];
+  new(&queries[5]) myconstructor(7);
   // newclass<float>* n = new newclass<float>;
   // n.x = 0;
   // MyClass<int>* mc2 = new MyClass<int>;

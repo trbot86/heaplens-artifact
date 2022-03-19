@@ -202,20 +202,6 @@ class ThreadExiter
     }
   };
 
-uint64_t memhook_get_server_clock() {
-#if defined(__i386__)
-    uint64_t ret;
-    __asm__ __volatile__("rdtsc" : "=A" (ret));
-#elif defined(__x86_64__)
-    unsigned hi, lo;
-    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    uint64_t ret = ( (uint64_t)lo)|( ((uint64_t)hi)<<32 );
-#else 
-    #error Must support RDTSC instruction! Sorry...
-#endif
-    return ret;
-}
-
 int get_slot(thread::id id);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);

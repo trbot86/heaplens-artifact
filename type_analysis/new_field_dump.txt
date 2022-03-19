@@ -41,6 +41,7 @@ mhRandom64::(anonymousunion)|volatile char [128]|___padding0|128|0
 mhRandom64::(anonymousunion)|uint64_t [4]|s|32|0
 mhRandom64::(anonymousunion)|volatile char [128]|___padding0|128|0
 mhRandom64::(anonymousunion)|uint64_t [4]|s|32|0
+myconstructor|int|m|4|0
 stru|int|a|4|0
 stru|int|b|4|4
 stru|int|a|4|0

@@ -56,6 +56,20 @@ using namespace std;
 struct slot;
 struct info_t;
 
+uint64_t memhook_get_server_clock() {
+#if defined(__i386__)
+    uint64_t ret;
+    __asm__ __volatile__("rdtsc" : "=A" (ret));
+#elif defined(__x86_64__)
+    unsigned hi, lo;
+    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+    uint64_t ret = ( (uint64_t)lo)|( ((uint64_t)hi)<<32 );
+#else 
+    #error Must support RDTSC instruction! Sorry...
+#endif
+    return ret;
+}
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -66,7 +80,7 @@ extern "C"
 
 // #define SIFTER_NEW
 #define new MemStamp((__FILE__), (__LINE__)) * new
-    // #define delete MemStamp((__FILE__), (__LINE__)) * delete
+// #define delete MemStamp((__FILE__), (__LINE__)) * delete
 
 #ifdef __cplusplus
 }
@@ -88,6 +102,13 @@ extern void *memhook_malloc(size_t size, const char *file, int line, bool log);
 template <class T>
 inline T *operator*(const MemStamp &stamp, T *p)
 {
+    /************************************************/
+    /* Rationale: placement new cannot be           */
+    /* overloaded for now, hence timestamp is 0.    */
+    /* If this is the case, then add timestamp here */
+    /************************************************/
+    if (unit_log.timestamp == 0)
+        unit_log.timestamp = memhook_get_server_clock();
     unit_log.file = filetable.insert(stamp.filename);
     unit_log.line = stamp.lineNum;
     unit_log.tindex_name = typetable.insert(typeid(T).name());
@@ -95,6 +116,10 @@ inline T *operator*(const MemStamp &stamp, T *p)
     collector.copy(unit_log);
     return p;
 }
+
+// inline void operator*(const MemStamp &stamp, void) {
+
+// }
 
 // template <typename T>
 // T malloc(size_t size, bool fakearg) {
