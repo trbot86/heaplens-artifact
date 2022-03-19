@@ -56,19 +56,7 @@ using namespace std;
 struct slot;
 struct info_t;
 
-uint64_t memhook_get_server_clock() {
-#if defined(__i386__)
-    uint64_t ret;
-    __asm__ __volatile__("rdtsc" : "=A" (ret));
-#elif defined(__x86_64__)
-    unsigned hi, lo;
-    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    uint64_t ret = ( (uint64_t)lo)|( ((uint64_t)hi)<<32 );
-#else 
-    #error Must support RDTSC instruction! Sorry...
-#endif
-    return ret;
-}
+uint64_t memhook_get_server_clock();
 
 #ifdef __cplusplus
 extern "C"
@@ -182,8 +170,6 @@ void* malloc(size_t size, bool fakearg=true)
 }
 
 #endif
-
-uint64_t memhook_get_server_clock();
 
 #define malloc(s) malloc_s((s), (__FILE__), (__LINE__))
 #define free(s) free_s((s), (__FILE__), (__LINE__))

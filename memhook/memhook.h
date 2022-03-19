@@ -69,6 +69,21 @@ thread_local int fileset_fd;
 
 int global_fd;
 
+uint64_t memhook_get_server_clock() {
+#if defined(__i386__)
+    uint64_t ret;
+    __asm__ __volatile__("rdtsc" : "=A" (ret));
+#elif defined(__x86_64__)
+    unsigned hi, lo;
+    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+    uint64_t ret = ( (uint64_t)lo)|( ((uint64_t)hi)<<32 );
+#else 
+    #error Must support RDTSC instruction! Sorry...
+#endif
+    return ret;
+}
+
+
 struct thread_record_array{
   int buffer_size_nbytes;
   struct info_t *allocation_log;
