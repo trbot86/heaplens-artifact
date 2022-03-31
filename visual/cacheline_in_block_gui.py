@@ -1,13 +1,13 @@
+import matplotlib
+matplotlib.use('TkAgg')
 from audioop import minmax
 from random import randint, randrange
 import tkinter as tk
 from tkinter import *
-import matplotlib
 import sys, sqlite3, matplotlib.pyplot as plt
 from pyrsistent import b
 from utils import insertnewrow
 
-matplotlib.use('TkAgg')
 from matplotlib.cm import get_cmap
 from matplotlib.lines import Line2D
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -32,7 +32,7 @@ def setcolormap(barchartdf):
 
 
 # def getbarchartdf(blocknodf, blockno="random", timestamp = 40905123453463716):
-def getbarchartdf(blocknodf, blockno="random", timestamp = 43231822340325612):
+def getbarchartdf(blocknodf, timestamp, blockno="random"):
     if(blockno=="random"):
         blockno = str(blocknodf['blockno'][randint(0, blocknodf.size - 1)])
 
@@ -40,11 +40,11 @@ def getbarchartdf(blocknodf, blockno="random", timestamp = 43231822340325612):
 
     print("**************")
     # PRINT CACHE QUERY
-    print(cache_query)
+    print("cache_query: " + cache_query + str(timestamp) + " and blockno like " + blockno)
     print("**************")
 
-    barchartdf = pd.read_sql_query(cache_query + "and blockno like " + blockno,
-                                   con)
+    barchartdf = pd.read_sql_query(cache_query + str(timestamp) + " and blockno like " + blockno,
+                                   con, dtype={'TYPE': str, 'ADDRESS': int, 'clno': int, 'blockno': int, 'cloff': int, 'SIZE': int, 'TIMESTAMP': int, 'isNew': int})
 
     print("BEFORE LATEST TIMESTAMP FILTERING")
     print("**************")
@@ -100,12 +100,12 @@ def getbarchartdf(blocknodf, blockno="random", timestamp = 43231822340325612):
     return barchartdf
 
 
-def getblocknodf():
+def getblocknodf(timestamp):
     print("**************")
 
-    print(blocklistquery)
+    print("blocklistquery: " + blocklistquery + str(timestamp))
 
-    blocknodf = pd.read_sql_query(blocklistquery, con)
+    blocknodf = pd.read_sql_query(blocklistquery + str(timestamp), con)
 
     print(blocknodf)
     return blocknodf
@@ -125,31 +125,55 @@ class StartPage(tk.Frame):
         self.createWidgets()
 
     def createWidgets(self):
-        blocknodf = getblocknodf()
-        barchartdf = getbarchartdf(blocknodf)
+        self.minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
+
+        blocknodf = getblocknodf(self.minmaxtimedf['max(TIMESTAMP)'][0])
+        barchartdf = getbarchartdf(blocknodf, timestamp=self.minmaxtimedf['max(TIMESTAMP)'][0])
 
         fig, self.gnt = plt.subplots()
-        self.plot_chart(barchartdf, self.gnt)
 
         self.canvas = FigureCanvasTkAgg(fig, master=self.chartframe)
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky=(N, S, E, W))
 
-        ##################
-        #     SLIDER     #
-        ##################
-        self.minmaxtimedf = pd.read_sql_query(get_min_max_timestamps, con)
+        self.plot_chart(barchartdf, self.gnt)
 
-        self.scaleVar = tk.IntVar()
-        self.scale = ttk.Scale(self.chartframe, from_=self.minmaxtimedf['min(TIMESTAMP)'][0], to=self.minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVar)
-        self.scale.grid(row=1, column=0, sticky=(E, W))
-        self.scale.config(command=self._callback)
+        #######################
+        #   UPPER  SLIDER     #
+        #######################
 
-        self.label = tk.Label(self.chartframe, text='Slider')
-        self.label.grid(row=2, column=0, sticky=(N, S, E, W))
-        self.label.config(width=20)
+        self.scaleVarUp = tk.IntVar()
+        print(barchartdf['TIMESTAMP'])
+
+        #ERROR: CHECK THIS!!!
+        if barchartdf.empty:
+            self.scaleUp = Scale(self.chartframe, from_=0, to=0, variable=self.scaleVarUp, orient=tk.HORIZONTAL)
+        else:
+            self.scaleUp = Scale(self.chartframe, from_=barchartdf['TIMESTAMP'].min(), to=barchartdf['TIMESTAMP'].max(), variable=self.scaleVarUp, orient=tk.HORIZONTAL)
+
+        self.scaleUp.grid(row=1, column=0, sticky=(E, W))
+        self.scaleUp.config(command=self._callbackUp)
+
+        self.labelUp = tk.Label(self.chartframe, text='Block Filter')
+        self.labelUp.grid(row=2, column=0, sticky=(N, S, E, W))
+        self.labelUp.config(width=20)
         
         print("min timestamp: ")
         print(self.minmaxtimedf)
+
+        #######################
+        #   LOWER  SLIDER     #
+        #######################
+
+        self.scaleVarDwn = tk.IntVar(value=self.minmaxtimedf['max(TIMESTAMP)'][0])
+        self.scaleDwn = Scale(self.chartframe, from_=self.minmaxtimedf['min(TIMESTAMP)'][0], to=self.minmaxtimedf['max(TIMESTAMP)'][0], variable=self.scaleVarDwn, orient=tk.HORIZONTAL)
+        self.scaleDwn.grid(row=3, column=0, sticky=(E, W))
+        self.scaleDwn.config(command=self._callbackDwn)
+
+        self.scaleDwn.bind("<ButtonRelease-1>", self.update_listbox)
+
+        self.labelDwn = tk.Label(self.chartframe, text='Total Time Filter')
+        self.labelDwn.grid(row=4, column=0, sticky=(N, S, E, W))
+        self.labelDwn.config(width=20)
 
         ##################
         #     TOOLBAR    #
@@ -173,7 +197,7 @@ class StartPage(tk.Frame):
 
         self.scrollbar = Scrollbar(self.sideframe)
         self.scrollbar.config(command = self.listbox.yview)
-        self.scrollbar.grid(row=0, column=1)
+        self.scrollbar.grid(row=0, column=1, sticky=(N, S))
 
         self.listbox.config(yscrollcommand = self.scrollbar.set)
         
@@ -199,20 +223,30 @@ class StartPage(tk.Frame):
         self.plotbutton = tk.Button(
             master=self.sideframe,
             text="Plot Selected",
-            command=lambda: self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.entrybox.get(), timestamp=43231808261299980))
+            command=lambda: self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.entrybox.get()))
         self.plotbutton.grid(row=3, column=0)
 
-    def _callback(self, event):
-        v = self.scaleVar.get()
-        self.label.config(text=v)
+    def _callbackUp(self, event):
+        v = self.scaleVarUp.get()
+        self.labelUp.config(text=v)
         return
+    
+    def _callbackDwn(self, event):
+        v = self.scaleVarDwn.get()
+        self.labelDwn.config(text=v)
+        return
+
+    def update_listbox(self, event):
+        v = self.scaleVarDwn.get()
+        blocknodf = getblocknodf(v)
+        self.populate_listbox(blocknodf)
 
     def selectblock(self):
         print("selected: " + self.listbox.get(ANCHOR))
         self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.listbox.get(ANCHOR))
 
     def populate_listbox(self, blocknodf):
-        print(blocknodf)
+        self.listbox.delete(0, END)
         for i in range(len(blocknodf)):
             self.listbox.insert(i, blocknodf.loc[i, 'blockno'])
 
@@ -267,13 +301,11 @@ class StartPage(tk.Frame):
             lastaddr.add(k)
 
     def plot(self, canvas, gnt, isRandom=True, blockno=None, timestamp=None):
-        if not timestamp:
-            timestamp = self.scaleVar.get()
-        blocknodf = getblocknodf()
+        blocknodf = getblocknodf(self.scaleVarDwn.get())
         if(isRandom == True):
-            barchartdf = getbarchartdf(blocknodf, "random", timestamp=timestamp)
+            barchartdf = getbarchartdf(blocknodf, self.scaleVarDwn.get(), "random")
         else:
-            barchartdf = getbarchartdf(blocknodf, blockno, timestamp=timestamp)
+            barchartdf = getbarchartdf(blocknodf, self.scaleVarUp.get(), blockno)
         self.plot_chart(barchartdf, gnt)
         canvas.draw()
 
@@ -299,7 +331,7 @@ display(xbytes)
 
 get_typenames = "select distinct ALLOCSWITHTYPES.TYPE from ALLOCSWITHTYPES;"
 
-blocklistquery = "select distinct address/" + blocksize + " as blockno from ALLOCSWITHTYPES where (" + typequery + ")"
+blocklistquery = "select distinct address/" + blocksize + " as blockno from ALLOCSWITHTYPES where (" + typequery + ") and TIMESTAMP <= "
 
 cache_query = "select type ,\
     address, \
@@ -309,7 +341,7 @@ cache_query = "select type ,\
     size ,\
     TIMESTAMP ,\
     isNew \
-from ALLOCSWITHTYPES where '1==1' "
+from ALLOCSWITHTYPES where '1==1' and TIMESTAMP <= "
 
 #  where (" + typequery + ") "
 
