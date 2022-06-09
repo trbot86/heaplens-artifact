@@ -137,6 +137,15 @@ class StartPage(tk.Frame):
         blocknodf = getblocknodf(self.minmaxtimedf['max(TIMESTAMP)'][0])
         barchartdf, self.blockno = getbarchartdf(blocknodf, timestamp=self.minmaxtimedf['max(TIMESTAMP)'][0])
 
+        #########################
+        #   BLOCKNO ENTRY BOX   #
+        #########################
+        self.entrybox = tk.Entry(self.sideframe)
+        self.entrybox.grid(row=1, column=0, sticky=(E, W))
+
+        self.entrybox.delete(0, END)
+        self.entrybox.insert(0, self.blockno)
+
         fig, self.gnt = plt.subplots()
 
         self.canvas = FigureCanvasTkAgg(fig, master=self.chartframe)
@@ -144,11 +153,6 @@ class StartPage(tk.Frame):
 
         self.plot_chart(barchartdf, self.gnt)
 
-        #########################
-        #   BLOCKNO ENTRY BOX   #
-        #########################
-        self.entrybox = tk.Entry(self.sideframe)
-        self.entrybox.grid(row=1, column=0, sticky=(E, W))
 
         #######################
         #   UPPER  SLIDER     #
@@ -166,13 +170,13 @@ class StartPage(tk.Frame):
         if barchartdf.empty:
             self.scaleUp = Scale(self.chartframe, from_=0, to=0, variable=self.scaleVarUp, orient=tk.HORIZONTAL)
         else:
-            self.scaleUp = Scale(self.chartframe, from_=barchartdf['TIMESTAMP'].min(), to=barchartdf['TIMESTAMP'].max(), variable=self.scaleVarUp, orient=tk.HORIZONTAL)
+            self.scaleUp = Scale(self.chartframe, from_=barchartdf['TIMESTAMP'].min()-10, to=barchartdf['TIMESTAMP'].max()+10, variable=self.scaleVarUp, orient=tk.HORIZONTAL)
             # self.scaleUp = Scale(self.chartframe, from_=10, to=100, variable=self.scaleVarUp, orient=tk.HORIZONTAL)
 
         self.scaleUp.grid(row=1, column=0, sticky=(E, W))
         self.scaleUp.config(command=self._callbackUp)
 
-        self.scaleUp.bind("<ButtonRelease-1>", lambda x: self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.entrybox.get(), timestamp=self.scaleVarUp))
+        self.scaleUp.bind("<ButtonRelease-1>", lambda x: self.plot(self.canvas, self.gnt, isRandom=False, blockno=self.entrybox.get(), timestamp=self.scaleVarUp.get()))
         # self.scaleUp.bind("<ButtonRelease-1>", lambda x: print("Hello world"))
 
         self.labelUp = tk.Label(self.chartframe, text='Block Filter')
@@ -226,7 +230,7 @@ class StartPage(tk.Frame):
         self.randplotbutton = tk.Button(
             master=self.sideframe,
             text="Plot Random",
-            command=lambda: self.plot_set_scale(canvas=self.canvas, gnt=self.gnt, isRandom=True))
+            command=lambda: self.plot_set_scale(canvas=self.canvas, gnt=self.gnt, isRandom=True, timestamp=self.scaleVarDwn.get()))
         self.randplotbutton.grid(row=2, column=0)
 
         #################################
@@ -315,9 +319,11 @@ class StartPage(tk.Frame):
     def plot(self, canvas, gnt, isRandom=True, blockno=None, timestamp=None):
         blocknodf = getblocknodf(self.scaleVarDwn.get())
         if(isRandom == True):
-            barchartdf, self.blockno = getbarchartdf(blocknodf, self.scaleVarDwn.get(), "random")
+            # barchartdf, self.blockno = getbarchartdf(blocknodf, self.scaleVarDwn.get(), "random")
+            barchartdf, self.blockno = getbarchartdf(blocknodf, timestamp, "random")
         else:
-            barchartdf, self.blockno = getbarchartdf(blocknodf, self.scaleVarUp.get(), blockno)
+            # barchartdf, self.blockno = getbarchartdf(blocknodf, self.scaleVarUp.get(), blockno)
+            barchartdf, self.blockno = getbarchartdf(blocknodf, timestamp, blockno)
 
         self.entrybox.delete(0, END)
         self.entrybox.insert(0, self.blockno)
@@ -338,7 +344,7 @@ class StartPage(tk.Frame):
         if barchartdf.empty:
             self.scaleUp.config(from_=0, to=0)
         else:
-            self.scaleUp.config(from_=barchartdf['TIMESTAMP'].min(), to=barchartdf['TIMESTAMP'].max())
+            self.scaleUp.config(from_=barchartdf['TIMESTAMP'].min()-10, to=barchartdf['TIMESTAMP'].max()+10)
 
 def display(var):
     import inspect, re
@@ -362,7 +368,7 @@ display(xbytes)
 
 get_typenames = "select distinct ALLOCSWITHTYPES.TYPE from ALLOCSWITHTYPES;"
 
-blocklistquery = "select distinct address/" + blocksize + " as blockno from ALLOCSWITHTYPES where (" + typequery + ") and TIMESTAMP <= "
+blocklistquery = "select distinct address/" + blocksize + " as blockno from ALLOCSWITHTYPES where (" + typequery + ") and isNew = 0 and TIMESTAMP <= "
 
 cache_query = "select type ,\
     address, \
