@@ -1,8 +1,6 @@
 #ifndef __HEADER_H
 #define __HEADER_H
 
-#include "memhook_interface.h"
-
 #ifdef __cplusplus
 #include <bits/stdc++.h>
 #endif
@@ -11,7 +9,7 @@
 // T* malloc(size_t size) {
 //   cout << "templated malloc\n";
 //   return (T*)malloc(size);
-// } 
+// }
 
 struct stru {
   int a;
@@ -31,7 +29,7 @@ class mem_alloc {
   public:
   void* alloc(size_t size) {
     void* ptr;
-    ptr = malloc<void, 34, MACRO_GET_STR("./header.h")>(size);
+    ptr = malloc(size);
     return ptr;
   }
 
@@ -39,7 +37,7 @@ class mem_alloc {
   T* alloc(size_t size) {
     void* ptr;
     std::string filestring = {filename...};
-  
+
     unit_log.file = filetable.insert(filestring.c_str());
     unit_log.tindex_name = typetable.insert(typeid(T).name());
 
@@ -63,15 +61,15 @@ void func (size_t mem, const size_t abcd) {
   int* r;
   struj* sjj;
   void* ptr, *ptr2 = NULL;
-  int * t = (int*)malloc<int, 66, MACRO_GET_STR("./header.h")>(sizeof(int));//
+  int * t = (int*)malloc(sizeof(int));//
 
-  r = (int*)malloc<int, 68, MACRO_GET_STR("./header.h")>(100*sizeof(int));//
-  ptr = malloc<void, 69, MACRO_GET_STR("./header.h")>(mem);
-  ptr2 = malloc<void, 70, MACRO_GET_STR("./header.h")>(abcd);
+  r = (int*)malloc(100*sizeof(int));//
+  ptr = malloc(mem);
+  ptr2 = malloc(abcd);
 
   #ifdef __cplusplus
   mem_alloc m;
-  m.alloc<char, 74, MACRO_GET_STR("./header.h")>(sizeof(char));
+  m.alloc(sizeof(char));
   #endif
 }
 

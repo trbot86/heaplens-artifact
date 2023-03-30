@@ -1,7 +1,7 @@
 CC=clang++
 C_CC=clang
 Includes=`llvm-config --cxxflags --ldflags` -L/lib/llvm-10/lib -fno-rtti
-Includes_2= 
+Includes_2=
 LLVMLIBS=`llvm-config --libs --system-libs`
 # CLANGLIBS=-Wno-unknown-warning-option -lclangTooling -lclangToolingInclusions -lclangFrontendTool -lclangFrontend -lclangDriver -lclangSerialization -lclangCodeGen -lclangParse -lclangSema -lclangStaticAnalyzerFrontend -lclangStaticAnalyzerCheckers -lclangStaticAnalyzerCore -lclangAnalysis -lclangARCMigrate -lclangApplyReplacements -lclangRewrite -lclangRewriteFrontend -lclangEdit -lclangAST -lclangASTMatchers -lclangLex -lclangBasic -lclang
 CLANGLIBS=-Wno-unknown-warning-option -Wl,--start-group -lclangAnalysis -lclangApplyReplacements -lclangARCMigrate -lclangAST -lclangASTMatchers -lclangBasic -lclangChangeNamespace -lclangCodeGen -lclangCrossTU -lclangDaemon -lclangDriver -lclangDynamicASTMatchers -lclangEdit -lclangFormat -lclangFrontend -lclangFrontendTool -lclangHandleCXX -lclangIncludeFixer -lclangIncludeFixerPlugin -lclangIndex -lclangLex -lclangMove -lclangParse -lclangQuery -lclangReorderFields -lclangRewrite -lclangRewriteFrontend -lclangSema -lclangSerialization -lclangStaticAnalyzerCheckers -lclangStaticAnalyzerCore -lclangStaticAnalyzerFrontend -lclangTidy -lclangTidyAndroidModule -lclangTidyBoostModule -lclangTidyBugproneModule -lclangTidyCERTModule -lclangTidyCppCoreGuidelinesModule -lclangTidyFuchsiaModule -lclangTidyGoogleModule -lclangTidyHICPPModule -lclangTidyLLVMModule -lclangTidyMiscModule -lclangTidyModernizeModule -lclangTidyMPIModule -lclangTidyObjCModule -lclangTidyPerformanceModule -lclangTidyPlugin -lclangTidyReadabilityModule -lclangTidyUtils -lclangTooling -lclangToolingASTDiff -lclangToolingCore -lclangToolingInclusions -lclangToolingRefactoring -lfindAllSymbols -Wl,--end-group -lz -lcurses -pthread
@@ -31,7 +31,7 @@ experimental: replacer_experimental.cpp
 
 2experimental: replacer_experimental2.cpp
 	$(CC) $(Includes) -DMTDFNAME="\"alloc\""  -DMTDFLEN="5" replacer_experimental2.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o 2experimental
-	
+
 ctdcheck: ChangeMallocCheck.cpp ChangeMallocCheck.h
 	$(CC) $(Includes) -DMTDFNAME="\"alloc\""  -DMTDFLEN="5" ChangeMallocCheck.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o ctdcheck
 
@@ -42,4 +42,4 @@ header_c: header.cpp
 	$(C_CC) /home/gspathak/sifter/type_analysis/header.c -g -o header_c -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 clean:
-	rm tool malloctypedumper replacer header header_c malloc_type_dump.txt info_dump binary_dump.txt fielddump.txt new_field_dump.txt new_fielddump.txt typedump.txt typeset_dump.txt fileset_dump.txt allocs.sqlite fixes.yaml
+	rm byte_rw experimental 2experimental fieldandtypedumper tool malloctypedumper replacer header header_c malloc_type_dump.txt info_dump binary_dump.txt fielddump.txt new_field_dump.txt new_fielddump.txt typedump.txt typeset_dump.txt fileset_dump.txt allocs.sqlite fixes.yaml

@@ -85,14 +85,14 @@ int main() {
   int* r;
   struj sjj;
 
-  int * t = (int*)malloc<int, 76, MACRO_GET_STR("header.cpp")>(sizeof(int));
+  int * t = (int*)malloc(sizeof(int));
 
-  r = (int*)malloc<int, 78, MACRO_GET_STR("header.cpp")>(100*sizeof(int));
+  r = (int*)malloc(100*sizeof(int));
 
-  int* s = (int*)malloc<int, 80, MACRO_GET_STR("header.cpp")>(100);
-  struj* z = (struj *)malloc<struj, 81, MACRO_GET_STR("header.cpp")>(sizeof(sjj.stj));
+  int* s = (int*)malloc(100);
+  struj* z = (struj *)malloc_s(sizeof(sjj.stj));
 
-  auto _latch = (pthread_mutex_t *) _mm_malloc<pthread_mutex_t, 83, MACRO_GET_STR("header.cpp")>(sizeof(pthread_mutex_t), 64);
+  auto _latch = (pthread_mutex_t *) _mm_malloc(sizeof(pthread_mutex_t), 64);
   int field_cnt = 6;
   auto columns = new Column [field_cnt];
   delete columns;
@@ -106,7 +106,7 @@ int main() {
   MyClass<float>* mc2 = new MyClass<float>;
 
   mem_alloc m;
-  m.alloc<char, 94, MACRO_GET_STR("header.cpp")>(sizeof(char));
+  m.alloc(sizeof(char));
   int queries[10];
   new(&queries[5]) myconstructor(7);
   // newclass<float>* n = new newclass<float>;
