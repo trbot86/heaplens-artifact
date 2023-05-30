@@ -1,9 +1,11 @@
 set -x
 #delete old info_t, new_info_t_dump.txt, allocs.sqlite
-bash -c "cd prac/setbench/macrobench/; rm info_dump allocs.sqlite binary_dump.txt fielddump.txt new_field_dump.txt fileset_dump.txt typedump.txt typeset_dump.txt malloc_type_dump.txt"
+bash -c "cd prac/setbench/macrobench/; rm info_dump allocs.sqlite binary_dump.txt fielddump.txt new_field_dump.txt fileset_dump.txt typedump.txt typeset_dump.txt malloc_type_dump.txt fixes.yaml"
 
 #run static analysis to templatize malloc
 # bash -c "cd prac/setbench/macrobench/; ./run-clang-tidy.py -clang-tidy-binary=./clang-tidy -checks=misc-malloc-checker -header-filter=.* -export-fixes=fixes.yaml -j10 -p=./"
+
+# Add #include "memhook_interface.h" to appropriate files
 
 # Run macrobench
 bash -c "cd prac/setbench/macrobench/; numactl -i all ./bin/rundb_TPCC_brown_ext_abtree_lf -t10 -s10000000 -r0.9 -w0.1 "
@@ -35,11 +37,8 @@ bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.p
 #generate allocs.sqlite TYPEMAP
 bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py typeset_dump.txt allocs.sqlite TYPEMAP "
 
-#update allocs with filename
-bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py filename allocs.sqlite UPDATEALLOCSWITHFILE "
-
-#update allocs with typename
-bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py filename allocs.sqlite UPDATEALLOCSWITHTYPE "
+#update allocs with filename and typename
+bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py filename allocs.sqlite UPDATEALLOCSWITHFILEANDTYPE "
 
 #update allocs.sqlite
 bash -c "cd prac/setbench/macrobench/; python3 ../../../memhook/savefieldstodb.py filename allocs.sqlite ALLOCSWITHTYPES "

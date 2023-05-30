@@ -51,6 +51,7 @@ import traceback
 try:
   import yaml
 except ImportError:
+  print("YAML NOT FOUND!!!!")
   yaml = None
 
 is_py2 = sys.version[0] == '2'

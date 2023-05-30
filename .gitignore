@@ -30,3 +30,5 @@ typeset_dump.txt
 experimental
 setbench_bk/**
 setbenchbk/**
+type_analysis/.cache/**
+.cache/**

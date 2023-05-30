@@ -69,7 +69,7 @@ Here you can see that libmemhook.so is second from the top of the stack, before 
 
 If you are preloading another memory allocator, or any other shared library and would like libmemhook to profile these allocations, make sure that you preload libmemhook, before
 said shared libraries.
-Example: 
+Example:
 $ LD_PRELOAD="../../memhook/libmemhook.so:../setbench_master/lib/libjemalloc.so" bin
 
 In this example ../setbench_master/lib/libjemalloc.so is a relative path to an instance of the jemalloc shared object.
@@ -78,19 +78,23 @@ DETAILED WORKFLOW (for general projects):
 1. Copy your project into prac
 2. Run static analysis to get type information from malloc and generate malloc_type_dump.txt, fielddump.txt, typedump.txt
 	./malloctypdumper compile_commands.json
-	./fieldandtypedumper <name of mainfile>.c/cpp
+	./fieldandtypedumper compile_commands.json
    You may also choose to templatize any allocation function of your choice by using clang-tidy. If you do this and it works
    well, you don't need malloctypedumper.
+5. Trim names of object types:
+	**don't know when to do this right now** python3 trim_name.py info_dump new_info_t_dump.txt
+	python3 -c "import trim_name; trim_name.trim_fields(\"fielddump.txt\");"
 3. Integrate memhook into project by changing Makefile, and adding memhook_interface.h in each c/cpp/h file.
 4. Compile and run project.
-5. Trim names of object types:
-	python3 trim_name.py info_dump new_info_t_dump.txt
-	python3 -c "import trim_name; trim_name.trim_fields(\"fielddump.txt\");"
+5. convert binary_dump.txt to info_dump.
 6. Import to DB:
-	python3 savefieldstodb.py new_info_t_dump.txt allocs.sqlite ALLOCS
+	python3 savefieldstodb.py info_dump allocs.sqlite ALLOCS
 	python3 savefieldstodb.py new_field_dump.txt allocs.sqlite FIELDS
 	python3 savefieldstodb.py malloc_type_dump.txt allocs.sqlite MALLOCS
-	python3 savefieldstodb.py filename allocs.sqlite ALLOCSWITHTYPES
+	python3 savefieldstodb.py fileset_dump.txt allocs.sqlite FILEMAP
+	python3 savefieldstodb.py typeset_dump.txt allocs.sqlite TYPEMAP
+	python3 savefieldstodb.py <placeholder> allocs.sqlite UPDATEALLOCSWITHFILEANDTYPE
+	python3 savefieldstodb.py <placeholder> allocs.sqlite ALLOCSWITHTYPES
 7. Run visualisation scripts:
 	python3 field_block_view.py allocsdb fieldsdb blocksize xbytes typequery
 	python3 cacheline_in_block.py allocsdb blocksize xbytes typequery

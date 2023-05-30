@@ -34,7 +34,7 @@ def updatetable(createstring, updatestring, tablename, drop):
 
     con = sqlite3.connect(outfile)
     cur = con.cursor()
-    
+
     # drop old table
     if drop == True:
         cur.execute("DROP TABLE IF EXISTS " + tablename)
@@ -47,22 +47,21 @@ def updatetable(createstring, updatestring, tablename, drop):
 
 if __name__ == "__main__":
     createfieldstable = "CREATE TABLE FIELDS(CLASS CHAR(100), TYPE CHAR(100) NOT NULL, FIELD CHAR (100), SIZE INT, OFFSET INT, PRIMARY KEY (CLASS, TYPE, FIELD));"
-    createallocstable = "CREATE TABLE ALLOCS(FILE CHAR(50)    NOT NULL, TYPE CHAR(100), LINE INT    NOT NULL, TIMESTAMP INT  NOT NULL, SIZE INT, ADDRESS INT    NOT NULL, isNew INT NOT NULL);"
+    createallocstable = "CREATE TABLE ALLOCS(FILEPTR CHAR(50), TYPE CHAR(100), LINE INT    NOT NULL, TIMESTAMP INT  NOT NULL, SIZE INT, ADDRESS INT    NOT NULL, isNew INT NOT NULL);"
     createmallocstable = "CREATE TABLE MALLOCS(FILE CHAR(50)    NOT NULL, LINE INT    NOT NULL,TYPE CHAR(50) NOT NULL);"
     createfilemaptable = "CREATE TABLE FILEMAP(FILEPTR CHAR(100) NOT NULL, FILE CHAR(100));"
     createtypemaptable = "CREATE TABLE TYPEMAP(TYPEPTR CHAR(100) NOT NULL, TYPE CHAR(100));"
     trimtypestable = "UPDATE TYPEMAP SET TYPE = REPLACE(TYPE, ' ', '')"
-    updateallocstablewithfile = "replace into ALLOCS \
-        (ROWID, file, type, line, TIMESTAMP, address, isNew, size) \
-        select allocs.rowid, filemap.file, allocs.type, allocs.line, allocs.TIMESTAMP, allocs.ADDRESS, allocs.isNew, allocs.SIZE \
-        from allocs left join filemap on allocs.file = filemap.FILEPTR;"
-    updateallocstablewithtype = "replace into ALLOCS \
-        (ROWID, file, type, line, TIMESTAMP, address, isNew, size) \
-        select allocs.rowid, allocs.file, typemap.type, allocs.line, allocs.TIMESTAMP, allocs.ADDRESS, allocs.isNew, allocs.SIZE \
-        from allocs left join typemap on allocs.type = typemap.TYPEPTR;"
+
+    updateallocstablewithfileandtype = "create table SUPERTABLE as \
+    select t2.FILE, t1.LINE, t1.TIMESTAMP, t1.SIZE, t1.ADDRESS, \
+    t1.isNew, t3.TYPE from ALLOCS t1 LEFT JOIN filemap t2 on t1.fileptr = t2.fileptr LEFT JOIN\
+    typemap t3 on t3.TYPEPTR = t1.TYPE"
+    # for adding info from MALLOCS table
     createallocswithtypetable = "create table ALLOCSWITHTYPES as \
         select t1.file, t1.type, t2.type as malloctype, t1.line, t1.TIMESTAMP, t1.size, t1.ADDRESS, t1.isNew \
-        from allocs t1 left join mallocs t2 on t1.file = t2.file and t1.line = t2.line"
+        from SUPERTABLE t1 left join mallocs t2 on t1.file = t2.file and t1.line = t2.line"
+    # for adding info from MALLOCS table
     updateallocswithtypetable = "update ALLOCSWITHTYPES \
         set TYPE = malloctype \
         where malloctype not NULL"
@@ -78,9 +77,7 @@ if __name__ == "__main__":
     elif sys.argv[3] == "TYPEMAP":
         savefiletodb(createtypemaptable, 2, "TYPEMAP")
         updatetable("", trimtypestable, "TYPEMAP", False)
-    elif sys.argv[3] == "UPDATEALLOCSWITHFILE":
-        updatetable("", updateallocstablewithfile, "ALLOCS", False)
-    elif sys.argv[3] == "UPDATEALLOCSWITHTYPE":
-        updatetable("", updateallocstablewithtype, "ALLOCS", False)
+    elif sys.argv[3] == "UPDATEALLOCSWITHFILEANDTYPE":
+        updatetable("", updateallocstablewithfileandtype, "ALLOCS", False)
     elif sys.argv[3] == "ALLOCSWITHTYPES":
         updatetable(createallocswithtypetable, updateallocswithtypetable, "ALLOCSWITHTYPES", True)

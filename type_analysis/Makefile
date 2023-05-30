@@ -14,14 +14,14 @@ run:
 .PHONY: parser malloctypedumper clean run all
 
 byte_reader: byte_rw.cpp
-	$(CC) byte_rw.cpp -g -o byte_rw
+	$(CC) byte_rw.cpp -g -o bin/byte_rw
 
 fieldandtypedumper: clang_parser.cpp
-	$(CC) $(Includes) -DMTDFNAME1="\"malloc\"" -DMTDFNAME2="\"realloc\"" -DMTDFNAME3="\"calloc\"" -DMTDFNAME4="\"reallocArray\"" -DMTDFNAME5="\"alloc\"" clang_parser.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o fieldandtypedumper
+	$(CC) $(Includes) -DMTDFNAME1="\"malloc\"" -DMTDFNAME2="\"realloc\"" -DMTDFNAME3="\"calloc\"" -DMTDFNAME4="\"reallocArray\"" -DMTDFNAME5="\"alloc\"" clang_parser.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o bin/fieldandtypedumper
 
 malloctypedumper: malloctypedumper.cpp
 	# $(CC) $(Includes) -DMTDFNAME="\"_mm_malloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o malloctypedumper
-	$(CC) $(Includes) -DMTDFNAME="\"alloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o malloctypedumper
+	$(CC) $(Includes) -DMTDFNAME="\"alloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o bin/malloctypedumper
 
 replacer: source_replacements.cpp
 	$(CC) $(Includes) -DMTDFNAME="\"malloc\"" source_replacements.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o replacer
@@ -42,4 +42,4 @@ header_c: header.cpp
 	$(C_CC) /home/gspathak/sifter/type_analysis/header.c -g -o header_c -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 clean:
-	rm byte_rw experimental 2experimental fieldandtypedumper tool malloctypedumper replacer header header_c malloc_type_dump.txt info_dump binary_dump.txt fielddump.txt new_field_dump.txt new_fielddump.txt typedump.txt typeset_dump.txt fileset_dump.txt allocs.sqlite fixes.yaml
+	rm byte_rw experimental 2experimental fieldandtypedumper tool malloctypedumper replacer header header_c malloc_type_dump.txt info_dump binary_dump.txt fielddump.txt new_field_dump.txt new_fielddump.txt typedump.txt typeset_dump.txt fileset_dump.txt allocs.sqlite fixes.yaml bin/*
