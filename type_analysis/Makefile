@@ -13,12 +13,15 @@ run:
 
 .PHONY: parser malloctypedumper clean run all
 
+# NEEDED
 byte_reader: byte_rw.cpp
 	$(CC) byte_rw.cpp -g -o bin/byte_rw
 
+# NEEDED
 fieldandtypedumper: clang_parser.cpp
 	$(CC) $(Includes) -DMTDFNAME1="\"malloc\"" -DMTDFNAME2="\"realloc\"" -DMTDFNAME3="\"calloc\"" -DMTDFNAME4="\"reallocArray\"" -DMTDFNAME5="\"alloc\"" clang_parser.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o bin/fieldandtypedumper
 
+# NEEDED
 malloctypedumper: malloctypedumper.cpp
 	# $(CC) $(Includes) -DMTDFNAME="\"_mm_malloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o malloctypedumper
 	$(CC) $(Includes) -DMTDFNAME="\"alloc\"" -DDEBUG malloctypedumper.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o bin/malloctypedumper
@@ -35,11 +38,13 @@ experimental: replacer_experimental.cpp
 ctdcheck: ChangeMallocCheck.cpp ChangeMallocCheck.h
 	$(CC) $(Includes) -DMTDFNAME="\"alloc\""  -DMTDFLEN="5" ChangeMallocCheck.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o ctdcheck
 
+# TEST
 header: header.cpp
-	$(CC) /home/gspathak/sifter/type_analysis/header.cpp -g -o header -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
+	$(CC) /home/gspathak/sifter/type_analysis/header.cpp -g -o header -L../memhook/ -I/home/gspathak/sifter/type_analysis/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
+# TEST
 header_c: header.cpp
-	$(C_CC) /home/gspathak/sifter/type_analysis/header.c -g -o header_c -L../memhook/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
+	$(C_CC) /home/gspathak/sifter/type_analysis/header.c -g -o header_c -L../memhook/ -I/home/gspathak/sifter/type_analysis/ -I../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 clean:
-	rm byte_rw experimental 2experimental fieldandtypedumper tool malloctypedumper replacer header header_c malloc_type_dump.txt info_dump binary_dump.txt fielddump.txt new_field_dump.txt new_fielddump.txt typedump.txt typeset_dump.txt fileset_dump.txt allocs.sqlite fixes.yaml bin/*
+	rm byte_rw experimental 2experimental fieldandtypedumper tool malloctypedumper replacer header header_c malloc_type_dump.txt info_dump binary_dump.txt fielddump.txt new_field_dump.txt new_fielddump.txt typedump.txt typeset_dump.txt fileset_dump.txt allocs.sqlite fixes.yaml fix.yaml new_info_t_dump.txt *.pyc bin/*

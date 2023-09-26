@@ -77,22 +77,29 @@ In this example ../setbench_master/lib/libjemalloc.so is a relative path to an i
 DETAILED WORKFLOW (for general projects):
 1. Copy your project into prac
 2. Run static analysis to get type information from malloc and generate malloc_type_dump.txt, fielddump.txt, typedump.txt
-	./malloctypdumper compile_commands.json
-	./fieldandtypedumper compile_commands.json
+	./bin/malloctypdumper compile_commands.json
+	./bin/fieldandtypedumper compile_commands.json
+
+	% This creates the files fielddump.txt, typedump.txt, malloc_type_dump.txt
    You may also choose to templatize any allocation function of your choice by using clang-tidy. If you do this and it works
    well, you don't need malloctypedumper.
+   ./run-clang-tidy.py -clang-tidy-binary clang-tidy-standalone/build/tool/clang-tidy -checks=misc-malloc-checker -p=./ -export-fixes=fixes.yaml
+    clang-apply-replacements ./
 5. Trim names of object types:
 	**don't know when to do this right now** python3 trim_name.py info_dump new_info_t_dump.txt
 	python3 -c "import trim_name; trim_name.trim_fields(\"fielddump.txt\");"
 3. Integrate memhook into project by changing Makefile, and adding memhook_interface.h in each c/cpp/h file.
 4. Compile and run project.
+	% Creates typeset_dump.txt, fileset_dump.txt, binary_dump.txt
 5. convert binary_dump.txt to info_dump.
 6. Import to DB:
+	% creates DBs
 	python3 savefieldstodb.py info_dump allocs.sqlite ALLOCS
 	python3 savefieldstodb.py new_field_dump.txt allocs.sqlite FIELDS
 	python3 savefieldstodb.py malloc_type_dump.txt allocs.sqlite MALLOCS
 	python3 savefieldstodb.py fileset_dump.txt allocs.sqlite FILEMAP
 	python3 savefieldstodb.py typeset_dump.txt allocs.sqlite TYPEMAP
+	% does join
 	python3 savefieldstodb.py <placeholder> allocs.sqlite UPDATEALLOCSWITHFILEANDTYPE
 	python3 savefieldstodb.py <placeholder> allocs.sqlite ALLOCSWITHTYPES
 7. Run visualisation scripts:

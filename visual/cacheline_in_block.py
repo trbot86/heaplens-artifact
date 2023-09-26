@@ -7,7 +7,7 @@ import tkinter as tk
 from tkinter import messagebox
 import matplotlib
 import sys, sqlite3, matplotlib.pyplot as plt
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 from matplotlib.cm import get_cmap
 from matplotlib.lines import Line2D
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -29,15 +29,15 @@ def insertnewrow(barchartdf):
     rows = []
     # print(barchartdf.shape[0])
     for i in range(0, barchartdf.shape[0]):
-        # print(i)        
+        # print(i)
         if barchartdf['cloff'][i] + barchartdf['SIZE'][i] > xbytes:
             s = barchartdf.at[i,'SIZE']
             barchartdf.at[i,'SIZE'] = xbytes - barchartdf['cloff'][i]
             new_s = barchartdf.at[i,'SIZE']
-            
+
             # print("s = "+ str(s))
             # print(new_s)
-            
+
             quo = (s-new_s)//xbytes
             rem = (s-new_s)%xbytes
             # print(quo)
@@ -47,7 +47,7 @@ def insertnewrow(barchartdf):
                 new_row['cloff'] = 0
                 new_row['SIZE'] = xbytes
                 rows.append(new_row)
-            
+
             if rem != 0:
                 new_row = pd.DataFrame(barchartdf[:][i:i+1]).copy(deep=True)
                 new_row['clno'] = new_row['clno'] + quo + 1
@@ -90,7 +90,7 @@ def renderchart(barchartdf):
     dct, mapping, clrmap, colormap = setcolormap(barchartdf)
 
     custom_lines = [Line2D([0], [0], color=clrmap(x), lw=4) for x in mapping]
-    
+
     print(mapping)
     print(clrmap)
     print("custom_lines: ", [clrmap(x) for x in mapping])
@@ -124,9 +124,9 @@ typequery = sys.argv[4]
 
 display(xbytes)
 
-get_typenames = "select distinct ALLOCSWITHTYPES.TYPE from ALLOCSWITHTYPES;"
+get_typenames = "select distinct SUPERTABLE.TYPE from SUPERTABLE;"
 
-blocklistquery = "select distinct address/" + blocksize + " as blockno from ALLOCSWITHTYPES where (" + typequery + ")"
+blocklistquery = "select distinct address/" + blocksize + " as blockno from SUPERTABLE where (" + typequery + ")"
 
 cache_query = "select type ,\
     address, \
@@ -134,7 +134,7 @@ cache_query = "select type ,\
     address/" + blocksize + " as blockno ,\
     (address%" + xbytes + ") as cloff ,\
     size \
-from ALLOCSWITHTYPES where '1==1' "
+from SUPERTABLE where '1==1' "
 #  where (" + typequery + ") "
 
 xbytes = int(xbytes)
@@ -160,7 +160,7 @@ while True:
     # PICK RANDOM BLOCK
     blockno = str(blocknodf['blockno'][randint(0, blocknodf.size-1)])
 
-    print(blockno) 
+    print(blockno)
 
     print("**************")
     # PRINT CACHE QUERY
