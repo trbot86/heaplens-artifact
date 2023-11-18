@@ -1,0 +1,34 @@
+{
+  "name": "memvis",
+  "version": "1.0.0",
+  "description": "Memory layout visualization",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "browser": {
+    "fs": false,
+    "crypto": false,
+    "path": false
+  },
+  "scripts": {
+    "build": "webpack --progress profile",
+    "server": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "copy-webpack-plugin": "^11.0.0",
+    "d3": "^7.8.5",
+    "express": "^4.18.2",
+    "html-webpack-plugin": "^5.5.3",
+    "sql.js": "^1.8.0"
+  },
+  "devDependencies": {
+    "css-loader": "^6.8.1",
+    "file-loader": "^6.2.0",
+    "style-loader": "^3.3.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-middleware": "^6.1.1",
+    "webpack-dev-server": "^4.15.1"
+  }
+}
