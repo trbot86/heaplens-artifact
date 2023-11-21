@@ -4,9 +4,9 @@ import { addElementsByTimestamp } from './objectFieldLayout.js';
 import { updatePagesByTimestamp } from './pageLayout.js';
 import { instantaneous, drawLayout } from './cacheSetLayout.js';
 
-const LAYOUT_TRANSLATE_X = 50;
+const LAYOUT_TRANSLATE_X = 70;
 const LAYOUT_TRANSLATE_Y = 20;
-const tabPosition = {x: 50, y: 310};
+const tabPosition = {x: 70, y: 310};
 let xScale, xAxis = undefined;
 
 export function getCurrTime() {
@@ -92,7 +92,7 @@ function allocsOverTimeLayout(objects) {
     let graphLayout = d3.select("#visPanels")
         .append("svg")
         .attr("id", "graphLayout")
-        .style("width", "90%")
+        .style("width", "100%")
         .style("height", "100%")
         .style("grid-column", "1 / 3")
         .style("grid-row", 2)
@@ -102,10 +102,10 @@ function allocsOverTimeLayout(objects) {
         .attr("id", "graphLayoutAxes");
     graphLayoutAxes.append("g")
         .attr("id", "graphLayoutXAxis")
-        .style("transform", "translate(50px, 300px)");
+        .style("transform", `translate(${LAYOUT_TRANSLATE_X}px, 300px)`);
     graphLayoutAxes.append("g")
         .attr("id", "graphLayoutYAxis")
-        .style("transform", "translate(50px, 20px)");
+        .style("transform", `translate(${LAYOUT_TRANSLATE_X}px, ${LAYOUT_TRANSLATE_Y}px)`);
 
     // console.log(Math.max);
     

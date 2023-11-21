@@ -65,13 +65,12 @@ function getSquaresData(objs) {
     let squareSize = Math.floor(width / setsPerRow);
 
     let setMap = objs.map(obj => ({cacheline: Math.floor(obj.alloc_addr / cachelineSize) % numCacheSets,
-        spread: Math.ceil((obj.alloc_size + (obj.alloc_size % cachelineSize)) / cachelineSize)}))
+        spread: 1 + Math.max(Math.ceil((obj.alloc_size - (cachelineSize - (obj.alloc_addr % cachelineSize))) / cachelineSize), 0)}));
     let freqMap = setMap.reduce((acc, curr) => {
         let inc = Math.ceil(curr.spread / numCacheSets);
         for (let i = curr.cacheline; i < curr.cacheline + Math.min(numCacheSets, curr.spread); i++) {
-            // TODO: check this calculation, pretty sure it's wrong
             let rounded = i - curr.cacheline < curr.spread % numCacheSets ? inc : inc - 1;
-            let j = (curr.cacheline + i) % numCacheSets;
+            let j = i % numCacheSets;
             acc[j] ? acc[j] += rounded : acc[j] = rounded;
         }
         // acc[curr] ? acc[curr]++ : acc[curr] = 1;
@@ -125,8 +124,8 @@ function refreshLayout(cs, assoc, cls) {
     associativity = assoc;
     cachelineSize = cls;
     d3.select("#cacheLayout").remove();
-    drawLayout();
-    drawToggle();
+    drawLayout(instantaneous ? getCurrTime() : -1);
+    // drawToggle();
 }
 
 function cacheSetLayout(objs, cachelineSize=64, ...cacheInfo) {
@@ -189,6 +188,7 @@ function cacheSetLayout(objs, cachelineSize=64, ...cacheInfo) {
         .style("alignment-baseline", "middle")
         .text((d, i) => `L${i+1}`);
 
+        drawToggle();
         refreshLayout(cacheInfo[0].size, cacheInfo[0].associativity, cachelineSize);
 }
 

@@ -4,26 +4,26 @@ import { CACHELINE_SIZE, colour_of_type } from './vis.js';
 /* ISSUES 
         - Allocations without matching frees are not shown */
 
-let memLayout, data, xScale, yScale = undefined;
+let memLayout, data, xScale, yScale, pageSize = undefined;
 
 export function addElementsByTimestamp(ts) {
     memLayout.selectAll("rect")
-        .data(data.filter(d => d.start <= ts && d.end >= ts),
-            d => (d.x, d.y))
+        .data(data.filter((d) => d.start <= ts && d.end >= ts),
+            (d) => d.id)
         .join(
-            enter => enter.append("rect")
+            (enter) => enter.append("rect")
                     .attr("x", d => xScale(d.x))
                     .attr("y", d => yScale(d.y) - yScale(yScale.domain()[0]-1))
                     .attr("width", d => xScale(d.width))
                     .attr("height", d => yScale(yScale.domain()[0]-d.height))
                     .attr("transform", "translate(30, 40)")
                     .attr("fill", d => d.colour),
-            update => undefined,
-            exit => exit.remove()
+            (update) => undefined,
+            (exit) => exit.remove()
         );
 }
 
-function splitBlocks(objects, startAddr) {
+function splitBlocks(objects, startAddr, pageSize) {
     const pageBlocks = [];
     // const startAddr = objects[0].alloc_addr - (objects[0].alloc_addr % CACHELINE_SIZE);
     
@@ -32,7 +32,8 @@ function splitBlocks(objects, startAddr) {
         let col = colour_of_type[obj.alloc_type];
         const normAddr = (obj.alloc_addr - startAddr);
         const begin = normAddr % CACHELINE_SIZE;
-        pageBlocks.push({x: begin,
+        pageBlocks.push({id: i*3,
+                        x: begin,
                         y: Math.floor(normAddr / CACHELINE_SIZE),
                         width: Math.min(obj.alloc_size, CACHELINE_SIZE - begin),
                         height: 1,
@@ -41,9 +42,16 @@ function splitBlocks(objects, startAddr) {
                         colour: col
                         });
         if (obj.alloc_size > CACHELINE_SIZE - begin) {
+            // let midHeight = Math.floor(Math.min(obj.alloc_size - CACHELINE_SIZE + begin,
+            //                                     pageSize - (obj.alloc_addr % pageSize) + CACHELINE_SIZE - begin) / CACHELINE_SIZE);
             let midHeight = Math.floor((obj.alloc_size - CACHELINE_SIZE + begin) / CACHELINE_SIZE);
+            let pageRem = Math.floor((pageSize - (obj.alloc_addr % pageSize) + CACHELINE_SIZE - begin) / CACHELINE_SIZE) - 1;
+            
+            if (midHeight > pageRem) midHeight = pageRem;
+            
             if (obj.alloc_size >= 2*CACHELINE_SIZE - begin) {
-                pageBlocks.push({x: 0,
+                pageBlocks.push({id: i*3 + 1,
+                                x: 0,
                                 y: Math.floor(normAddr / CACHELINE_SIZE) + midHeight,
                                 width: CACHELINE_SIZE,
                                 height: midHeight,
@@ -53,8 +61,9 @@ function splitBlocks(objects, startAddr) {
                                 });
             }
             let leftover = (obj.alloc_size - CACHELINE_SIZE + begin) % CACHELINE_SIZE;
-            if (leftover > 0) {
-                pageBlocks.push({x: 0,
+            if (midHeight != pageRem && leftover > 0) {
+                pageBlocks.push({id: i*3 + 2,
+                                x: 0,
                                 y: Math.floor(normAddr / CACHELINE_SIZE) + midHeight + 1,
                                 width: leftover,
                                 height: 1,
@@ -68,7 +77,7 @@ function splitBlocks(objects, startAddr) {
     return pageBlocks;
 }
 
-function objectLayout(objects, startAddr, initTs = 0) {
+function objectLayout(objects, startAddr, initTs=0, pageSize=4096) {
     d3.select("#memLayout").remove();
 
     memLayout = d3.select("#visPanels")
@@ -100,7 +109,7 @@ function objectLayout(objects, startAddr, initTs = 0) {
     d3.select("#memLayoutXAxis").call(xAxis);
     d3.select("#memLayoutYAxis").call(yAxis);
 
-    data = splitBlocks(objects, startAddr);
+    data = splitBlocks(objects, startAddr, pageSize);
     addElementsByTimestamp(initTs);
 }
 
