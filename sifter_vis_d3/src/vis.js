@@ -15,6 +15,9 @@ async function initVis(objects) {
         .append("g")
         .attr("id", "visPanels");
 
+    console.log("TESTING");
+    console.log(objects.sort((a, b) => a.alloc_size - b.alloc_size));
+
     const types = [...new Set(objects.map((obj) => obj.alloc_type))];
     const colScale = d3.scaleSequential()
                         .domain([0, types.length])

@@ -44,3 +44,7 @@ type_analysis/.cache/**
 sifter_vis_d3/media/
 sifter_vis_d3/node_modules/
 sifter_vis_d3/dist/
+sifter_vis_d3/log.txt
+**/binary_dump.txt
+**/info_dump
+**/new_field_dump.txt

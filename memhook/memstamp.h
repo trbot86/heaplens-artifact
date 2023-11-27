@@ -4,7 +4,7 @@
 using namespace std;
 
 struct info_t {
-    const char *file;
+    const char* file;
     const char* tindex_name;
     unsigned int line;
     uint64_t timestamp;
@@ -13,7 +13,9 @@ struct info_t {
     bool typeofop;
     //char padding[PADDING];
 
-    info_t() : file(nullptr), tindex_name(nullptr), line(0), timestamp(0), size(0), addr(nullptr) {}
+    info_t() : file(nullptr), tindex_name(nullptr), line(0), timestamp(0), size(0), addr(nullptr) {
+        (void) 0;
+    }
 };
 
 class MemStamp

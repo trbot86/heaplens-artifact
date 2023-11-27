@@ -129,6 +129,12 @@ memhook_memory_pool::~memhook_memory_pool(){
 	//instead of doing this, the memory_pool array can keep track of cumulative bytes
 
 	for(int i = 0; i < memory_pool.size(); i++){
+    cout << "Buffer size: " << memory_pool[i].buffer_size_nbytes << endl;
+    // cout << "File: " << memory_pool[i].allocation_log->file << endl;
+    // cout << "t_index name: " << memory_pool[i].allocation_log->tindex_name << endl;
+    // cout << "line: " << memory_pool[i].allocation_log->line << endl;
+    cout << "timestamp: " << memory_pool[i].allocation_log->timestamp << endl;
+    cout << "size: " << memory_pool[i].allocation_log->size << endl;
 		total_byte_count += memory_pool[i].buffer_size_nbytes;
 		write(global_fd, memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
 	}
@@ -190,19 +196,21 @@ class ThreadExiter
     //void operator=(ThreadExiter const&) = delete;
     
     ThreadExiter(){
-      printf("ThreadExiter Constructor has been called - v2\n");
+      // printf("ThreadExiter Constructor has been called - v2\n");
     }
     ~ThreadExiter()
     {
-      printf("ThreadExiter Destructor has been called - v2\n");
-
-      int next_buffer = (buffer_index + 1) % 2;
+      // printf("ThreadExiter Destructor has been called - v2\n");
 
       if(async_struct_array) {
-        if(aio_error(&async_struct_array[buffer_index]) == EINPROGRESS){
-          async_api_struct_list[0] = &async_struct_array[next_buffer];
-
-          aio_suspend(async_api_struct_list,1,0);
+        for (int i = 1; i < number_of_buffers; i++) {
+          if (aio_error(&async_struct_array[(buffer_index + i) % number_of_buffers]) == EINPROGRESS){
+            async_api_struct_list[0] = &async_struct_array[(buffer_index + i) % number_of_buffers];
+            
+            if (aio_suspend(async_api_struct_list, 1, NULL) != 0) {
+              cout << "aio_suspend failed in thread destructor" << endl;
+            }
+          }
         }
 
         int unfilled_buffer_size = sizeof(struct info_t)* log_index;
@@ -221,7 +229,7 @@ int get_slot(thread::id id);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);
 
-void   (memhook_free)(void *ptr, const char* file, int line, bool log);
+void  (memhook_free)(void *ptr, const char* file, int line, bool log);
 void *memhook_malloc(size_t size, const char* file, int line, bool log);
 
 #warning This binary is being compiled with memhook. Running it will produce a text file (info_t_dump.txt) that should be provided as an argument to the shell script for step3.
@@ -260,58 +268,54 @@ MemStampCollector::MemStampCollector() {
 MemStampCollector::~MemStampCollector() {
   
 }
+
 void MemStampCollector::copy(info_t &unit_log){
 	if(thread_first_call) {
 		allocation_log = (struct info_t **)next_malloc(sizeof(struct info_t*)*number_of_buffers);
-        for(int i = 0; i < 2; i++){
-            allocation_log[i] = (struct info_t*) next_malloc(sizeof(struct info_t)*MEMHOOK_MAX_BUFFER_SIZE);
-        }
+    for(int i = 0; i < number_of_buffers; i++) {
+      allocation_log[i] = (struct info_t*) next_malloc(sizeof(struct info_t)*MEMHOOK_MAX_BUFFER_SIZE);
+    }
 
-        // printf("%lu \n", sizeof(struct info_t));
-        async_struct_array = (struct aiocb*)next_malloc(sizeof(struct aiocb)*number_of_buffers);
-        async_api_struct_list = (struct aiocb **)next_malloc(sizeof(struct aiocb*)*1);
+    // printf("%lu \n", sizeof(struct info_t));
+    async_struct_array = (struct aiocb*)next_malloc(sizeof(struct aiocb)*number_of_buffers);
+    async_api_struct_list = (struct aiocb **)next_malloc(sizeof(struct aiocb*)*1);
 
-        //char file_path[] = "binary_dump.txt";
-        //fd = open(file_path,O_WRONLY|O_APPEND|O_CREAT);
-
-        thread_first_call = 0;
+    thread_first_call = 0;
 	}
 
-    memcpy(&allocation_log[buffer_index][log_index], &unit_log, sizeof(info_t));
-    //set unit_log to zero
-    memset(&unit_log, 0, sizeof(unit_log));
-    log_index++;
+  memcpy(&allocation_log[buffer_index][log_index], &unit_log, sizeof(info_t));
+  //set unit_log to zero
+  memset(&unit_log, 0, sizeof(unit_log));
+  log_index++;
 
-    if(log_index == MEMHOOK_MAX_BUFFER_SIZE){
-    	async_struct_array[buffer_index].aio_buf = allocation_log[buffer_index];
-    	async_struct_array[buffer_index].aio_nbytes = sizeof(struct info_t)*MEMHOOK_MAX_BUFFER_SIZE;
-    	async_struct_array[buffer_index].aio_fildes = global_fd;
-    	async_struct_array[buffer_index].aio_offset = 0;
-    	async_struct_array[buffer_index].aio_reqprio = 0;
-    	async_struct_array[buffer_index].aio_sigevent.sigev_notify = SIGEV_NONE;
+  if(log_index == MEMHOOK_MAX_BUFFER_SIZE) {
+    cout << "STARTING ASYNC WRITE" << endl;
+    async_struct_array[buffer_index].aio_buf = allocation_log[buffer_index];
+    async_struct_array[buffer_index].aio_nbytes = sizeof(struct info_t)*MEMHOOK_MAX_BUFFER_SIZE;
+    async_struct_array[buffer_index].aio_fildes = global_fd;
+    async_struct_array[buffer_index].aio_offset = 0;
+    async_struct_array[buffer_index].aio_reqprio = 0;
+    async_struct_array[buffer_index].aio_sigevent.sigev_notify = SIGEV_NONE;
 
-    	aio_write(&async_struct_array[buffer_index]);
-    	aio_fsync(O_SYNC, &async_struct_array[buffer_index]);
+    if (aio_write(&async_struct_array[buffer_index]) != 0) {
+      cout << "aio_write FAILED" << endl;
+    }
 
-      //NOT NEEDED
-      // if(first_filled_buffer_status == 0){
-      //   first_filled_buffer_status = 1;
-      //   buffer_index = 1;
-      //   log_index = 0;
-      //   return;
-      // }
+    buffer_index = (buffer_index + 1) % number_of_buffers;
+    log_index = 0;
 
-    	buffer_index = (buffer_index + 1) % 2;
-    	log_index = 0;
-
-      if(aio_error(&async_struct_array[buffer_index]) == EINPROGRESS){
-        async_api_struct_list[0] = &async_struct_array[buffer_index];
-        int aio_error_code = aio_suspend(async_api_struct_list,1,0);
-
-        if(aio_error_code == -1)
-          printf("suspend returned -1\n");
+    if (aio_error(&async_struct_array[buffer_index]) == EINPROGRESS){
+      async_api_struct_list[0] = &async_struct_array[buffer_index];
+      cout << "WAITING FOR AIO" << endl;
+      
+      if(aio_suspend(async_api_struct_list, 1, NULL) != 0) {
+        cout << "aio_suspend failed in copy" << endl;
+      }
+      else {
+        cout << "done waiting for aio_suspend" << endl;
       }
     }
+  }
 }
 
 MemStampCollector collector;
