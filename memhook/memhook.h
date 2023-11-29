@@ -289,7 +289,6 @@ void MemStampCollector::copy(info_t &unit_log){
   log_index++;
 
   if(log_index == MEMHOOK_MAX_BUFFER_SIZE) {
-    cout << "STARTING ASYNC WRITE" << endl;
     async_struct_array[buffer_index].aio_buf = allocation_log[buffer_index];
     async_struct_array[buffer_index].aio_nbytes = sizeof(struct info_t)*MEMHOOK_MAX_BUFFER_SIZE;
     async_struct_array[buffer_index].aio_fildes = global_fd;
@@ -306,13 +305,9 @@ void MemStampCollector::copy(info_t &unit_log){
 
     if (aio_error(&async_struct_array[buffer_index]) == EINPROGRESS){
       async_api_struct_list[0] = &async_struct_array[buffer_index];
-      cout << "WAITING FOR AIO" << endl;
       
       if(aio_suspend(async_api_struct_list, 1, NULL) != 0) {
         cout << "aio_suspend failed in copy" << endl;
-      }
-      else {
-        cout << "done waiting for aio_suspend" << endl;
       }
     }
   }
