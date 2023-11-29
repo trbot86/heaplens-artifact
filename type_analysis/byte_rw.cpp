@@ -59,8 +59,8 @@ void read_block(int id, unsigned long int fsize) {
   for (int i = 0; i < num_my_blocks; i++) {
     aio_control[i] = (struct aiocb*) malloc(sizeof(struct aiocb));
     memset(aio_control[i], 0, sizeof(struct aiocb));
-    struct info_t* start = ((struct info_t*) filemap) + (id * STRUCTS_PER_BLOCK * i);
-    unsigned long int remainder_of_file = (fsize / sizeof(struct info_t)) - (id * STRUCTS_PER_BLOCK * i);
+    struct info_t* start = ((struct info_t*) filemap) + (id * STRUCTS_PER_BLOCK) + (i * NUMBER_OF_THREADS_BYTERW * STRUCTS_PER_BLOCK);
+    unsigned long int remainder_of_file = (fsize / sizeof(struct info_t)) - (id * STRUCTS_PER_BLOCK) - (i * NUMBER_OF_THREADS_BYTERW * STRUCTS_PER_BLOCK);
     int bytes_copied = 0;
     for (int j = 0; j < min<unsigned long int>(remainder_of_file, (unsigned long int) STRUCTS_PER_BLOCK); j++) {
       struct info_t event = *(start + j);
