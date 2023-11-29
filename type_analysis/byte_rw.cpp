@@ -64,8 +64,10 @@ void read_block(int id, unsigned long int fsize) {
     int bytes_copied = 0;
     for (int j = 0; j < min<unsigned long int>(remainder_of_file, (unsigned long int) STRUCTS_PER_BLOCK); j++) {
       struct info_t event = *(start + j);
-      bytes_copied += sprintf(charmap + curr_byte + bytes_copied, "0x%lx|0x%lx|%d|%lu|%lu|%ld|%d\n",
+      bytes_copied += sprintf(charmap + curr_byte + bytes_copied, "%s%lx|%s%lx|%d|%lu|%lu|%ld|%d\n",
+                                                event.file ? "0x" : "",
                                                 (uintptr_t) event.file,
+                                                event.tindex_name ? "0x" : "",
                                                 (uintptr_t) event.tindex_name,
                                                 event.line,
                                                 event.timestamp,
