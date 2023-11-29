@@ -36,6 +36,7 @@ type_analysis/typedump.txt
 type_analysis/fileset_dump.txt
 type_analysis/typeset_dump.txt
 type_analysis/binary_dump.txt
+type_analysis/test_uniqueness.py
 experimental
 setbench_bk/**
 setbenchbk/**
