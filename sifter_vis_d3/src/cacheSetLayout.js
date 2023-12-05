@@ -64,8 +64,8 @@ function getSquaresData(objs) {
     let setsPerRow = Math.floor(Math.sqrt(numCacheSets));
     let squareSize = Math.floor(width / setsPerRow);
 
-    let setMap = objs.map(obj => ({cacheline: Math.floor(obj.alloc_addr / cachelineSize) % numCacheSets,
-        spread: 1 + Math.max(Math.ceil((obj.alloc_size - (cachelineSize - (obj.alloc_addr % cachelineSize))) / cachelineSize), 0)}));
+    let setMap = objs.map(obj => ({cacheline: Math.floor(obj.addr / cachelineSize) % numCacheSets,
+        spread: 1 + Math.max(Math.ceil((obj.size - (cachelineSize - (obj.addr % cachelineSize))) / cachelineSize), 0)}));
     let freqMap = setMap.reduce((acc, curr) => {
         let inc = Math.ceil(curr.spread / numCacheSets);
         for (let i = curr.cacheline; i < curr.cacheline + Math.min(numCacheSets, curr.spread); i++) {
@@ -85,7 +85,7 @@ function getSquaresData(objs) {
 }
 
 export function drawLayout(ts=-1) {
-    let squaresData = getSquaresData(instantaneous ? objects.filter(d => d.alloc_timestamp <= ts && d.free_timestamp >= ts) : objects,
+    let squaresData = getSquaresData(instantaneous ? objects.filter(d => d.allocTs <= ts && d.freeTs >= ts) : objects,
         cacheSize, associativity, cachelineSize);
     const heatScale = d3.scaleLinear().domain([0, Math.max(1, Math.max(...squaresData.map(d => d.freq ? d.freq : 0)))]).range(["white", "red"]);
 
@@ -130,6 +130,7 @@ function refreshLayout(cs, assoc, cls) {
 
 function cacheSetLayout(objs, cachelineSize=64, ...cacheInfo) {
     objects = objs;
+    console.log(objects);
 
     let cacheSetTabs = d3.select("#visPanels")
         .append("div")

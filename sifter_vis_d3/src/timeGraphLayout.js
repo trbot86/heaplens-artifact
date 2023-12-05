@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { colour_of_type } from "./vis.js";
+import { colourOfType } from "./vis.js";
 import { addElementsByTimestamp } from './objectFieldLayout.js';
 import { updatePagesByTimestamp } from './pageLayout.js';
 import { instantaneous, drawLayout } from './cacheSetLayout.js';
@@ -81,13 +81,12 @@ function slider() {
 }
 
 function allocsOverTimeLayout(objects) {
-    const alloc_times = objects.map(obj => obj.alloc_timestamp);
-    const free_times = objects.map(obj => obj.free_timestamp == null ? 0 : obj.free_timestamp);
-    const minTime = Math.min(...alloc_times);
-    const maxTime = Math.max(...alloc_times.concat(free_times));
-    const endBuff = Math.floor((maxTime - minTime)*0.05);
-    const sizes = objects.map(obj => obj.alloc_size);
-    const totalSize = sizes.reduce((acc, curr) => acc + curr);
+    const allocTimes = objects.map(obj => obj.allocTs);
+    const freeTimes = objects.map(obj => obj.freeTs == null ? 0 : obj.freeTs);
+    const minTime = Math.min(...allocTimes);
+    const maxTime = Math.max(Math.max(...allocTimes), Math.max(...freeTimes));
+    const endBuff = Math.floor((maxTime - minTime)*0.03);
+    const sizes = objects.map(obj => obj.size);
 
     let graphLayout = d3.select("#visPanels")
         .append("svg")
@@ -128,19 +127,19 @@ function allocsOverTimeLayout(objects) {
     const lines = {};
 
     let objects_by_type = objects.reduce((acc, curr) => {
-        acc[curr.alloc_type] ? acc[curr.alloc_type].push(curr) : acc[curr.alloc_type] = [curr];
+        acc[curr.type] ? acc[curr.type].push(curr) : acc[curr.type] = [curr];
         return acc;
     }, {});
 
     for (let type of Object.keys(objects_by_type)) {
         events[type] = [];
         for (let obj of objects_by_type[type]) {
-            events[type].push([obj.alloc_timestamp, obj.alloc_size, true]);
-            if (obj.free_timestamp != null) {
-                events[type].push([obj.free_timestamp, obj.alloc_size, false]);
+            events[type].push([obj.allocTs, obj.size, true]);
+            if (obj.freeTs != null) {
+                events[type].push([obj.freeTs, obj.size, false]);
             }
         }
-        events[type].sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
+        events[type].sort((a, b) => a[0] - b[0]);
 
         lines[type] = [[minTime-endBuff, 0]];
         let sizeSum = 0;
@@ -163,7 +162,7 @@ function allocsOverTimeLayout(objects) {
             .datum(lines[type])
             .attr("class", "line")
             .attr("fill", "none")
-            .attr("stroke", colour_of_type[type])
+            .attr("stroke", colourOfType[type])
             .attr("stroke-width", 2)
             .attr("transform", `translate(${LAYOUT_TRANSLATE_X}, ${LAYOUT_TRANSLATE_Y})`)
             .attr("d", d3.line()

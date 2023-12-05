@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { CACHELINE_SIZE, colour_of_type } from './vis.js';
+import { colourOfType } from './vis.js';
 
 /* ISSUES 
         - Allocations without matching frees are not shown */
@@ -23,52 +23,53 @@ export function addElementsByTimestamp(ts) {
         );
 }
 
-function splitBlocks(objects, startAddr, pageSize) {
+function splitBlocks(objects, startPage, pageSize, cachelineSize) {
     const pageBlocks = [];
-    // const startAddr = objects[0].alloc_addr - (objects[0].alloc_addr % CACHELINE_SIZE);
+    const startAddr = startPage * pageSize;
+    // const startAddr = objects[0].alloc_addr - (objects[0].alloc_addr % cachelineSize);
     
     for (let i = 0; i < objects.length; i++) {
         let obj = objects[i];
-        let col = colour_of_type[obj.alloc_type];
-        const normAddr = (obj.alloc_addr - startAddr);
-        const begin = normAddr % CACHELINE_SIZE;
+        let col = colourOfType[obj.type];
+        const normAddr = (obj.addr - startAddr);
+        const begin = normAddr % cachelineSize;
         pageBlocks.push({id: i*3,
                         x: begin,
-                        y: Math.floor(normAddr / CACHELINE_SIZE),
-                        width: Math.min(obj.alloc_size, CACHELINE_SIZE - begin),
+                        y: Math.floor(normAddr / cachelineSize),
+                        width: Math.min(obj.size, cachelineSize - begin),
                         height: 1,
-                        start: obj.alloc_timestamp,
-                        end: obj.free_timestamp,
+                        start: obj.allocTs,
+                        end: obj.freeTs,
                         colour: col
                         });
-        if (obj.alloc_size > CACHELINE_SIZE - begin) {
-            // let midHeight = Math.floor(Math.min(obj.alloc_size - CACHELINE_SIZE + begin,
-            //                                     pageSize - (obj.alloc_addr % pageSize) + CACHELINE_SIZE - begin) / CACHELINE_SIZE);
-            let midHeight = Math.floor((obj.alloc_size - CACHELINE_SIZE + begin) / CACHELINE_SIZE);
-            let pageRem = Math.floor((pageSize - (obj.alloc_addr % pageSize) + CACHELINE_SIZE - begin) / CACHELINE_SIZE) - 1;
+        if (obj.size > cachelineSize - begin) {
+            // let midHeight = Math.floor(Math.min(obj.alloc_size - cachelineSize + begin,
+            //                                     pageSize - (obj.alloc_addr % pageSize) + cachelineSize - begin) / cachelineSize);
+            let midHeight = Math.floor((obj.size - cachelineSize + begin) / cachelineSize);
+            let pageRem = Math.floor((pageSize - (obj.addr % pageSize) + cachelineSize - begin) / cachelineSize) - 1;
             
             if (midHeight > pageRem) midHeight = pageRem;
             
-            if (obj.alloc_size >= 2*CACHELINE_SIZE - begin) {
+            if (obj.size >= 2*cachelineSize - begin) {
                 pageBlocks.push({id: i*3 + 1,
                                 x: 0,
-                                y: Math.floor(normAddr / CACHELINE_SIZE) + midHeight,
-                                width: CACHELINE_SIZE,
+                                y: Math.floor(normAddr / cachelineSize) + midHeight,
+                                width: cachelineSize,
                                 height: midHeight,
-                                start: obj.alloc_timestamp,
-                                end: obj.free_timestamp,
+                                start: obj.allocTs,
+                                end: obj.freeTs,
                                 colour: col
                                 });
             }
-            let leftover = (obj.alloc_size - CACHELINE_SIZE + begin) % CACHELINE_SIZE;
+            let leftover = (obj.size - cachelineSize + begin) % cachelineSize;
             if (midHeight != pageRem && leftover > 0) {
                 pageBlocks.push({id: i*3 + 2,
                                 x: 0,
-                                y: Math.floor(normAddr / CACHELINE_SIZE) + midHeight + 1,
+                                y: Math.floor(normAddr / cachelineSize) + midHeight + 1,
                                 width: leftover,
                                 height: 1,
-                                start: obj.alloc_timestamp,
-                                end: obj.free_timestamp,
+                                start: obj.allocTs,
+                                end: obj.freeTs,
                                 colour: col
                                 });
             }
@@ -77,7 +78,7 @@ function splitBlocks(objects, startAddr, pageSize) {
     return pageBlocks;
 }
 
-function objectLayout(objects, startAddr, initTs=0, pageSize=4096) {
+function objectLayout(objects, startAddr, initTs=0, pageSize=4096, cachelineSize=64) {
     d3.select("#memLayout").remove();
 
     memLayout = d3.select("#visPanels")
@@ -98,18 +99,18 @@ function objectLayout(objects, startAddr, initTs=0, pageSize=4096) {
         .attr("id", "memLayoutYAxis")
         .style("transform", "translate(30px, 40px)");
 
-    xScale = d3.scaleLinear().domain([0, CACHELINE_SIZE]).range([0, 290]);
+    xScale = d3.scaleLinear().domain([0, cachelineSize]).range([0, 290]);
     let xAxis = d3.axisBottom(xScale);
-    xAxis.tickValues(d3.range(0, CACHELINE_SIZE+1, 8)).tickFormat(d3.format("d"));
+    xAxis.tickValues(d3.range(0, cachelineSize+1, 8)).tickFormat(d3.format("d"));
 
-    yScale = d3.scaleLinear().domain([CACHELINE_SIZE, 0]).range([0, 290]);
+    yScale = d3.scaleLinear().domain([cachelineSize, 0]).range([0, 290]);
     let yAxis = d3.axisLeft(yScale);
-    yAxis.tickValues(d3.range(0, CACHELINE_SIZE+1, 8)).tickFormat(d3.format("d"));
+    yAxis.tickValues(d3.range(0, cachelineSize+1, 8)).tickFormat(d3.format("d"));
 
     d3.select("#memLayoutXAxis").call(xAxis);
     d3.select("#memLayoutYAxis").call(yAxis);
 
-    data = splitBlocks(objects, startAddr, pageSize);
+    data = splitBlocks(objects, startAddr, pageSize, cachelineSize);
     addElementsByTimestamp(initTs);
 }
 

@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { colour_of_type } from './vis.js';
+import { colourOfType } from './vis.js';
 
 const LINE_SEP = 20;
 
@@ -17,10 +17,10 @@ function legendLayout() {
         .style("overflow", "auto")
         .append('svg')
         .style('width', '100%')
-        .style('height', `${(Object.keys(colour_of_type).length+0.8)*LINE_SEP}px`);
+        .style('height', `${(Object.keys(colourOfType).length+0.8)*LINE_SEP}px`);
 
     legendGroup.selectAll("rect")
-        .data(Object.values(colour_of_type))
+        .data(Object.values(colourOfType))
         .enter()
         .append("rect")
         .attr("x", 0)
@@ -30,7 +30,7 @@ function legendLayout() {
         .style("fill", d => d);
 
     legendGroup.selectAll("text")
-        .data(Object.keys(colour_of_type))
+        .data(Object.keys(colourOfType))
         .enter()
         .append("text")
         .attr("x", 1.5*LINE_SEP)
