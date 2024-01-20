@@ -1,76 +1,40 @@
 // import initSqlJs from "sql.js";
 // Following import required to let webpack know it needs to copy the wasm file to our assets
 // import sqlWasm from "!!file-loader?name=sql-wasm-[contenthash].wasm!sql.js/dist/sql-wasm.wasm";
+import * as d3 from 'd3';
 import MainVisualization from './vis.js';
+
+export let mainVis = undefined;
+
+export function getCurrTime() {
+    return mainVis.getGraphLayout().getCurrTime();
+}
 
 async function getDb(src) {
     // const SQL = await initSqlJs({locateFile: () => sqlWasm});
 
     try {
-        // const db = new SQL.Database(src);
-        // const MAIN_TABLE = "SUPERTABLE";
-
-        // const data = [];
-        /*  The following statement matches all of the allocations with
-            corresponding frees. The following statement:
-                (SELECT COUNT(*) FROM Allocs WHERE alloc_timestamp <= a.alloc_timestamp)
-            simply labels the rows from 1 to n, where n is the total
-            number of allocations. These unique IDs are needed for D3 to
-            efficiently update the visualization based on changes to the data. */
-        // const stmt = db.prepare(`WITH Allocs AS (
-        //                             SELECT FILE AS alloc_file,
-        //                                 SIZE AS alloc_size,
-        //                                 ADDRESS AS alloc_addr,
-        //                                 TYPE AS alloc_type,
-        //                                 TIMESTAMP AS alloc_timestamp
-        //                             FROM SUPERTABLE
-        //                             WHERE isNew=1
-        //                         ),
-        //                         Frees AS (
-        //                             SELECT ADDRESS AS free_addr,
-        //                                 TIMESTAMP AS FREE_TIMESTAMP
-        //                             FROM SUPERTABLE
-        //                             WHERE isNew=0
-        //                         )
-        //                         SELECT a.alloc_file,
-        //                             a.alloc_size,
-        //                             a.alloc_addr,
-        //                             a.alloc_type,
-        //                             a.alloc_timestamp,
-        //                             MIN(f.FREE_TIMESTAMP) AS free_timestamp,
-        //                             (SELECT COUNT(*) FROM Allocs WHERE alloc_timestamp <= a.alloc_timestamp) AS ID
-        //                         FROM Allocs a
-        //                         LEFT JOIN Frees f ON a.alloc_addr = f.free_addr AND f.free_timestamp >= a.alloc_timestamp
-        //                         GROUP BY a.alloc_addr, a.alloc_timestamp
-        //                         ORDER BY a.alloc_addr ASC`);
-
-        // const stmt = db.prepare(`SELECT FILE as allocFile,
-        //                                 SIZE as size,
-        //                                 ADDRESS as addr,
-        //                                 TYPE as type,
-        //                                 TIMESTAMP as timestamp,
-        //                                 isNew as isAlloc
-        //                         FROM SUPERTABLE`);
-
-        // while (stmt.step()) {
-        //     data.push(stmt.getAsObject());
-        // }
-        
-        // stmt.free();
-        // db.close();
-
-        // document.getElementById("dropPanels").remove();
-
-        fetch('/run-sampler')
-            .then((response) => response.json())
-            .then((data) => {
-                console.log('Data received from server.');
+        fetch('/run-get-records')
+            .then((allResponse) => allResponse.json())
+            .then((allData) => {
                 document.getElementById("dropPanels").remove();
-                MainVisualization.build(data);
+                // console.log(allData['pts']
+                mainVis = MainVisualization.build(allData);
+                // fetch('/run-sampler')
+                //     .then((sampleResponse) => sampleResponse.json())
+                //     .then((sampleData) => {
+                //         console.log('Data received from server.');
+                //         mainVis.constructPageVis(sampleData);
+                //     })
+                //     .catch((error) => {
+                //         console.error('Error: ', error);
+                //     });
             })
             .catch((error) => {
                 console.error('Error: ', error);
             });
+
+        
 
         // TODO add loading animation/indicator while visualization initializes
         // initVis(data);

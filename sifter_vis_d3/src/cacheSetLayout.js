@@ -1,9 +1,17 @@
 import * as d3 from 'd3';
-import { getCurrTime } from './timeGraphLayout.js';
+import { getCurrTime } from './dbloader.js';
 
 export let instantaneous = false;
 let objects = [];
 let cacheSize, associativity, cachelineSize = undefined;
+
+/* TODO:
+    *   Implement ability to resize the cache visualization area so that
+        patterns may be more easily seen
+    *   Attempt to auto-detect cache information in memhook application?
+    *   Allow user to input values for cache info
+    *   Store presets with cache information of processors that have been
+        mapped */
 
 function drawToggle() {
     d3.select("#toggleGroup").remove();
@@ -22,18 +30,18 @@ function drawToggle() {
         .style("fill", "#ddd");
     
     toggleGroup.append("circle")
-        .attr("class", "toggle")
-        .attr("cx", 0)
-        .attr("cy", 2.5)
-        .attr("r", 10)
-        .style("fill", "#ccc")
-        .on("click", function() {
+        .attr('class', 'toggle')
+        .attr('cx', 0)
+        .attr('cy', 2.5)
+        .attr('r', 10)
+        .style('fill', '#ccc')
+        .on('click', function() {
             instantaneous = !instantaneous;
             if (instantaneous) {
                 d3.select(this)
                     .transition()
                     .ease(d3.easeCubicOut)
-                    .attr("cx", 21);
+                    .attr("cx", 24);
                 drawLayout(getCurrTime());
             }
             else {
@@ -52,19 +60,19 @@ function drawToggle() {
         .text("Summary");
 
     toggleGroup.append("text")
-        .attr("x", 40)
+        .attr("x", 43)
         .attr("y", 5)
         .attr("font-family", "monospace")
         .text("Instantaneous");
 }
 
-function getSquaresData(objs) {
+function getSquaresData(allocs) {
     const width = 270;
     let numCacheSets = Math.ceil(cacheSize / (associativity*cachelineSize));
     let setsPerRow = Math.floor(Math.sqrt(numCacheSets));
     let squareSize = Math.floor(width / setsPerRow);
 
-    let setMap = objs.map(obj => ({cacheline: Math.floor(obj.addr / cachelineSize) % numCacheSets,
+    let setMap = allocs.map((obj) => ({cacheline: Math.floor(obj.addr / cachelineSize) % numCacheSets,
         spread: 1 + Math.max(Math.ceil((obj.size - (cachelineSize - (obj.addr % cachelineSize))) / cachelineSize), 0)}));
     let freqMap = setMap.reduce((acc, curr) => {
         let inc = Math.ceil(curr.spread / numCacheSets);
@@ -130,7 +138,6 @@ function refreshLayout(cs, assoc, cls) {
 
 function cacheSetLayout(objs, cachelineSize=64, ...cacheInfo) {
     objects = objs;
-    console.log(objects);
 
     let cacheSetTabs = d3.select("#visPanels")
         .append("div")
