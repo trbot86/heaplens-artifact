@@ -3,11 +3,14 @@ import legendLayout from './legend.js';
 import cacheSetLayout from './cacheSetLayout.js';
 import pageLayout from './pageLayout.js';
 import timeGraphLayout from './timeGraphLayout.js';
+import { updatePagesByTimestamp } from './pageLayout.js';
+
 
 /* TODO:
     *   Add ability to 'zoom in' to individual panels */
 
 export const colourOfType = {};
+const TIMEGRAPH_TRANSLATE_Y = 75;
 
 function binarySearchSuccessor(arr, v, start=undefined, end=undefined) {
     if (!arr || arr[arr.length - 1] < v) return null;
@@ -33,11 +36,13 @@ class MainVisualization {
     #initTs;
     #graphLayout;
     #timeGraphChart;
+    #cacheSetChart;
     #typesToShowOnGraph;
     #tsToIndexMap;
     #data;
     #zoomed;
     #zoomTs;
+    #cacheFocus;
 
     constructor(data) {
         console.log('Number of records in input: ', data['records'].length);
@@ -53,6 +58,7 @@ class MainVisualization {
 
         this.#data = data;
         this.#zoomed = false;
+        this.#cacheFocus = false;
         this.#zoomTs = {'startTs': 0, 'endTs': 0};
         this.#typesToShowOnGraph = types.reduce((acc, curr) => {
             acc[curr] = true;
@@ -82,13 +88,25 @@ class MainVisualization {
         // delete data['pts']['gstats_t::gstats_thread_data'];
         this.createNewGraphLayoutElement();
 
-        this.#timeGraphChart = timeGraphLayout();
+        this.#timeGraphChart = timeGraphLayout().y(TIMEGRAPH_TRANSLATE_Y);
         this.#graphLayout.datum({pts: data.pts, changes: data.changes})
                         .call(this.#timeGraphChart);
 
         // this.#graphLayout = TimeGraphLayout.build(data['pts'], data['changes']);
 
-        legendLayout();
+        d3.select('#visPanels')
+            .append('div')
+            .attr('id', 'legendLayout')
+            .style('width', '85%')
+            .style('height', '50%')
+            .style('grid-column', 3)
+            .style('grid-row', 2)
+            .style('justify-self', 'start')
+            .style('position', 'relative')
+            .style('top', '15%')
+            // .style('overflow', 'hidden')
+            .datum(colourOfType)
+            .call(legendLayout());
     }
 
     getGraphLayout() {
@@ -142,7 +160,7 @@ class MainVisualization {
         // console.log(filteredPts);
         // console.log(filteredChanges);
         // console.log(numPtsRemoved);
-        this.#timeGraphChart = timeGraphLayout();
+        this.#timeGraphChart = timeGraphLayout().y(TIMEGRAPH_TRANSLATE_Y);
         this.#graphLayout.datum({pts: filteredPts, changes: filteredChanges})
                         .call(this.#timeGraphChart);
     }
@@ -164,6 +182,26 @@ class MainVisualization {
     unzoom() {
         this.#zoomed = false;
         this.reconstructGraphLayout();
+    }
+
+    toggleCacheFocus() {
+        this.#cacheFocus = !this.#cacheFocus;
+        if (this.#cacheFocus) {
+            d3.select('#pageLayout')
+                .style('visibility', 'hidden');
+            d3.select('#memLayout')
+                .style('visibility', 'hidden');
+            d3.select('#cacheSetSVG')
+                .style('grid-column', 2);
+        }
+        else {
+            d3.select('#pageLayout')
+                .style('visibility', 'visible');
+            d3.select('#memLayout')
+                .style('visibility', 'visible');
+            d3.select('#cacheSetSVG')
+                .style('grid-column', 3);
+        }
     }
 
     constructPageVis(pages) {
@@ -226,10 +264,45 @@ class MainVisualization {
         }
 
         pageLayout(pagesJoined, this.#initTs, pageSize);
-        // console.log(Object.values(pagesJoined));
-        cacheSetLayout(Object.values(pagesJoined).reduce((acc, curr) => acc.concat(curr['events']), []), 64, {associativity: 8, size: 32768},
-                                                                                    {associativity: 8, size: 2097152},
-                                                                                    {associativity: 8, size: 4194304});
+
+        console.log('Vis object: ', this);
+        this.#cacheSetChart = cacheSetLayout().cacheLineSize(64)
+            .cacheInfo([{associativity: 8, size: 32768, width: 270},
+                        {associativity: 8, size: 2097152, width: 270},
+                        {associativity: 8, size: 4194304, width: 270}])
+            .mainVis(this);
+        d3.select('#visPanels')
+            .append('svg')
+            .attr('id', 'cacheSetSVG')
+            .style('width', '350px')
+            .style('height', '400px')
+            .style('grid-column', 3)
+            .style('grid-row', 1)
+            .append('g')
+            .attr('id', 'cacheSetBox')
+            .style('transform', 'translate(30px, 40px)')
+            // .append('div')
+            // .attr('id', 'cacheSetBox')
+            // .style('display', 'flex')
+            // .style('flex-direction', 'column')
+            // .style('align-items', 'flex-start')
+            // .style('position', 'relative')
+            // .style('left', '30px')
+            // .style('top', '40px')
+            // .style('grid-column', 3)
+            // .style('grid-row', 1)
+            // .style('width', '300px')
+            // .style('height', '350px')
+            .datum(Object.values(pagesJoined).reduce((acc, curr) => acc.concat(curr['events']), []))
+            .call(this.#cacheSetChart);
+
+        // cacheSetLayout(Object.values(pagesJoined).reduce((acc, curr) => acc.concat(curr['events']), []), 64, {associativity: 8, size: 32768},
+        //                                                                             {associativity: 8, size: 2097152},
+        //                                                                             {associativity: 8, size: 4194304});
+
+        this.#timeGraphChart.callbacks([updatePagesByTimestamp,
+                                        this.#cacheSetChart.currTime]);
+                                        // ...instantaneous ? [drawLayout] : []]);
     }
 
     static build(data) {

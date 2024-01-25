@@ -5,6 +5,7 @@ import { getCurrTime } from './dbloader.js';
 import { activate } from './objectFieldLayout.js';
 import { addElementsByTimestamp } from './objectFieldLayout.js';
 
+
 let pageSize = 4096;
 let pageRectHeight = 32;
 let pageRectWidth = 500;
@@ -13,24 +14,39 @@ let pageRectBorder = 2;
 let data, pageScale = undefined;
 
 export function updatePagesByTimestamp(ts) {
-    d3.select('#pageLayout')
+    addElementsByTimestamp(ts);
+    const elements = d3.select('#pageLayout')
         .selectAll('.pageGroup')
         .data(Object.entries(data), (d) => parseInt(d[0]))
-        .selectAll('.object')
+        .selectAll('.dataObject')
         .data((d) => d[1].events.filter((obj) => obj.allocTs <= ts && (obj.freeTs == null || obj.freeTs >= ts)),
-            (d) => d.ID)
-        .join(enter => enter.insert('rect', ':first-child')
-                .attr('class', 'object')
-                .attr('x', (d) => pageScale(d.addr % pageSize))
-                .attr('y', 0)
-                .attr('width', (d) => pageScale(Math.min(d.size, pageSize - (d.addr % pageSize))))
-                .attr('height', pageRectHeight)
-                .style('stroke', 'black')
-                .style('stroke-width', '1px')
-                .style('fill', (d) => colourOfType[d.type]),
-            update => undefined,
-            exit => exit.remove()
-        );
+            (d) => d.ID);
+    
+    const enterElements = elements.enter()
+        .insert('g', ':first-child')
+        .attr('class', 'dataObject');
+    enterElements.append('rect')
+        .attr('x', (d) => pageScale(d.addr % pageSize))
+        .attr('y', 0)
+        .attr('width', (d) => pageScale(Math.min(d.size, pageSize - (d.addr % pageSize))))
+        .attr('height', pageRectHeight)
+        // .style('stroke', 'black')
+        // .style('stroke-width', '1px')
+        .style('fill', (d) => colourOfType[d.type]);
+    enterElements.append('line')
+        .attr('x1', (d) => pageScale(d.addr % pageSize))
+        .attr('y1', 0)
+        .attr('x2', (d) => pageScale(d.addr % pageSize))
+        .attr('y2', pageRectHeight)
+        .style('stroke', 'black');
+    enterElements.append('line')
+        .attr('x1', (d) => pageScale((d.addr % pageSize) + Math.min(d.size, pageSize - (d.addr % pageSize))))
+        .attr('y1', 0)
+        .attr('x2', (d) => pageScale((d.addr % pageSize) + Math.min(d.size, pageSize - (d.addr % pageSize))))
+        .attr('y2', pageRectHeight)
+        .style('stroke', 'black');
+
+    elements.exit().remove();
 }
 
 function pageLayout(pages, initTs, pgsz=4096, cachelineSize=64) {

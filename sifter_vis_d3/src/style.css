@@ -38,7 +38,7 @@ svg.cacheTab {
 
 #visPanels {
     display: grid;
-    grid-template-columns: 600px 1fr 1fr;
+    grid-template-columns: 600px 600px 1fr;
     grid-template-rows: 350px 500px;
     gap: 10px;
 }

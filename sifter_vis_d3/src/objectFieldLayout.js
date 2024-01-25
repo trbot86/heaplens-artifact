@@ -6,22 +6,37 @@ let memLayout, data, xScale, yScale, pageSize = undefined;
 
 
 export function addElementsByTimestamp(ts) {
-    memLayout.selectAll('rect')
+    if (!memLayout) return;
+    let elements = memLayout.selectAll('.zoomDataObject')
         .data(data.filter((d) => d.start <= ts && (d.end == null || d.end >= ts)),
-            (d) => d.id)
-        .join(
-            (enter) => enter.append('rect')
-                    .attr('x', (d) => xScale(d.x))
-                    .attr('y', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1))
-                    .attr('width', (d) => xScale(d.width))
-                    .attr('height', (d) => yScale(yScale.domain()[0]-d.height))
-                    .attr('transform', 'translate(30, 40)')
-                    .style('stroke', 'black')
-                    .style('stroke-width', '1px')
-                    .style('fill', (d) => d.colour),
-            (update) => undefined,
-            (exit) => exit.remove()
-        );
+            (d) => d.id);
+
+    let enterElements = elements.enter()
+        .append('g')
+        .attr('class', 'zoomDataObject');
+    enterElements.append('rect')
+        .attr('x', (d) => xScale(d.x))
+        .attr('y', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1))
+        .attr('width', (d) => xScale(d.width))
+        .attr('height', (d) => yScale(yScale.domain()[0]-d.height))
+        .attr('transform', 'translate(30, 40)')
+        .style('fill', (d) => d.colour);
+    enterElements.append('line')
+        .attr('x1', (d) => xScale(d.x))
+        .attr('y1', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1))
+        .attr('x2', (d) => xScale(d.x))
+        .attr('y2', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1) + yScale(yScale.domain()[0]-d.height))
+        .attr('transform', 'translate(30, 40)')
+        .style('stroke', 'black');
+    enterElements.append('line')
+        .attr('x1', (d) => xScale(d.x + d.width))
+        .attr('y1', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1))
+        .attr('x2', (d) => xScale(d.x + d.width))
+        .attr('y2', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1) + yScale(yScale.domain()[0]-d.height))
+        .attr('transform', 'translate(30, 40)')
+        .style('stroke', 'black');
+
+    elements.exit().remove();
 }
 
 function splitBlocks(objects, startPage, pageSize, cachelineSize) {
