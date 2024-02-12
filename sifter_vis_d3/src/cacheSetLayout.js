@@ -3,8 +3,6 @@ import { getCurrTime, mainVis } from './dbloader.js';
 
 
 /* TODO:
-    *   Implement ability to resize the cache visualization area so that
-        patterns may be more easily seen
     *   Attempt to auto-detect cache information in memhook application?
     *   Allow user to input values for cache info
     *   Store presets with cache information of processors that have been

@@ -25,17 +25,19 @@ app.use(
 //     next();
 // });
 
-app.get('/run-get-records', (req, res) => {
+app.get('/run-get-records/:fname', (req, res) => {
     // Execute a child process
-    const samplerProcess = spawn('python', ['sampler.py', 'all']);
+    const samplerProcess = spawn('python', ['sampler.py', 'all', req.params.fname]);
     console.log('Received request for all records.');
 
-    let result = '';
+    samplerProcess.stdout.pipe(res);
 
-    samplerProcess.stdout.on('data', (data) => {
-        console.log('Data received.');
-        result += data;
-    });
+    // let result = '';
+
+    // samplerProcess.stdout.on('data', (data) => {
+    //     console.log('Data received.');
+    //     result += data;
+    // });
 
     samplerProcess.stderr.on('data', (data) => {
         console.error(`Error from script: ${data.toString()}`);
@@ -43,15 +45,20 @@ app.get('/run-get-records', (req, res) => {
     });
 
     samplerProcess.on('close', (code) => {
-        console.log(`Sampler script process exited with code ${code} - passing data to frontend.`);
-        res.send(result);
+        if (code != 0) {
+            console.error(`Sampler script process exited with code ${code}.`);
+        }
+        else {
+            console.log('Sample script exited properly.')
+        }
+        res.end();
     });
 });
 
-app.get('/run-sampler/:startTs-:endTs-:alg-:runLen-:maxRuns', (req, res) => {
+app.get('/run-sampler/:fname-:startTs-:endTs-:alg-:runLen-:maxRuns', (req, res) => {
     // Execute a child process
     console.log('Received sample request.');
-    const samplerProcess = spawn('python', ['sampler.py', 'sample', req.params.startTs, req.params.endTs,
+    const samplerProcess = spawn('python', ['sampler.py', 'sample', req.params.fname, req.params.startTs, req.params.endTs,
                                             req.params.alg, req.params.runLen, req.params.maxRuns]);
 
     let result = '';

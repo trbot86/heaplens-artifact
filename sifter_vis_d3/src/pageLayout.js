@@ -2,8 +2,6 @@ import * as d3 from 'd3';
 import { colourOfType } from './vis.js';
 import objectLayout from './objectFieldLayout.js';
 import { getCurrTime } from './dbloader.js';
-import { activate } from './objectFieldLayout.js';
-import { addElementsByTimestamp } from './objectFieldLayout.js';
 
 
 let pageSize = 4096;
@@ -11,10 +9,10 @@ let pageRectHeight = 32;
 let pageRectWidth = 500;
 let pageRectBorder = 2;
 
-let data, pageScale = undefined;
+let data, pageScale, objLayout, statsTracker = undefined;
 
 export function updatePagesByTimestamp(ts) {
-    addElementsByTimestamp(ts);
+    objLayout.addElementsByTimestamp(ts);
     const elements = d3.select('#pageLayout')
         .selectAll('.pageGroup')
         .data(Object.entries(data), (d) => parseInt(d[0]))
@@ -49,15 +47,39 @@ export function updatePagesByTimestamp(ts) {
     elements.exit().remove();
 }
 
-function pageLayout(pages, initTs, pgsz=4096, cachelineSize=64) {
+function refreshObjectLayout(objects, startAddr, initTs, pageSize=4096, cachelineSize=64,
+                            x=30, y=40, width=290, height=290) {
+    d3.select('#memLayout').remove();
+    let memLayout = d3.select('#visPanels')
+        .append('svg')
+        .attr('id', 'memLayout')
+        .style('width', '100%')
+        .style('height', '100%')
+        .style('grid-column', 2)
+        .style('grid-row', 1)
+        .style('overflow', 'visible');
+
+    objLayout = objectLayout()
+                    .x(x)
+                    .y(y)
+                    .width(width)
+                    .height(height)
+                    .stats(statsTracker);
+    memLayout.datum({objects: objects,
+                    startAddr: startAddr,
+                    initTs: initTs,
+                    pageSize: pageSize,
+                    cachelineSize: cachelineSize})
+        .call(objLayout);
+}
+
+function pageLayout(pages, initTs, st, pgsz=4096, cachelineSize=64) {
     pageSize = pgsz;
+    statsTracker = st;
 
     let layout = d3.select('#visPanels')
         .append('div')
         .attr('id', 'pageLayout')
-        // .style('display', 'flex')
-        // .style('flex-direction', 'column')
-        // .style('align-items', 'flex-start')
         .style('width', '100%')
         .style('height', '85%')
         .style('grid-column', 1)
@@ -92,7 +114,7 @@ function pageLayout(pages, initTs, pgsz=4096, cachelineSize=64) {
         .style('fill-opacity', 0.0)
         .on('click', function() {
             let selPage = this.parentNode.getAttribute('data-pagenum');
-            objectLayout(data[selPage].events, selPage, getCurrTime());
+            refreshObjectLayout(data[selPage].events, selPage, getCurrTime(), 4096, cachelineSize, '16%', '14%');
         })
         .on('mouseover', function() {
             d3.select(this)
@@ -128,8 +150,9 @@ function pageLayout(pages, initTs, pgsz=4096, cachelineSize=64) {
         }
     }
 
+    refreshObjectLayout(Object.values(data)[0].events, Object.keys(data)[0],
+                                    initTs, pageSize, cachelineSize, '16%', '14%');
     updatePagesByTimestamp(initTs);
-    objectLayout(Object.values(data)[0].events, Object.keys(data)[0], initTs, pageSize, cachelineSize);
 }
 
 export default pageLayout;

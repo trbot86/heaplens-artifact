@@ -38,7 +38,7 @@ class Sampler:
     
     def get_all_records(self, page_size=4096):
         # TODO: should not need DISTINCT once memhook is fixed
-        df = pd.read_sql_query("""SELECT DISTINCT FILE as file,
+        df = pd.read_sql_query("""SELECT FILE as file,
                                     SIZE as size,
                                     ADDRESS as addr,
                                     TYPE as type,
@@ -68,20 +68,12 @@ class Sampler:
             if len(df[df['type'] == tp]) >= CHANGE_POINT_THRESHOLD:
                 change_point_alg = rpt.Window(width=150, model='l2', min_size=CHANGE_POINT_THRESHOLD).fit(df_pts)
                 change_pts[tp] = list(map(int, change_point_alg.predict(pen=20)))
-                # print(type(change_pts[tp]))
-            # if tp == 'abtree_ns::Node<11,longlong>':
-            #     print(change_pts['abtree_ns::Node<11,longlong>'])
-            #     print(len(pts[tp]))
-            #     rpt.display(df_pts, [0, 1], change_pts['abtree_ns::Node<11,longlong>'])
-            #     # plt.plot(pts['abtree_ns::Node<11,longlong>'].index, pts['abtree_ns::Node<11,longlong>']['size'])
-            #     plt.show()
 
-        # print(type(pts['KeyGeneratorUniform<longlong>'][0]['size']))
         return {'records': df.to_dict(orient='records'), 'pts': pts, 'changes': change_pts}
 
     def get_records_in_interval(self, start_ts, end_ts, page_size=4096):
-        # TODO: should not need DISTINCT once memhook is fixed
-        df = pd.read_sql_query("""SELECT DISTINCT FILE as file,
+        # TODO: change this to get alloc events before start if matching free is after start
+        df = pd.read_sql_query("""SELECT FILE as file,
                                     SIZE as size,
                                     ADDRESS as addr,
                                     TYPE as type,
@@ -129,6 +121,8 @@ class Sampler:
                             max_run_length=3, max_runs_from_cluster=2, include_all_noise=True):
         labeled_data = self.get_clusters_of_pages(start_ts, end_ts, page_size, alg=cluster_alg)
         clusters = labeled_data.groupby('cluster', sort=False).groups
+        # print(clusters)
+        # print("Number of clusters: {}".format(len(clusters)))
         sampled_pages = set()
         for c in clusters:
             if len(clusters[c]) <= max_runs_from_cluster * max_run_length:
@@ -150,15 +144,15 @@ class Sampler:
 
 if __name__ == "__main__":
     # pd.set_option('display.max_columns', None)
-    s = Sampler("allocs.sqlite")
+    s = Sampler(sys.argv[2])
     retval = None
 
     if sys.argv[1] == "all":
         retval = s.get_all_records_and_lines();
         # print(retval)
     else:
-        retval = s.get_sample_of_pages(int(sys.argv[2]), int(sys.argv[3]), cluster_alg=sys.argv[4],
-                                       max_run_length=int(sys.argv[5]), max_runs_from_cluster=int(sys.argv[6]))
+        retval = s.get_sample_of_pages(int(sys.argv[3]), int(sys.argv[4]), cluster_alg=sys.argv[5],
+                                       max_run_length=int(sys.argv[6]), max_runs_from_cluster=int(sys.argv[7]))
     # print([retval[page]['cluster'] for page in sorted(retval.keys())])
     # print(retval['records'][0])
     # print("Type of retval[records]: {}".format(type(retval['records'])))
@@ -179,6 +173,8 @@ if __name__ == "__main__":
     #                                      type(retval['pts']['KeyGeneratorUniform<longlong>'][0]['ts']),
     #                                      type(retval['pts']['KeyGeneratorUniform<longlong>'][0]['size']),
     #                                      type(retval['changes']['KeyGeneratorUniform<longlong>'][0])))
+        
+
     print(json.dumps(retval))
     sys.stdout.flush()
 

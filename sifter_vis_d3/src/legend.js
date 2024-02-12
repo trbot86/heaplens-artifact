@@ -18,7 +18,6 @@ function legendLayout() {
             .attr('x', LINE_SEP)
             .attr('y', 0)
             .on('input', function() {
-                console.log('test');
                 drawTypes(d3.select(this).property('value'));
             });
 
@@ -103,11 +102,11 @@ function legendLayout() {
                     enter.append('input')
                         .attr('class', 'timeCheckbox')
                         .attr('type', 'checkbox')
-                        .attr('data-type', (d) => d)
+                        .attr('data-type', (d) => d.type)
                         .style('position', 'absolute')
                         .style('left', '0px')
                         .style('top', (d, i) => `${(i-0.07)*LINE_SEP}px`)
-                        .property('checked', true)
+                        .property('checked', (d) => mainVis ? mainVis.getVisOfType(d.type) : true)
                         .on('change', function(event) {
                             mainVis.changeVisOfType(d3.select(this).attr('data-type'));
                         });

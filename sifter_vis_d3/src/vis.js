@@ -4,23 +4,22 @@ import cacheSetLayout from './cacheSetLayout.js';
 import pageLayout from './pageLayout.js';
 import timeGraphLayout from './timeGraphLayout.js';
 import { updatePagesByTimestamp } from './pageLayout.js';
+import StatsTracker from './statsTracker.js';
 
-
-/* TODO:
-    *   Add ability to 'zoom in' to individual panels */
 
 export const colourOfType = {};
-const TIMEGRAPH_TRANSLATE_Y = 75;
+const TIMEGRAPH_TRANSLATE_Y = 55;
 
-function binarySearchSuccessor(arr, v, start=undefined, end=undefined) {
-    if (!arr || arr[arr.length - 1] < v) return null;
+export function binarySearchSuccessor(arr, v, start=undefined, end=undefined) {
+    if (!arr) return null;
+    if (arr[arr.length - 1] < v) return [arr[arr.length - 1], arr.length - 1];
     if (start == undefined) {
         start = 0;
         end = arr.length - 1;
     }
 
     if (end - start <= 1) {
-        return arr[start] > v ? arr[start] : arr[end];
+        return arr[start] > v ? [arr[start], start] : [arr[end], end];
     }
 
     let mid = Math.floor((start + end) / 2);
@@ -33,6 +32,7 @@ function binarySearchSuccessor(arr, v, start=undefined, end=undefined) {
 }
 
 class MainVisualization {
+    #fname;
     #initTs;
     #graphLayout;
     #timeGraphChart;
@@ -43,9 +43,11 @@ class MainVisualization {
     #zoomed;
     #zoomTs;
     #cacheFocus;
+    #statsTracker;
 
-    constructor(data) {
+    constructor(fname, data) {
         console.log('Number of records in input: ', data['records'].length);
+        this.#fname = fname;
         const types = [...new Set(data['records'].map((rec) => rec.type))];
         const colScale = d3.scaleSequential()
                             .domain([0, types.length])
@@ -71,7 +73,7 @@ class MainVisualization {
             }, {});
             return acc;
         }, {});
-
+        this.#statsTracker = new StatsTracker(types, data['records']);
 
 
         // const changeTs = types.reduce((chMap, type) => {
@@ -81,10 +83,6 @@ class MainVisualization {
         //     return chMap;
         // }, {});
 
-        // console.log(data['pts']);
-        // console.log(data['changes']);
-        // console.log(this.#tsToIndexMap);
-        
         // delete data['pts']['gstats_t::gstats_thread_data'];
         this.createNewGraphLayoutElement();
 
@@ -132,6 +130,7 @@ class MainVisualization {
             acc[curr] = this.#zoomed ? this.#data['pts'][curr].filter((d) => d.ts >= this.#zoomTs.startTs) : this.#data['pts'][curr];
             return acc;
         }, {});
+
         const numPtsRemoved = filteredTypes.reduce((rmMap, type) => {
             rmMap[type] = this.#data['pts'][type].length - filteredPtsLow[type].length;
             return rmMap;
@@ -156,10 +155,6 @@ class MainVisualization {
             return acc;
         }, {});
 
-        // console.log(this.#data['pts']);
-        // console.log(filteredPts);
-        // console.log(filteredChanges);
-        // console.log(numPtsRemoved);
         this.#timeGraphChart = timeGraphLayout().y(TIMEGRAPH_TRANSLATE_Y);
         this.#graphLayout.datum({pts: filteredPts, changes: filteredChanges})
                         .call(this.#timeGraphChart);
@@ -170,6 +165,10 @@ class MainVisualization {
     changeVisOfType(type) {
         this.#typesToShowOnGraph[type] = !this.#typesToShowOnGraph[type];
         this.reconstructGraphLayout();
+    }
+
+    getVisOfType(type) {
+        return this.#typesToShowOnGraph[type];
     }
 
     zoom(startTs, endTs) {
@@ -226,13 +225,13 @@ class MainVisualization {
             
             let joined = [];
             for (let allocEvent of allocs) {
-                let freeTime = binarySearchSuccessor(freesMap[allocEvent.addr], allocEvent.ts);
+                let ft = binarySearchSuccessor(freesMap[allocEvent.addr], allocEvent.ts);
                 joined.push({'file': allocEvent.file,
                             'size': allocEvent.size,
                             'addr': allocEvent.addr,
                             'type': allocEvent.type,
                             'allocTs': allocEvent.ts,
-                            'freeTs': freeTime,
+                            'freeTs': ft ? ft[0] : null,
                             'isDup': false,
                             'ID': currID});
                 currID++;
@@ -263,16 +262,15 @@ class MainVisualization {
             }
         }
 
-        pageLayout(pagesJoined, this.#initTs, pageSize);
+        pageLayout(pagesJoined, this.#initTs, this.#statsTracker, pageSize);
 
-        console.log('Vis object: ', this);
         this.#cacheSetChart = cacheSetLayout().cacheLineSize(64)
             .cacheInfo([{associativity: 8, size: 32768, width: 270},
                         {associativity: 8, size: 2097152, width: 270},
                         {associativity: 8, size: 4194304, width: 270}])
             .mainVis(this);
         d3.select('#visPanels')
-            .append('svg')
+            .insert('svg', '#memLayout')
             .attr('id', 'cacheSetSVG')
             .style('width', '350px')
             .style('height', '400px')
@@ -305,12 +303,16 @@ class MainVisualization {
                                         // ...instantaneous ? [drawLayout] : []]);
     }
 
-    static build(data) {
+    getFileName() {
+        return this.#fname;
+    }
+
+    static build(fname, data) {
         d3.select('body')
             .append('g')
             .attr('id', 'visPanels');
 
-        return new MainVisualization(data);
+        return new MainVisualization(fname, data);
     }
 }
 

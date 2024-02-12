@@ -21,7 +21,7 @@ function timeGraphLayout() {
         const sampleInfo = {algorithm: 'dbscan',
                             runLength: 3,
                             numRuns: 2};
-        console.log('SELECTION: ', selection);
+        console.log(selection.datum().pts);
         const   points = selection.datum().pts,
                 changePts = selection.datum().changes,
                 allPts = Object.keys(points).reduce((acc, curr) => acc.concat(points[curr]), []),
@@ -241,7 +241,7 @@ function timeGraphLayout() {
                                 console.log('start ts: ', startTs);
                                 console.log('end ts: ', endTs);
                                 console.log('sample info: ', sampleInfo);
-                                fetch(`/run-sampler/${startTs}-${endTs}-${sampleInfo.algorithm}-${sampleInfo.runLength}-${sampleInfo.numRuns}`)
+                                fetch(`/run-sampler/${mainVis.getFileName()}-${startTs}-${endTs}-${sampleInfo.algorithm}-${sampleInfo.runLength}-${sampleInfo.numRuns}`)
                                     .then((sampleResponse) => sampleResponse.json())
                                     .then((sampleData) => {
                                         console.log('Data received from server.');
