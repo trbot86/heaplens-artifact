@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import MainVisualization from './vis.js';
 
 export let mainVis = undefined;
@@ -9,10 +10,30 @@ export function getCurrTime() {
 async function getDb(srcName) {
     try {
         fetch(`/run-get-records/${srcName}`)
-            .then((allResponse) => allResponse.json())
-            .then((allData) => {
+            .then((allResponse) => {
+                console.log(allResponse);
+                return allResponse.text();
+            })
+            .then((allResponse) => {
+                console.log('About to parse...');
+                console.log(allResponse.slice(0, 10))
+                let allData = JSON.parse(allResponse);
+                console.log('Parsed!');
                 document.getElementById("dropPanels").remove();
                 mainVis = MainVisualization.build(srcName, allData);
+                fetch(`/run-sampler/${mainVis.getFileName()}-0-0-dbscan-3-2`)
+                    .then((sampleResponse) => sampleResponse.text())
+                    .then((sampleResponse) => {
+                        let sampleData = JSON.parse(sampleResponse);
+                        console.log('Generating graphs');
+                        d3.select('#pageLayout').remove();
+                        d3.select('#cacheSetBox').remove();
+        
+                        mainVis.constructPageVis(sampleData);
+                    })
+                    .catch((error) => {
+                        console.error('Error: ', error);
+                    });
             })
             .catch((error) => {
                 console.error('Error: ', error);

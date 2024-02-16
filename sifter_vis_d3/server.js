@@ -1,6 +1,6 @@
-import express from "express";
-import webpack from "webpack";
-import webpackDevMiddleware from "webpack-dev-middleware";
+import express from 'express';
+import webpack from 'webpack';
+import webpackDevMiddleware from 'webpack-dev-middleware';
 import { spawn } from 'child_process';
 
 const app = express();

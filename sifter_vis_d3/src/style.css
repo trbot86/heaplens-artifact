@@ -60,3 +60,9 @@ svg.cacheTab {
     border: solid #ccc 1px;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
 }
+
+.changeRegion {
+    fill: #c3f4e8;
+    opacity: 0.1;
+    pointer-events: none;
+}

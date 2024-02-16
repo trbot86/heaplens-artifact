@@ -8,7 +8,8 @@ import numpy as np
 import ruptures as rpt
 import matplotlib.pyplot as plt
 import sys
-import json
+import msgpack
+import math
 from random import randint
 
 
@@ -25,15 +26,17 @@ class Sampler:
         self.con.close()
 
     def __add_free_types(self, df):
-        alloc_type_size = {}
+        # alloc_type_size = {}
         df.sort_values('ts', inplace=True)
-        for i in range(len(df)):
-            if df.at[i, 'is_alloc'] == 1:
-                alloc_type_size[df.at[i, 'addr']] = {'type': df.at[i, 'type'], 'size': df.at[i, 'size']}
-            elif df.at[i, 'addr'] in alloc_type_size:
-                df.at[i, 'type'] = alloc_type_size[df.at[i, 'addr']]['type']
-                df.at[i, 'size'] = alloc_type_size[df.at[i, 'addr']]['size']
-                del alloc_type_size[df.at[i, 'addr']]
+        df.loc[df["size"] == 0, "size"] = None
+        df[["size", "type"]] = df.groupby("addr")[["size", "type"]].ffill()
+        # for i in range(len(df)):
+        #     if df.at[i, 'is_alloc'] == 1:
+        #         alloc_type_size[df.at[i, 'addr']] = {'type': df.at[i, 'type'], 'size': df.at[i, 'size']}
+        #     elif df.at[i, 'addr'] in alloc_type_size:
+        #         df.at[i, 'type'] = alloc_type_size[df.at[i, 'addr']]['type']
+        #         df.at[i, 'size'] = alloc_type_size[df.at[i, 'addr']]['size']
+        #         del alloc_type_size[df.at[i, 'addr']]
         return df
     
     def get_all_records(self, page_size=4096):
@@ -55,7 +58,7 @@ class Sampler:
         return df
     
     def get_all_records_and_lines(self):
-        df = self.__add_free_types(self.get_all_records())
+        df = self.__add_free_types(self.get_all_records()).dropna(subset=['size'])
         pts = {}
         change_pts = {}
         for tp in df.loc[:, 'type'].unique():
@@ -84,7 +87,8 @@ class Sampler:
         return df
 
     def get_clusters_of_pages(self, start_ts, end_ts, page_size=4096, alg='dbscan'):
-        df = self.__add_free_types(self.get_records_in_interval(start_ts, end_ts, page_size))
+        recs = self.get_records_in_interval(start_ts, end_ts, page_size) if start_ts > 0 and end_ts > 0 else self.get_all_records()
+        df = self.__add_free_types(recs).dropna(subset=['size'])
         df['page_num'] = df['addr'] // page_size
 
         if len(df) == 0:
@@ -99,15 +103,16 @@ class Sampler:
                                         columns='type', aggfunc='count', fill_value=0)
         
         merged = pivot_allocs.merge(pivot_frees, how='left', on='page_num', suffixes=('_alloc', '_free')).fillna(value=0)
+        # print(merged)
         #TODO Take a look at FeatureAgglomeration?
         page_pattern = StandardScaler().fit_transform(merged)
         clusters = None
         if (alg == 'dbscan'):
-            clusters = DBSCAN(eps=0.5, min_samples=2).fit_predict(page_pattern)
+            clusters = DBSCAN(eps=0.6, min_samples=max(1, math.floor(len(merged.index) / 150))).fit_predict(page_pattern)
         elif (alg == 'agglomerative'):
-            clusters = AgglomerativeClustering(n_clusters=None, distance_threshold=1).fit_predict(page_pattern)
+            clusters = AgglomerativeClustering(n_clusters=None, distance_threshold=10).fit_predict(page_pattern)
         elif (alg == 'meanshift'):
-            clusters = MeanShift(min_bin_freq=2, cluster_all=False).fit_predict(page_pattern)
+            clusters = MeanShift(min_bin_freq=math.floor(len(merged.index) / 150), cluster_all=False).fit_predict(page_pattern)
         merged['cluster'] = clusters
         
         pages = pd.DataFrame.from_dict({page: [group[event_labels].values.tolist()]
@@ -144,6 +149,7 @@ class Sampler:
 
 if __name__ == "__main__":
     # pd.set_option('display.max_columns', None)
+    pd.options.mode.chained_assignment = None
     s = Sampler(sys.argv[2])
     retval = None
 
@@ -152,30 +158,9 @@ if __name__ == "__main__":
         # print(retval)
     else:
         retval = s.get_sample_of_pages(int(sys.argv[3]), int(sys.argv[4]), cluster_alg=sys.argv[5],
-                                       max_run_length=int(sys.argv[6]), max_runs_from_cluster=int(sys.argv[7]))
-    # print([retval[page]['cluster'] for page in sorted(retval.keys())])
-    # print(retval['records'][0])
-    # print("Type of retval[records]: {}".format(type(retval['records'])))
-    # print("""Type of file: {},
-    #     Type of size: {},
-    #     Type of addr: {},
-    #     Type of type: {},
-    #     Type of ts: {}
-    #     Type of is_alloc: {},
-    #     Type of pts ts: {},
-    #     Type of pts size: {},
-    #     Type of change pts: {}""".format(type(retval['records'][0]['file']),
-    #                                      type(retval['records'][0]['size']),
-    #                                      type(retval['records'][0]['addr']),
-    #                                      type(retval['records'][0]['type']),
-    #                                      type(retval['records'][0]['ts']),
-    #                                      type(retval['records'][0]['is_alloc']),
-    #                                      type(retval['pts']['KeyGeneratorUniform<longlong>'][0]['ts']),
-    #                                      type(retval['pts']['KeyGeneratorUniform<longlong>'][0]['size']),
-    #                                      type(retval['changes']['KeyGeneratorUniform<longlong>'][0])))
-        
+                                       max_run_length=int(sys.argv[6]), max_runs_from_cluster=int(sys.argv[7]))    
 
-    print(json.dumps(retval))
+    print(msgpack.packb(retval['pts'], use_bin_type=True))
     sys.stdout.flush()
 
 # abtree_ns::Node<11,longlong>_alloc

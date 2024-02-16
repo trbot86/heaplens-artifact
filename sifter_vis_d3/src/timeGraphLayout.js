@@ -11,34 +11,33 @@ function timeGraphLayout() {
         height = 280,
         xScale = undefined,
         yScale = undefined,
-        tabPosition = {x: 0, y: 0},
-        timeChangeCallbacks = [];
+        tabPosition = {x: x, y: y + height},
+        timeChangeCallbacks = [],
+        initialized = false,
+        sampleInfo = {algorithm: 'dbscan',
+                    runLength: 3,
+                    numRuns: 2},
+        minTs = 0,
+        maxTs = 0,
+        boundaryBuffer = 0,
+        allPts = undefined,
+        maxSizeSum = 0,
+        zoomed = false;
 
     function drawTimeGraphLayout(selection) {
-        tabPosition = {x: x, y: y + height};
-        let leftSampleIntervalPos = 0,
-            rightSampleIntervalPos = 0;
-        const sampleInfo = {algorithm: 'dbscan',
-                            runLength: 3,
-                            numRuns: 2};
-        console.log(selection.datum().pts);
+        // console.log(selection.datum().pts);
         const   points = selection.datum().pts,
                 changePts = selection.datum().changes,
-                allPts = Object.keys(points).reduce((acc, curr) => acc.concat(points[curr]), []),
-                maxSizeSum = allPts.map((pt) => pt.size).reduce((max, s) => Math.max(max, s), 0),
-                minTs = allPts.map((pt) => pt.ts).reduce((min, t) => Math.min(min, t), allPts[0].ts),
-                maxTs = allPts.map((pt) => pt.ts).reduce((max, t) => Math.max(max, t), allPts[0].ts),
-                boundaryBuffer = Math.floor((maxTs - minTs)*0.03),
-                lines = {},
-                graphLayoutAxes = selection.append('g')
-                                            .attr('id', 'graphLayoutAxes');
+                lines = {};
         
-        graphLayoutAxes.append('g')
-            .attr('id', 'graphLayoutXAxis')
-            .style('transform', `translate(${x}px, ${y + height}px)`);
-        graphLayoutAxes.append('g')
-            .attr('id', 'graphLayoutYAxis')
-            .style('transform', `translate(${x}px, ${y}px)`);
+        allPts = Object.keys(points).reduce((acc, curr) => acc.concat(points[curr]), []);
+        maxSizeSum = allPts.map((pt) => pt.size).reduce((max, s) => Math.max(max, s), 0);
+
+        if (!initialized || zoomed) {
+            minTs = allPts.map((pt) => pt.ts).reduce((min, t) => Math.min(min, t), allPts[0].ts);
+            maxTs = allPts.map((pt) => pt.ts).reduce((max, t) => Math.max(max, t), allPts[0].ts);
+            boundaryBuffer = Math.floor((maxTs - minTs)*0.03);
+        }
 
         for (let type of Object.keys(points)) {
             lines[type] = [[minTs - boundaryBuffer, 0]];
@@ -59,29 +58,61 @@ function timeGraphLayout() {
             Math.pow(2, Math.floor(Math.log2(0.1*maxSizeSum)))
             )).tickFormat(d3.format('d'));
 
-        d3.select('#graphLayoutXAxis').call(xAxis);
-                    // .selectAll('text')
-                    // .attr('dx', '5em')
-                    // .attr('dy', '0.7em')
-                    // .style('transform', 'rotate(0.12turn');
-        d3.select('#graphLayoutYAxis').call(yAxis);
+        if (!initialized) {
+            d3.select('#graphLayout').remove();
+            const svgGroup = selection.append('svg')
+                    .attr('id', 'graphLayout')
+                    .style('width', `100%`)
+                    .style('height', `100%`)
+                    .style('position', 'absolute')
+                    .style('top', '0px')
+                    .style('left', '0px');
+            const xAxisGroup = svgGroup.append('g')
+                    .attr('id', 'graphLayoutXAxis')
+                    .style('transform', `translate(${x}px, ${y + height}px)`);
+            const yAxisGroup = svgGroup.append('g')
+                    .attr('id', 'graphLayoutYAxis')
+                    .style('transform', `translate(${x}px, ${y}px)`);
 
-        changeRegions();
-        sampleRegion();
+            xAxisGroup.call(xAxis);
+                        // .selectAll('text')
+                        // .attr('dx', '5em')
+                        // .attr('dy', '0.7em')
+                        // .style('transform', 'rotate(0.12turn');
+            yAxisGroup.call(yAxis);
+        }
 
+        d3.select('#timeGraphCanvas').remove();
+        const canvas = selection.append('canvas')
+                .attr('id', 'timeGraphCanvas')
+                .attr('width', width + x)
+                .attr('height', height + y);
+        const context = canvas.node().getContext('2d');
+        
+        context.translate(x, y);
+
+        const line = d3.line()
+                    .x((d) => xScale(d[0]))
+                    .y((d) => yScale(d[1]))
+                    .context(context);
+
+        context.clearRect(0, 0, width, height);
         for (let type of Object.keys(points)) {
-            d3.select('#graphLayout')
-                .append('path')
-                .datum(lines[type])
-                .attr('class', 'line')
-                .attr('fill', 'none')
-                .attr('stroke', colourOfType[type])
-                .attr('stroke-width', 1)
-                .attr('transform', `translate(${x}, ${y})`)
-                .attr('d', d3.line()
-                            .x(d => xScale(d[0]))
-                            .y(d => yScale(d[1]))
-                );
+            context.beginPath();
+            line(lines[type]);
+            context.lineWidth = 1;
+            context.opacity = 1;
+            context.strokeStyle = colourOfType[type];
+            context.stroke();
+            context.closePath();
+        }
+
+        if (!initialized) {
+            changeRegions();
+            sampleRegion();
+            slider(xScale(minTs - boundaryBuffer));
+            let ts = getCurrTime();
+            for (let func of timeChangeCallbacks) func(ts);
         }
 
         function changeRegions() {
@@ -115,26 +146,27 @@ function timeGraphLayout() {
                     return xScale(xScale.domain()[0] + points[d.type][d.right].ts - points[d.type][d.left].ts) + buffer;
                 })
                 .attr('height', height)
-                .style('fill', '#ccfff3')
                 .style('transform', `translate(${x}px, ${y}px)`);
         }
     
         function sampleRegion() {
-            const initRegionWidth = Math.floor(0.1 * width);
+            const initRegionWidth = width;
             const handleWidth = 8;
             const sampleButtonWidth = 70;
             let moveHandle, sampleButton, settingsPopup = undefined;
-            const region = selection.append('rect')
+            const region = d3.select('#graphLayout')
+                            .append('rect')
                             .attr('x', xScale(xScale.domain()[0]))
                             .attr('y', 0)
                             .attr('width', initRegionWidth)
                             .attr('height', height)
                             .style('fill', '#ccc')
-                            .style('opacity', 0.5)
+                            .style('opacity', 0.3)
                             .style('transform', `translate(${x}px, ${y}px)`);
             
             let initLeftDiff = 0.0;
-            const leftHandle = selection.append('rect')
+            const leftHandle = d3.select('#graphLayout')
+                            .append('rect')
                             .attr('x', xScale(xScale.domain()[0]))
                             .attr('y', 0)
                             .attr('width', handleWidth)
@@ -164,7 +196,8 @@ function timeGraphLayout() {
                                 }));
     
             let initRightDiff = 0.0;
-            const rightHandle = selection.append('rect')
+            const rightHandle = d3.select('#graphLayout')
+                            .append('rect')
                             .attr('x', xScale(xScale.domain()[0]) + initRegionWidth - handleWidth)
                             .attr('y', 0)
                             .attr('width', handleWidth)
@@ -182,9 +215,6 @@ function timeGraphLayout() {
                                 .on('drag', function(event) {
                                     const adjustEventX = event.x - x - initRightDiff;
                                     const intRegionX = parseInt(region.attr('x'));
-                                    // console.log('adjust X: ', adjustEventX);
-                                    // console.log('old x: ', intRegionX);
-                                    // console.log('scale max: ', myXScale(myXScale.domain()[1]));
                                     if (adjustEventX <= xScale(xScale.domain()[1]) && adjustEventX >= intRegionX + 2*handleWidth) {
                                         const nWidth = adjustEventX - intRegionX;
                                         region.attr('width', nWidth);
@@ -194,7 +224,8 @@ function timeGraphLayout() {
                                 }));
     
             let initMoveDiff = 0.0;
-            moveHandle = selection.append('rect')
+            moveHandle = d3.select('#graphLayout')
+                            .append('rect')
                             .attr('x', xScale(xScale.domain()[0]) + handleWidth)
                             .attr('y', 0)
                             .attr('width', initRegionWidth - 2*handleWidth)
@@ -220,7 +251,27 @@ function timeGraphLayout() {
                                     }
                                 }));
             
-            const sampleButtonGroup = selection.append('g')
+            
+            function requestSample(startTs, endTs, alg, rlen, numRuns) {
+                console.log('start ts: ', startTs);
+                console.log('end ts: ', endTs);
+                console.log('sample info: ', alg, rlen, numRuns);
+                fetch(`/run-sampler/${mainVis.getFileName()}-${startTs}-${endTs}-${alg}-${rlen}-${numRuns}`)
+                    .then((sampleResponse) => sampleResponse.json())
+                    .then((sampleData) => {
+                        console.log('Data received from server.');
+                        d3.select('#pageLayout').remove();
+                        d3.select('#cacheSetBox').remove();
+        
+                        mainVis.constructPageVis(sampleData);
+                    })
+                    .catch((error) => {
+                        console.error('Error: ', error);
+                    });
+            }
+
+            const sampleButtonGroup = d3.select('#graphLayout')
+                            .append('g')
                             .style('transform', `translate(${x}px, ${y}px)`);
             
             sampleButton = sampleButtonGroup.append('rect')
@@ -238,24 +289,7 @@ function timeGraphLayout() {
                             .on('click', function() {
                                 let startTs = Math.floor(xScale.invert(parseInt(leftHandle.attr('x'))));
                                 let endTs = Math.floor(xScale.invert(parseInt(rightHandle.attr('x')) + handleWidth));
-                                console.log('start ts: ', startTs);
-                                console.log('end ts: ', endTs);
-                                console.log('sample info: ', sampleInfo);
-                                fetch(`/run-sampler/${mainVis.getFileName()}-${startTs}-${endTs}-${sampleInfo.algorithm}-${sampleInfo.runLength}-${sampleInfo.numRuns}`)
-                                    .then((sampleResponse) => sampleResponse.json())
-                                    .then((sampleData) => {
-                                        console.log('Data received from server.');
-                                        d3.select('#pageLayout').remove();
-                                        d3.select('#cacheSetBox').remove();
-    
-                                        mainVis.constructPageVis(sampleData);
-                                        leftSampleIntervalPos = parseInt(leftHandle.attr('x'));
-                                        rightSampleIntervalPos = parseInt(rightHandle.attr('x')) + handleWidth;
-                                        slider();
-                                    })
-                                    .catch((error) => {
-                                        console.error('Error: ', error);
-                                    });
+                                requestSample(startTs, endTs, sampleInfo.algorithm, sampleInfo.runLength, sampleInfo.numRuns);
                             })
                             .on('mouseover', function() {
                                 d3.select(this)
@@ -294,7 +328,9 @@ function timeGraphLayout() {
                             .style('cursor', 'pointer')
                             .style('pointer-events', 'visible')
                             .on('click', function() {
-                                mainVis.zoom(xScale.invert(parseInt(leftHandle.attr('x'))), xScale.invert(parseInt(rightHandle.attr('x')) + handleWidth));
+                                minTs = xScale.invert(parseInt(leftHandle.attr('x')));
+                                maxTs = xScale.invert(parseInt(rightHandle.attr('x')) + handleWidth);
+                                mainVis.zoom(minTs, maxTs);
                             })
                             .on('mouseover', function() {
                                 d3.select(this)
@@ -333,6 +369,8 @@ function timeGraphLayout() {
                             .style('cursor', 'pointer')
                             .style('pointer-events', 'visible')
                             .on('click', function() {
+                                minTs = allPts.map((pt) => pt.ts).reduce((min, t) => Math.min(min, t), allPts[0].ts);
+                                maxTs = allPts.map((pt) => pt.ts).reduce((max, t) => Math.max(max, t), allPts[0].ts);
                                 mainVis.unzoom();
                             })
                             .on('mouseover', function() {
@@ -396,7 +434,7 @@ function timeGraphLayout() {
                             .style('pointer-events', 'none')
                             .text('Settings');
     
-            settingsPopup = SettingsPopup.build(sampleInfo);
+            if (!initialized) settingsPopup = SettingsPopup.build(sampleInfo);
         }
 
         function getCurrTime() {
@@ -416,9 +454,7 @@ function timeGraphLayout() {
         function handleDrag(e) {
             // console.log(e);
             // tabPosition.x += e.dx;
-            e.subject.x = Math.max(Math.min(e.x,
-                rightSampleIntervalPos), 
-                leftSampleIntervalPos);
+            e.subject.x = Math.max(Math.min(e.x, width), 0);
             updateTab();
             let ts = getCurrTime();
             for (let func of timeChangeCallbacks) func(ts);
@@ -427,16 +463,17 @@ function timeGraphLayout() {
             // if (instantaneous) drawLayout(ts);
         }
     
-        function slider() {
+        function slider(initPos) {
             d3.select('#dragTab').remove();
     
-            tabPosition.x = leftSampleIntervalPos;
+            tabPosition.x = initPos;
             const colour = 'rgb(148, 148, 148)';
             let tab = d3.symbol()
                 .type(d3.symbolTriangle)
                 .size(60);
     
-            let tabGroup = selection.append('g')
+            let tabGroup = d3.select('#graphLayout')
+                .append('g')
                 // .datum(tabPosition)
                 .attr('id', 'dragTab');
                 // .attr('transform', d => `translate(${d.x}, ${d.y})`);
@@ -472,17 +509,22 @@ function timeGraphLayout() {
                 .call(d3.drag()
                     .on('drag', handleDrag));
         }
+
+        initialized = true;
+        zoomed = false;
     }
 
     drawTimeGraphLayout.x = function(val) {
         if (!arguments.length) return x;
         x = val;
+        tabPosition.x = x;
         return drawTimeGraphLayout;
     }
 
     drawTimeGraphLayout.y = function(val) {
         if (!arguments.length) return y;
         y = val;
+        tabPosition.y = y + height;
         return drawTimeGraphLayout;
     }
 
@@ -498,6 +540,12 @@ function timeGraphLayout() {
         return drawTimeGraphLayout;
     }
 
+    drawTimeGraphLayout.sampleInfo = function(val) {
+        if (!arguments.length) return sampleInfo;
+        sampleInfo = val;
+        return drawTimeGraphLayout;
+    }
+
     drawTimeGraphLayout.callbacks = function(val) {
         if (!arguments.length) return timeChangeCallbacks;
         timeChangeCallbacks = val;
@@ -506,6 +554,11 @@ function timeGraphLayout() {
 
     drawTimeGraphLayout.getCurrTime = function() {
         return xScale.invert(tabPosition.x);
+    }
+
+    drawTimeGraphLayout.zoom = function() {
+        zoomed = true;
+        return drawTimeGraphLayout;
     }
 
     return drawTimeGraphLayout;

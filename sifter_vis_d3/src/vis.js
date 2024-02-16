@@ -48,7 +48,8 @@ class MainVisualization {
     constructor(fname, data) {
         console.log('Number of records in input: ', data['records'].length);
         this.#fname = fname;
-        const types = [...new Set(data['records'].map((rec) => rec.type))];
+        // const types = [...new Set(data['records'].map((rec) => rec.type))];
+        const types = Object.keys(data['pts']);
         const colScale = d3.scaleSequential()
                             .domain([0, types.length])
                             .interpolator(d3.interpolateRainbow);
@@ -113,18 +114,26 @@ class MainVisualization {
 
     createNewGraphLayoutElement() {
         this.#graphLayout = d3.select('#visPanels')
-            .append('svg')
-            .attr('id', 'graphLayout')
-            .style('width', '100%')
-            .style('height', '100%')
+            .append('div')
+            .attr('id', 'graphLayoutDiv')
+            .attr('width', '100%')
+            .attr('height', '100%')
+            .style('position', 'relative')
             .style('grid-column', '1 / 3')
-            .style('grid-row', 2)
-            .style('justify-self', 'end');
+            .style('grid-row', 2);
+        // this.#graphLayout = d3.select('#visPanels')
+        //     .append('svg')
+        //     .attr('id', 'graphLayout')
+        //     .style('width', '100%')
+        //     .style('height', '100%')
+        //     .style('grid-column', '1 / 3')
+        //     .style('grid-row', 2)
+        //     .style('justify-self', 'end');
     }
 
     reconstructGraphLayout() {
-        this.#graphLayout.remove();
-        this.createNewGraphLayoutElement();
+        // this.#graphLayout.remove();
+        // this.createNewGraphLayoutElement();
         const filteredTypes = Object.keys(this.#typesToShowOnGraph).filter((t) => this.#typesToShowOnGraph[t]);
         const filteredPtsLow = filteredTypes.reduce((acc, curr) => {
             acc[curr] = this.#zoomed ? this.#data['pts'][curr].filter((d) => d.ts >= this.#zoomTs.startTs) : this.#data['pts'][curr];
@@ -155,12 +164,10 @@ class MainVisualization {
             return acc;
         }, {});
 
-        this.#timeGraphChart = timeGraphLayout().y(TIMEGRAPH_TRANSLATE_Y);
+        // this.#timeGraphChart = timeGraphLayout().y(TIMEGRAPH_TRANSLATE_Y);
         this.#graphLayout.datum({pts: filteredPts, changes: filteredChanges})
                         .call(this.#timeGraphChart);
     }
-
-    /* ISSUE: reconstructing the graph layout causes the sample settings to be lost */
 
     changeVisOfType(type) {
         this.#typesToShowOnGraph[type] = !this.#typesToShowOnGraph[type];
@@ -175,12 +182,14 @@ class MainVisualization {
         this.#zoomed = true;
         this.#zoomTs.startTs = startTs;
         this.#zoomTs.endTs = endTs;
-        this.reconstructGraphLayout();
+        this.#graphLayout.call(this.#timeGraphChart.zoom());
+        // this.reconstructGraphLayout();
     }
 
     unzoom() {
         this.#zoomed = false;
-        this.reconstructGraphLayout();
+        this.#graphLayout.call(this.#timeGraphChart.zoom());
+        // this.reconstructGraphLayout();
     }
 
     toggleCacheFocus() {
