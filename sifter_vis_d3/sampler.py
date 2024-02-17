@@ -8,7 +8,7 @@ import numpy as np
 import ruptures as rpt
 import matplotlib.pyplot as plt
 import sys
-import msgpack
+import json
 import math
 from random import randint
 
@@ -160,7 +160,7 @@ if __name__ == "__main__":
         retval = s.get_sample_of_pages(int(sys.argv[3]), int(sys.argv[4]), cluster_alg=sys.argv[5],
                                        max_run_length=int(sys.argv[6]), max_runs_from_cluster=int(sys.argv[7]))    
 
-    print(msgpack.packb(retval['pts'], use_bin_type=True))
+    print(json.dumps(retval))
     sys.stdout.flush()
 
 # abtree_ns::Node<11,longlong>_alloc
