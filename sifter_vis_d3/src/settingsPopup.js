@@ -12,7 +12,7 @@ export class SettingsPopup {
         const textFields = ['Page clustering algorithm:',
                             'Max run length:',
                             'Max runs from cluster:',
-                            'Page features:']
+                            'Number of buckets:']
 
         const window = d3.select('body')
             .append('div')
@@ -76,6 +76,7 @@ export class SettingsPopup {
                                         'meanshift';
                 sampleInfo.runLength = parseInt(d3.select('#runLength').text());
                 sampleInfo.numRuns = parseInt(d3.select('#numRuns').text());
+                sampleInfo.buckets = parseInt(bucketSelector.property('value'));
                 d3.select('#settingsPopup')
                     .transition()
                     .style('display', 'none');
@@ -110,6 +111,17 @@ export class SettingsPopup {
             const sel = d3.select(this).property('value');
             console.log("Selected algorithm: ", sel);
         });
+
+        let bucketSelector = window.append('input')
+            .attr('type', 'number')
+            .attr('min', 1000)
+            .attr('max', 100000)
+            .attr('step', 100)
+            .attr('value', 5000)
+            .attr('size', 8)
+            .style('position', 'absolute')
+            .style('top', `${TOP_BUFF + 3*LINE_SEP}px`)
+            .style('left', '230px');
     }
 
     static build(sampleInfo) {

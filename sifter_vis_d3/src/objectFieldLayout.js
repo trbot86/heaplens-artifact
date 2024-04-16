@@ -4,35 +4,41 @@ import { typeInfoPopup, trimString } from './statsTracker.js';
 
 
 function objectLayout() {
-    let memLayout, data, xScale, yScale, pageSize, statsTracker = undefined;
+    let memLayout, data, xScale, yScale, pageSize, statsTracker, fields = undefined;
     let x = 30,
         y = 40,
         width = 290,
-        height = 290;
+        height = 290,
+        expandedTypes = new Set(),
+        prevTs = 0,
+        objects,
+        startAddr,
+        cachelineSize;
 
     function drawObjectLayout(selection) {
-        let objects = selection.datum().objects,
-            startAddr = selection.datum().startAddr,
-            initTs = selection.datum().initTs,
-            pageSize = selection.datum().pageSize,
-            cachelineSize = selection.datum().cachelineSize;
+        objects = selection.datum().objects;
+        startAddr = selection.datum().startAddr;
+        pageSize = selection.datum().pageSize;
+        cachelineSize = selection.datum().cachelineSize;
         memLayout = selection;
+        let initTs = selection.datum().initTs;
 
         // let memLayoutAxes = memLayout.append('g')
         //     .attr('id', 'memLayoutAxes');
         
-        memLayout.append('g')
-            .attr('id', 'blockGroup')
-            .style('transform', `translate(${typeof x == 'string' ? x : x + 'px'}, ${typeof y == 'string' ? y : y + 'px'})`);
-        let yAxisGridGroup = memLayout.append('g')
-            .attr('id', 'memLayoutYAxisGrid')
-            .style('transform', `translate(${typeof x == 'string' ? x : x + 'px'}, ${typeof y == 'string' ? y : y + 'px'})`);
         let xAxisGroup = memLayout.append('g')
             .attr('id', 'memLayoutXAxisGroup')
             .style('transform', `translate(${typeof x == 'string' ? x : x + 'px'}, ${typeof y == 'string' ? y : y + 'px'})`);
         let yAxisGroup = memLayout.append('g')
             .attr('id', 'memLayoutYAxisGroup')
             .style('transform', `translate(${typeof x == 'string' ? x : x + 'px'}, ${typeof y == 'string' ? y : y + 'px'})`);
+        memLayout.append('g')
+            .attr('id', 'blockGroup')
+            .style('transform', `translate(${typeof x == 'string' ? x : x + 'px'}, ${typeof y == 'string' ? y : y + 'px'})`);
+        let yAxisGridGroup = memLayout.append('g')
+            .attr('id', 'memLayoutYAxisGrid')
+            .style('transform', `translate(${typeof x == 'string' ? x : x + 'px'}, ${typeof y == 'string' ? y : y + 'px'})`);
+        
 
         xScale = d3.scaleLinear().domain([0, cachelineSize]).range([0, width]);
         let xAxis = d3.axisTop(xScale);
@@ -44,8 +50,16 @@ function objectLayout() {
         let yAxisGrid = d3.axisLeft(yScale).tickSize(-height).tickValues(d3.range(0, cachelineSize, 1)).tickFormat('');
 
         xAxisGroup.call(xAxis);
-        yAxisGroup.call(yAxis);
-        yAxisGridGroup.call(yAxisGrid);
+        yAxisGroup.call(yAxis)
+            .select('path')
+            .style('stroke', '#ccc');
+        yAxisGridGroup.call(yAxisGrid)
+            .selectAll('.tick')
+            .filter((d, i) => i % 2 === 1)
+            .select('line')
+            .style('stroke', '#ccc');
+        yAxisGridGroup.select('path')
+            .style('display', 'none');
 
         data = splitBlocks(objects, startAddr, pageSize, cachelineSize);
         addElementsByTimestamp(initTs);
@@ -55,96 +69,151 @@ function objectLayout() {
         addElementsByTimestamp(ts);
     }
 
+    function addlch(col, sl, sc, sh) {
+        const {l, c, h} = d3.lch(col);
+        return d3.lch(Math.max(Math.min(l+sl, 100), 0),
+                Math.max(Math.min(c+sc, 150), 30),
+                Math.max(Math.min(h+sh, 360), 0));
+    }
+
     function addElementsByTimestamp(ts) {
         if (!memLayout) return;
+        prevTs = ts;
         let elements = memLayout.select('#blockGroup')
             .selectAll('.zoomDataObject')
             .data(data.filter((d) => d.start <= ts && (d.end == null || d.end >= ts)),
-                (d) => d.id);
-    
-        let enterElements = elements.enter()
-            .append('g')
-            .attr('class', 'zoomDataObject');
-        enterElements.append('rect')
-            .attr('class', (d) => `block-${d.trimType}`)
-            .attr('x', (d) => xScale(d.x))
-            .attr('y', (d) => yScale(d.y))
-            .attr('width', (d) => xScale(d.width))
-            .attr('height', (d) => yScale(d.height))
-            .style('fill', (d) => d.colour)
-            .style('pointer-events', 'visible')
-            .on('mouseover', function(e, d) {
-                memLayout.selectAll(`.block-${d.trimType}`)
-                    .transition()
-                    .style('fill', d3.color(d.colour).darker(2));
+                (d) => d.id)
+            .join(
+                (enter) => {
+                    let enterGroup = enter.append('g')
+                        .attr('class', 'zoomDataObject');
+                    enterGroup.append('rect')
+                        .attr('class', (d) => `block-${d.trimType}`)
+                        .attr('x', (d) => xScale(d.x))
+                        .attr('y', (d) => yScale(d.y))
+                        .attr('width', (d) => xScale(d.width))
+                        .attr('height', (d) => yScale(d.height))
+                        .style('fill', (d) => expandedTypes.has(d.type) && !d.isSubtype ? 'url(#crosshatch)' : d.colour)
+                        // .style('opacity', (d) => expandedTypes.has(d.type) && !d.isSubtype ? 0.3 : 1.0)
+                        .style('pointer-events', 'visible')
+                        .on('mouseover', function(e, d) {
+                            if (!expandedTypes.has(d.type) || d.isSubtype) {
+                                memLayout.selectAll(`.block-${d.trimType}`)
+                                    .transition()
+                                    .style('fill', d3.color(d.colour).darker(2));
+                            }
 
-                let type = trimString(d.type, 18);
-                let typeHintSvg = memLayout.append('svg')
-                        .attr('id', 'typeHint')
-                        .attr('data-type', type)
-                        .attr('x', d3.pointer(e)[0] - 2*type.length - 10)
-                        .attr('y', d3.pointer(e)[1] + 40)
-                        .style('width', `${3*type.length}px`)
-                        .style('height', '20px');
-                typeHintSvg.append('rect')
-                        .attr('x', 6)
-                        .attr('y', 0)
-                        .attr('width', 6.5*type.length)
-                        .attr('height', 14)
-                        .style('fill', 'white')
-                        .style('pointer-events', 'none');
-                        
-                typeHintSvg.append('text')
-                        .attr('x', type.length)
-                        .attr('y', 8)
-                        .attr('font-family', 'monospace')
-                        .style('font-size', '10px')
-                        .style('pointer-events', 'none')
-                        .text(type);
-                
-                memLayout.append('g')
-                        .attr('id', 'statsPopup')
-                        .call(typeInfoPopup().x('95%')
-                                .y('14%')
-                                .width(260)
-                                .type(d.type)
-                                .lineSpace(12)
-                                .maxChars(20)
-                                .textLines(statsTracker.getColocRatios(d.type))
-                                );
-            })
-            .on('mousemove', function(e, d) {
-                let typeHint = memLayout.select('#typeHint');
-                typeHint.attr('x', d3.pointer(e)[0] - 2*typeHint.attr('data-type').length - 10)
-                    .attr('y', d3.pointer(e)[1] + 40);
-            })
-            .on('mouseout', function(e, d) {
-                memLayout.select('#typeHint')
-                    .remove();
-                memLayout.selectAll(`.block-${d.trimType}`)
-                    .transition()
-                    .style('fill', d.colour);
-                memLayout.select('#statsPopup')
-                    .remove();
-            });
-        enterElements.append('line')
-            .attr('x1', (d) => xScale(d.x))
-            .attr('y1', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1))
-            .attr('x2', (d) => xScale(d.x))
-            .attr('y2', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1) + yScale(yScale.domain()[0]-d.height))
-            .style('visibility', (d) => d.isBegin ? 'inherit' : 'hidden')
-            .style('stroke', 'black')
-            .style('stroke-width', '1px');
-        enterElements.append('line')
-            .attr('x1', (d) => xScale(d.x + d.width))
-            .attr('y1', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1))
-            .attr('x2', (d) => xScale(d.x + d.width))
-            .attr('y2', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1) + yScale(yScale.domain()[0]-d.height))
-            .style('visibility', (d) => d.isEnd ? 'inherit' : 'hidden')
-            .style('stroke', 'black')
-            .style('stroke-width', '1px');
-    
-        elements.exit().remove();
+                            let type = trimString(d.type, 18);
+                            let typeHintSvg = memLayout.append('svg')
+                                    .attr('id', 'typeHint')
+                                    .attr('data-type', type)
+                                    .attr('x', d3.pointer(e)[0])
+                                    .attr('y', d3.pointer(e)[1])
+                                    .style('width', `${3*type.length}px`)
+                                    .style('height', '20px')
+                                    .style('transform', `translate(${x}, calc(${y} - 15px))`);
+                            typeHintSvg.append('rect')
+                                    .attr('x', 0)
+                                    .attr('y', 0)
+                                    .attr('width', 6.5*type.length)
+                                    .attr('height', 14)
+                                    .style('fill', 'white')
+                                    .style('pointer-events', 'none');
+                                    
+                            typeHintSvg.append('text')
+                                    .attr('x', 1)
+                                    .attr('y', 9)
+                                    .attr('font-family', 'monospace')
+                                    .style('font-size', '10px')
+                                    .style('pointer-events', 'none')
+                                    .text(type);
+                        })
+                        .on('mousemove', function(e, d) {
+                            let typeHint = memLayout.select('#typeHint');
+                            typeHint.attr('x', d3.pointer(e)[0])
+                                .attr('y', d3.pointer(e)[1]);
+                        })
+                        .on('mouseout', function(e, d) {
+                            memLayout.select('#typeHint')
+                                .remove();
+                            memLayout.selectAll(`.block-${d.trimType}`)
+                                .transition()
+                                .style('fill', (d) => expandedTypes.has(d.type) && !d.isSubtype ? 'url(#crosshatch)' : d.colour);
+                        })
+                        .on('click', function(e, d) {
+                            if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+                                let textGroup = d3.select('body')
+                                    .append('div')
+                                    .attr('id', 'statsPopup')
+                                    .attr('class', 'popup')
+                                    .style('display', 'block')
+                                    .style('text-align', 'center')
+                                    .style('height', `${Math.min((1 + statsTracker.getTypes().length) * 19, 400)}px`);
+                                textGroup.call(typeInfoPopup().y('10%')
+                                                .type(d.type)
+                                                .lineSpace(15)
+                                                .maxChars(30)
+                                                .width('47%')
+                                                .height('100%')
+                                                .clKind('Single')
+                                                .stats(statsTracker));
+                                textGroup.call(typeInfoPopup().y('10%')
+                                                .type(d.type)
+                                                .lineSpace(15)
+                                                .maxChars(30)
+                                                .width('47%')
+                                                .height('100%')
+                                                .clKind('Double')
+                                                .stats(statsTracker));
+                                textGroup.append('i')
+                                    .attr('class', 'fa fa-close')
+                                    .style('position', 'absolute')
+                                    .style('top', '3%')
+                                    .style('right', '1%')
+                                    .style('font-size', '24px')
+                                    .style('color', '#ccc')
+                                    .style('cursor', 'pointer')
+                                    .on('click', function() {
+                                        d3.select('#statsPopup').remove();
+                                    });
+                            }
+                            else if (e.altKey && fields[d.type.replaceAll(' ', '')] && !(e.ctrlKey || e.metaKey)) {
+                                memLayout.select('#typeHint')
+                                    .remove();
+                                if (!expandedTypes.has(d.type)) {
+                                    expandedTypes.add(d.type);
+                                }
+                                else {
+                                    expandedTypes.delete(d.type);
+                                }
+                                data = splitBlocks(objects, startAddr, pageSize, cachelineSize);
+                                addElementsByTimestamp(prevTs);
+                            }
+                        });
+                    enterGroup.append('line')
+                        .attr('x1', (d) => xScale(d.x))
+                        .attr('y1', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1))
+                        .attr('x2', (d) => xScale(d.x))
+                        .attr('y2', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1) + yScale(yScale.domain()[0]-d.height))
+                        .style('visibility', (d) => d.isBegin ? 'inherit' : 'hidden')
+                        .style('stroke', 'black')
+                        .style('stroke-width', '1px');
+                    enterGroup.append('line')
+                        .attr('x1', (d) => xScale(d.x + d.width))
+                        .attr('y1', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1))
+                        .attr('x2', (d) => xScale(d.x + d.width))
+                        .attr('y2', (d) => yScale(d.y) - yScale(yScale.domain()[0]-1) + yScale(yScale.domain()[0]-d.height))
+                        .style('visibility', (d) => d.isEnd ? 'inherit' : 'hidden')
+                        .style('stroke', 'black')
+                        .style('stroke-width', '1px');
+                },
+                (update) => {
+                    update.selectAll('rect')
+                        .transition()
+                        .style('fill', (d) => expandedTypes.has(d.type) && !d.isSubtype ? 'url(#crosshatch)' : d.colour);
+                },
+                (exit) => exit.remove()
+            );
     }
 
     function splitBlocks(objects, startPage, pageSize, cachelineSize) {
@@ -153,69 +222,78 @@ function objectLayout() {
         // const startAddr = objects[0].alloc_addr - (objects[0].alloc_addr % cachelineSize);
         
         for (let i = 0; i < objects.length; i++) {
-            let obj = objects[i];
-            let trimType = obj.type.replace(/[^a-zA-Z]+/g, '');
-            let col = colourOfType[obj.type];
-            const normAddr = (obj.addr - startAddr);
-            const begin = normAddr % cachelineSize;
-            let startBlock = {  type: obj.type,
-                                trimType: trimType,
-                                id: i*3,
-                                x: begin,
-                                y: Math.floor(normAddr / cachelineSize),
-                                width: Math.min(obj.size, cachelineSize - begin),
-                                height: 1,
-                                start: obj.allocTs,
-                                end: obj.freeTs,
-                                colour: col,
-                                isBegin: !obj.isDup
-                                };
-            if (obj.size > cachelineSize - begin) {
-                startBlock.isEnd = false;
-                // let midHeight = Math.floor(Math.min(obj.alloc_size - cachelineSize + begin,
-                //                                     pageSize - (obj.alloc_addr % pageSize) + cachelineSize - begin) / cachelineSize);
-                let midHeight = Math.floor((obj.size - cachelineSize + begin) / cachelineSize);
-                let pageRem = Math.floor((pageSize - ((obj.addr % pageSize) + cachelineSize - begin)) / cachelineSize);
-                
-                if (midHeight > pageRem) midHeight = pageRem;
-                // else midHeight -= 1;
-                
-                if (obj.size >= 2*cachelineSize - begin && midHeight > 0) {
-                    pageBlocks.push({type: obj.type,
+            let noSpacesType = objects[i].type.replaceAll(' ', '');
+            for (let obj of [objects[i]].concat(expandedTypes.has(objects[i].type) && fields[noSpacesType] ? fields[noSpacesType].map(
+                    (subtype) => ({type: subtype.subtype, addr: objects[i].addr + subtype.offset,
+                        allocTs: objects[i].allocTs, freeTs: objects[i].freeTs, isDup: objects[i].isDup,
+                        size: subtype.size, isSubtype: true})) : [])) {
+                // console.log(obj);
+                let trimType = obj.type.replace(/[^a-zA-Z]+/g, '');
+                let col = colourOfType[obj.type];
+                const normAddr = (obj.addr - startAddr);
+                const begin = normAddr % cachelineSize;
+                let startBlock = {  type: obj.type,
                                     trimType: trimType,
-                                    id: i*3 + 1,
-                                    x: 0,
-                                    y: Math.floor(normAddr / cachelineSize) + 1,
-                                    width: cachelineSize,
-                                    height: midHeight,
-                                    start: obj.allocTs,
-                                    end: obj.freeTs,
-                                    colour: col,
-                                    isStart: false,
-                                    isEnd: false
-                                    });
-                }
-                let leftover = (obj.size - cachelineSize + begin) % cachelineSize;
-                if (midHeight != pageRem && leftover > 0) {
-                    pageBlocks.push({type: obj.type,
-                                    trimType: trimType,
-                                    id: i*3 + 2,
-                                    x: 0,
-                                    y: Math.floor(normAddr / cachelineSize) + midHeight + 1,
-                                    width: leftover,
+                                    id: obj.type + toString(obj.addr) + toString(obj.allocTs) + '0',
+                                    x: begin,
+                                    y: Math.floor(normAddr / cachelineSize),
+                                    width: Math.min(obj.size, cachelineSize - begin),
                                     height: 1,
                                     start: obj.allocTs,
                                     end: obj.freeTs,
-                                    colour: col,
-                                    isStart: false,
-                                    isEnd: true
-                                    });
+                                    colour: obj.isSubtype ? addlch(col, 20, 10, 1) : col,
+                                    isBegin: !obj.isDup,
+                                    isSubtype: obj.isSubtype
+                                    };
+                if (obj.size > cachelineSize - begin) {
+                    startBlock.isEnd = false;
+                    // let midHeight = Math.floor(Math.min(obj.alloc_size - cachelineSize + begin,
+                    //                                     pageSize - (obj.alloc_addr % pageSize) + cachelineSize - begin) / cachelineSize);
+                    let midHeight = Math.floor((obj.size - cachelineSize + begin) / cachelineSize);
+                    let pageRem = Math.floor((pageSize - ((obj.addr % pageSize) + cachelineSize - begin)) / cachelineSize);
+                    
+                    if (midHeight > pageRem) midHeight = pageRem;
+                    // else midHeight -= 1;
+                    
+                    if (obj.size >= 2*cachelineSize - begin && midHeight > 0) {
+                        pageBlocks.push({type: obj.type,
+                                        trimType: trimType,
+                                        id: obj.type + toString(obj.addr) + toString(obj.allocTs) + '1',
+                                        x: 0,
+                                        y: Math.floor(normAddr / cachelineSize) + 1,
+                                        width: cachelineSize,
+                                        height: midHeight,
+                                        start: obj.allocTs,
+                                        end: obj.freeTs,
+                                        colour: obj.isSubtype ? addlch(col, 20, 10, 1) : col,
+                                        isStart: false,
+                                        isEnd: false,
+                                        isSubtype: obj.isSubtype
+                                        });
+                    }
+                    let leftover = (obj.size - cachelineSize + begin) % cachelineSize;
+                    if (midHeight != pageRem && leftover > 0) {
+                        pageBlocks.push({type: obj.type,
+                                        trimType: trimType,
+                                        id: obj.type + toString(obj.addr) + toString(obj.allocTs) + '2',
+                                        x: 0,
+                                        y: Math.floor(normAddr / cachelineSize) + midHeight + 1,
+                                        width: leftover,
+                                        height: 1,
+                                        start: obj.allocTs,
+                                        end: obj.freeTs,
+                                        colour: obj.isSubtype ? addlch(col, 20, 10, 1) : col,
+                                        isStart: false,
+                                        isEnd: true,
+                                        isSubtype: obj.isSubtype
+                                        });
+                    }
                 }
+                else {
+                    startBlock.isEnd = true;
+                }
+                pageBlocks.push(startBlock);
             }
-            else {
-                startBlock.isEnd = true;
-            }
-            pageBlocks.push(startBlock);
         }
         return pageBlocks;
     }
@@ -247,6 +325,12 @@ function objectLayout() {
     drawObjectLayout.stats = function(val) {
         if (!arguments) return statsTracker;
         statsTracker = val;
+        return drawObjectLayout;
+    }
+
+    drawObjectLayout.fields = function(val) {
+        if (!arguments) return fields;
+        fields = val;
         return drawObjectLayout;
     }
 

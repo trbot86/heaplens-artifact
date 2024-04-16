@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import { spawn } from 'child_process';
@@ -15,6 +16,9 @@ app.use(
     })
 );
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
 // app.use('/run-sampler', (req, res, next) => {
 //     // Set timeout for 10 minutes just in case
 //     req.setTimeout(10*60*1000, () => {
@@ -25,9 +29,9 @@ app.use(
 //     next();
 // });
 
-app.get('/run-get-records/:fname', (req, res) => {
+app.get('/run-get-records/:fname-:numBuckets', (req, res) => {
     // Execute a child process
-    const samplerProcess = spawn('python', ['sampler.py', 'all', req.params.fname]);
+    const samplerProcess = spawn('python', ['sampler.py', 'all', req.params.fname, req.params.numBuckets]);
     console.log('Received request for all records.');
 
     samplerProcess.stdout.pipe(res);
@@ -55,11 +59,13 @@ app.get('/run-get-records/:fname', (req, res) => {
     });
 });
 
-app.get('/run-sampler/:fname-:startTs-:endTs-:alg-:runLen-:maxRuns', (req, res) => {
+app.post('/run-sampler/:fname-:startTs-:endTs-:alg-:runLen-:maxRuns-:numBuckets', (req, res) => {
     // Execute a child process
     console.log('Received sample request.');
+    // console.log(`"${JSON.stringify(req.body).replaceAll('\"', "\\'")}"`);
     const samplerProcess = spawn('python', ['sampler.py', 'sample', req.params.fname, req.params.startTs, req.params.endTs,
-                                            req.params.alg, req.params.runLen, req.params.maxRuns]);
+                                            req.params.alg, req.params.runLen, req.params.maxRuns, req.params.numBuckets,
+                                            `${JSON.stringify(req.body).replaceAll('\"', "\\'")}`]);
 
     let result = '';
 

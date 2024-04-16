@@ -8,9 +8,11 @@ export function getCurrTime() {
     return mainVis.getGraphLayout().getCurrTime();
 }
 
+const numBuckets = 500000;
+
 async function getDb(srcName) {
     try {
-        fetch(`/run-get-records/${srcName}`)
+        fetch(`/run-get-records/${srcName}-${numBuckets}`)
             .then((allResponse) => allResponse.text())
             .then((allResponse) => {
                 let allData = JSON.parse(allResponse);

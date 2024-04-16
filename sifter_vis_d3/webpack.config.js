@@ -1,6 +1,7 @@
 import path from "path"
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import CopyWebpackPlugin from "copy-webpack-plugin";
+import ImageMinimizerPlugin from "image-minimizer-webpack-plugin";
 import webpack from "webpack";
 
 const __dirname = path.resolve();
@@ -21,6 +22,28 @@ export default {
         clean: true
     },
     plugins: [
+        new ImageMinimizerPlugin({
+            minimizer: {
+                implementation: ImageMinimizerPlugin.imageminMinify,
+                options: {
+                    plugins: [
+                        [
+                        'imagemin-svgo',
+                            {
+                                plugins: [
+                                    // SVGO options is here "https://github.com/svg/svgo#what-it-can-do"
+                                    {
+                                    name: 'preset-default',
+                                    removeViewBox: false,
+                                    removeXMLNS: true,
+                                    },
+                                ],
+                            },
+                        ],
+                    ],
+                },
+            },
+        }),
         new HtmlWebpackPlugin({
             template: "src/index.html",
             filename: "index.html",
@@ -39,6 +62,14 @@ export default {
     ],
     module: {
         rules: [
+            {
+            test: /\.svg$/,
+            use: [
+                {
+                loader: "raw-loader"
+                }
+            ]
+            },
             {
             test: /\.(png|jpe?g|gif)$/i,
             type: "asset/resource",

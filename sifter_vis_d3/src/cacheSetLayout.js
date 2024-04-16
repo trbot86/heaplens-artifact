@@ -12,7 +12,7 @@ function cacheSetLayout() {
     let objects = [],
         cacheLineSize = 64,
         cacheInfo = [],
-        instantaneous = false,
+        current = true,
         currTime = 0,
         currCache = {},
         // currSize = 0,
@@ -108,7 +108,7 @@ function cacheSetLayout() {
     drawLayout.currTime = function(val) {
         if (!arguments) return currTime;
         currTime = val;
-        if (instantaneous) drawSquares();
+        if (current) drawSquares();
         return drawLayout;
     }
 
@@ -139,13 +139,13 @@ function cacheSetLayout() {
         
         toggleGroup.append('circle')
             .attr('class', 'toggle')
-            .attr('cx', instantaneous ? 24 : 0)
+            .attr('cx', !current ? 24 : 0)
             .attr('cy', 2.5)
             .attr('r', 10)
             .style('fill', '#ccc')
             .on('click', function() {
-                instantaneous = !instantaneous;
-                if (instantaneous) {
+                current = !current;
+                if (!current) {
                     d3.select(this)
                         .transition()
                         .ease(d3.easeCubicOut)
@@ -165,13 +165,13 @@ function cacheSetLayout() {
             .attr('x', -70)
             .attr('y', 5)
             .attr('font-family', 'monospace')
-            .text('Summary');
+            .text('Current');
     
         toggleGroup.append('text')
             .attr('x', 43)
             .attr('y', 5)
             .attr('font-family', 'monospace')
-            .text('Instantaneous');
+            .text('All events heatmap');
     }
 
     function drawWidthHandle() {
@@ -299,7 +299,7 @@ function cacheSetLayout() {
     }
 
     function drawSquares() {
-        let squaresData = getSquaresData(instantaneous ? objects.filter(d => d.allocTs <= currTime && d.freeTs >= currTime) : objects);
+        let squaresData = getSquaresData(current ? objects.filter(d => d.allocTs <= currTime && d.freeTs >= currTime) : objects);
         const heatScale = d3.scaleLinear().domain([0, Math.max(1, Math.max(...squaresData.map(d => d.freq ? d.freq : 0)))]).range(['white', 'red']);
     
         let cacheLayout = d3.select('#cacheLayout');

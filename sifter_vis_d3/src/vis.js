@@ -38,6 +38,7 @@ class MainVisualization {
     #timeGraphChart;
     #cacheSetChart;
     #typesToShowOnGraph;
+    #typesToSample;
     #tsToIndexMap;
     #data;
     #zoomed;
@@ -46,7 +47,7 @@ class MainVisualization {
     #statsTracker;
 
     constructor(fname, data) {
-        console.log('Number of records in input: ', data['records'].length);
+        console.log('Number of points in input: ', Object.keys(data['pts']).reduce((acc, curr) => acc + data.pts[curr].length, 0));
         this.#fname = fname;
         // const types = [...new Set(data['records'].map((rec) => rec.type))];
         const types = Object.keys(data['pts']);
@@ -67,6 +68,10 @@ class MainVisualization {
             acc[curr] = true;
             return acc
         }, {});
+        this.#typesToSample = types.reduce((acc, curr) => {
+            acc[curr] = true;
+            return acc
+        }, {});
         this.#tsToIndexMap = types.reduce((acc, curr) => {
             acc[curr] = data['pts'][curr].reduce((tsmap, elem, i) => {
                 tsmap[elem.ts] = i + 1;
@@ -74,7 +79,7 @@ class MainVisualization {
             }, {});
             return acc;
         }, {});
-        this.#statsTracker = new StatsTracker(types, data['records']);
+        this.#statsTracker = new StatsTracker(types, data['stats']);
 
 
         // const changeTs = types.reduce((chMap, type) => {
@@ -131,7 +136,7 @@ class MainVisualization {
         //     .style('justify-self', 'end');
     }
 
-    reconstructGraphLayout() {
+    reconstructGraphLayout(zoom=false, unzoom=false) {
         // this.#graphLayout.remove();
         // this.createNewGraphLayoutElement();
         const filteredTypes = Object.keys(this.#typesToShowOnGraph).filter((t) => this.#typesToShowOnGraph[t]);
@@ -166,7 +171,7 @@ class MainVisualization {
 
         // this.#timeGraphChart = timeGraphLayout().y(TIMEGRAPH_TRANSLATE_Y);
         this.#graphLayout.datum({pts: filteredPts, changes: filteredChanges})
-                        .call(this.#timeGraphChart);
+                        .call(zoom ? this.#timeGraphChart.zoom() : unzoom ? this.#timeGraphChart.unzoom() : this.#timeGraphChart);
     }
 
     changeVisOfType(type) {
@@ -178,18 +183,29 @@ class MainVisualization {
         return this.#typesToShowOnGraph[type];
     }
 
+    getSampleVector() {
+        return this.#typesToSample;
+    }
+
+    changeTypeSampled(type) {
+        this.#typesToSample[type] = !this.#typesToSample[type];
+        // TODO add a warning telling user to resample?
+    }
+
+    isTypeSampled(type) {
+        return this.#typesToSample[type];
+    }
+
     zoom(startTs, endTs) {
         this.#zoomed = true;
         this.#zoomTs.startTs = startTs;
         this.#zoomTs.endTs = endTs;
-        this.#graphLayout.call(this.#timeGraphChart.zoom());
-        // this.reconstructGraphLayout();
+        this.reconstructGraphLayout(true, false);
     }
 
     unzoom() {
         this.#zoomed = false;
-        this.#graphLayout.call(this.#timeGraphChart.zoom());
-        // this.reconstructGraphLayout();
+        this.reconstructGraphLayout(false, true);
     }
 
     toggleCacheFocus() {
@@ -212,58 +228,67 @@ class MainVisualization {
         }
     }
 
-    constructPageVis(pages) {
+    constructPageVis(data) {
+        let pages = data['page_num_events'];
         const pageSize = 4096;
 
-        let pagesJoined = {};
+        // let pagesJoined = {};
 
-        for (let page of Object.keys(pages)) {
-            pagesJoined[parseInt(page)] = {'events': [], 'cluster': pages[page]['cluster']};
-        }
+        // for (let page of Object.keys(pages)) {
+        //     pagesJoined[parseInt(page)] = {'events': [], 'cluster': pages[page]['cluster']};
+        // }
         let currID = 0;
-        let allJoined = [];
+        // let allJoined = [];
 
         for (let [page, attrs] of Object.entries(pages)) {
             page = parseInt(page);
-            attrs.events.sort((a, b) => a.ts - b.ts);
-            let allocs = attrs.events.filter((event) => event.is_alloc == 1);
-            let freesMap = attrs.events.filter((event) => event.is_alloc == 0).reduce((acc, curr) => {
-                acc[curr.addr] ? acc[curr.addr].push(curr.ts) : acc[curr.addr] = [curr.ts];
-                return acc;
-            }, {});
+            attrs.events.sort((a, b) => a.alloc_ts - b.alloc_ts);
             
-            let joined = [];
-            for (let allocEvent of allocs) {
-                let ft = binarySearchSuccessor(freesMap[allocEvent.addr], allocEvent.ts);
-                joined.push({'file': allocEvent.file,
-                            'size': allocEvent.size,
-                            'addr': allocEvent.addr,
-                            'type': allocEvent.type,
-                            'allocTs': allocEvent.ts,
-                            'freeTs': ft ? ft[0] : null,
-                            'isDup': false,
-                            'ID': currID});
-                currID++;
-            }
+            // for (let ev of attrs.events) {
+            //     ev.isDup = false;
+            //     ev.ID = currID;
+            //     currID++;
+            // }
+            // let allocs = attrs.events.filter((event) => event.is_alloc == 1);
+            // let freesMap = attrs.events.filter((event) => event.is_alloc == 0).reduce((acc, curr) => {
+            //     acc[curr.addr] ? acc[curr.addr].push(curr.ts) : acc[curr.addr] = [curr.ts];
+            //     return acc;
+            // }, {});
             
-            pagesJoined[page]['events'] = pagesJoined[page]['events'].concat(joined);
+            // let joined = [];
+            // for (let allocEvent of allocs) {
+            //     let ft = binarySearchSuccessor(freesMap[allocEvent.addr], allocEvent.ts);
+            //     joined.push({'file': allocEvent.file,
+            //                 'size': allocEvent.size,
+            //                 'addr': allocEvent.addr,
+            //                 'type': allocEvent.type,
+            //                 'allocTs': allocEvent.ts,
+            //                 'freeTs': ft ? ft[0] : null,
+            //                 'isDup': false,
+            //                 'ID': currID});
+            //     currID++;
+            // }
+            
+            // pagesJoined[page]['events'] = pagesJoined[page]['events'].concat(joined);
 
-            for (let event of pagesJoined[page]['events']) {
+            for (let event of attrs.events) {
+                event.isDup = false;
+                event.ID = currID++;
                 let endOffsetLastObject = (event.addr % pageSize) + event.size;
                 let iPage = page + 1;
-                while (endOffsetLastObject > pageSize && pagesJoined[iPage]) {
+
+                while (endOffsetLastObject > pageSize && pages[iPage]) {
                     /*  NOTE: at this point, we rely on the fact that the objects are sorted in ascending order
-                        by the address. */
+                        by the address. Actually I don't think this is true anymore?? */
                     let newEvent = structuredClone(event);
                     newEvent.size = Math.min(endOffsetLastObject - pageSize, pageSize);
                     newEvent.addr = iPage * pageSize;
                     // newObj.alloc_addr = (objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) -
                     //     ((objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) % pageSize);
                     newEvent.isDup = true;
-                    newEvent.ID = currID;
-                    currID++;
+                    newEvent.ID = currID++;
 
-                    pagesJoined[iPage]['events'].push(newEvent);
+                    pages[iPage].events.push(newEvent);
                     // objs[objs.length - 1].alloc_size -= newObj.alloc_size;
                     endOffsetLastObject -= pageSize;
                     iPage++;
@@ -271,7 +296,7 @@ class MainVisualization {
             }
         }
 
-        pageLayout(pagesJoined, this.#initTs, this.#statsTracker, pageSize);
+        pageLayout(pages, data['clusters'], data['features'], this.#initTs, this.#statsTracker, data['fields'], pageSize);
 
         this.#cacheSetChart = cacheSetLayout().cacheLineSize(64)
             .cacheInfo([{associativity: 8, size: 32768, width: 270},
@@ -285,9 +310,10 @@ class MainVisualization {
             .style('height', '400px')
             .style('grid-column', 3)
             .style('grid-row', 1)
+            .style('overflow', 'visible')
             .append('g')
             .attr('id', 'cacheSetBox')
-            .style('transform', 'translate(30px, 40px)')
+            .style('transform', 'translate(40px, 30px)')
             // .append('div')
             // .attr('id', 'cacheSetBox')
             // .style('display', 'flex')
@@ -300,7 +326,7 @@ class MainVisualization {
             // .style('grid-row', 1)
             // .style('width', '300px')
             // .style('height', '350px')
-            .datum(Object.values(pagesJoined).reduce((acc, curr) => acc.concat(curr['events']), []))
+            .datum(Object.values(pages).reduce((acc, curr) => acc.concat(curr.events), []))
             .call(this.#cacheSetChart);
 
         // cacheSetLayout(Object.values(pagesJoined).reduce((acc, curr) => acc.concat(curr['events']), []), 64, {associativity: 8, size: 32768},
@@ -309,7 +335,6 @@ class MainVisualization {
 
         this.#timeGraphChart.callbacks([updatePagesByTimestamp,
                                         this.#cacheSetChart.currTime]);
-                                        // ...instantaneous ? [drawLayout] : []]);
     }
 
     getFileName() {
