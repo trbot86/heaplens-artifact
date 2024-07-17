@@ -138,18 +138,26 @@ StatementMatcher lhsofMallocMatcher =
 
     #endif
 
+    std::cout << "start if" << std::endl;
+
     if(typenode->isBuiltinType()) {
+      std::cout << "built in" << std::endl;
       malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), \
       functionDeclFullLocation.getLineNumber()), typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy)));
     }
     else if(typenode->isRecordType()) {
+      std::cout << "record"  << std::endl;
       malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), \
       functionDeclFullLocation.getLineNumber()), typenode->getAsRecordDecl()->getQualifiedNameAsString()));
     }
     else if(typenode->isPointerType()) {
+      std::cout << "ptr type" << std::endl;
       malloctypeset.insert(pair<pair<string,int>, string>(pair<string,int>(pathVector.c_str() + functionDeclFullLocation.getFileEntry()->getName().str(), \
       functionDeclFullLocation.getLineNumber()), typenode->getPointeeType().getAsString()));
+      std::cout << "ptr type inserted" << std::endl;
     }
+
+    std::cout << "end matcher" << std::endl;
  }
 
 class ClassnamePrinter : public MatchFinder::MatchCallback {
@@ -312,6 +320,8 @@ void typedump(char* filename) {
   ofstream file;
   file.open(filename);
 
+  std::cout << "pt 1" << MTDFNAME << std::endl;
+
   for(auto i = typenameset.begin();i != typenameset.end();++i) {
     file << *i << endl;
   }
@@ -327,11 +337,15 @@ int main(int argc, const char **argv) {
 
   ClangTool Tool(*compDatabase, compDatabase->getAllFiles());
 
+  std::cout << "MTDFNAME: " << MTDFNAME << std::endl;
+
   for(const auto& src : Tool.getSourcePaths()) {
     std::cout << src << std::endl;
   }
   
-  Tool.run(newFrontendActionFactory<MyFrontendAction>().get());
+  if (Tool.run(newFrontendActionFactory<MyFrontendAction>().get()) != 0) {
+    std::cout << "Tool run failed" << std::endl;
+  }
 
   printtofile();
   return 0;

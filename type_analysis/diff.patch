@@ -1,0 +1,2100 @@
+diff --git a/sifter_vis_d3/server.js b/sifter_vis_d3/server.js
+index 7f23753..5f7acad 100644
+--- a/sifter_vis_d3/server.js
++++ b/sifter_vis_d3/server.js
+@@ -1,20 +1,20 @@
+-import express from "express";
+-import webpack from "webpack";
+-import webpackDevMiddleware from "webpack-dev-middleware";
+-
+-const app = express();
+-import { default as config } from './webpack.config.js';
+-const compiler = webpack(config);
+-
+-const port = 8000;
+-
+-app.use(
+-    webpackDevMiddleware(compiler, {
+-        publicPath: config.output.publicPath,
+-    })
+-);
+-
+-app.listen(port, function() {
+-        console.log(`App is running on http://localhost:${port}...\n`)
+-    } 
++import express from "express";
++import webpack from "webpack";
++import webpackDevMiddleware from "webpack-dev-middleware";
++
++const app = express();
++import { default as config } from './webpack.config.js';
++const compiler = webpack(config);
++
++const port = 8000;
++
++app.use(
++    webpackDevMiddleware(compiler, {
++        publicPath: config.output.publicPath,
++    })
++);
++
++app.listen(port, function() {
++        console.log(`App is running on http://localhost:${port}...\n`)
++    } 
+ );
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/cacheSetLayout.js b/sifter_vis_d3/src/cacheSetLayout.js
+index 2f05404..882520d 100644
+--- a/sifter_vis_d3/src/cacheSetLayout.js
++++ b/sifter_vis_d3/src/cacheSetLayout.js
+@@ -1,195 +1,195 @@
+-import * as d3 from 'd3';
+-import { getCurrTime } from './timeGraphLayout.js';
+-
+-export let instantaneous = false;
+-let objects = [];
+-let cacheSize, associativity, cachelineSize = undefined;
+-
+-function drawToggle() {
+-    d3.select("#toggleGroup").remove();
+-
+-    let toggleGroup = d3.select("#cacheSetBox")
+-        .append("svg")
+-        .attr("id", "toggleGroup")
+-        .style("width", "100%")
+-        .style("height", "10%")
+-        .append("g")
+-        .style("transform", "translate(33%, 50%)");
+-    
+-    toggleGroup.append("rect")
+-        .style("width", "24px")
+-        .style("height", "5px")
+-        .style("fill", "#ddd");
+-    
+-    toggleGroup.append("circle")
+-        .attr("class", "toggle")
+-        .attr("cx", 0)
+-        .attr("cy", 2.5)
+-        .attr("r", 10)
+-        .style("fill", "#ccc")
+-        .on("click", function() {
+-            instantaneous = !instantaneous;
+-            if (instantaneous) {
+-                d3.select(this)
+-                    .transition()
+-                    .ease(d3.easeCubicOut)
+-                    .attr("cx", 21);
+-                drawLayout(getCurrTime());
+-            }
+-            else {
+-                d3.select(this)
+-                    .transition()
+-                    .ease(d3.easeCubicOut)
+-                    .attr("cx", 0);
+-                drawLayout();
+-            }
+-        });
+-
+-    toggleGroup.append("text")
+-        .attr("x", -70)
+-        .attr("y", 5)
+-        .attr("font-family", "monospace")
+-        .text("Summary");
+-
+-    toggleGroup.append("text")
+-        .attr("x", 40)
+-        .attr("y", 5)
+-        .attr("font-family", "monospace")
+-        .text("Instantaneous");
+-}
+-
+-function getSquaresData(objs) {
+-    const width = 270;
+-    let numCacheSets = Math.ceil(cacheSize / (associativity*cachelineSize));
+-    let setsPerRow = Math.floor(Math.sqrt(numCacheSets));
+-    let squareSize = Math.floor(width / setsPerRow);
+-
+-    let setMap = objs.map(obj => ({cacheline: Math.floor(obj.alloc_addr / cachelineSize) % numCacheSets,
+-        spread: Math.ceil((obj.alloc_size + (obj.alloc_size % cachelineSize)) / cachelineSize)}))
+-    let freqMap = setMap.reduce((acc, curr) => {
+-        let inc = Math.ceil(curr.spread / numCacheSets);
+-        for (let i = curr.cacheline; i < curr.cacheline + Math.min(numCacheSets, curr.spread); i++) {
+-            // TODO: check this calculation, pretty sure it's wrong
+-            let rounded = i - curr.cacheline < curr.spread % numCacheSets ? inc : inc - 1;
+-            let j = (curr.cacheline + i) % numCacheSets;
+-            acc[j] ? acc[j] += rounded : acc[j] = rounded;
+-        }
+-        // acc[curr] ? acc[curr]++ : acc[curr] = 1;
+-        return acc;
+-    }, {});
+-
+-    return new Array(numCacheSets).fill(undefined).map((d, i) => 
+-        ({x: (i % setsPerRow)*squareSize,
+-            y: Math.floor(i / setsPerRow)*squareSize,
+-            freq: freqMap[i],
+-            size: squareSize}));
+-}
+-
+-export function drawLayout(ts=-1) {
+-    let squaresData = getSquaresData(instantaneous ? objects.filter(d => d.alloc_timestamp <= ts && d.free_timestamp >= ts) : objects,
+-        cacheSize, associativity, cachelineSize);
+-    const heatScale = d3.scaleLinear().domain([0, Math.max(1, Math.max(...squaresData.map(d => d.freq ? d.freq : 0)))]).range(["white", "red"]);
+-
+-    let cacheLayout = d3.select("#cacheLayout");
+-
+-    if (cacheLayout.empty()) {
+-        cacheLayout = d3.select("#cacheSetBox")
+-            .insert("svg", "#toggleGroup")
+-            .attr("id", "cacheLayout")
+-            .style("width", "100%")
+-            .style("height", "60%");
+-    }
+-
+-    cacheLayout.selectAll("rect")
+-        .data(squaresData, d => (d.x, d.y))
+-        .join(enter => enter.append("rect")
+-            .attr("x", d => d.x)
+-            .attr("y", d => d.y)
+-            .attr("width", d => d.size)
+-            .attr("height", d => d.size)
+-            .style("stroke", "#ccc")
+-            .style("stroke-width", 0.5)
+-            .style("fill", function(d, i) {
+-                return heatScale(d.freq ? d.freq : 0);
+-            }),
+-            update => update.style("fill", function(d, i) {
+-                return heatScale(d.freq ? d.freq : 0);
+-            }),
+-            exit => exit.remove()
+-        );
+-        // .style("transform", "translate(50px, 85px)");
+-}
+-
+-function refreshLayout(cs, assoc, cls) {
+-    cacheSize = cs;
+-    associativity = assoc;
+-    cachelineSize = cls;
+-    d3.select("#cacheLayout").remove();
+-    drawLayout();
+-    drawToggle();
+-}
+-
+-function cacheSetLayout(objs, cachelineSize=64, ...cacheInfo) {
+-    objects = objs;
+-
+-    let cacheSetTabs = d3.select("#visPanels")
+-        .append("div")
+-        .attr("id", "cacheSetBox")
+-        .style("display", "flex")
+-        .style("flex-direction", "column")
+-        .style("align-items", "flex-start")
+-        .style("position", "relative")
+-        .style("left", "30px")
+-        .style("top", "40px")
+-        .style("grid-column", 3)
+-        .style("grid-row", 1)
+-        .style("width", "300px")
+-        .style("height", "460px")
+-        .append("div")
+-        .attr("id", "cacheSetTabs")
+-        .style("display", "flex")
+-        .style("flex-direction", "row")
+-        .style("width", "100%")
+-        .style("height", "10%");
+-        // .style("align-items", "flex-start");
+-
+-    cacheSetTabs.selectAll("svg")
+-        .data(cacheInfo)
+-        .enter()
+-        .append("svg")
+-        .attr("class", "cacheTab")
+-        .style("width", "45px")
+-        .style("height", "30px")
+-        // .style("width", "40px")
+-        // .style("height", "25px")
+-        .style("background-color", "white")
+-        .style("border", "1px solid #ccc")
+-        .style("border-top-left-radius", (d, i) => i == 0 ? "7px" : "0px")
+-        .style("border-bottom-left-radius", (d, i) => i == 0 ? "7px" : "0px")
+-        .style("border-top-right-radius", (d, i) => i == cacheInfo.length - 1 ? "7px" : "0px")
+-        .style("border-bottom-right-radius", (d, i) => i == cacheInfo.length - 1 ? "7px" : "0px")
+-        .on("click", function(e, d) {
+-            refreshLayout(d.size, d.associativity, cachelineSize); // TODO: make sure variables like "cachelineSize" are not overloaded
+-        })
+-        .on("mouseover", function() {
+-            d3.select(this)
+-                .transition()
+-                .style("background-color", "#ccc");
+-        })
+-        .on("mouseout", function() {
+-            d3.select(this)
+-                .transition()
+-                .style("background-color", "white");
+-        })
+-        .append("text")
+-        .attr("text-anchor", "middle")
+-        .attr("x", "50%")
+-        .attr("y", "62%")
+-        .attr("font-family", "monospace")
+-        .style("alignment-baseline", "middle")
+-        .text((d, i) => `L${i+1}`);
+-
+-        refreshLayout(cacheInfo[0].size, cacheInfo[0].associativity, cachelineSize);
+-}
+-
++import * as d3 from 'd3';
++import { getCurrTime } from './timeGraphLayout.js';
++
++export let instantaneous = false;
++let objects = [];
++let cacheSize, associativity, cachelineSize = undefined;
++
++function drawToggle() {
++    d3.select("#toggleGroup").remove();
++
++    let toggleGroup = d3.select("#cacheSetBox")
++        .append("svg")
++        .attr("id", "toggleGroup")
++        .style("width", "100%")
++        .style("height", "10%")
++        .append("g")
++        .style("transform", "translate(33%, 50%)");
++    
++    toggleGroup.append("rect")
++        .style("width", "24px")
++        .style("height", "5px")
++        .style("fill", "#ddd");
++    
++    toggleGroup.append("circle")
++        .attr("class", "toggle")
++        .attr("cx", 0)
++        .attr("cy", 2.5)
++        .attr("r", 10)
++        .style("fill", "#ccc")
++        .on("click", function() {
++            instantaneous = !instantaneous;
++            if (instantaneous) {
++                d3.select(this)
++                    .transition()
++                    .ease(d3.easeCubicOut)
++                    .attr("cx", 21);
++                drawLayout(getCurrTime());
++            }
++            else {
++                d3.select(this)
++                    .transition()
++                    .ease(d3.easeCubicOut)
++                    .attr("cx", 0);
++                drawLayout();
++            }
++        });
++
++    toggleGroup.append("text")
++        .attr("x", -70)
++        .attr("y", 5)
++        .attr("font-family", "monospace")
++        .text("Summary");
++
++    toggleGroup.append("text")
++        .attr("x", 40)
++        .attr("y", 5)
++        .attr("font-family", "monospace")
++        .text("Instantaneous");
++}
++
++function getSquaresData(objs) {
++    const width = 270;
++    let numCacheSets = Math.ceil(cacheSize / (associativity*cachelineSize));
++    let setsPerRow = Math.floor(Math.sqrt(numCacheSets));
++    let squareSize = Math.floor(width / setsPerRow);
++
++    let setMap = objs.map(obj => ({cacheline: Math.floor(obj.alloc_addr / cachelineSize) % numCacheSets,
++        spread: 1 + Math.max(Math.ceil((obj.alloc_size - (cachelineSize - (obj.alloc_addr % cachelineSize))) / cachelineSize), 0)}));
++    let freqMap = setMap.reduce((acc, curr) => {
++        let inc = Math.ceil(curr.spread / numCacheSets);
++        for (let i = curr.cacheline; i < curr.cacheline + Math.min(numCacheSets, curr.spread); i++) {
++            let rounded = i - curr.cacheline < curr.spread % numCacheSets ? inc : inc - 1;
++            let j = i % numCacheSets;
++            acc[j] ? acc[j] += rounded : acc[j] = rounded;
++        }
++        // acc[curr] ? acc[curr]++ : acc[curr] = 1;
++        return acc;
++    }, {});
++
++    return new Array(numCacheSets).fill(undefined).map((d, i) => 
++        ({x: (i % setsPerRow)*squareSize,
++            y: Math.floor(i / setsPerRow)*squareSize,
++            freq: freqMap[i],
++            size: squareSize}));
++}
++
++export function drawLayout(ts=-1) {
++    let squaresData = getSquaresData(instantaneous ? objects.filter(d => d.alloc_timestamp <= ts && d.free_timestamp >= ts) : objects,
++        cacheSize, associativity, cachelineSize);
++    const heatScale = d3.scaleLinear().domain([0, Math.max(1, Math.max(...squaresData.map(d => d.freq ? d.freq : 0)))]).range(["white", "red"]);
++
++    let cacheLayout = d3.select("#cacheLayout");
++
++    if (cacheLayout.empty()) {
++        cacheLayout = d3.select("#cacheSetBox")
++            .insert("svg", "#toggleGroup")
++            .attr("id", "cacheLayout")
++            .style("width", "100%")
++            .style("height", "60%");
++    }
++
++    cacheLayout.selectAll("rect")
++        .data(squaresData, d => (d.x, d.y))
++        .join(enter => enter.append("rect")
++            .attr("x", d => d.x)
++            .attr("y", d => d.y)
++            .attr("width", d => d.size)
++            .attr("height", d => d.size)
++            .style("stroke", "#ccc")
++            .style("stroke-width", 0.5)
++            .style("fill", function(d, i) {
++                return heatScale(d.freq ? d.freq : 0);
++            }),
++            update => update.style("fill", function(d, i) {
++                return heatScale(d.freq ? d.freq : 0);
++            }),
++            exit => exit.remove()
++        );
++        // .style("transform", "translate(50px, 85px)");
++}
++
++function refreshLayout(cs, assoc, cls) {
++    cacheSize = cs;
++    associativity = assoc;
++    cachelineSize = cls;
++    d3.select("#cacheLayout").remove();
++    drawLayout(instantaneous ? getCurrTime() : -1);
++    // drawToggle();
++}
++
++function cacheSetLayout(objs, cachelineSize=64, ...cacheInfo) {
++    objects = objs;
++
++    let cacheSetTabs = d3.select("#visPanels")
++        .append("div")
++        .attr("id", "cacheSetBox")
++        .style("display", "flex")
++        .style("flex-direction", "column")
++        .style("align-items", "flex-start")
++        .style("position", "relative")
++        .style("left", "30px")
++        .style("top", "40px")
++        .style("grid-column", 3)
++        .style("grid-row", 1)
++        .style("width", "300px")
++        .style("height", "460px")
++        .append("div")
++        .attr("id", "cacheSetTabs")
++        .style("display", "flex")
++        .style("flex-direction", "row")
++        .style("width", "100%")
++        .style("height", "10%");
++        // .style("align-items", "flex-start");
++
++    cacheSetTabs.selectAll("svg")
++        .data(cacheInfo)
++        .enter()
++        .append("svg")
++        .attr("class", "cacheTab")
++        .style("width", "45px")
++        .style("height", "30px")
++        // .style("width", "40px")
++        // .style("height", "25px")
++        .style("background-color", "white")
++        .style("border", "1px solid #ccc")
++        .style("border-top-left-radius", (d, i) => i == 0 ? "7px" : "0px")
++        .style("border-bottom-left-radius", (d, i) => i == 0 ? "7px" : "0px")
++        .style("border-top-right-radius", (d, i) => i == cacheInfo.length - 1 ? "7px" : "0px")
++        .style("border-bottom-right-radius", (d, i) => i == cacheInfo.length - 1 ? "7px" : "0px")
++        .on("click", function(e, d) {
++            refreshLayout(d.size, d.associativity, cachelineSize); // TODO: make sure variables like "cachelineSize" are not overloaded
++        })
++        .on("mouseover", function() {
++            d3.select(this)
++                .transition()
++                .style("background-color", "#ccc");
++        })
++        .on("mouseout", function() {
++            d3.select(this)
++                .transition()
++                .style("background-color", "white");
++        })
++        .append("text")
++        .attr("text-anchor", "middle")
++        .attr("x", "50%")
++        .attr("y", "62%")
++        .attr("font-family", "monospace")
++        .style("alignment-baseline", "middle")
++        .text((d, i) => `L${i+1}`);
++
++        drawToggle();
++        refreshLayout(cacheInfo[0].size, cacheInfo[0].associativity, cachelineSize);
++}
++
+ export default cacheSetLayout;
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/dbloader.js b/sifter_vis_d3/src/dbloader.js
+index 7607634..b5358a2 100644
+--- a/sifter_vis_d3/src/dbloader.js
++++ b/sifter_vis_d3/src/dbloader.js
+@@ -1,111 +1,111 @@
+-import initSqlJs from "sql.js";
+-// Following import required to let webpack know it needs to copy the wasm file to our assets
+-import sqlWasm from "!!file-loader?name=sql-wasm-[contenthash].wasm!sql.js/dist/sql-wasm.wasm";
+-import initVis from "./vis.js";
+-
+-async function getDb(src) {
+-    const SQL = await initSqlJs({locateFile: () => sqlWasm});
+-
+-    try {
+-        const db = new SQL.Database(src);
+-        const MAIN_TABLE = "SUPERTABLE";
+-
+-        const data = [];
+-        /*  The following statement matches all of the allocations with
+-            corresponding frees. The following statement:
+-                (SELECT COUNT(*) FROM Allocs WHERE alloc_timestamp <= a.alloc_timestamp)
+-            simply labels the rows from 1 to n, where n is the total
+-            number of allocations. These unique IDs are needed for D3 to
+-            efficiently update the visualization based on changes to the data. */
+-        const stmt = db.prepare(`WITH Allocs AS (
+-                                    SELECT FILE AS alloc_file,
+-                                        SIZE AS alloc_size,
+-                                        ADDRESS AS alloc_addr,
+-                                        TYPE AS alloc_type,
+-                                        TIMESTAMP AS alloc_timestamp
+-                                    FROM SUPERTABLE
+-                                    WHERE isNew=1
+-                                ),
+-                                Frees AS (
+-                                    SELECT ADDRESS AS free_addr,
+-                                        TIMESTAMP AS FREE_TIMESTAMP
+-                                    FROM SUPERTABLE
+-                                    WHERE isNew=0
+-                                )
+-                                SELECT a.alloc_file,
+-                                    a.alloc_size,
+-                                    a.alloc_addr,
+-                                    a.alloc_type,
+-                                    a.alloc_timestamp,
+-                                    MIN(f.FREE_TIMESTAMP) AS free_timestamp,
+-                                    (SELECT COUNT(*) FROM Allocs WHERE alloc_timestamp <= a.alloc_timestamp) AS ID
+-                                FROM Allocs a
+-                                LEFT JOIN Frees f ON a.alloc_addr = f.free_addr AND f.free_timestamp >= a.alloc_timestamp
+-                                GROUP BY a.alloc_addr, a.alloc_timestamp
+-                                ORDER BY a.alloc_addr ASC`);
+-
+-        // const stmt = db.prepare(`SELECT FILE as allocFile,
+-        //                                 SIZE as size,
+-        //                                 ADDRESS as addr,
+-        //                                 TYPE as type,
+-        //                                 TIMESTAMP as timestamp,
+-        //                                 isNew as isAlloc
+-        //                         FROM SUPERTABLE`);
+-
+-        while (stmt.step()) {
+-            data.push(stmt.getAsObject());
+-        }
+-        
+-        stmt.free();
+-        db.close();
+-
+-        document.getElementById("dropPanels").remove();
+-
+-        // TODO add loading animation/indicator while visualization initializes
+-        initVis(data);
+-    }
+-    catch (err) {
+-        console.log("ERROR: " + err.message);
+-    }
+-}
+-
+-async function dropListener(event) {
+-    event.preventDefault();
+-    const files = event.dataTransfer.files;
+-
+-    if (files.length == 1) {
+-        console.log("Selected file: " + files[0].name);
+-        const reader = new FileReader();
+-        reader.onload = (f) => {
+-            /* Convert resulting ArrayBuffer into Uint8Array. Otherwise the
+-            Database initialization in getDb does not work. */
+-            getDb(new Uint8Array(f.target.result));
+-        }
+-        reader.readAsArrayBuffer(files[0]);
+-    }
+-}
+-
+-function initDB() {
+-    document.getElementById("dropArea").addEventListener("drop", dropListener);
+-}
+-
+-export default initDB;
+-
+-
+-
+-// dropArea.addEventListener("click", function () {
+-//     const fileInput = document.createElement("input");
+-//     fileInput.type = "file";
+-//     fileInput.style.display = "none";
+-    
+-//     fileInput.addEventListener("change", function () {
+-//         const selectedFile = fileInput.files[0];
+-//         if (selectedFile) {
+-//             console.log("Selected file: " + selectedFile.name);
+-//         }
+-//     });
+-
+-//     document.body.appendChild(fileInput);
+-//     fileInput.click();
+-//     document.body.removeChild(fileInput);
++import initSqlJs from "sql.js";
++// Following import required to let webpack know it needs to copy the wasm file to our assets
++import sqlWasm from "!!file-loader?name=sql-wasm-[contenthash].wasm!sql.js/dist/sql-wasm.wasm";
++import initVis from "./vis.js";
++
++async function getDb(src) {
++    const SQL = await initSqlJs({locateFile: () => sqlWasm});
++
++    try {
++        const db = new SQL.Database(src);
++        const MAIN_TABLE = "SUPERTABLE";
++
++        const data = [];
++        /*  The following statement matches all of the allocations with
++            corresponding frees. The following statement:
++                (SELECT COUNT(*) FROM Allocs WHERE alloc_timestamp <= a.alloc_timestamp)
++            simply labels the rows from 1 to n, where n is the total
++            number of allocations. These unique IDs are needed for D3 to
++            efficiently update the visualization based on changes to the data. */
++        const stmt = db.prepare(`WITH Allocs AS (
++                                    SELECT FILE AS alloc_file,
++                                        SIZE AS alloc_size,
++                                        ADDRESS AS alloc_addr,
++                                        TYPE AS alloc_type,
++                                        TIMESTAMP AS alloc_timestamp
++                                    FROM SUPERTABLE
++                                    WHERE isNew=1
++                                ),
++                                Frees AS (
++                                    SELECT ADDRESS AS free_addr,
++                                        TIMESTAMP AS FREE_TIMESTAMP
++                                    FROM SUPERTABLE
++                                    WHERE isNew=0
++                                )
++                                SELECT a.alloc_file,
++                                    a.alloc_size,
++                                    a.alloc_addr,
++                                    a.alloc_type,
++                                    a.alloc_timestamp,
++                                    MIN(f.FREE_TIMESTAMP) AS free_timestamp,
++                                    (SELECT COUNT(*) FROM Allocs WHERE alloc_timestamp <= a.alloc_timestamp) AS ID
++                                FROM Allocs a
++                                LEFT JOIN Frees f ON a.alloc_addr = f.free_addr AND f.free_timestamp >= a.alloc_timestamp
++                                GROUP BY a.alloc_addr, a.alloc_timestamp
++                                ORDER BY a.alloc_addr ASC`);
++
++        // const stmt = db.prepare(`SELECT FILE as allocFile,
++        //                                 SIZE as size,
++        //                                 ADDRESS as addr,
++        //                                 TYPE as type,
++        //                                 TIMESTAMP as timestamp,
++        //                                 isNew as isAlloc
++        //                         FROM SUPERTABLE`);
++
++        while (stmt.step()) {
++            data.push(stmt.getAsObject());
++        }
++        
++        stmt.free();
++        db.close();
++
++        document.getElementById("dropPanels").remove();
++
++        // TODO add loading animation/indicator while visualization initializes
++        initVis(data);
++    }
++    catch (err) {
++        console.log("ERROR: " + err.message);
++    }
++}
++
++async function dropListener(event) {
++    event.preventDefault();
++    const files = event.dataTransfer.files;
++
++    if (files.length == 1) {
++        console.log("Selected file: " + files[0].name);
++        const reader = new FileReader();
++        reader.onload = (f) => {
++            /* Convert resulting ArrayBuffer into Uint8Array. Otherwise the
++            Database initialization in getDb does not work. */
++            getDb(new Uint8Array(f.target.result));
++        }
++        reader.readAsArrayBuffer(files[0]);
++    }
++}
++
++function initDB() {
++    document.getElementById("dropArea").addEventListener("drop", dropListener);
++}
++
++export default initDB;
++
++
++
++// dropArea.addEventListener("click", function () {
++//     const fileInput = document.createElement("input");
++//     fileInput.type = "file";
++//     fileInput.style.display = "none";
++    
++//     fileInput.addEventListener("change", function () {
++//         const selectedFile = fileInput.files[0];
++//         if (selectedFile) {
++//             console.log("Selected file: " + selectedFile.name);
++//         }
++//     });
++
++//     document.body.appendChild(fileInput);
++//     fileInput.click();
++//     document.body.removeChild(fileInput);
+ // });
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/index.html b/sifter_vis_d3/src/index.html
+index b088c15..9e191f3 100644
+--- a/sifter_vis_d3/src/index.html
++++ b/sifter_vis_d3/src/index.html
+@@ -1,13 +1,13 @@
+-<!DOCTYPE html>
+-<html lang="en">
+-    <head>
+-        <title>Hello World</title>
+-    </head>
+-    <body>
+-        <div id="dropPanels">
+-            <div id="dropArea">
+-                <p>Drag and drop a file here.</p>
+-            </div>
+-        </div>
+-    </body>
++<!DOCTYPE html>
++<html lang="en">
++    <head>
++        <title>Hello World</title>
++    </head>
++    <body>
++        <div id="dropPanels">
++            <div id="dropArea">
++                <p>Drag and drop a file here.</p>
++            </div>
++        </div>
++    </body>
+ </html>
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/index.js b/sifter_vis_d3/src/index.js
+index c412a2a..102a450 100644
+--- a/sifter_vis_d3/src/index.js
++++ b/sifter_vis_d3/src/index.js
+@@ -1,9 +1,9 @@
+-import './style.css';
+-import initDB from './dbloader.js';
+-
+-/*  Following two lines prevent browser from loading file dropped outside drop 
+-    area (also fixes bug where browser sometimes tries to load file dropped
+-    inside drop area) */
+-window.addEventListener("dragover", e => e.preventDefault(), false);
+-window.addEventListener("drop", e => e.preventDefault(), false);
++import './style.css';
++import initDB from './dbloader.js';
++
++/*  Following two lines prevent browser from loading file dropped outside drop 
++    area (also fixes bug where browser sometimes tries to load file dropped
++    inside drop area) */
++window.addEventListener("dragover", e => e.preventDefault(), false);
++window.addEventListener("drop", e => e.preventDefault(), false);
+ initDB();
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/legend.js b/sifter_vis_d3/src/legend.js
+index 2e0451a..369530e 100644
+--- a/sifter_vis_d3/src/legend.js
++++ b/sifter_vis_d3/src/legend.js
+@@ -1,44 +1,44 @@
+-import * as d3 from 'd3';
+-import { colour_of_type } from './vis.js';
+-
+-const LINE_SEP = 20;
+-
+-function legendLayout() {
+-    let legendGroup = d3.select("#visPanels")
+-        .append("div")
+-        .attr("id", "legendLayout")
+-        .style('width', '80%')
+-        .style('height', '40%')
+-        .style("grid-column", 3)
+-        .style("grid-row", 2)
+-        .style("justify-self", "start")
+-        .style("position", "relative")
+-        .style("top", "40%")
+-        .style("overflow", "auto")
+-        .append('svg')
+-        .style('width', '100%')
+-        .style('height', `${(Object.keys(colour_of_type).length+0.8)*LINE_SEP}px`);
+-
+-    legendGroup.selectAll("rect")
+-        .data(Object.values(colour_of_type))
+-        .enter()
+-        .append("rect")
+-        .attr("x", 0)
+-        .attr("y", (d, i) => i*LINE_SEP)
+-        .attr("width", 0.8*LINE_SEP)
+-        .attr("height", 0.8*LINE_SEP)
+-        .style("fill", d => d);
+-
+-    legendGroup.selectAll("text")
+-        .data(Object.keys(colour_of_type))
+-        .enter()
+-        .append("text")
+-        .attr("x", 1.5*LINE_SEP)
+-        .attr("y", (d, i) => (i+0.67)*LINE_SEP)
+-        .attr("font-family", "monospace")
+-        .text(d => d)
+-        .attr("text-anchor", "left")
+-        .style("alignment-baseline", "middle");
+-}
+-
++import * as d3 from 'd3';
++import { colour_of_type } from './vis.js';
++
++const LINE_SEP = 20;
++
++function legendLayout() {
++    let legendGroup = d3.select("#visPanels")
++        .append("div")
++        .attr("id", "legendLayout")
++        .style('width', '80%')
++        .style('height', '40%')
++        .style("grid-column", 3)
++        .style("grid-row", 2)
++        .style("justify-self", "start")
++        .style("position", "relative")
++        .style("top", "40%")
++        .style("overflow", "auto")
++        .append('svg')
++        .style('width', '100%')
++        .style('height', `${(Object.keys(colour_of_type).length+0.8)*LINE_SEP}px`);
++
++    legendGroup.selectAll("rect")
++        .data(Object.values(colour_of_type))
++        .enter()
++        .append("rect")
++        .attr("x", 0)
++        .attr("y", (d, i) => i*LINE_SEP)
++        .attr("width", 0.8*LINE_SEP)
++        .attr("height", 0.8*LINE_SEP)
++        .style("fill", d => d);
++
++    legendGroup.selectAll("text")
++        .data(Object.keys(colour_of_type))
++        .enter()
++        .append("text")
++        .attr("x", 1.5*LINE_SEP)
++        .attr("y", (d, i) => (i+0.67)*LINE_SEP)
++        .attr("font-family", "monospace")
++        .text(d => d)
++        .attr("text-anchor", "left")
++        .style("alignment-baseline", "middle");
++}
++
+ export default legendLayout;
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/objectFieldLayout.js b/sifter_vis_d3/src/objectFieldLayout.js
+index 1e5f1f9..83ceb0b 100644
+--- a/sifter_vis_d3/src/objectFieldLayout.js
++++ b/sifter_vis_d3/src/objectFieldLayout.js
+@@ -1,107 +1,116 @@
+-import * as d3 from 'd3';
+-import { CACHELINE_SIZE, colour_of_type } from './vis.js';
+-
+-/* ISSUES 
+-        - Allocations without matching frees are not shown */
+-
+-let memLayout, data, xScale, yScale = undefined;
+-
+-export function addElementsByTimestamp(ts) {
+-    memLayout.selectAll("rect")
+-        .data(data.filter(d => d.start <= ts && d.end >= ts),
+-            d => (d.x, d.y))
+-        .join(
+-            enter => enter.append("rect")
+-                    .attr("x", d => xScale(d.x))
+-                    .attr("y", d => yScale(d.y) - yScale(yScale.domain()[0]-1))
+-                    .attr("width", d => xScale(d.width))
+-                    .attr("height", d => yScale(yScale.domain()[0]-d.height))
+-                    .attr("transform", "translate(30, 40)")
+-                    .attr("fill", d => d.colour),
+-            update => undefined,
+-            exit => exit.remove()
+-        );
+-}
+-
+-function splitBlocks(objects, startAddr) {
+-    const pageBlocks = [];
+-    // const startAddr = objects[0].alloc_addr - (objects[0].alloc_addr % CACHELINE_SIZE);
+-    
+-    for (let i = 0; i < objects.length; i++) {
+-        let obj = objects[i];
+-        let col = colour_of_type[obj.alloc_type];
+-        const normAddr = (obj.alloc_addr - startAddr);
+-        const begin = normAddr % CACHELINE_SIZE;
+-        pageBlocks.push({x: begin,
+-                        y: Math.floor(normAddr / CACHELINE_SIZE),
+-                        width: Math.min(obj.alloc_size, CACHELINE_SIZE - begin),
+-                        height: 1,
+-                        start: obj.alloc_timestamp,
+-                        end: obj.free_timestamp,
+-                        colour: col
+-                        });
+-        if (obj.alloc_size > CACHELINE_SIZE - begin) {
+-            let midHeight = Math.floor((obj.alloc_size - CACHELINE_SIZE + begin) / CACHELINE_SIZE);
+-            if (obj.alloc_size >= 2*CACHELINE_SIZE - begin) {
+-                pageBlocks.push({x: 0,
+-                                y: Math.floor(normAddr / CACHELINE_SIZE) + midHeight,
+-                                width: CACHELINE_SIZE,
+-                                height: midHeight,
+-                                start: obj.alloc_timestamp,
+-                                end: obj.free_timestamp,
+-                                colour: col
+-                                });
+-            }
+-            let leftover = (obj.alloc_size - CACHELINE_SIZE + begin) % CACHELINE_SIZE;
+-            if (leftover > 0) {
+-                pageBlocks.push({x: 0,
+-                                y: Math.floor(normAddr / CACHELINE_SIZE) + midHeight + 1,
+-                                width: leftover,
+-                                height: 1,
+-                                start: obj.alloc_timestamp,
+-                                end: obj.free_timestamp,
+-                                colour: col
+-                                });
+-            }
+-        }
+-    }
+-    return pageBlocks;
+-}
+-
+-function objectLayout(objects, startAddr, initTs = 0) {
+-    d3.select("#memLayout").remove();
+-
+-    memLayout = d3.select("#visPanels")
+-        .append("svg")
+-        .attr("id", "memLayout")
+-        .style("width", "80%")
+-        .style("height", "100%")
+-        .style("grid-column", 2)
+-        .style("grid-row", 1)
+-        .style("justify-self", "end");
+-
+-    let memLayoutAxes = memLayout.append("g")
+-        .attr("id", "memLayoutAxes");
+-    memLayoutAxes.append("g")
+-        .attr("id", "memLayoutXAxis")
+-        .style("transform", "translate(30px, 330px)");
+-    memLayoutAxes.append("g")
+-        .attr("id", "memLayoutYAxis")
+-        .style("transform", "translate(30px, 40px)");
+-
+-    xScale = d3.scaleLinear().domain([0, CACHELINE_SIZE]).range([0, 290]);
+-    let xAxis = d3.axisBottom(xScale);
+-    xAxis.tickValues(d3.range(0, CACHELINE_SIZE+1, 8)).tickFormat(d3.format("d"));
+-
+-    yScale = d3.scaleLinear().domain([CACHELINE_SIZE, 0]).range([0, 290]);
+-    let yAxis = d3.axisLeft(yScale);
+-    yAxis.tickValues(d3.range(0, CACHELINE_SIZE+1, 8)).tickFormat(d3.format("d"));
+-
+-    d3.select("#memLayoutXAxis").call(xAxis);
+-    d3.select("#memLayoutYAxis").call(yAxis);
+-
+-    data = splitBlocks(objects, startAddr);
+-    addElementsByTimestamp(initTs);
+-}
+-
++import * as d3 from 'd3';
++import { CACHELINE_SIZE, colour_of_type } from './vis.js';
++
++/* ISSUES 
++        - Allocations without matching frees are not shown */
++
++let memLayout, data, xScale, yScale, pageSize = undefined;
++
++export function addElementsByTimestamp(ts) {
++    memLayout.selectAll("rect")
++        .data(data.filter((d) => d.start <= ts && d.end >= ts),
++            (d) => d.id)
++        .join(
++            (enter) => enter.append("rect")
++                    .attr("x", d => xScale(d.x))
++                    .attr("y", d => yScale(d.y) - yScale(yScale.domain()[0]-1))
++                    .attr("width", d => xScale(d.width))
++                    .attr("height", d => yScale(yScale.domain()[0]-d.height))
++                    .attr("transform", "translate(30, 40)")
++                    .attr("fill", d => d.colour),
++            (update) => undefined,
++            (exit) => exit.remove()
++        );
++}
++
++function splitBlocks(objects, startAddr, pageSize) {
++    const pageBlocks = [];
++    // const startAddr = objects[0].alloc_addr - (objects[0].alloc_addr % CACHELINE_SIZE);
++    
++    for (let i = 0; i < objects.length; i++) {
++        let obj = objects[i];
++        let col = colour_of_type[obj.alloc_type];
++        const normAddr = (obj.alloc_addr - startAddr);
++        const begin = normAddr % CACHELINE_SIZE;
++        pageBlocks.push({id: i*3,
++                        x: begin,
++                        y: Math.floor(normAddr / CACHELINE_SIZE),
++                        width: Math.min(obj.alloc_size, CACHELINE_SIZE - begin),
++                        height: 1,
++                        start: obj.alloc_timestamp,
++                        end: obj.free_timestamp,
++                        colour: col
++                        });
++        if (obj.alloc_size > CACHELINE_SIZE - begin) {
++            // let midHeight = Math.floor(Math.min(obj.alloc_size - CACHELINE_SIZE + begin,
++            //                                     pageSize - (obj.alloc_addr % pageSize) + CACHELINE_SIZE - begin) / CACHELINE_SIZE);
++            let midHeight = Math.floor((obj.alloc_size - CACHELINE_SIZE + begin) / CACHELINE_SIZE);
++            let pageRem = Math.floor((pageSize - (obj.alloc_addr % pageSize) + CACHELINE_SIZE - begin) / CACHELINE_SIZE) - 1;
++            
++            if (midHeight > pageRem) midHeight = pageRem;
++            
++            if (obj.alloc_size >= 2*CACHELINE_SIZE - begin) {
++                pageBlocks.push({id: i*3 + 1,
++                                x: 0,
++                                y: Math.floor(normAddr / CACHELINE_SIZE) + midHeight,
++                                width: CACHELINE_SIZE,
++                                height: midHeight,
++                                start: obj.alloc_timestamp,
++                                end: obj.free_timestamp,
++                                colour: col
++                                });
++            }
++            let leftover = (obj.alloc_size - CACHELINE_SIZE + begin) % CACHELINE_SIZE;
++            if (midHeight != pageRem && leftover > 0) {
++                pageBlocks.push({id: i*3 + 2,
++                                x: 0,
++                                y: Math.floor(normAddr / CACHELINE_SIZE) + midHeight + 1,
++                                width: leftover,
++                                height: 1,
++                                start: obj.alloc_timestamp,
++                                end: obj.free_timestamp,
++                                colour: col
++                                });
++            }
++        }
++    }
++    return pageBlocks;
++}
++
++function objectLayout(objects, startAddr, initTs=0, pageSize=4096) {
++    d3.select("#memLayout").remove();
++
++    memLayout = d3.select("#visPanels")
++        .append("svg")
++        .attr("id", "memLayout")
++        .style("width", "80%")
++        .style("height", "100%")
++        .style("grid-column", 2)
++        .style("grid-row", 1)
++        .style("justify-self", "end");
++
++    let memLayoutAxes = memLayout.append("g")
++        .attr("id", "memLayoutAxes");
++    memLayoutAxes.append("g")
++        .attr("id", "memLayoutXAxis")
++        .style("transform", "translate(30px, 330px)");
++    memLayoutAxes.append("g")
++        .attr("id", "memLayoutYAxis")
++        .style("transform", "translate(30px, 40px)");
++
++    xScale = d3.scaleLinear().domain([0, CACHELINE_SIZE]).range([0, 290]);
++    let xAxis = d3.axisBottom(xScale);
++    xAxis.tickValues(d3.range(0, CACHELINE_SIZE+1, 8)).tickFormat(d3.format("d"));
++
++    yScale = d3.scaleLinear().domain([CACHELINE_SIZE, 0]).range([0, 290]);
++    let yAxis = d3.axisLeft(yScale);
++    yAxis.tickValues(d3.range(0, CACHELINE_SIZE+1, 8)).tickFormat(d3.format("d"));
++
++    d3.select("#memLayoutXAxis").call(xAxis);
++    d3.select("#memLayoutYAxis").call(yAxis);
++
++    data = splitBlocks(objects, startAddr, pageSize);
++    addElementsByTimestamp(initTs);
++}
++
+ export default objectLayout;
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/pageLayout.js b/sifter_vis_d3/src/pageLayout.js
+index 2b86e1f..b08d272 100644
+--- a/sifter_vis_d3/src/pageLayout.js
++++ b/sifter_vis_d3/src/pageLayout.js
+@@ -1,97 +1,93 @@
+-import * as d3 from 'd3';
+-import { colour_of_type } from './vis.js';
+-import objectLayout from './objectFieldLayout.js';
+-import { getCurrTime } from './timeGraphLayout.js';
+-import { activate } from './objectFieldLayout.js';
+-import { addElementsByTimestamp } from './objectFieldLayout.js';
+-
+-let pageSize = 4096;
+-let pageRectHeight = 32;
+-let pageRectWidth = 500;
+-let pageRectBorder = 2;
+-
+-let data, pageScale = undefined;
+-
+-export function updatePagesByTimestamp(ts) {
+-    d3.select("#pageLayout")
+-        .selectAll("svg")
+-        .data(Object.entries(data), d => d[0])
+-        .selectAll(".object")
+-        .data(d => d[1].filter(obj => obj.alloc_timestamp <= ts && obj.free_timestamp >= ts),
+-            d => (d.alloc_timestamp, d.alloc_addr))
+-        .join(enter => enter.insert("rect", ":first-child")
+-                .attr("class", "object")
+-                .attr("x", d => pageScale(d.alloc_addr % pageSize))
+-                .attr("y", 0)
+-                .attr("width", d => pageScale(d.alloc_size))
+-                .attr("height", pageRectHeight)
+-                .style("fill", d => colour_of_type[d.alloc_type]),
+-            update => undefined,
+-            exit => exit.remove()
+-        );
+-}
+-
+-function pageLayout(pgsz, pages, initTs) {
+-    pageSize = pgsz;
+-
+-    let layout = d3.select("#visPanels")
+-        .append("div")
+-        .attr("id", "pageLayout")
+-        // .style("display", "flex")
+-        // .style("flex-direction", "column")
+-        // .style("align-items", "flex-start")
+-        .style("width", "90%")
+-        .style("height", "85%")
+-        .style("grid-column", 1)
+-        .style("grid-row", 1)
+-        .style("justify-self", "end")
+-        .style("align-self", "center")
+-        .style("position", "relative")
+-        .style("overflow", "auto")
+-        .style("top", "40px")
+-        .style("left", "40px");
+-
+-    pageScale = d3.scaleLinear().domain([0, pageSize]).range([0, pageRectWidth]);
+-    data = pages;
+-
+-    layout.selectAll("svg")
+-        .data(Object.entries(pages), d => parseInt(d[0]))
+-        .enter()
+-        .append("svg")
+-        .attr("class", "pageGroup")
+-        .attr("data-pagenum", d => parseInt(d[0]))
+-        .style("width", `${pageRectWidth*1.1}px`)
+-        .style("height", `${pageRectHeight*1.2}px`)
+-        // .style("transform", (d, i) => `translate(70px, ${50 + 1.15*i*pageRectHeight}px)`)
+-        // .style("position", "relative")
+-        .append("rect")
+-        .attr("class", "pageBorder")
+-        // .attr("x", 0)
+-        // .attr("y", -pageRectBorder / 2)
+-        // .attr("y", (d, i) => 1.07*i*pageRectHeight)
+-        .style("width", `${pageRectWidth}px`)
+-        .style("height", `${pageRectHeight}px`)
+-        .style("min-height", `${pageRectHeight}px`)
+-        .style("stroke-width", pageRectBorder)
+-        .style("fill", "black")
+-        .style("fill-opacity", 0.0)
+-        .on("click", function() {
+-            let selPage = this.parentNode.getAttribute("data-pagenum");
+-            objectLayout(data[selPage], selPage, getCurrTime());
+-        })
+-        .on("mouseover", function() {
+-            d3.select(this)
+-                .transition()
+-                .style("fill-opacity", 0.3);
+-        })
+-        .on("mouseout", function() {
+-            d3.select(this)
+-                .transition()
+-                .style("fill-opacity", 0.0);
+-        });
+-
+-    updatePagesByTimestamp(initTs);
+-    objectLayout(Object.values(data)[0], Object.keys(data)[0], initTs);
+-}
+-
++import * as d3 from 'd3';
++import { colour_of_type } from './vis.js';
++import objectLayout from './objectFieldLayout.js';
++import { getCurrTime } from './timeGraphLayout.js';
++import { activate } from './objectFieldLayout.js';
++import { addElementsByTimestamp } from './objectFieldLayout.js';
++
++let pageSize = 4096;
++let pageRectHeight = 32;
++let pageRectWidth = 500;
++let pageRectBorder = 2;
++
++let data, pageScale = undefined;
++
++export function updatePagesByTimestamp(ts) {
++    d3.select("#pageLayout")
++        .selectAll("svg")
++        .data(Object.entries(data), d => d[0])
++        .selectAll(".object")
++        .data((d) => d[1].filter(obj => obj.alloc_timestamp <= ts && obj.free_timestamp >= ts),
++            (d) => d.ID)
++        .join(enter => enter.insert("rect", ":first-child")
++                .attr("class", "object")
++                .attr("x", d => pageScale(d.alloc_addr % pageSize))
++                .attr("y", 0)
++                .attr("width", d => pageScale(Math.min(d.alloc_size, pageSize - (d.alloc_addr % pageSize))))
++                .attr("height", pageRectHeight)
++                .style("fill", d => colour_of_type[d.alloc_type]),
++            update => undefined,
++            exit => exit.remove()
++        );
++}
++
++function pageLayout(pgsz, pages, initTs) {
++    pageSize = pgsz;
++
++    let layout = d3.select("#visPanels")
++        .append("div")
++        .attr("id", "pageLayout")
++        // .style("display", "flex")
++        // .style("flex-direction", "column")
++        // .style("align-items", "flex-start")
++        .style("width", "90%")
++        .style("height", "85%")
++        .style("grid-column", 1)
++        .style("grid-row", 1)
++        .style("justify-self", "end")
++        .style("align-self", "center")
++        .style("position", "relative")
++        .style("overflow-x", "hidden")
++        .style("overflow-y", "auto")
++        .style("top", "40px")
++        .style("left", "40px");
++
++    pageScale = d3.scaleLinear().domain([0, pageSize]).range([0, pageRectWidth]);
++    data = pages;
++
++    layout.selectAll("svg")
++        .data(Object.entries(pages), d => parseInt(d[0]))
++        .enter()
++        .append("svg")
++        .attr("class", "pageGroup")
++        .attr("data-pagenum", d => parseInt(d[0]))
++        .style("width", `${pageRectWidth*1.1}px`)
++        .style("height", `${pageRectHeight*1.2}px`)
++        .append("rect")
++        .attr("class", "pageBorder")
++        .style("width", `${pageRectWidth}px`)
++        .style("height", `${pageRectHeight}px`)
++        .style("min-height", `${pageRectHeight}px`)
++        .style("stroke-width", pageRectBorder)
++        .style("fill", "black")
++        .style("fill-opacity", 0.0)
++        .on("click", function() {
++            let selPage = this.parentNode.getAttribute("data-pagenum");
++            objectLayout(data[selPage], selPage, getCurrTime());
++        })
++        .on("mouseover", function() {
++            d3.select(this)
++                .transition()
++                .style("fill-opacity", 0.3);
++        })
++        .on("mouseout", function() {
++            d3.select(this)
++                .transition()
++                .style("fill-opacity", 0.0);
++        });
++
++    updatePagesByTimestamp(initTs);
++    objectLayout(Object.values(data)[0], Object.keys(data)[0], initTs, pageSize);
++}
++
+ export default pageLayout;
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/style.css b/sifter_vis_d3/src/style.css
+index cc4da16..14ee66d 100644
+--- a/sifter_vis_d3/src/style.css
++++ b/sifter_vis_d3/src/style.css
+@@ -1,44 +1,44 @@
+-body {
+-    color: black;
+-    background-color: white;
+-}
+-
+-rect.pageBorder {
+-    cursor: pointer;
+-    pointer-events: visible;
+-    stroke: black;
+-}
+-
+-circle.toggle {
+-    cursor: pointer;
+-}
+-
+-svg.cacheTab {
+-    cursor: pointer;
+-}
+-
+-#dropPanels {
+-    display: grid;
+-    grid-template-columns: 1fr 1fr 1fr;
+-    grid-template-rows: 1fr 1fr 1fr;
+-}
+-
+-#dropArea {
+-    width: 300px;
+-    height: 200px;
+-    border: 2px dashed #ccc;
+-    text-align: center;
+-    padding: 20px;
+-    cursor: pointer;
+-    grid-column: 2;
+-    grid-row: 2;
+-    justify-self: center;
+-    align-self: center;
+-}
+-
+-#visPanels {
+-    display: grid;
+-    grid-template-columns: 600px 1fr 1fr;
+-    grid-template-rows: 350px 350px;
+-    gap: 10px;
++body {
++    color: black;
++    background-color: white;
++}
++
++rect.pageBorder {
++    cursor: pointer;
++    pointer-events: visible;
++    stroke: black;
++}
++
++circle.toggle {
++    cursor: pointer;
++}
++
++svg.cacheTab {
++    cursor: pointer;
++}
++
++#dropPanels {
++    display: grid;
++    grid-template-columns: 1fr 1fr 1fr;
++    grid-template-rows: 1fr 1fr 1fr;
++}
++
++#dropArea {
++    width: 300px;
++    height: 200px;
++    border: 2px dashed #ccc;
++    text-align: center;
++    padding: 20px;
++    cursor: pointer;
++    grid-column: 2;
++    grid-row: 2;
++    justify-self: center;
++    align-self: center;
++}
++
++#visPanels {
++    display: grid;
++    grid-template-columns: 600px 1fr 1fr;
++    grid-template-rows: 350px 350px;
++    gap: 10px;
+ }
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/timeGraphLayout.js b/sifter_vis_d3/src/timeGraphLayout.js
+index aa6760e..d43a632 100644
+--- a/sifter_vis_d3/src/timeGraphLayout.js
++++ b/sifter_vis_d3/src/timeGraphLayout.js
+@@ -1,179 +1,179 @@
+-import * as d3 from 'd3';
+-import { colour_of_type } from "./vis.js";
+-import { addElementsByTimestamp } from './objectFieldLayout.js';
+-import { updatePagesByTimestamp } from './pageLayout.js';
+-import { instantaneous, drawLayout } from './cacheSetLayout.js';
+-
+-const LAYOUT_TRANSLATE_X = 50;
+-const LAYOUT_TRANSLATE_Y = 20;
+-const tabPosition = {x: 50, y: 310};
+-let xScale, xAxis = undefined;
+-
+-export function getCurrTime() {
+-    return xScale.invert(tabPosition.x - LAYOUT_TRANSLATE_X);
+-}
+-
+-function updateTab() {
+-    let newX = Math.max(Math.min(tabPosition.x,
+-        xScale.range()[1]+LAYOUT_TRANSLATE_X), LAYOUT_TRANSLATE_X);
+-    // TODO: Should be able to group these selections somehow
+-    d3.select("#bottomTab")
+-        .style("transform", d => `translate(${newX}px, ${d.y}px)`);
+-    d3.select("#topTab")
+-        .style("transform", d => `translate(${newX}px, ${d.y-300}px)  rotate(0.5turn)`);
+-    d3.select("#tabLine")
+-        .style("transform", d => `translate(${newX}px, 10px)`);
+-}
+-
+-function handleDrag(e) {
+-    // console.log(e);
+-    // tabPosition.x += e.dx;
+-    e.subject.x = e.x;
+-    updateTab();
+-    let ts = getCurrTime();
+-    addElementsByTimestamp(ts);
+-    updatePagesByTimestamp(ts);
+-    if (instantaneous) drawLayout(ts);
+-}
+-
+-function slider() {
+-    const colour = "rgb(148, 148, 148)";
+-    let tab = d3.symbol()
+-        .type(d3.symbolTriangle)
+-        .size(60);
+-
+-    let tabGroup = d3.select("#graphLayout")
+-        .append("g")
+-        // .datum(tabPosition)
+-        .attr("id", "dragTab");
+-        // .attr("transform", d => `translate(${d.x}, ${d.y})`);
+-
+-    tabGroup.append("line")
+-        .datum(tabPosition)
+-        .attr("id", "tabLine")
+-        .style("stroke", colour)
+-        .style("stroke-width", 2)
+-        .attr("x1", 0)
+-        .attr("y1", 0)
+-        .attr("x2", 0)
+-        .attr("y2", 300)
+-        .style("transform", d => `translate(${d.x}px, 10px)`);
+-
+-    tabGroup.append("path")
+-        .datum(tabPosition)
+-        .attr("id", "bottomTab")
+-        .attr("d", tab)
+-        .attr("stroke", colour)
+-        .attr("fill", colour)
+-        .style("transform", d => `translate(${d.x}px, ${d.y}px)`)
+-        .call(d3.drag()
+-            .on("drag", handleDrag));
+-
+-    tabGroup.append("path")
+-        .datum(tabPosition)
+-        .attr("id", "topTab")
+-        .attr("d", tab)
+-        .attr("stroke", colour)
+-        .attr("fill", colour)
+-        .style("transform", d => `translate(${d.x}px, ${d.y-300}px) rotate(0.5turn)`)
+-        .call(d3.drag()
+-            .on("drag", handleDrag));
+-}
+-
+-function allocsOverTimeLayout(objects) {
+-    const alloc_times = objects.map(obj => obj.alloc_timestamp);
+-    const free_times = objects.map(obj => obj.free_timestamp == null ? 0 : obj.free_timestamp);
+-    const minTime = Math.min(...alloc_times);
+-    const maxTime = Math.max(...alloc_times.concat(free_times));
+-    const endBuff = Math.floor((maxTime - minTime)*0.05);
+-    const sizes = objects.map(obj => obj.alloc_size);
+-    const totalSize = sizes.reduce((acc, curr) => acc + curr);
+-
+-    let graphLayout = d3.select("#visPanels")
+-        .append("svg")
+-        .attr("id", "graphLayout")
+-        .style("width", "90%")
+-        .style("height", "100%")
+-        .style("grid-column", "1 / 3")
+-        .style("grid-row", 2)
+-        .style("justify-self", "end");
+-
+-    let graphLayoutAxes = graphLayout.append("g")
+-        .attr("id", "graphLayoutAxes");
+-    graphLayoutAxes.append("g")
+-        .attr("id", "graphLayoutXAxis")
+-        .style("transform", "translate(50px, 300px)");
+-    graphLayoutAxes.append("g")
+-        .attr("id", "graphLayoutYAxis")
+-        .style("transform", "translate(50px, 20px)");
+-
+-    // console.log(Math.max);
+-    
+-    xScale = d3.scaleLinear().domain([minTime-endBuff, maxTime+endBuff]).range([0, 800]);
+-    xAxis = d3.axisBottom(xScale).tickSize(0).tickValues([]);
+-
+-    const maxY = Math.ceil(1.1*Math.max(...sizes));
+-    let yScale = d3.scaleLinear().domain([maxY, 0]).range([0, 280]);
+-    let yAxis = d3.axisLeft(yScale);
+-    yAxis.tickValues(d3.range(0, maxY+1, 
+-        Math.pow(2, Math.floor(Math.log2(0.1*maxY)))
+-        )).tickFormat(d3.format("d"));
+-
+-    d3.select("#graphLayoutXAxis").call(xAxis);
+-    d3.select("#graphLayoutYAxis").call(yAxis);
+-
+-    slider();
+-    
+-    const events = {};
+-    const lines = {};
+-
+-    let objects_by_type = objects.reduce((acc, curr) => {
+-        acc[curr.alloc_type] ? acc[curr.alloc_type].push(curr) : acc[curr.alloc_type] = [curr];
+-        return acc;
+-    }, {});
+-
+-    for (let type of Object.keys(objects_by_type)) {
+-        events[type] = [];
+-        for (let obj of objects_by_type[type]) {
+-            events[type].push([obj.alloc_timestamp, obj.alloc_size, true]);
+-            if (obj.free_timestamp != null) {
+-                events[type].push([obj.free_timestamp, obj.alloc_size, false]);
+-            }
+-        }
+-        events[type].sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
+-
+-        lines[type] = [[minTime-endBuff, 0]];
+-        let sizeSum = 0;
+-        for (let event of events[type]) {
+-            if (event[2]) {
+-                lines[type].push([event[0], sizeSum]);
+-                sizeSum += event[1];
+-                lines[type].push([event[0], sizeSum]);
+-            }
+-            else {
+-                lines[type].push([event[0], sizeSum]);
+-                sizeSum -= event[1];
+-                lines[type].push([event[0], sizeSum]);
+-            }
+-        }
+-        lines[type].push([maxTime+endBuff, sizeSum]);
+-
+-        d3.select("#graphLayout")
+-            .append("path")
+-            .datum(lines[type])
+-            .attr("class", "line")
+-            .attr("fill", "none")
+-            .attr("stroke", colour_of_type[type])
+-            .attr("stroke-width", 2)
+-            .attr("transform", `translate(${LAYOUT_TRANSLATE_X}, ${LAYOUT_TRANSLATE_Y})`)
+-            .attr("d", d3.line()
+-                        .x(d => xScale(d[0]))
+-                        .y(d => yScale(d[1]))
+-            );
+-    }
+-
+-    // Return timestamp corresponding to initial tab position
+-    return getCurrTime();
+-}
+-
++import * as d3 from 'd3';
++import { colour_of_type } from "./vis.js";
++import { addElementsByTimestamp } from './objectFieldLayout.js';
++import { updatePagesByTimestamp } from './pageLayout.js';
++import { instantaneous, drawLayout } from './cacheSetLayout.js';
++
++const LAYOUT_TRANSLATE_X = 70;
++const LAYOUT_TRANSLATE_Y = 20;
++const tabPosition = {x: 70, y: 310};
++let xScale, xAxis = undefined;
++
++export function getCurrTime() {
++    return xScale.invert(tabPosition.x - LAYOUT_TRANSLATE_X);
++}
++
++function updateTab() {
++    let newX = Math.max(Math.min(tabPosition.x,
++        xScale.range()[1]+LAYOUT_TRANSLATE_X), LAYOUT_TRANSLATE_X);
++    // TODO: Should be able to group these selections somehow
++    d3.select("#bottomTab")
++        .style("transform", d => `translate(${newX}px, ${d.y}px)`);
++    d3.select("#topTab")
++        .style("transform", d => `translate(${newX}px, ${d.y-300}px)  rotate(0.5turn)`);
++    d3.select("#tabLine")
++        .style("transform", d => `translate(${newX}px, 10px)`);
++}
++
++function handleDrag(e) {
++    // console.log(e);
++    // tabPosition.x += e.dx;
++    e.subject.x = e.x;
++    updateTab();
++    let ts = getCurrTime();
++    addElementsByTimestamp(ts);
++    updatePagesByTimestamp(ts);
++    if (instantaneous) drawLayout(ts);
++}
++
++function slider() {
++    const colour = "rgb(148, 148, 148)";
++    let tab = d3.symbol()
++        .type(d3.symbolTriangle)
++        .size(60);
++
++    let tabGroup = d3.select("#graphLayout")
++        .append("g")
++        // .datum(tabPosition)
++        .attr("id", "dragTab");
++        // .attr("transform", d => `translate(${d.x}, ${d.y})`);
++
++    tabGroup.append("line")
++        .datum(tabPosition)
++        .attr("id", "tabLine")
++        .style("stroke", colour)
++        .style("stroke-width", 2)
++        .attr("x1", 0)
++        .attr("y1", 0)
++        .attr("x2", 0)
++        .attr("y2", 300)
++        .style("transform", d => `translate(${d.x}px, 10px)`);
++
++    tabGroup.append("path")
++        .datum(tabPosition)
++        .attr("id", "bottomTab")
++        .attr("d", tab)
++        .attr("stroke", colour)
++        .attr("fill", colour)
++        .style("transform", d => `translate(${d.x}px, ${d.y}px)`)
++        .call(d3.drag()
++            .on("drag", handleDrag));
++
++    tabGroup.append("path")
++        .datum(tabPosition)
++        .attr("id", "topTab")
++        .attr("d", tab)
++        .attr("stroke", colour)
++        .attr("fill", colour)
++        .style("transform", d => `translate(${d.x}px, ${d.y-300}px) rotate(0.5turn)`)
++        .call(d3.drag()
++            .on("drag", handleDrag));
++}
++
++function allocsOverTimeLayout(objects) {
++    const alloc_times = objects.map(obj => obj.alloc_timestamp);
++    const free_times = objects.map(obj => obj.free_timestamp == null ? 0 : obj.free_timestamp);
++    const minTime = Math.min(...alloc_times);
++    const maxTime = Math.max(...alloc_times.concat(free_times));
++    const endBuff = Math.floor((maxTime - minTime)*0.05);
++    const sizes = objects.map(obj => obj.alloc_size);
++    const totalSize = sizes.reduce((acc, curr) => acc + curr);
++
++    let graphLayout = d3.select("#visPanels")
++        .append("svg")
++        .attr("id", "graphLayout")
++        .style("width", "100%")
++        .style("height", "100%")
++        .style("grid-column", "1 / 3")
++        .style("grid-row", 2)
++        .style("justify-self", "end");
++
++    let graphLayoutAxes = graphLayout.append("g")
++        .attr("id", "graphLayoutAxes");
++    graphLayoutAxes.append("g")
++        .attr("id", "graphLayoutXAxis")
++        .style("transform", `translate(${LAYOUT_TRANSLATE_X}px, 300px)`);
++    graphLayoutAxes.append("g")
++        .attr("id", "graphLayoutYAxis")
++        .style("transform", `translate(${LAYOUT_TRANSLATE_X}px, ${LAYOUT_TRANSLATE_Y}px)`);
++
++    // console.log(Math.max);
++    
++    xScale = d3.scaleLinear().domain([minTime-endBuff, maxTime+endBuff]).range([0, 800]);
++    xAxis = d3.axisBottom(xScale).tickSize(0).tickValues([]);
++
++    const maxY = Math.ceil(1.1*Math.max(...sizes));
++    let yScale = d3.scaleLinear().domain([maxY, 0]).range([0, 280]);
++    let yAxis = d3.axisLeft(yScale);
++    yAxis.tickValues(d3.range(0, maxY+1, 
++        Math.pow(2, Math.floor(Math.log2(0.1*maxY)))
++        )).tickFormat(d3.format("d"));
++
++    d3.select("#graphLayoutXAxis").call(xAxis);
++    d3.select("#graphLayoutYAxis").call(yAxis);
++
++    slider();
++    
++    const events = {};
++    const lines = {};
++
++    let objects_by_type = objects.reduce((acc, curr) => {
++        acc[curr.alloc_type] ? acc[curr.alloc_type].push(curr) : acc[curr.alloc_type] = [curr];
++        return acc;
++    }, {});
++
++    for (let type of Object.keys(objects_by_type)) {
++        events[type] = [];
++        for (let obj of objects_by_type[type]) {
++            events[type].push([obj.alloc_timestamp, obj.alloc_size, true]);
++            if (obj.free_timestamp != null) {
++                events[type].push([obj.free_timestamp, obj.alloc_size, false]);
++            }
++        }
++        events[type].sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
++
++        lines[type] = [[minTime-endBuff, 0]];
++        let sizeSum = 0;
++        for (let event of events[type]) {
++            if (event[2]) {
++                lines[type].push([event[0], sizeSum]);
++                sizeSum += event[1];
++                lines[type].push([event[0], sizeSum]);
++            }
++            else {
++                lines[type].push([event[0], sizeSum]);
++                sizeSum -= event[1];
++                lines[type].push([event[0], sizeSum]);
++            }
++        }
++        lines[type].push([maxTime+endBuff, sizeSum]);
++
++        d3.select("#graphLayout")
++            .append("path")
++            .datum(lines[type])
++            .attr("class", "line")
++            .attr("fill", "none")
++            .attr("stroke", colour_of_type[type])
++            .attr("stroke-width", 2)
++            .attr("transform", `translate(${LAYOUT_TRANSLATE_X}, ${LAYOUT_TRANSLATE_Y})`)
++            .attr("d", d3.line()
++                        .x(d => xScale(d[0]))
++                        .y(d => yScale(d[1]))
++            );
++    }
++
++    // Return timestamp corresponding to initial tab position
++    return getCurrTime();
++}
++
+ export default allocsOverTimeLayout;
+\ No newline at end of file
+diff --git a/sifter_vis_d3/src/vis.js b/sifter_vis_d3/src/vis.js
+index de11a9a..7562415 100644
+--- a/sifter_vis_d3/src/vis.js
++++ b/sifter_vis_d3/src/vis.js
+@@ -1,73 +1,78 @@
+-import * as d3 from 'd3';
+-import allocsOverTimeLayout from './timeGraphLayout.js';
+-import objectLayout from './objectFieldLayout.js';
+-import legendLayout from './legend.js';
+-import cacheSetLayout from './cacheSetLayout.js';
+-import pageLayout from './pageLayout.js';
+-
+-const pageSize = 4096;
+-
+-export const CACHELINE_SIZE = 64;
+-export const colour_of_type = {};
+-
+-async function initVis(objects) {
+-    d3.select("body")
+-        .append("g")
+-        .attr("id", "visPanels");
+-
+-    /*  TODO: think of better way to do this. Maybe have dbloader return
+-        list of distinct types? */
+-    let types = [];
+-    for (let obj of objects) {
+-        if (!(obj.alloc_type in colour_of_type)) {
+-            colour_of_type[obj.alloc_type] = undefined;
+-            types.push(obj.alloc_type);
+-        }
+-    }
+-
+-    const colScale = d3.scaleSequential()
+-                        .domain([0, types.length])
+-                        .interpolator(d3.interpolateRainbow);
+-    let col = 0;
+-    for (let type of types) {
+-        colour_of_type[type] = colScale(col);
+-        col++;
+-    }
+-
+-    let initTs = allocsOverTimeLayout(objects);
+-    cacheSetLayout(objects, 64, {associativity: 8, size: 32768},
+-        {associativity: 8, size: 2097152},
+-        {associativity: 8, size: 4194304});
+-
+-    let pages = objects.reduce((acc, curr) => {
+-            let pageNum = curr.alloc_addr - (curr.alloc_addr % pageSize);
+-            acc[pageNum] ? acc[pageNum].push(curr) : acc[pageNum] = [curr];
+-            return acc;
+-        }, {});
+-
+-    /*  TODO: in order to change page sizes, you will need to not change the objects
+-        when constructing the pages */
+-    for (let [page, objs] of Object.entries(pages)) {
+-        page = parseInt(page);
+-        let endOffsetLastObject = (objs[objs.length - 1].alloc_addr % pageSize) + objs[objs.length - 1].alloc_size;
+-        if (endOffsetLastObject > pageSize) {
+-            let newObj = structuredClone(objs[objs.length - 1]);
+-            newObj.alloc_size = endOffsetLastObject - pageSize;
+-            newObj.alloc_addr = (objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) -
+-                ((objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) % pageSize);
+-            // TODO: figure out a better way to do this; unshift shifts the entire array forward
+-            pages[page + pageSize] ? pages[page + pageSize].unshift(newObj) : pages[page + pageSize] = [newObj];
+-            objs[objs.length - 1].alloc_size -= newObj.alloc_size;
+-        }
+-    }
+-
+-    // console.log(pages);
+-    // console.log(Object.entries(pages));
+-
+-    // let initTs = allocsOverTimeLayout(Object.values(pages).reduce((acc, curr) => acc.concat(curr),[]));
+-    pageLayout(pageSize, pages, initTs);
+-    // objectLayout(objects, initTs);
+-    legendLayout();
+-}
+-
++import * as d3 from 'd3';
++import allocsOverTimeLayout from './timeGraphLayout.js';
++import objectLayout from './objectFieldLayout.js';
++import legendLayout from './legend.js';
++import cacheSetLayout from './cacheSetLayout.js';
++import pageLayout from './pageLayout.js';
++
++const pageSize = 4096;
++
++export const CACHELINE_SIZE = 64;
++export const colour_of_type = {};
++
++async function initVis(objects) {
++    d3.select("body")
++        .append("g")
++        .attr("id", "visPanels");
++
++    const types = [...new Set(objects.map((obj) => obj.alloc_type))];
++    const colScale = d3.scaleSequential()
++                        .domain([0, types.length])
++                        .interpolator(d3.interpolateRainbow);
++    let col = 0;
++    for (let type of types) {
++        colour_of_type[type] = colScale(col);
++        col++;
++    }
++
++    let initTs = allocsOverTimeLayout(objects);
++    cacheSetLayout(objects, 64, {associativity: 8, size: 32768},
++                                {associativity: 8, size: 2097152},
++                                {associativity: 8, size: 4194304});
++
++    let pages = objects.reduce((acc, curr) => {
++            let pageNum = curr.alloc_addr - (curr.alloc_addr % pageSize);
++            acc[pageNum] ? acc[pageNum].push(curr) : acc[pageNum] = [curr];
++            return acc;
++        }, {});
++
++    /*  TODO: in order to change page sizes, you will need to not change the objects
++        when constructing the pages */
++    for (let [page, objs] of Object.entries(pages)) {
++        page = parseInt(page);
++        let endOffsetLastObject = (objs[objs.length - 1].alloc_addr % pageSize) + objs[objs.length - 1].alloc_size;
++        while (endOffsetLastObject > pageSize) {
++            /*  NOTE: at this point, we rely on the fact that the objects are sorted in ascending order
++                by the address. */
++            let newObj = structuredClone(objs[objs.length - 1]);
++            newObj.alloc_size = Math.min(endOffsetLastObject - pageSize, pageSize);
++            newObj.alloc_addr = (Math.floor(objs[objs.length - 1].alloc_addr / pageSize) + 1)*pageSize;
++            // newObj.alloc_addr = (objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) -
++            //     ((objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) % pageSize);
++            newObj.isDup = true;
++            pages[page + pageSize] ? pages[page + pageSize].push(newObj) : pages[page + pageSize] = [newObj];
++            // objs[objs.length - 1].alloc_size -= newObj.alloc_size;
++            endOffsetLastObject -= pageSize;
++        }
++
++        // if (endOffsetLastObject > pageSize) {
++        //     let newObj = structuredClone(objs[objs.length - 1]);
++        //     newObj.alloc_size = endOffsetLastObject - pageSize;
++        //     newObj.alloc_addr = (objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) -
++        //         ((objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) % pageSize);
++        //     // TODO: figure out a better way to do this; unshift shifts the entire array forward
++        //     pages[page + pageSize] ? pages[page + pageSize].push(newObj) : pages[page + pageSize] = [newObj];
++        //     objs[objs.length - 1].alloc_size -= newObj.alloc_size;
++        // }
++    }
++
++    // console.log(pages);
++    // console.log(Object.entries(pages));
++
++    // let initTs = allocsOverTimeLayout(Object.values(pages).reduce((acc, curr) => acc.concat(curr),[]));
++    pageLayout(pageSize, pages, initTs);
++    // objectLayout(objects, initTs);
++    legendLayout();
++}
++
+ export default initVis;
+\ No newline at end of file
+diff --git a/sifter_vis_d3/webpack.config.js b/sifter_vis_d3/webpack.config.js
+index 8326257..ee6dc94 100644
+--- a/sifter_vis_d3/webpack.config.js
++++ b/sifter_vis_d3/webpack.config.js
+@@ -1,123 +1,123 @@
+-import path from "path"
+-import HtmlWebpackPlugin from "html-webpack-plugin";
+-import CopyWebpackPlugin from "copy-webpack-plugin";
+-import webpack from "webpack";
+-
+-const __dirname = path.resolve();
+-
+-export default {
+-    mode: 'development',
+-    devtool: 'inline-source-map',
+-    entry: {
+-        index: './src/index.js'
+-    },
+-    devServer: {
+-        contentBase: path.resolve(__dirname, 'src/index.html'),
+-        port: 8000
+-    },
+-    output: {
+-        filename: 'index.bundle.js',
+-        path: path.resolve(__dirname, 'dist'),
+-        clean: true
+-    },
+-    plugins: [
+-        new HtmlWebpackPlugin({
+-            template: "src/index.html",
+-            filename: "index.html",
+-            showErrors: true,
+-            assetModuleFilename: 'images/[hash][ext][query]',
+-        }),
+-        new CopyWebpackPlugin({
+-            patterns: [
+-                {from: "src/assets/", to: "assets/"}
+-            ]
+-        }),
+-        // new webpack.ProvidePlugin({
+-        //     $: "jquery",
+-        //     jQuery: "jquery"
+-        // })
+-    ],
+-    module: {
+-        rules: [
+-            {
+-            test: /\.(png|jpe?g|gif)$/i,
+-            type: "asset/resource",
+-            generator: { filename: `assets/[name][ext]`},
+-            },
+-            {
+-            test: /\.wasm$/,
+-            type: 'javascript/auto'
+-            },
+-            {
+-            test: /\.css$/,
+-            use: [
+-                'style-loader',
+-                'css-loader'
+-            ]
+-            }
+-        ]
+-    },
+-    resolve: {
+-        fallback: {
+-            "fs": false,
+-            "crypto": false,
+-            "path": false
+-        }
+-    }
+-}
+-
+-// module.exports = {
+-//   mode: 'development',
+-//   entry: {index: './src/index.js'},
+-//   output: {
+-//     path: path.resolve(__dirname, 'dist'),
+-//     filename: 'index.bundle.js',
+-//     clean: true,
+-//     publicPath: '/',
+-//   },
+-//   module: {
+-//     rules: [
+-//       {
+-//         test: /\.(png|jpe?g|gif)$/i,
+-//         type: "asset/resource",
+-//         generator: { filename: `assets/[name][ext]`},
+-//       },
+-//     ],
+-//   },
+-// };
+-
+-// const path = require('path')
+-// const HtmlWebpackPlugin = require('html-webpack-plugin')
+-
+-// module.exports = {
+-//     mode: 'development',
+-//     entry: {
+-//         index: './src/index.js'
+-//     },
+-//     devtool: 'incline-source-map',
+-//     plugins: [
+-//         new HtmlWebpackPlugin({
+-//             template: "src/index.html",
+-//             filename: "index.html",
+-//             showErrors: true,
+-//             assetModuleFilename: 'assets/[hash][ext][query]'
+-//         })
+-//     ],
+-//     output: {
+-//         filename: '[name].bundle.js',
+-//         path: path.resolve(__dirname, 'dist'),
+-//         clean: true
+-//     },
+-//     module: {
+-//         rules: [
+-//             {
+-//                 test: '/\.css$/i',
+-//                 use: ['style-loader', 'css-loader']
+-//             }
+-
+-//         ]
+-//     },
+-//     resolve: {
+-//         extensions: ['.js']
+-//     },
++import path from "path"
++import HtmlWebpackPlugin from "html-webpack-plugin";
++import CopyWebpackPlugin from "copy-webpack-plugin";
++import webpack from "webpack";
++
++const __dirname = path.resolve();
++
++export default {
++    mode: 'development',
++    devtool: 'inline-source-map',
++    entry: {
++        index: './src/index.js'
++    },
++    devServer: {
++        contentBase: path.resolve(__dirname, 'src/index.html'),
++        port: 8000
++    },
++    output: {
++        filename: 'index.bundle.js',
++        path: path.resolve(__dirname, 'dist'),
++        clean: true
++    },
++    plugins: [
++        new HtmlWebpackPlugin({
++            template: "src/index.html",
++            filename: "index.html",
++            showErrors: true,
++            assetModuleFilename: 'images/[hash][ext][query]',
++        }),
++        new CopyWebpackPlugin({
++            patterns: [
++                {from: "src/assets/", to: "assets/"}
++            ]
++        }),
++        // new webpack.ProvidePlugin({
++        //     $: "jquery",
++        //     jQuery: "jquery"
++        // })
++    ],
++    module: {
++        rules: [
++            {
++            test: /\.(png|jpe?g|gif)$/i,
++            type: "asset/resource",
++            generator: { filename: `assets/[name][ext]`},
++            },
++            {
++            test: /\.wasm$/,
++            type: 'javascript/auto'
++            },
++            {
++            test: /\.css$/,
++            use: [
++                'style-loader',
++                'css-loader'
++            ]
++            }
++        ]
++    },
++    resolve: {
++        fallback: {
++            "fs": false,
++            "crypto": false,
++            "path": false
++        }
++    }
++}
++
++// module.exports = {
++//   mode: 'development',
++//   entry: {index: './src/index.js'},
++//   output: {
++//     path: path.resolve(__dirname, 'dist'),
++//     filename: 'index.bundle.js',
++//     clean: true,
++//     publicPath: '/',
++//   },
++//   module: {
++//     rules: [
++//       {
++//         test: /\.(png|jpe?g|gif)$/i,
++//         type: "asset/resource",
++//         generator: { filename: `assets/[name][ext]`},
++//       },
++//     ],
++//   },
++// };
++
++// const path = require('path')
++// const HtmlWebpackPlugin = require('html-webpack-plugin')
++
++// module.exports = {
++//     mode: 'development',
++//     entry: {
++//         index: './src/index.js'
++//     },
++//     devtool: 'incline-source-map',
++//     plugins: [
++//         new HtmlWebpackPlugin({
++//             template: "src/index.html",
++//             filename: "index.html",
++//             showErrors: true,
++//             assetModuleFilename: 'assets/[hash][ext][query]'
++//         })
++//     ],
++//     output: {
++//         filename: '[name].bundle.js',
++//         path: path.resolve(__dirname, 'dist'),
++//         clean: true
++//     },
++//     module: {
++//         rules: [
++//             {
++//                 test: '/\.css$/i',
++//                 use: ['style-loader', 'css-loader']
++//             }
++
++//         ]
++//     },
++//     resolve: {
++//         extensions: ['.js']
++//     },
+ // };
+\ No newline at end of file

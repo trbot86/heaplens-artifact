@@ -1,4 +1,4 @@
-CC=clang++
+CC=g++
 CFLAGS= -fPIC -g -O2
 Includes= /usr/lib/llvm-6.0/include/
 Libs=

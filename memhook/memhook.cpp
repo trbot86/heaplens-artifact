@@ -23,6 +23,8 @@
 #include "memhook_interface.h"
 #include "memhook.h"
 
+// #define MEMHOOK_FORCE_MALLOC
+
 #undef new
 #undef delete
 
@@ -57,15 +59,21 @@ static unsigned long tmpallocs = 0;
 static volatile int initialized = 0;
 
 __attribute__((constructor)) static void init() {
-    fprintf(stdout, "loading rtld_next functions...\n");
-    next_malloc         = (void * (*)(size_t ))dlsym(RTLD_NEXT, "malloc");
-    if (!next_malloc) exit(43);
-    // fprintf(stdout, "    malloc\n");
-    fprintf(stdout, "    next_malloc@%p \n", next_malloc);
-    next_free           = (void   (*)(void *))dlsym(RTLD_NEXT, "free");
-    fprintf(stdout, "    free\n");
-    next_calloc         = (void * (*)(size_t , size_t ))dlsym(RTLD_NEXT, "calloc");
-    fprintf(stdout, "    calloc\n");
+    // // fprintf(stdout, "loading rtld_next functions...\n");
+    // next_malloc         = (void * (*)(size_t ))dlsym(RTLD_NEXT, "malloc");
+    // if (!next_malloc) exit(43);
+    // // fprintf(stdout, "    next_malloc@%p \n", next_malloc);
+    // next_free           = (void   (*)(void *))dlsym(RTLD_NEXT, "free");
+    // // fprintf(stdout, "    free@%p\n");
+    // next_calloc         = (void * (*)(size_t , size_t ))dlsym(RTLD_NEXT, "calloc");
+    // // fprintf(stdout, "    calloc@%p\n");
+    // next_ssmem_alloc    = (void * (*)(ssmem_allocator_t*, size_t))dlsym(RTLD_NEXT, "ssmem_alloc");
+    // // fprintf(stdout, "    next_ssmem_alloc@%p \n", next_ssmem_alloc);
+    // next_ssmem_free     = (void   (*)(ssmem_allocator_t*, void*))dlsym(RTLD_NEXT, "ssmem_free");
+    // // fprintf(stdout, "    next_ssmem_free@%p \n", next_ssmem_free);
+
+    // test_ssmem_free = (void   (*)(ssmem_allocator_t*, void*))dlsym(RTLD_DEFAULT, "ssmem_free");
+    // fprintf(stdout, "    test_ssmem_free@%p \n", test_ssmem_free);
     // next_valloc         = dlsym(RTLD_NEXT, "valloc");
     // fprintf(stdout, "    valloc\n");
     // next_pvalloc        = dlsym(RTLD_NEXT, "pvalloc");
@@ -82,16 +90,22 @@ __attribute__((constructor)) static void init() {
     // fprintf(stdout, "    reallocf\n");
     // next_reallocarray   = dlsym(RTLD_NEXT, "reallocarray");
     // fprintf(stdout, "    reallocarray\n");
-    fprintf(stdout, "    done.\n");
-    initialized = 1;
-    if (!next_malloc || !next_free) {
-        fprintf(stderr, "Error in `dlsym`: %s\n", dlerror());
-        exit(1);
-    }
 
 
-    char file_path[] = "binary_dump.txt";
+
+    // fprintf(stdout, "    done.\n");
+    // if (!next_ssmem_alloc || !next_ssmem_free) {
+    //     fprintf(stderr, "Error in dlsym!!!\n");
+    //     fprintf(stdout, "    next_ssmem_alloc@%p \n", next_ssmem_alloc);
+    //     fprintf(stdout, "    next_ssmem_free@%p \n", next_ssmem_free);
+    //     // fprintf(stderr, "Error in `dlsym`: %s\n", dlerror());
+    //     exit(1);
+    // }
+
+    // fprintf(stdout, "About to load global fd\n");
     global_fd = open(file_path,O_RDWR|O_APPEND|O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
+    initialized = 1;
+    fprintf(stdout, "Done memhook constructor\n");
 }
 
 void *memhook_malloc(size_t size, const char* file = "specialfile", int line = 0, bool log = true) {
@@ -108,19 +122,31 @@ void *memhook_malloc(size_t size, const char* file = "specialfile", int line = 0
         }
     }
 
+    // if (!next_malloc) next_malloc = (void * (*)(size_t ))dlsym(RTLD_NEXT, "malloc");
+    // if (!next_malloc) fprintf(stdout, "failed to find next malloc\n");
+
+    // fprintf(stdout, "TESTING PASSED INIT IN MEMHOOK MALLOC, initialized = %d\n", initialized);
+
     if(!setup) {
         exiter.add();
         setup = true;
     }
 
-    if (next_malloc == 0) exit(42);
-    void * mem = next_malloc(size);
+    // fprintf(stdout, "passed setup stuff\n");
+
+    void* mem;
+    // if (malloc == 0) exit(42);
+    mem = malloc(size);
+
+    // fprintf(stdout, "passed next malloc\n");
 
     // if (!mem) exit(71);
 
     if(mem == 0) {
         throw bad_alloc();
     }
+
+    // fprintf(stdout, "passed bad alloc\n");
 
     //**************INITIALISE INFO_T OBJECT AND COPY LATER***************//
     // collector.add(memhook_get_server_clock(), size, mem, true);
@@ -130,10 +156,12 @@ void *memhook_malloc(size_t size, const char* file = "specialfile", int line = 0
     unit_log.size = size;
     unit_log.addr = mem;
     unit_log.typeofop = true;
-    if(log == true) {
-        unit_log.file = file;
+    if (log) {
+        unit_log.file = filetable.insert(file);
         unit_log.line = line;
     }
+
+    // fprintf(stdout, "passed unit log stuff\n");
 
     // printf("real malloc called!\n");
 
@@ -151,16 +179,19 @@ void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, boo
     }
     
     if ((ptr >= (void*) tmpbuff && ptr <= (void*)(tmpbuff + tmppos))) { // possible off-by-one error at right endpoint...
-        fprintf(stdout, "freeing temp memory\n");
-    } else {
-        next_free(ptr);
+        // fprintf(stdout, "freeing temp memory\n");
+        return;
     }
+
+    if (!next_free) next_free = (void (*)(void *))dlsym(RTLD_NEXT, "free");
+    if (!next_free) fprintf(stdout, "failed to find next free\n");
+    next_free(ptr);
 
     unit_log.timestamp = memhook_get_server_clock();
     unit_log.size = 0;
     unit_log.addr = ptr;
     unit_log.typeofop = false;
-    if(log == true) {
+    if(log) {
         unit_log.file = file;
         unit_log.line = line;
     }
@@ -177,7 +208,7 @@ void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, boo
 //     return next_realloc(ptr, size);
 // }
 void *memhook_calloc(size_t nmemb, size_t size, char* file, int line, bool log) {
-        if ((!initialized)) {
+    if ((!initialized)) {
         // printf("nmemb*size=%lu\n", (nmemb*size));
         void *ptr = memhook_malloc(nmemb*size, file, line, false);
         // printf("nmemb*size=%lu\n", (nmemb*size));
@@ -185,26 +216,133 @@ void *memhook_calloc(size_t nmemb, size_t size, char* file, int line, bool log) 
         if (!ptr) exit(70);
         return ptr;
     }
-    return next_calloc(nmemb, size);
+    return calloc(nmemb, size);
+}
+
+void alloc_log(void* ptr, size_t size, const char* filename, int line, const char* name_of_type) {
+    unit_log.timestamp = memhook_get_server_clock();
+    unit_log.size = size;
+    unit_log.addr = ptr;
+    unit_log.typeofop = true;
+    unit_log.file = filetable.insert(filename);
+    unit_log.tindex_name = typetable.insert(name_of_type);
+    unit_log.line = line;
+    collector.copy(unit_log);
+}
+
+void free_log(void* ptr) {
+    unit_log.timestamp = memhook_get_server_clock();
+    unit_log.addr = ptr;
+    unit_log.typeofop = false;
+    collector.copy(unit_log);
 }
 
 extern "C" {
 
-    //Used for C/C++ projects which do not support templating
-    void *malloc_s(size_t size, const char* filepath, int line) {
-        // printf("%s %p \n", filepath, (void*)filepath);
-        unit_log.file = filetable.insert(filepath);
-        void* ptr = memhook_malloc(size, unit_log.file, line, true);
-        collector.copy(unit_log);
+    // Used for C/C++ projects which do not support templating
+    void* malloc_s(size_t size, int line, const char* filename, const char* name_of_type) {
+        unit_log.tindex_name = typetable.insert(name_of_type);
+        
+        void* ptr = memhook_malloc(size, filename, line, true);
+        if (initialized) {
+            // cout << "CALLED CUSTOM MALLOC" << endl;
+            collector.copy(unit_log);
+        }
         return ptr;
     }
 
+    void free(void* ptr) {
+        if (!ptr) return;
+        memhook_free(ptr, NULL, 0, false);
+        if (initialized) {
+            // cout << "CALLED CUSTOM FREE" << endl;
+            collector.copy(unit_log);
+        }
+    }
 
-    void free_s(void *ptr, const char* filepath, int line) {
-        unit_log.file = filetable.insert(filepath);
-        memhook_free(ptr, unit_log.file, line, true);
-        collector.copy(unit_log);
-        return;
+    // void free_s(void* ptr, int line, const char* filename, const char* typename) {
+    //     filetable.insert(filename);
+    //     if (!ptr) return;
+    //     memhook_free(ptr, filename, line, false);
+    //     if (initialized) {
+    //         // cout << "CALLED CUSTOM FREE" << endl;
+    //         collector.copy(unit_log);
+    //     }
+    // }
+
+    void* ssmem_alloc_s(ssmem_allocator_t* a, size_t size, int line, const char* filename, const char* name_of_type) {
+        // if (!next_ssmem_alloc) next_ssmem_alloc = (void * (*)(ssmem_allocator_t*, size_t))dlsym(RTLD_NEXT, "ssmem_alloc");
+        // if (!next_ssmem_alloc) fprintf(stdout, "failed to find next ssmem alloc\n");
+
+        // cout << "CALLED ssmem_alloc" << endl;
+        #ifdef MEMHOOK_FORCE_MALLOC
+        void* ptr = malloc_s(size, line, filename, name_of_type);
+        #endif
+        #ifndef MEMHOOK_FORCE_MALLOC
+        void* ptr = ssmem_alloc(a, size);
+        alloc_log(ptr, size, filename, line, name_of_type);
+        #endif
+
+        return ptr;
+    }
+
+    void ssmem_free(ssmem_allocator_t* a, void* ptr) {
+        #ifdef MEMHOOK_FORCE_MALLOC
+        free(ptr);
+        #endif
+        #ifndef MEMHOOK_FORCE_MALLOC
+        if (!next_ssmem_free) next_ssmem_free = (void (*)(ssmem_allocator_t*, void*))dlsym(RTLD_NEXT, "ssmem_free");
+        if (!next_ssmem_free) fprintf(stdout, "failed to find next ssmem free\n");
+
+        next_ssmem_free(a, ptr);
+        
+        free_log(ptr);
+        #endif
+    }
+
+    void* ssalloc_s(size_t size, int line, const char* filename, const char* name_of_type) {
+        // if (!next_ssalloc) next_ssalloc = (void * (*)(size_t))dlsym(RTLD_NEXT, "ssalloc");
+        // if (!next_ssalloc) fprintf(stdout, "failed to find next ssalloc\n");
+
+        #ifdef MEMHOOK_FORCE_MALLOC
+        void* ptr = malloc_s(size, line, filename, name_of_type);
+        #endif
+        #ifndef MEMHOOK_FORCE_MALLOC
+        void* ptr = ssalloc(size);
+        alloc_log(ptr, size, filename, line, name_of_type);
+        #endif
+
+        return ptr;
+    }
+
+    void* ssalloc_aligned_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
+        // if (!next_ssalloc_aligned) next_ssalloc_aligned = (void * (*)(size_t, size_t))dlsym(RTLD_NEXT, "ssalloc_aligned");
+        // if (!next_ssalloc_aligned) fprintf(stdout, "failed to find next ssalloc_aligned\n");
+
+        #ifdef MEMHOOK_FORCE_MALLOC
+        void* ptr = _mm_malloc(size, alignment);
+        #endif
+        #ifndef MEMHOOK_FORCE_MALLOC
+        void* ptr = ssalloc_aligned(alignment, size);
+        #endif
+
+        alloc_log(ptr, roundUp(size, alignment), filename, line, name_of_type);
+
+        return ptr;
+    }
+
+    void ssfree(void* ptr) {
+        #ifdef MEMHOOK_FORCE_MALLOC
+        free(ptr);
+        #endif
+        #ifndef MEMHOOK_FORCE_MALLOC
+        if (!next_ssfree) next_ssfree = (void (*)(void*))dlsym(RTLD_NEXT, "ssfree");
+        if (!next_ssfree) fprintf(stdout, "failed to find next ssfree\n");
+
+        next_ssfree(ptr);
+        
+        free_log(ptr);
+        #endif
     }
 
     // void *calloc(size_t nmemb, size_t size) {

@@ -100,8 +100,8 @@ DETAILED WORKFLOW (for general projects):
 	python3 savefieldstodb.py fileset_dump.txt allocs.sqlite FILEMAP
 	python3 savefieldstodb.py typeset_dump.txt allocs.sqlite TYPEMAP
 	% does join
-	python3 savefieldstodb.py <placeholder> allocs.sqlite UPDATEALLOCSWITHFILEANDTYPE
-	python3 savefieldstodb.py <placeholder> allocs.sqlite ALLOCSWITHTYPES
+	python3 savefieldstodb.py placeholder allocs.sqlite UPDATEALLOCSWITHFILEANDTYPE
+	python3 savefieldstodb.py placeholder allocs.sqlite ALLOCSWITHTYPES
 7. Run visualisation scripts:
 	python3 field_block_view.py allocsdb fieldsdb blocksize xbytes typequery
 	python3 cacheline_in_block.py allocsdb blocksize xbytes typequery

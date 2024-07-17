@@ -18,9 +18,11 @@
 #include <vector>
 #include <stdio.h>
 #include <aio.h>
+#include <unordered_set>
 
 #include "memstamp.h"
 #include "hash.h"
+#include "ssmem.h"
 
 #define MEMHOOK_BACKTRACE_DEPTH 2
 #ifndef MEMHOOK_MAX_THREADS
@@ -35,7 +37,7 @@
 using namespace std;
 
 struct slot;
-struct info_t;
+struct memhook_info_t;
 class ThreadExiter;
 // thread_local unordered_set<const char*> threadFiles;
 // thread_local unordered_set<const char*> typeFiles;
@@ -44,10 +46,11 @@ class ThreadExiter;
 
 memhook_hashtable filetable;
 memhook_hashtable typetable;
+char file_path[] = "binary_dump.txt";
 
 thread_local int thread_first_call = 1;
 thread_local int first_filled_buffer_status = 0;
-thread_local struct info_t ** allocation_log = NULL;
+thread_local struct memhook_info_t ** allocation_log = NULL;
 thread_local int log_index = 0;
 thread_local struct aiocb * async_struct_first_buffer = NULL;
 thread_local struct aiocb * async_struct_second_buffer = NULL;
@@ -63,7 +66,7 @@ thread_local int buffer_index = 0;
 //how many buffers
 thread_local int number_of_buffers = 2;
 
-thread_local info_t unit_log;
+thread_local memhook_info_t unit_log;
 
 thread_local int fileset_fd;
 
@@ -86,7 +89,7 @@ uint64_t memhook_get_server_clock() {
 
 struct thread_record_array{
   int buffer_size_nbytes;
-  struct info_t *allocation_log;
+  struct memhook_info_t *allocation_log;
 };
 
 class memhook_memory_pool {
@@ -94,16 +97,16 @@ class memhook_memory_pool {
   char padding1[PADDING];
   int array_count;
 
-  // vector <info_t *> memory_pool;
+  // vector <memhook_info_t *> memory_pool;
   vector <thread_record_array> memory_pool;
   pthread_mutex_t lock;
   char padding2[PADDING];
 
   public:
-  void add(info_t* logarray, int buffer_count);
+  void add(memhook_info_t* logarray, int buffer_count);
   memhook_memory_pool();
   ~memhook_memory_pool();
-    //virtual info_t* pop();
+    //virtual memhook_info_t* pop();
     //virtual void dumptodisk();
 };
 
@@ -129,24 +132,36 @@ memhook_memory_pool::~memhook_memory_pool(){
 	//instead of doing this, the memory_pool array can keep track of cumulative bytes
 
 	for(int i = 0; i < memory_pool.size(); i++){
-    cout << "Buffer size: " << memory_pool[i].buffer_size_nbytes << endl;
+    // cout << "Buffer size: " << memory_pool[i].buffer_size_nbytes << endl;
     // cout << "File: " << memory_pool[i].allocation_log->file << endl;
     // cout << "t_index name: " << memory_pool[i].allocation_log->tindex_name << endl;
     // cout << "line: " << memory_pool[i].allocation_log->line << endl;
-    cout << "timestamp: " << memory_pool[i].allocation_log->timestamp << endl;
-    cout << "size: " << memory_pool[i].allocation_log->size << endl;
+    // cout << "timestamp: " << memory_pool[i].allocation_log->timestamp << endl;
+    // cout << "size: " << memory_pool[i].allocation_log->size << endl;
 		total_byte_count += memory_pool[i].buffer_size_nbytes;
 		write(global_fd, memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
 	}
 
   for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
-    if(filetable.bucket[i] != NULL)
-    fileset << (void*)filetable.bucket[i] << "|" << filetable.bucket[i] << endl;
+    // if(filetable.bucket[i] != NULL)
+    if(filetable.bucket[i].full) {
+      printf("Filetable bucket is: %p\n", (void*) filetable.bucket[i].str);
+      fileset << (void*)filetable.bucket[i].str << "|" << filetable.bucket[i].str << endl;
+    }
   }
 
   for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
-    if(typetable.bucket[i] != NULL) {
-      typeset << (void*)typetable.bucket[i] << "|" << abi::__cxa_demangle(typetable.bucket[i], 0, 0, &status) << endl;
+    // if(typetable.bucket[i] != NULL) {
+    if(typetable.bucket[i].full) {
+      char* real_tname = abi::__cxa_demangle(typetable.bucket[i].str, 0, 0, &status);
+      if (real_tname) {
+        printf("(C++) Typetable bucket is: %p\n", typetable.bucket[i].str);
+        typeset << (void*)typetable.bucket[i].str << "|" << real_tname << endl;
+      }
+      else {
+        printf("(C) Typetable bucket is: %p\n", typetable.bucket[i].str);
+        typeset << (void*)typetable.bucket[i].str << "|" << typetable.bucket[i].str << endl;
+      }
       // cout << typetable.bucket[i] << endl;
     }
   }
@@ -156,7 +171,7 @@ memhook_memory_pool::~memhook_memory_pool(){
 }
 
 //max buffer size is already known
-void memhook_memory_pool::add(info_t *logarray, int buffer_size_nbytes){
+void memhook_memory_pool::add(memhook_info_t *logarray, int buffer_size_nbytes){
 
   if(buffer_size_nbytes == 0)
     return;
@@ -213,7 +228,7 @@ class ThreadExiter
           }
         }
 
-        int unfilled_buffer_size = sizeof(struct info_t)* log_index;
+        int unfilled_buffer_size = sizeof(struct memhook_info_t)* log_index;
         //ADD FILE AND TYPES TO MEMPOOL OBJECT
         mem_pool_obj.add(allocation_log[buffer_index], unfilled_buffer_size);
       }
@@ -229,14 +244,20 @@ int get_slot(thread::id id);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);
 
-void  (memhook_free)(void *ptr, const char* file, int line, bool log);
-void *memhook_malloc(size_t size, const char* file, int line, bool log);
+void  (memhook_free)(void *ptr, const char* file, int line, bool log, bool ssmem, ssmem_allocator_t* a);
+void *memhook_malloc(size_t size, const char* file, int line, bool log, bool ssmem, ssmem_allocator_t* a);
 
-#warning This binary is being compiled with memhook. Running it will produce a text file (info_t_dump.txt) that should be provided as an argument to the shell script for step3.
+#warning This binary is being compiled with memhook.
 
 void   (*next_free)(void *ptr);
-void * (*next_malloc)(size_t size);
-void * (*next_calloc)(size_t nmemb, size_t size);
+// void * (*next_malloc)(size_t size);
+// void * (*next_calloc)(size_t nmemb, size_t size);
+void   (*next_ssmem_free)(ssmem_allocator_t* a, void* ptr);
+// void * (*ssmem_alloc)(ssmem_allocator_t* a, size_t size);
+void   (*next_ssfree)(void* ptr);
+// void * (*ssalloc)(size_t size);
+// void * (*ssalloc_aligned)(size_t alignment, size_t size);
+
 
 struct slot {
 	volatile bool occupied;
@@ -252,10 +273,10 @@ thread_local int iter = 0;
 */
 
 thread_local int it = 0;
-thread_local info_t* myArray = nullptr;
+thread_local memhook_info_t* myArray = nullptr;
 thread_local int max_retry = 0;
 
-ostream& operator << (ostream& os, info_t& info);
+ostream& operator << (ostream& os, memhook_info_t& info);
 
 MemStamp::MemStamp(char const *filename, int lineNum)
     : filename(filename), lineNum(lineNum) { }
@@ -269,28 +290,28 @@ MemStampCollector::~MemStampCollector() {
   
 }
 
-void MemStampCollector::copy(info_t &unit_log){
+void MemStampCollector::copy(memhook_info_t &unit_log){
 	if(thread_first_call) {
-		allocation_log = (struct info_t **)next_malloc(sizeof(struct info_t*)*number_of_buffers);
+		allocation_log = (struct memhook_info_t **) malloc(sizeof(struct memhook_info_t*)*number_of_buffers);
     for(int i = 0; i < number_of_buffers; i++) {
-      allocation_log[i] = (struct info_t*) next_malloc(sizeof(struct info_t)*MEMHOOK_MAX_BUFFER_SIZE);
+      allocation_log[i] = (struct memhook_info_t*) malloc(sizeof(struct memhook_info_t)*MEMHOOK_MAX_BUFFER_SIZE);
     }
 
-    // printf("%lu \n", sizeof(struct info_t));
-    async_struct_array = (struct aiocb*)next_malloc(sizeof(struct aiocb)*number_of_buffers);
-    async_api_struct_list = (struct aiocb **)next_malloc(sizeof(struct aiocb*)*1);
+    // printf("%lu \n", sizeof(struct memhook_info_t));
+    async_struct_array = (struct aiocb*) malloc(sizeof(struct aiocb)*number_of_buffers);
+    async_api_struct_list = (struct aiocb **) malloc(sizeof(struct aiocb*)*1);
 
     thread_first_call = 0;
 	}
 
-  memcpy(&allocation_log[buffer_index][log_index], &unit_log, sizeof(info_t));
+  memcpy(&allocation_log[buffer_index][log_index], &unit_log, sizeof(memhook_info_t));
   //set unit_log to zero
   memset(&unit_log, 0, sizeof(unit_log));
   log_index++;
 
   if(log_index == MEMHOOK_MAX_BUFFER_SIZE) {
     async_struct_array[buffer_index].aio_buf = allocation_log[buffer_index];
-    async_struct_array[buffer_index].aio_nbytes = sizeof(struct info_t)*MEMHOOK_MAX_BUFFER_SIZE;
+    async_struct_array[buffer_index].aio_nbytes = sizeof(struct memhook_info_t)*MEMHOOK_MAX_BUFFER_SIZE;
     async_struct_array[buffer_index].aio_fildes = global_fd;
     async_struct_array[buffer_index].aio_offset = 0;
     async_struct_array[buffer_index].aio_reqprio = 0;
