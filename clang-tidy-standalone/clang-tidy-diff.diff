@@ -1,0 +1,629 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8971ab2..476e29a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,8 +10,15 @@ set_default_build_type(Debug)
+ 
+ find_package(LLVM 10.0.0 EXACT REQUIRED CONFIG)
+ 
++set(LLVM_PATH /usr/lib/llvm-10)
++
+ include_directories("${LLVM_INCLUDE_DIRS}")
+-link_directories("${LLVM_LIBRARY_DIRS}")
++# link_directories("${LLVM_LIBRARY_DIRS}")
++# include_directories(${LLVM_PATH}/include)
++link_directories(${LLVM_PATH}/lib)
++
++
++set(CMAKE_LIBRARY_PATH "/usr/lib/llvm-10/lib")
+ 
+ # Checks.
+ # If you add a check, also add it to ClangTidyForceLinker.h in this directory.
+diff --git a/ClangTidy.cpp b/ClangTidy.cpp
+index 40aaf40..8d42b46 100644
+--- a/ClangTidy.cpp
++++ b/ClangTidy.cpp
+@@ -19,30 +19,30 @@
+ #include "ClangTidyModuleRegistry.h"
+ #include "ClangTidyProfiling.h"
+ #include "ExpandModularHeadersPPCallbacks.h"
+-#include "clang/AST/ASTConsumer.h"
+-#include "clang/AST/ASTContext.h"
+-#include "clang/AST/Decl.h"
+-#include "clang/ASTMatchers/ASTMatchFinder.h"
+-#include "clang/Config/config.h"
+-#include "clang/Format/Format.h"
+-#include "clang/Frontend/ASTConsumers.h"
+-#include "clang/Frontend/CompilerInstance.h"
+-#include "clang/Frontend/FrontendActions.h"
+-#include "clang/Frontend/FrontendDiagnostic.h"
+-#include "clang/Frontend/MultiplexConsumer.h"
+-#include "clang/Frontend/TextDiagnosticPrinter.h"
+-#include "clang/Lex/PPCallbacks.h"
+-#include "clang/Lex/Preprocessor.h"
+-#include "clang/Lex/PreprocessorOptions.h"
+-#include "clang/Rewrite/Frontend/FixItRewriter.h"
+-#include "clang/Rewrite/Frontend/FrontendActions.h"
+-#include "clang/Tooling/Core/Diagnostic.h"
+-#include "clang/Tooling/DiagnosticsYaml.h"
+-#include "clang/Tooling/Refactoring.h"
+-#include "clang/Tooling/ReplacementsYaml.h"
+-#include "clang/Tooling/Tooling.h"
+-#include "llvm/Support/Process.h"
+-#include "llvm/Support/Signals.h"
++#include <clang/AST/ASTConsumer.h>
++#include <clang/AST/ASTContext.h>
++#include <clang/AST/Decl.h>
++#include <clang/ASTMatchers/ASTMatchFinder.h>
++#include <clang/Config/config.h>
++#include <clang/Format/Format.h>
++#include <clang/Frontend/ASTConsumers.h>
++#include <clang/Frontend/CompilerInstance.h>
++#include <clang/Frontend/FrontendActions.h>
++#include <clang/Frontend/FrontendDiagnostic.h>
++#include <clang/Frontend/MultiplexConsumer.h>
++#include <clang/Frontend/TextDiagnosticPrinter.h>
++#include <clang/Lex/PPCallbacks.h>
++#include <clang/Lex/Preprocessor.h>
++#include <clang/Lex/PreprocessorOptions.h>
++#include <clang/Rewrite/Frontend/FixItRewriter.h>
++#include <clang/Rewrite/Frontend/FrontendActions.h>
++#include <clang/Tooling/Core/Diagnostic.h>
++#include <clang/Tooling/DiagnosticsYaml.h>
++#include <clang/Tooling/Refactoring.h>
++#include <clang/Tooling/ReplacementsYaml.h>
++#include <clang/Tooling/Tooling.h>
++#include <llvm/Support/Process.h>
++#include <llvm/Support/Signals.h>
+ #include <algorithm>
+ #include <utility>
+ 
+diff --git a/ClangTidy.h b/ClangTidy.h
+index 0f3c3ac..d83b543 100644
+--- a/ClangTidy.h
++++ b/ClangTidy.h
+@@ -12,7 +12,7 @@
+ #include "ClangTidyCheck.h"
+ #include "ClangTidyDiagnosticConsumer.h"
+ #include "ClangTidyOptions.h"
+-#include "llvm/Support/raw_ostream.h"
++#include <llvm/Support/raw_ostream.h>
+ #include <memory>
+ #include <vector>
+ 
+diff --git a/ClangTidyCheck.h b/ClangTidyCheck.h
+index 1ad881f..8b8b047 100644
+--- a/ClangTidyCheck.h
++++ b/ClangTidyCheck.h
+@@ -11,10 +11,10 @@
+ 
+ #include "ClangTidyDiagnosticConsumer.h"
+ #include "ClangTidyOptions.h"
+-#include "clang/ASTMatchers/ASTMatchFinder.h"
+-#include "clang/Basic/Diagnostic.h"
+-#include "clang/Basic/SourceManager.h"
+-#include "llvm/ADT/StringExtras.h"
++#include <clang/ASTMatchers/ASTMatchFinder.h>
++#include <clang/Basic/Diagnostic.h>
++#include <clang/Basic/SourceManager.h>
++#include <llvm/ADT/StringExtras.h>
+ #include <memory>
+ #include <type_traits>
+ #include <vector>
+diff --git a/ClangTidyDiagnosticConsumer.cpp b/ClangTidyDiagnosticConsumer.cpp
+index a5b6834..d72652d 100644
+--- a/ClangTidyDiagnosticConsumer.cpp
++++ b/ClangTidyDiagnosticConsumer.cpp
+@@ -18,14 +18,14 @@
+ #include "ClangTidyDiagnosticConsumer.h"
+ #include "ClangTidyOptions.h"
+ #include "GlobList.h"
+-#include "clang/AST/ASTDiagnostic.h"
+-#include "clang/AST/Attr.h"
+-#include "clang/Basic/Diagnostic.h"
+-#include "clang/Basic/DiagnosticOptions.h"
+-#include "clang/Frontend/DiagnosticRenderer.h"
+-#include "clang/Tooling/Core/Diagnostic.h"
+-#include "llvm/ADT/STLExtras.h"
+-#include "llvm/ADT/SmallString.h"
++#include <clang/AST/ASTDiagnostic.h>
++#include <clang/AST/Attr.h>
++#include <clang/Basic/Diagnostic.h>
++#include <clang/Basic/DiagnosticOptions.h>
++#include <clang/Frontend/DiagnosticRenderer.h>
++#include <clang/Tooling/Core/Diagnostic.h>
++#include <llvm/ADT/STLExtras.h>
++#include <llvm/ADT/SmallString.h>
+ #include <tuple>
+ #include <vector>
+ using namespace clang;
+diff --git a/ClangTidyDiagnosticConsumer.h b/ClangTidyDiagnosticConsumer.h
+index 0d39296..7b6db08 100644
+--- a/ClangTidyDiagnosticConsumer.h
++++ b/ClangTidyDiagnosticConsumer.h
+@@ -11,13 +11,13 @@
+ 
+ #include "ClangTidyOptions.h"
+ #include "ClangTidyProfiling.h"
+-#include "clang/Basic/Diagnostic.h"
+-#include "clang/Basic/SourceManager.h"
+-#include "clang/Tooling/Core/Diagnostic.h"
+-#include "clang/Tooling/Refactoring.h"
+-#include "llvm/ADT/DenseMap.h"
+-#include "llvm/ADT/StringMap.h"
+-#include "llvm/Support/Timer.h"
++#include <clang/Basic/Diagnostic.h>
++#include <clang/Basic/SourceManager.h>
++#include <clang/Tooling/Core/Diagnostic.h>
++#include <clang/Tooling/Refactoring.h>
++#include <llvm/ADT/DenseMap.h>
++#include <llvm/ADT/StringMap.h>
++#include <llvm/Support/Timer.h>
+ 
+ namespace clang {
+ 
+diff --git a/ClangTidyForceLinker.h b/ClangTidyForceLinker.h
+index 3a13dec..7f3f8c4 100644
+--- a/ClangTidyForceLinker.h
++++ b/ClangTidyForceLinker.h
+@@ -9,8 +9,8 @@
+ #ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_CLANGTIDYFORCELINKER_H
+ #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_CLANGTIDYFORCELINKER_H
+ 
+-#include "clang/Config/config.h"
+-#include "llvm/Support/Compiler.h"
++#include <clang/Config/config.h>
++#include <llvm/Support/Compiler.h>
+ 
+ namespace clang {
+ namespace tidy {
+diff --git a/ClangTidyModule.h b/ClangTidyModule.h
+index 5c484f1..d7ba1a2 100644
+--- a/ClangTidyModule.h
++++ b/ClangTidyModule.h
+@@ -10,7 +10,7 @@
+ #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_CLANGTIDYMODULE_H
+ 
+ #include "ClangTidy.h"
+-#include "llvm/ADT/StringRef.h"
++#include <llvm/ADT/StringRef.h>
+ #include <functional>
+ #include <map>
+ #include <memory>
+diff --git a/ClangTidyModuleRegistry.h b/ClangTidyModuleRegistry.h
+index 891671a..8a5a8b3 100644
+--- a/ClangTidyModuleRegistry.h
++++ b/ClangTidyModuleRegistry.h
+@@ -10,7 +10,7 @@
+ #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_CLANGTIDYMODULEREGISTRY_H
+ 
+ #include "ClangTidyModule.h"
+-#include "llvm/Support/Registry.h"
++#include <llvm/Support/Registry.h>
+ 
+ namespace clang {
+ namespace tidy {
+diff --git a/ClangTidyOptions.cpp b/ClangTidyOptions.cpp
+index 59a2d5c..9c934ed 100644
+--- a/ClangTidyOptions.cpp
++++ b/ClangTidyOptions.cpp
+@@ -8,14 +8,14 @@
+ 
+ #include "ClangTidyOptions.h"
+ #include "ClangTidyModuleRegistry.h"
+-#include "clang/Basic/LLVM.h"
+-#include "llvm/ADT/SmallString.h"
+-#include "llvm/Support/Debug.h"
+-#include "llvm/Support/Errc.h"
+-#include "llvm/Support/FileSystem.h"
+-#include "llvm/Support/Path.h"
+-#include "llvm/Support/YAMLTraits.h"
+-#include "llvm/Support/raw_ostream.h"
++#include <clang/Basic/LLVM.h>
++#include <llvm/ADT/SmallString.h>
++#include <llvm/Support/Debug.h>
++#include <llvm/Support/Errc.h>
++#include <llvm/Support/FileSystem.h>
++#include <llvm/Support/Path.h>
++#include <llvm/Support/YAMLTraits.h>
++#include <llvm/Support/raw_ostream.h>
+ #include <utility>
+ 
+ #define DEBUG_TYPE "clang-tidy-options"
+diff --git a/ClangTidyOptions.h b/ClangTidyOptions.h
+index 99951dd..86a9c9b 100644
+--- a/ClangTidyOptions.h
++++ b/ClangTidyOptions.h
+@@ -9,12 +9,12 @@
+ #ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_CLANGTIDYOPTIONS_H
+ #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_CLANGTIDYOPTIONS_H
+ 
+-#include "llvm/ADT/IntrusiveRefCntPtr.h"
+-#include "llvm/ADT/Optional.h"
+-#include "llvm/ADT/StringMap.h"
+-#include "llvm/ADT/StringRef.h"
+-#include "llvm/Support/ErrorOr.h"
+-#include "llvm/Support/VirtualFileSystem.h"
++#include <llvm/ADT/IntrusiveRefCntPtr.h>
++#include <llvm/ADT/Optional.h>
++#include <llvm/ADT/StringMap.h>
++#include <llvm/ADT/StringRef.h>
++#include <llvm/Support/ErrorOr.h>
++#include <llvm/Support/VirtualFileSystem.h>
+ #include <functional>
+ #include <map>
+ #include <string>
+diff --git a/ClangTidyProfiling.cpp b/ClangTidyProfiling.cpp
+index e60332d..43cde51 100644
+--- a/ClangTidyProfiling.cpp
++++ b/ClangTidyProfiling.cpp
+@@ -7,12 +7,12 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "ClangTidyProfiling.h"
+-#include "llvm/ADT/STLExtras.h"
+-#include "llvm/ADT/SmallString.h"
+-#include "llvm/Support/FileSystem.h"
+-#include "llvm/Support/Path.h"
+-#include "llvm/Support/YAMLTraits.h"
+-#include "llvm/Support/raw_ostream.h"
++#include <llvm/ADT/STLExtras.h>
++#include <llvm/ADT/SmallString.h>
++#include <llvm/Support/FileSystem.h>
++#include <llvm/Support/Path.h>
++#include <llvm/Support/YAMLTraits.h>
++#include <llvm/Support/raw_ostream.h>
+ #include <system_error>
+ #include <utility>
+ 
+diff --git a/ClangTidyProfiling.h b/ClangTidyProfiling.h
+index a266e38..8209a18 100644
+--- a/ClangTidyProfiling.h
++++ b/ClangTidyProfiling.h
+@@ -9,11 +9,11 @@
+ #ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_CLANGTIDYPROFILING_H
+ #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_CLANGTIDYPROFILING_H
+ 
+-#include "llvm/ADT/Optional.h"
+-#include "llvm/ADT/StringMap.h"
+-#include "llvm/Support/Chrono.h"
+-#include "llvm/Support/Timer.h"
+-#include "llvm/Support/raw_ostream.h"
++#include <llvm/ADT/Optional.h>
++#include <llvm/ADT/StringMap.h>
++#include <llvm/Support/Chrono.h>
++#include <llvm/Support/Timer.h>
++#include <llvm/Support/raw_ostream.h>
+ #include <string>
+ #include <utility>
+ #include <vector>
+diff --git a/ExpandModularHeadersPPCallbacks.cpp b/ExpandModularHeadersPPCallbacks.cpp
+index 4831774..9af5343 100644
+--- a/ExpandModularHeadersPPCallbacks.cpp
++++ b/ExpandModularHeadersPPCallbacks.cpp
+@@ -7,9 +7,9 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "ExpandModularHeadersPPCallbacks.h"
+-#include "clang/Frontend/CompilerInstance.h"
+-#include "clang/Lex/PreprocessorOptions.h"
+-#include "clang/Serialization/ASTReader.h"
++#include <clang/Frontend/CompilerInstance.h>
++#include <clang/Lex/PreprocessorOptions.h>
++#include <clang/Serialization/ASTReader.h>
+ 
+ namespace clang {
+ namespace tooling {
+diff --git a/ExpandModularHeadersPPCallbacks.h b/ExpandModularHeadersPPCallbacks.h
+index 30c8236..c03ce91 100644
+--- a/ExpandModularHeadersPPCallbacks.h
++++ b/ExpandModularHeadersPPCallbacks.h
+@@ -9,9 +9,9 @@
+ #ifndef LLVM_CLANG_TOOLING_EXPANDMODULARHEADERSPPCALLBACKS_H_
+ #define LLVM_CLANG_TOOLING_EXPANDMODULARHEADERSPPCALLBACKS_H_
+ 
+-#include "clang/Lex/PPCallbacks.h"
+-#include "clang/Lex/Preprocessor.h"
+-#include "llvm/ADT/DenseSet.h"
++#include <clang/Lex/PPCallbacks.h>
++#include <clang/Lex/Preprocessor.h>
++#include <llvm/ADT/DenseSet.h>
+ 
+ namespace clang {
+ class CompilerInstance;
+diff --git a/GlobList.cpp b/GlobList.cpp
+index fad3616..7ac6ff6 100644
+--- a/GlobList.cpp
++++ b/GlobList.cpp
+@@ -7,7 +7,7 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "GlobList.h"
+-#include "llvm/ADT/SmallString.h"
++#include <llvm/ADT/SmallString.h>
+ 
+ using namespace clang;
+ using namespace tidy;
+diff --git a/GlobList.h b/GlobList.h
+index 4edb03b..e4b6208 100644
+--- a/GlobList.h
++++ b/GlobList.h
+@@ -9,9 +9,9 @@
+ #ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_GLOBLIST_H
+ #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_GLOBLIST_H
+ 
+-#include "clang/Basic/LLVM.h"
+-#include "llvm/ADT/StringRef.h"
+-#include "llvm/Support/Regex.h"
++#include <clang/Basic/LLVM.h>
++#include <llvm/ADT/StringRef.h>
++#include <llvm/Support/Regex.h>
+ #include <vector>
+ 
+ namespace clang {
+diff --git a/misc/CMakeLists.txt b/misc/CMakeLists.txt
+index 1b8a7fa..a4293e8 100644
+--- a/misc/CMakeLists.txt
++++ b/misc/CMakeLists.txt
+@@ -1,4 +1,5 @@
+ add_clang_library(clangTidyMiscModule
++  MalloccheckerCheck.cpp
+   MiscTidyModule.cpp
+ 
+   LINK_LIBS
+diff --git a/misc/MalloccheckerCheck.cpp b/misc/MalloccheckerCheck.cpp
+new file mode 100644
+index 0000000..1f2b3a0
+--- /dev/null
++++ b/misc/MalloccheckerCheck.cpp
+@@ -0,0 +1,113 @@
++//===--- MalloccheckerCheck.cpp - clang-tidy ------------------------------===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "MalloccheckerCheck.h"
++#include "clang/AST/ASTContext.h"
++#include "clang/ASTMatchers/ASTMatchFinder.h"
++#include "clang/ASTMatchers/ASTMatchers.h"
++
++#include <iostream>
++
++#define MTDFNAME "_mm_malloc"
++#define MTDFNAME2 "alloc"
++// #define MATCH_FUNCTIONS anyOf(hasName(MTDFNAME), hasName(MTDFNAME2))
++#define MATCH_FUNCTIONS hasName(MTDFNAME)
++
++using namespace clang::ast_matchers;
++using namespace std;
++
++namespace clang {
++namespace tidy {
++namespace misc {
++
++StatementMatcher sizeofMallocMatcher = expr(sizeOfExpr(allOf(
++    hasAncestor(
++        callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fdeclsizeofmalloc"))).bind("sizeofmalloc")),
++    hasArgumentOfType(
++        hasUnqualifiedDesugaredType(type().bind("sizeof-arg-type"))))));
++
++// matches malloc lhs without explicit casts
++StatementMatcher lhsofMallocMatcher = binaryOperator(
++    hasOperatorName("="),
++    anyOf(hasDescendant(callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fdecllhsmalloc")))
++                            .bind("lhsmalloc")),
++          hasRHS(hasDescendant(callExpr(callee(functionDecl(MATCH_FUNCTIONS)))
++                                   .bind("lhsmalloc")))),
++    hasLHS(hasType(type().bind("lhs-type"))));
++
++DeclarationMatcher declMallocMatcher = varDecl(
++    hasDescendant(
++        callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fdeclmalloc"))).bind("declmalloc")),
++    hasType(type().bind("decltype")));
++
++void MalloccheckerCheck::registerMatchers(MatchFinder *Finder) {
++  // FIXME: Add matchers.
++  Finder->addMatcher(sizeofMallocMatcher, this);
++  Finder->addMatcher(lhsofMallocMatcher, this);
++  Finder->addMatcher(declMallocMatcher, this);
++}
++
++void MalloccheckerCheck::emitDiagnostics(const MatchFinder::MatchResult &Result, string allocnodebind, string typenodebind, string declnodebind) {
++  const clang::CallExpr *mnode =
++      Result.Nodes.getNodeAs<clang::CallExpr>(allocnodebind);
++  const clang::FunctionDecl *declnode =
++      Result.Nodes.getNodeAs<clang::FunctionDecl>(declnodebind);
++  const clang::Type *typenode =
++      Result.Nodes.getNodeAs<clang::Type>(typenodebind);
++
++  if(mnode) {
++    if(declnode) {
++    std::string type;
++
++  static PrintingPolicy print_policy((Result.Context)->getLangOpts());
++  print_policy.FullyQualifiedName = 1;
++  print_policy.SuppressScope = 0;
++
++  if (typenode->isBuiltinType()) {
++    type =
++        typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy);
++  } else if (typenode->isRecordType()) {
++    type = typenode->getAsRecordDecl()->getQualifiedNameAsString();
++  } else if (typenode->isPointerType()) {
++    type = typenode->getPointeeType().getAsString();
++  }
++
++  FullSourceLoc fsrcloc = Result.Context->getFullLoc(mnode->getExprLoc());
++  string FileName = fsrcloc.getFileEntry()->getName().str();
++  int line = fsrcloc.getLineNumber();
++
++  SmallString<200> pathVector;
++  //   std::cout << "FILENAME: "
++  //             << pathVector.c_str() + fsrcloc.getFileEntry()->getName().str()
++  //             << ": " << line << endl;
++
++  // cout << "DeclName: " << declnode->getNameAsString() << endl;
++  int offset = declnode->getNameAsString().size();
++
++  diag(mnode->getExprLoc().getLocWithOffset(offset), "insert type here",
++       DiagnosticIDs::Error)
++      << FixItHint::CreateInsertion(
++             mnode->getExprLoc().getLocWithOffset(offset),
++             "<" + type + ", " + to_string(line) + ", MACRO_GET_STR(\"" + FileName + "\")" +
++                  ">");
++    }
++  }
++}
++
++void MalloccheckerCheck::check(const MatchFinder::MatchResult &Result) {
++  // FIXME: Add callback implementation.
++
++  MalloccheckerCheck::emitDiagnostics(Result, "sizeofmalloc", "sizeof-arg-type", "fdeclsizeofmalloc");
++  MalloccheckerCheck::emitDiagnostics(Result, "lhsmalloc", "lhs-type", "fdecllhsmalloc");
++  MalloccheckerCheck::emitDiagnostics(Result, "declmalloc", "decltype", "fdeclmalloc");
++
++}
++
++} // namespace misc
++} // namespace tidy
++} // namespace clang
+diff --git a/misc/MalloccheckerCheck.h b/misc/MalloccheckerCheck.h
+new file mode 100644
+index 0000000..3885328
+--- /dev/null
++++ b/misc/MalloccheckerCheck.h
+@@ -0,0 +1,36 @@
++//===--- MalloccheckerCheck.h - clang-tidy ----------------------*- C++ -*-===//
++//
++// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_MALLOCCHECKERCHECK_H
++#define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_MALLOCCHECKERCHECK_H
++
++#include "../ClangTidyCheck.h"
++
++namespace clang {
++namespace tidy {
++namespace misc {
++
++/// FIXME: Write a short description.
++/// This check "templatizes" any allocation function with the type of memory it allocates
++/// For the user-facing documentation see:
++/// http://clang.llvm.org/extra/clang-tidy/checks/misc-MallocChecker.html
++class MalloccheckerCheck : public ClangTidyCheck {
++public:
++  MalloccheckerCheck(StringRef Name, ClangTidyContext *Context)
++      : ClangTidyCheck(Name, Context) {}
++  void registerMatchers(ast_matchers::MatchFinder *Finder) override;
++  void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
++private:
++  void emitDiagnostics(const ast_matchers::MatchFinder::MatchResult &Result, std::string allocnodebind, std::string typenodebind, std::string declnodebind);
++};
++
++} // namespace misc
++} // namespace tidy
++} // namespace clang
++
++#endif // LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_MALLOCCHECKERCHECK_H
+diff --git a/misc/MiscTidyModule.cpp b/misc/MiscTidyModule.cpp
+index 8f9adb6..9939ae8 100644
+--- a/misc/MiscTidyModule.cpp
++++ b/misc/MiscTidyModule.cpp
+@@ -9,6 +9,7 @@
+ #include "../ClangTidy.h"
+ #include "../ClangTidyModule.h"
+ #include "../ClangTidyModuleRegistry.h"
++#include "MalloccheckerCheck.h"
+ 
+ namespace clang {
+ namespace tidy {
+@@ -17,6 +18,8 @@ namespace misc {
+ class MiscModule : public ClangTidyModule {
+ public:
+   void addCheckFactories(ClangTidyCheckFactories &CheckFactories) override {
++    CheckFactories.registerCheck<MalloccheckerCheck>(
++    "misc-malloc-checker");
+   }
+ };
+ 
+@@ -31,4 +34,4 @@ static ClangTidyModuleRegistry::Add<misc::MiscModule>
+ volatile int MiscModuleAnchorSource = 0;
+ 
+ } // namespace tidy
+-} // namespace clang
++} // namespace clang
+\ No newline at end of file
+diff --git a/tool/CMakeLists.txt b/tool/CMakeLists.txt
+index 83bef3f..d591e6e 100644
+--- a/tool/CMakeLists.txt
++++ b/tool/CMakeLists.txt
+@@ -12,8 +12,12 @@ add_clang_tool(clang-tidy
+   ClangTidyMain.cpp
+   )
+ 
++target_link_libraries(clang-tidy PRIVATE -L/usr/lib/llvm-10/lib)
++target_link_libraries(clang-tidy PRIVATE -L/lib/llvm-10/lib)
++
+ clang_target_link_libraries(clang-tidy
+-  PRIVATE
++  PUBLIC
++  -Wl,--start-group
+   clangAnalysis
+   clangAST
+   clangASTMatchers
+@@ -35,11 +39,14 @@ clang_target_link_libraries(clang-tidy
+   clangToolingCore
+   clangToolingInclusions
+   clangLex
++  LLVM-10
+   )
+ 
++target_link_libraries(clang-tidy PUBLIC -WL,--end-group)
++
+ target_link_libraries(clang-tidy
+-  PRIVATE
++  PUBLIC
+   clangTidy
+   ${llvm_libs}
+   ${ALL_CLANG_TIDY_CHECKS}
+-  )
++  )
+\ No newline at end of file
+diff --git a/tool/ClangTidyMain.cpp b/tool/ClangTidyMain.cpp
+index ad6182d..9bccb17 100644
+--- a/tool/ClangTidyMain.cpp
++++ b/tool/ClangTidyMain.cpp
+@@ -17,11 +17,11 @@
+ #include "../ClangTidy.h"
+ #include "../ClangTidyForceLinker.h"
+ #include "../GlobList.h"
+-#include "clang/Tooling/CommonOptionsParser.h"
+-#include "llvm/Support/InitLLVM.h"
+-#include "llvm/Support/Process.h"
+-#include "llvm/Support/Signals.h"
+-#include "llvm/Support/TargetSelect.h"
++#include <clang/Tooling/CommonOptionsParser.h>
++#include <llvm/Support/InitLLVM.h>
++#include <llvm/Support/Process.h>
++#include <llvm/Support/Signals.h>
++#include <llvm/Support/TargetSelect.h>
+ 
+ using namespace clang::ast_matchers;
+ using namespace clang::driver;
+@@ -55,7 +55,8 @@ Configuration files:
+ 
+ const char DefaultChecks[] = // Enable these checks by default:
+     "clang-diagnostic-*,"    //   * compiler diagnostics
+-    "clang-analyzer-*";      //   * Static Analyzer checks
++    "clang-analyzer-*,"
++    "misc-*";      //   * Static Analyzer checks
+ 
+ static cl::opt<std::string> Checks("checks", cl::desc(R"(
+ Comma-separated list of globs with optional '-'
