@@ -131,7 +131,7 @@ else
     cmake -DCPP_TEMPLATE=OFF ..
 fi
 cmake --build .
-cd ..
+cd ../..
 echo "Done building clang-tidy"
 echo ""
 
