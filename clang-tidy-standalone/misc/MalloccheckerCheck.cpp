@@ -103,7 +103,7 @@ void MalloccheckerCheck::emitDiagnostics(const MatchFinder::MatchResult &Result,
       std::cout << "DeclName: " << declnode->getNameAsString() << endl;
       int offset = declnode->getNameAsString().size();
 
-#ifdef MALLOCCHECKER_NOTEMPLATE
+#ifndef MALLOCCHECKER_TEMPLATE
       diag(mnode->getExprLoc().getLocWithOffset(offset), "insert _s here",
           DiagnosticIDs::Error)
           << FixItHint::CreateInsertion(
@@ -115,14 +115,14 @@ void MalloccheckerCheck::emitDiagnostics(const MatchFinder::MatchResult &Result,
                 mnode->getEndLoc(),
                 ", " + to_string(line) + ", \"" + FileName + "\", \"" + type + "\"");
 #endif
-#ifndef MALLOCCHECKER_NOTEMPLATE      
+#ifdef MALLOCCHECKER_TEMPLATE      
       diag(mnode->getExprLoc().getLocWithOffset(offset), "insert type here",
           DiagnosticIDs::Error)
           << FixItHint::CreateInsertion(
                 mnode->getExprLoc().getLocWithOffset(offset),
                 "<" + type + ", " + to_string(line) + ", MACRO_GET_STR(\"" + FileName + "\")" +
                       ">");
-#endif // NOTEMPLATE
+#endif // TEMPLATE
     }
   }
 }

@@ -144,7 +144,7 @@ if [ "$?" -ne 0 ]; then echo "ERROR building memhook" ; exit 1 ; fi
 
 bash -c 'cd type_analysis ; make fieldandtypedumper'
 cd type_analysis
-if [ -d ./bin ]; then
+if ! [[ -d ./bin ]]; then
     mkdir bin
 fi
 make fieldandtypedumper

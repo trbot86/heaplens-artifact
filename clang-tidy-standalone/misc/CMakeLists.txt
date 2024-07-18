@@ -17,5 +17,5 @@ add_clang_library(clangTidyMiscModule
 option(CPP_TEMPLATE "Specify whether the target application supports templating." OFF)
 
 if(CPP_TEMPLATE)
-  add_definitions(-DMALLOCCHECKER_NOTEMPLATE)
+  add_definitions(-DMALLOCCHECKER_TEMPLATE)
 endif(CPP_TEMPLATE)
