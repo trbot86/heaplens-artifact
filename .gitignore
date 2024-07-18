@@ -17,9 +17,8 @@ a.out
 database.out
 clang_parser.out
 libmemhook.so
-clang-tidy-standalone/build
 bin
-bin/
+clang-tidy-standalone/build
 .vscode
 .vscode/
 malloc_type_dump.txt

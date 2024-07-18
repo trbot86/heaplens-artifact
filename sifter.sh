@@ -143,7 +143,13 @@ if [ "$?" -ne 0 ]; then echo "ERROR building memhook" ; exit 1 ; fi
 ## then goto type_analysis and compile
 
 bash -c 'cd type_analysis ; make fieldandtypedumper'
-if [ "$?" -ne 0 ]; then echo "ERROR building type analysis and database conversion tools" ; exit 1 ; fi
+cd type_analysis
+if [ -d ./bin ]; then
+    mkdir bin
+fi
+make fieldandtypedumper
+cd ..
+if [ "$?" -ne 0 ]; then echo "ERROR building type analysis tool" ; exit 1 ; fi
 
 ## copy the project
 rm -r $outdir ; cp -r $indir $outdir
