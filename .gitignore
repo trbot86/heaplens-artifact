@@ -9,7 +9,6 @@ typedump.txt
 new_info_t_dump.txt
 *.sqlite
 *.yaml
-tool
 refactor
 analyze
 visitor
@@ -18,6 +17,7 @@ a.out
 database.out
 clang_parser.out
 libmemhook.so
+clang-tidy-standalone/build
 bin
 bin/
 .vscode
