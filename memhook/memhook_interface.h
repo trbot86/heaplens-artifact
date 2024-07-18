@@ -20,6 +20,7 @@
 #include <sys/stat.h>
 // #include <fcntl.h>
 #include <unistd.h>
+#include <malloc.h>
 #include <mm_malloc.h>
 #include "memstamp.h"
 #include "hash.h"
@@ -85,6 +86,8 @@ extern "C"
     void* ssalloc_s(size_t size, int line, const char* filename, const char* name_of_type);
     void* ssalloc_aligned_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type);
     void* ssmem_alloc_s(ssmem_allocator_t*, size_t, int, const char*, const char*);
+    int posix_memalign_s(void** memptr, size_t alignment, size_t size, int line, const char* filename, const char* name_of_type);
+    void* memalign_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type);
     // void ssmem_free_s(ssmem_allocator_t*, void*, int, const char*);
     // void free(void* ptr);
 

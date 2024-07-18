@@ -345,6 +345,18 @@ extern "C" {
         #endif
     }
 
+    int posix_memalign_s(void** memptr, size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
+        int ret = posix_memalign(memptr, alignment, size);
+        alloc_log(memptr, roundUp(size, alignment), filename, line, name_of_type);
+        return ret;
+    }
+
+    void* memalign_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
+        void* ptr = memalign(alignment, size);
+        alloc_log(ptr, roundUp(size, alignment), filename, line, name_of_type);
+        return ptr;
+    }
+
     // void *calloc(size_t nmemb, size_t size) {
     //     return memhook_calloc(nmemb, size, true);
     // }

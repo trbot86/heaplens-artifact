@@ -120,7 +120,7 @@ add_includes () {
 if [ -z "$indir" ]; then
     echo "Must specify an input directory"
     exit 1
-elif [ -z "$outdir" -a "$database" = false ]; then
+elif [ -z "$outdir" -a "$database" = false -a "$includesOnly" = false ]; then
     echo "USAGE: sifter.sh INPUT_FOLDER OUTPUT_FOLDER"
 	echo "      output folder will be created"
     echo "      (or run with --database flag to create a database after running experiment)"
