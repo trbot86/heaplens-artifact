@@ -5,6 +5,7 @@ outdir=""
 database=false
 template=false
 skipRefactor=false
+includesOnly=false
 subdirectory=""
 buildcmd="bear make"
 perffile=""
@@ -83,6 +84,9 @@ while [ $# -gt 0 ]; do
         --skip-refactor)
             skipRefactor=true
         ;;
+        --includes-only)
+            includesOnly=true
+        ;;
         *)
             if [ -z "$indir" ]; then
                 indir=$1
@@ -96,6 +100,22 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
+
+add_includes () {
+    echo "refactoring all c h cc hh cpp hpp files to include memhook_interface.h..."
+    cd /root/sifter/$1
+    for f in $(for t in '*.h' '*.cpp' '*.c' '*.hpp' '*.cc' '*.hh' ; do find . -name "$t" ; done) ; do
+        if [[ "$f" =~ .*memhook.* ]] || grep -q '#include "memhook_interface.h"' $f; then
+            echo "   skipping file $f..."
+            continue
+        fi
+        echo '#include "memhook_interface.h"' >> TEMP_MEMHOOK_INCLUDE
+        cat $f >> TEMP_MEMHOOK_INCLUDE
+        mv TEMP_MEMHOOK_INCLUDE $f
+    done
+    echo "    Done."
+    echo ""
+}
 
 if [ -z "$indir" ]; then
     echo "Must specify an input directory"
@@ -117,6 +137,9 @@ elif [ "$database" = true ]; then
     cd type_analysis
     make convert_to_db
     bash -c './bin/convert_to_db $perffile $fielddump $pagespertype $sample $cutoff'
+elif [ "$includesOnly" = true ]; then
+    add_includes $indir
+    exit 0
 fi
 
 cd clang-tidy-standalone
@@ -142,7 +165,6 @@ if [ "$?" -ne 0 ]; then echo "ERROR building memhook" ; exit 1 ; fi
 
 ## then goto type_analysis and compile
 
-bash -c 'cd type_analysis ; make fieldandtypedumper'
 cd type_analysis
 if ! [[ -d ./bin ]]; then
     mkdir bin
@@ -181,24 +203,11 @@ if [ "$skipRefactor" = true ]; then
 else
     python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-10 -checks=misc-malloc-checker -fix
     echo "performed refactoring with clang-tidy"
+    add_includes $outdir
 fi
 # clang-apply-replacements-10 ./
 if [ "$?" -ne 0 ]; then echo "ERROR templating mallocs" ; exit 1 ; fi
 # rm fixes.yaml # commented for debugging
-echo ""
-
-echo "refactoring all c h cc hh cpp hpp files to include memhook_interface.h..."
-cd /root/sifter/$outdir
-for f in $(for t in '*.h' '*.cpp' '*.c' '*.hpp' '*.cc' '*.hh' ; do find . -name "$t" ; done) ; do
-    if [[ "$f" =~ .*memhook.* ]] || grep -q '#include "memhook_interface.h"' $f; then
-        echo "   skipping file $f..."
-        continue
-    fi
-    echo '#include "memhook_interface.h"' >> TEMP_MEMHOOK_INCLUDE
-    cat $f >> TEMP_MEMHOOK_INCLUDE
-    mv TEMP_MEMHOOK_INCLUDE $f
-done
-echo "    Done."
 echo ""
 
 echo "You need to include the memhook library in your Makefile:"
