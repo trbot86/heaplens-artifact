@@ -3,7 +3,7 @@
 
 using namespace std;
 
-struct info_t {
+struct memhook_info_t {
     const char* file;
     const char* tindex_name;
     unsigned int line;
@@ -13,7 +13,7 @@ struct info_t {
     bool typeofop;
     //char padding[PADDING];
 
-    info_t() : file(nullptr), tindex_name(nullptr), line(0), timestamp(0), size(0), addr(nullptr) {
+    memhook_info_t() : file(nullptr), tindex_name(nullptr), line(0), timestamp(0), size(0), addr(nullptr) {
         (void) 0;
     }
 };
@@ -37,7 +37,7 @@ class MemStampCollector {
 
     ~MemStampCollector();
 
-    void copy(info_t &unit_log);
+    void copy(memhook_info_t &unit_log);
     // void update(const char * file, unsigned int line, type_index* tindex);
     // void threadexit();
 };

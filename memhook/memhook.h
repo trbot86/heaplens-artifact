@@ -22,7 +22,7 @@
 
 #include "memstamp.h"
 #include "hash.h"
-#include "ssmem.h"
+#include "memhook_ssmem.h"
 
 #define MEMHOOK_BACKTRACE_DEPTH 2
 #ifndef MEMHOOK_MAX_THREADS

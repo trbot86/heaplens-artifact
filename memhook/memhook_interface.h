@@ -7,8 +7,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
-#include "ssmem.h"
-#include "ssalloc.h"
+#include "memhook_ssmem.h"
+#include "memhook_ssalloc.h"
 #ifdef __cplusplus
 
 #include <iostream>
