@@ -1,4 +1,3 @@
-#include "memhook_interface.h"
 // #define MALLOCCHECKER_NOTEMPLATE
 //===--- MalloccheckerCheck.cpp - clang-tidy ------------------------------===//
 //

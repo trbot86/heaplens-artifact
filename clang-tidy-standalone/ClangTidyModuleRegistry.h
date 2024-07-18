@@ -1,4 +1,3 @@
-#include "memhook_interface.h"
 //===--- ClangTidyModuleRegistry.h - clang-tidy -----------------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.

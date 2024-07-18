@@ -1,4 +1,3 @@
-#include "memhook_interface.h"
 //===--- tools/extra/clang-tidy/ClangTidyMain.h - Clang tidy tool -------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.

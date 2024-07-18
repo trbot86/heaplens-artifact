@@ -1,4 +1,3 @@
-#include "memhook_interface.h"
 //===- ClangTidyForceLinker.h - clang-tidy --------------------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
