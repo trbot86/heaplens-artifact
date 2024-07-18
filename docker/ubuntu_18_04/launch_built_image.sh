@@ -11,4 +11,4 @@ docker stop sifter 2>/dev/null
 echo y | docker container rm sifter 2>/dev/null
 
 ## launch built docker image in a container
-docker run -d --privileged --name sifter sifter
+docker run -it --privileged --name sifter sifter

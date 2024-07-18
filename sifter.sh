@@ -13,7 +13,7 @@ pagespertype=""
 sample=""
 cutoff=""
 
-while [ $# > 0 ]; do
+while [ $# -gt 0 ]; do
     case $1 in
         -h | --help)
             echo "HELP"
@@ -83,7 +83,7 @@ while [ $# > 0 ]; do
         --skip-refactor)
             skipRefactor=true
         ;;
-        \?)
+        *)
             if [ -z "$indir" ]; then
                 indir=$1
             elif [ -z "$outdir" ]; then
@@ -100,12 +100,12 @@ done
 if [ -z "$indir" ]; then
     echo "Must specify an input directory"
     exit 1
-elif [ -z "$outdir" -a ! $database ]; then
+elif [ -z "$outdir" -a "$database" = false ]; then
     echo "USAGE: sifter.sh INPUT_FOLDER OUTPUT_FOLDER"
 	echo "      output folder will be created"
     echo "      (or run with --database flag to create a database after running experiment)"
     exit 1
-elif [ $database ]; then
+elif [ "$database" = true ]; then
     if ! [ -f $indir/binary_dump.txt ]; then
         echo "ERROR the directory $indir does not contain binary_dump.txt"
         echo "(Did you forget to run your application?)"
@@ -123,7 +123,7 @@ cd clang-tidy-standalone
 rm -rf build
 mkdir build
 cd build
-if $template; then
+if [ "$template" = true ]; then
     echo "About to build clang-tidy with templating ON"
     cmake -DCPP_TEMPLATE=ON ..
 else
@@ -164,12 +164,12 @@ echo "performing field extraction..."
 if [ "$?" -ne 0 ]; then echo "ERROR running field extraction" ; exit 1 ; fi
 echo ""
 
-if $template; then
+if [ "$template" = true ]; then
     echo "templating mallocs..."
 else
     echo "replacing malloc with malloc_s..."
 fi
-if $skipRefactor; then
+if [ "$skipRefactor" = true ]; then
     python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-10 -checks=misc-malloc-checker -export-fixes=fixes.yaml
     echo "skipped refactoring step - fixes written to fixes.yaml"
 else
