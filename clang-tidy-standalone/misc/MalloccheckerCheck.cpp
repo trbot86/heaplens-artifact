@@ -20,7 +20,15 @@
 #define MTDFNAME3 "malloc"
 #define MTDFNAME4 "ssmem_alloc"
 #define MTDFNAME5 "ssalloc"
-#define MATCH_FUNCTIONS allOf(anyOf(hasName(MTDFNAME), hasName(MTDFNAME2), hasName(MTDFNAME3), hasName(MTDFNAME4), hasName(MTDFNAME5)), unless(isTemplateInstantiation()))
+#define MTDFNAME6 "memalign"
+#define MTDFNAME7 "posix_memalign"
+#define MATCH_FUNCTIONS allOf(anyOf(hasName(MTDFNAME),
+                                    hasName(MTDFNAME2),
+                                    hasName(MTDFNAME3),
+                                    hasName(MTDFNAME4),
+                                    hasName(MTDFNAME5),
+                                    hasName(MTDFNAME6),
+                                    hasName(MTDFNAME7)), unless(isTemplateInstantiation()))
 // #define MATCH_FUNCTIONS hasName(MTDFNAME)
 
 using namespace clang::ast_matchers;
