@@ -357,8 +357,8 @@ class Sampler:
         # .reset_index().set_index('cluster')
         clusters = labeled_data.groupby('cluster', sort=False).groups
 
-        # max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(page_size, 2), 2))
-        max_pages = 1 # DEBUGGING
+        max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(page_size, 2), 2))
+        # max_pages = 1 # DEBUGGING
         sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
         taken = 0
         cluster_keys = list(clusters.keys())

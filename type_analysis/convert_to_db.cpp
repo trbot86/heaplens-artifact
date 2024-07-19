@@ -429,9 +429,10 @@ int main(int argc, char* argv[]) {
 
   cout << "Number of unique types found: " << seen_types.size() << endl;
 
-  cout << "Field file name: " << field_file << endl;
-  if (is_field_file)
+  if (is_field_file) {
+    cout << "Field file name: " << field_file << endl;
     get_fields(field_file, type_set, db);
+  }
 
   for (int i = 0, recs_taken = 0, num_file_writes = 0, bytes_copied = 0; i < num_structs; i++) {
     struct info_t event = *(filemap + i);
@@ -460,6 +461,8 @@ int main(int argc, char* argv[]) {
           skip_addrs.insert(page_num_end);
         }
     }
+
+    cout << "Beginning to copy records to database..." << endl;
 
     if (sample_portion < 0 || include_addrs.find(page_num) != include_addrs.end() || include_addrs.find(page_num_end) != include_addrs.end()) {
       bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
