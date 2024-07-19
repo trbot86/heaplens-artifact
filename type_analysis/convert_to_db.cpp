@@ -1,4 +1,3 @@
-#include "memhook_interface.h"
 #include <iostream>
 #include <algorithm>
 #include <cstdio>
@@ -437,6 +436,7 @@ int main(int argc, char* argv[]) {
   for (int i = 0, recs_taken = 0, num_file_writes = 0, bytes_copied = 0; i < num_structs; i++) {
     struct info_t event = *(filemap + i);
     uint64_t page_num = (uint64_t) event.addr / page_size;
+    uint64_t page_num_end = ((uint64_t) event.addr + event.size) / page_size;
     stringstream filenamestr, typenamestr;
     filenamestr << static_cast<const void*>(event.file);
     typenamestr << static_cast<const void*>(event.tindex_name);
@@ -451,7 +451,17 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (sample_portion < 0 || include_addrs.find(page_num) != include_addrs.end()) {
+    if (skip_addrs.find(page_num_end) == skip_addrs.end() &&
+        include_addrs.find(page_num_end) == include_addrs.end()) {
+        if (rand() < sample_portion*RAND_MAX) {
+          include_addrs.insert(page_num_end);
+        }
+        else {
+          skip_addrs.insert(page_num_end);
+        }
+    }
+
+    if (sample_portion < 0 || include_addrs.find(page_num) != include_addrs.end() || include_addrs.find(page_num_end) != include_addrs.end()) {
       bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
                                                       "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
                                                 event.file ?  file_map.at(filenamestr.str()).c_str() : "NULL",

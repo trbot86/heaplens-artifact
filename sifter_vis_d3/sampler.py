@@ -249,14 +249,17 @@ class Sampler:
             return pd.DataFrame({"cl_addr": [], "hitm": []})
 
     def get_fields(self, types):
-        df = pd.read_sql_query("""SELECT TYPE as type,
-                                    SUBTYPE as subtype,
-                                    NAME as name,
-                                    SIZE as size,
-                                    OFFSET as offset
-                                FROM FIELDS""",
-                                self.con)
-        return {k: v.to_dict(orient='records') for k, v in df[df['type'].isin(types)].set_index('type').groupby(level=0)}
+        try:
+            df = pd.read_sql_query("""SELECT TYPE as type,
+                                        SUBTYPE as subtype,
+                                        NAME as name,
+                                        SIZE as size,
+                                        OFFSET as offset
+                                    FROM FIELDS""",
+                                    self.con)
+            return {k: v.to_dict(orient='records') for k, v in df[df['type'].isin(types)].set_index('type').groupby(level=0)}
+        except:
+            return dict()
 
     def get_clusters_of_pages(self, start_ts, end_ts, type_data, page_size=4096, alg='dbscan', cls=64, num_buckets=5000):
         recs = self.get_records_in_interval(start_ts, end_ts, page_size) if start_ts > 0 and end_ts > 0 else self.get_all_records()

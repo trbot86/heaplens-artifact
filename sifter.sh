@@ -137,6 +137,7 @@ elif [ "$database" = true ]; then
     cd type_analysis
     make convert_to_db
     bash -c './bin/convert_to_db $perffile $fielddump $pagespertype $sample $cutoff'
+    exit 0
 elif [ "$includesOnly" = true ]; then
     add_includes $indir
     exit 0
