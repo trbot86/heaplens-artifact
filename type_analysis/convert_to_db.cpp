@@ -269,6 +269,18 @@ void create_supertable(sqlite3* db) {
   }
 }
 
+void flip_coin(float sample_portion, uint64_t page_num, unordered_set<uint64_t> include_addrs, unordered_set<uint64_t> skip_addrs) {
+  if (skip_addrs.find(page_num) == skip_addrs.end() &&
+      include_addrs.find(page_num) == include_addrs.end()) {
+      if (rand() < sample_portion*RAND_MAX) {
+        include_addrs.insert(page_num);
+      }
+      else {
+        skip_addrs.insert(page_num);
+      }
+  }
+}
+
 int main(int argc, char* argv[]) {
   struct option long_opts[] = {
     {"perf-file",           required_argument,  0,  'p'},
@@ -443,34 +455,42 @@ int main(int argc, char* argv[]) {
     stringstream filenamestr, typenamestr;
     filenamestr << static_cast<const void*>(event.file);
     typenamestr << static_cast<const void*>(event.tindex_name);
-    
-    if (skip_addrs.find(page_num) == skip_addrs.end() &&
-        include_addrs.find(page_num) == include_addrs.end()) {
-        if (rand() < sample_portion*RAND_MAX) {
-          include_addrs.insert(page_num);
-        }
-        else {
-          skip_addrs.insert(page_num);
-        }
-    }
 
-    if (skip_addrs.find(page_num_end) == skip_addrs.end() &&
-        include_addrs.find(page_num_end) == include_addrs.end()) {
-        if (rand() < sample_portion*RAND_MAX) {
-          include_addrs.insert(page_num_end);
-        }
-        else {
-          skip_addrs.insert(page_num_end);
-        }
-    }
+    flip_coin(sample_portion, page_num, include_addrs, skip_addrs);
+    flip_coin(sample_portion, page_num_end, include_addrs, skip_addrs);
 
-    if (sample_portion < 0 || include_addrs.find(page_num) != include_addrs.end() || include_addrs.find(page_num_end) != include_addrs.end()) {
+    if (sample_portion <= 0 || (include_addrs.find(page_num) != include_addrs.end() &&
+        include_addrs.find(page_num_end) != include_addrs.end())) {
       bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
                                                       "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
                                                 event.file ?  file_map.at(filenamestr.str()).c_str() : "NULL",
                                                 event.line,
                                                 event.timestamp,
                                                 event.size,
+                                                (long) event.addr,
+                                                event.typeofop,
+                                                event.tindex_name ? type_map.at(typenamestr.str()).c_str() : "NULL");
+      recs_taken++;
+    }
+    else if (include_addrs.find(page_num) != include_addrs.end()) {
+      bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
+                                                      "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
+                                                event.file ?  file_map.at(filenamestr.str()).c_str() : "NULL",
+                                                event.line,
+                                                event.timestamp,
+                                                page_size - ((uint64_t) event.addr % page_size),
+                                                (long) event.addr,
+                                                event.typeofop,
+                                                event.tindex_name ? type_map.at(typenamestr.str()).c_str() : "NULL");
+      recs_taken++;
+    }
+    else if (include_addrs.find(page_num_end) != include_addrs.end()) {
+      bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
+                                                      "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
+                                                event.file ?  file_map.at(filenamestr.str()).c_str() : "NULL",
+                                                event.line,
+                                                event.timestamp,
+                                                event.size - (page_size - ((uint64_t) event.addr % page_size)),
                                                 (long) event.addr,
                                                 event.typeofop,
                                                 event.tindex_name ? type_map.at(typenamestr.str()).c_str() : "NULL");
