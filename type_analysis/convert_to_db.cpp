@@ -434,6 +434,8 @@ int main(int argc, char* argv[]) {
     get_fields(field_file, type_set, db);
   }
 
+  cout << "Beginning to copy records to database..." << endl;
+
   for (int i = 0, recs_taken = 0, num_file_writes = 0, bytes_copied = 0; i < num_structs; i++) {
     struct info_t event = *(filemap + i);
     uint64_t page_num = (uint64_t) event.addr / page_size;
@@ -461,8 +463,6 @@ int main(int argc, char* argv[]) {
           skip_addrs.insert(page_num_end);
         }
     }
-
-    cout << "Beginning to copy records to database..." << endl;
 
     if (sample_portion < 0 || include_addrs.find(page_num) != include_addrs.end() || include_addrs.find(page_num_end) != include_addrs.end()) {
       bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
