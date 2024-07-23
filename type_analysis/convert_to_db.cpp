@@ -269,7 +269,7 @@ void create_supertable(sqlite3* db) {
   }
 }
 
-void flip_coin(float sample_portion, uint64_t page_num, unordered_set<uint64_t> include_addrs, unordered_set<uint64_t> skip_addrs) {
+void flip_coin(float sample_portion, uint64_t page_num, unordered_set<uint64_t>& include_addrs, unordered_set<uint64_t>& skip_addrs) {
   if (skip_addrs.find(page_num) == skip_addrs.end() &&
       include_addrs.find(page_num) == include_addrs.end()) {
       if (rand() < sample_portion*RAND_MAX) {
@@ -451,7 +451,7 @@ int main(int argc, char* argv[]) {
   for (int i = 0, recs_taken = 0, num_file_writes = 0, bytes_copied = 0; i < num_structs; i++) {
     struct info_t event = *(filemap + i);
     uint64_t page_num = (uint64_t) event.addr / page_size;
-    uint64_t page_num_end = ((uint64_t) event.addr + event.size) / page_size;
+    uint64_t page_num_end = ((uint64_t) event.addr + event.size - 1) / page_size;
     stringstream filenamestr, typenamestr;
     filenamestr << static_cast<const void*>(event.file);
     typenamestr << static_cast<const void*>(event.tindex_name);
