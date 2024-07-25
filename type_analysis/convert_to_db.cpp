@@ -2,12 +2,13 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
+#include <cstdint>
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sqlite3.h>
 #include <fstream>
-#include <map>
+#include <unordered_map>
 #include <sstream>
 #include <cstring>
 #include <sys/stat.h>
@@ -16,6 +17,7 @@
 #include <regex>
 #include <getopt.h>
 #include <string>
+#include <thread>
 
 #define PADDING 64
 #ifndef STRUCTS_PER_BLOCK
@@ -24,6 +26,31 @@
 #define MINIMUM_STRUCT_PER_BLOCK 1000000
 
 using namespace std;
+
+// thread_local sqlite3* my_db;
+// atomic<int> id{};
+
+// int init_id() {
+//   return id++;
+// }
+
+// const uint64_t FNV_OFFSET_BASIS = 14695981039346656037;
+// const uint64_t FNV_PRIME = 1099511628211;
+
+// size_t fnv_hash(const char* data, size_t size) {
+//   size_t hash = FNV_OFFSET_BASIS;
+//   for (int i = 0; i < size; i++) {
+//     hash *= FNV_PRIME;
+//     hash ^= data[i];
+//   }
+//   return hash;
+// }
+
+// struct myhash {
+//   size_t operator()(const char* const s) const noexcept {
+//     return fnv_hash(s, strlen(s));
+//   }
+// };
 
 struct info_t {
     const char* file;
@@ -54,13 +81,14 @@ size_t bin_search(size_t* arr, size_t x, int begin, int end) {
   }
 }
 
-map<string, string> construct_map(const char* filename) {
-  map<string, string> retmap{};
+unordered_map<uintptr_t, string> construct_map(const char* filename) {
+  unordered_map<uintptr_t, string> retmap{};
   ifstream fd{filename};
   string val;
   for (string key; getline(fd, key, '|'); ) {
     getline(fd, val);
-    retmap.insert(pair<string, string>{key, val});
+    uintptr_t ptr = (uintptr_t) stoul(key, nullptr, 16);
+    retmap.insert(pair<uintptr_t, string>{ptr, val});
   }
   return retmap;
 }
@@ -170,7 +198,7 @@ void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db
         // else
         //   cout << "NO" << type << " " << subtype << " " << name << " " << size << " " << offset << endl;
 
-        if (seen_types.find(type_trim) != seen_types.end() &&
+        if (seen_types.find(type_trim.c_str()) != seen_types.end() &&
             (entries.find(type_trim) == entries.end() || entries[type_trim].find(name) == entries[type_trim].end())) {
           struct field_data new_entry{subtype, size, offset};
           entries[type_trim][name] = new_entry;
@@ -281,6 +309,10 @@ void flip_coin(float sample_portion, uint64_t page_num, unordered_set<uint64_t>&
   }
 }
 
+
+
+
+
 int main(int argc, char* argv[]) {
   struct option long_opts[] = {
     {"perf-file",           required_argument,  0,  'p'},
@@ -290,7 +322,8 @@ int main(int argc, char* argv[]) {
     {"cacheline-size",      required_argument,  0,  0},
     {"num-pages-per-type",  required_argument,  0,  't'},
     {"field-dump",          required_argument,  0,  'f'},
-    {"malloc-type-c",       required_argument,  0,  'm'}
+    {"malloc-type-c",       required_argument,  0,  'm'},
+    {"threads",             optional_argument,  0,  'j'}
   };
   int opt_ind = 0;
 
@@ -306,9 +339,10 @@ int main(int argc, char* argv[]) {
   int page_size = 4096;
   int cacheline_size = 64;
   int num_pages_per_type = 1;
+  unsigned int num_threads = 1;
   const char* type_c_file;
   bool is_type_c = false;
-  while ((c = getopt_long(argc, argv, "p:c:s:t:", long_opts, &opt_ind)) != -1) {
+  while ((c = getopt_long(argc, argv, "p:c:s:t:j", long_opts, &opt_ind)) != -1) {
     switch (c) {
       case 0:
         switch (opt_ind) {
@@ -334,12 +368,16 @@ int main(int argc, char* argv[]) {
         break;
       case 't':
         num_pages_per_type = stoi(optarg);
-        cout << "NUM PAGES PER TYPE: " << num_pages_per_type << endl;
         break;
       case 'f':
         field_file = optarg;
         is_field_file = true;
         break;
+      case 'j':
+        if (optarg != NULL)
+          num_threads = stoi(optarg);
+        else
+          num_threads = thread::hardware_concurrency();
       case 'm':
         type_c_file = optarg;
         is_type_c = true;
@@ -364,28 +402,28 @@ int main(int argc, char* argv[]) {
   if (is_perf_file)
     get_perf_addrs(perf_file, cutoff, page_size, cacheline_size, include_addrs, db);
 
-  const char* input_filename = "binary_dump.txt";
   unsigned long int file_byte_size = 0;
   struct stat sb;
 
-  FILE* input_file = fopen(input_filename, "r");
-  if(input_file ==  NULL ){
-		printf("%s not found \n", input_filename);
+  FILE* input_file = fopen("binary_dump.txt", "r");
+  if (input_file ==  NULL) {
+		printf("binary_dump.txt not found\n");
+    exit(-1);
 	}
 	
 	fstat(fileno(input_file), &sb);
   file_byte_size = (unsigned long int) sb.st_size;
   long int num_structs = file_byte_size / sizeof(struct info_t);
 
-  map<string, string> type_map = construct_map("typeset_dump.txt");
-  map<string, string> file_map = construct_map("fileset_dump.txt");
-  map<string, int> seen_types{};
+  unordered_map<uintptr_t, string> type_map = construct_map("typeset_dump.txt");
+  unordered_map<uintptr_t, string> file_map = construct_map("fileset_dump.txt");
+  unordered_map<uintptr_t, int> seen_types{};
   unordered_set<string> type_set{};
 
   const int num_classes = 31;
   size_t size_classes [num_classes] = { 8, 16, 32, 48, 64, 80, 96, 128, 192, 224, 256, 320, 384, 512, 640, 768, 1024, 1280, 
                                         1536, 2048, 3584, 8192, 28672, 40960, 81920, 163840, 655360, 917504, 10485760, 20971520, 99999999999};
-  map<size_t, int> size_class_counts{};
+  unordered_map<size_t, int> size_class_counts{};
   for (int i = 0; i < num_classes; i++) {
     size_class_counts.insert(pair<size_t, int>{size_classes[i], 0});
   }
@@ -403,25 +441,35 @@ int main(int argc, char* argv[]) {
     cout << "Successfully mapped file" << endl;
   }
 
-  char* charmap = (char *) malloc(800 * sizeof(char) * STRUCTS_PER_BLOCK);
-  memset(charmap, 0, 800 * sizeof(char) * STRUCTS_PER_BLOCK);
+  // char* charmap = (char *) malloc(800 * sizeof(char) * STRUCTS_PER_BLOCK);
+  // memset(charmap, '\0', 800 * sizeof(char) * STRUCTS_PER_BLOCK);
+
+  // uint64_t x = 0;
+  // cout << "Beginning RT test" << endl;
+  // for (int i = 0; i < num_structs; i++) {
+  //   x++;
+  // }
+  // cout << "End test! " << x << endl;
 
   for (int i = 0; i < num_structs; i++) {
     struct info_t event = *(filemap + i);
+    if (!event.typeofop)
+      continue;
     stringstream typenamestr;
     typenamestr << static_cast<const void*>(event.tindex_name);
-    if (seen_types.find(typenamestr.str()) == seen_types.end()) {
-      seen_types.insert(pair<string, int>{typenamestr.str(), 0});
+
+    if (seen_types.find((uintptr_t) event.tindex_name) == seen_types.end()) {
+      seen_types.insert(pair<uintptr_t, int>{(uintptr_t) event.tindex_name, 0});
     }
-    if (seen_types.at(typenamestr.str()) < num_pages_per_type) {
-      if (type_map.find(typenamestr.str()) != type_map.end()) {
-        string type_trim = type_map.at(typenamestr.str());
+    if (seen_types.at((uintptr_t) event.tindex_name) < num_pages_per_type) {
+      if (type_map.find((uintptr_t) event.tindex_name) != type_map.end()) {
+        string type_trim = type_map.at((uintptr_t) event.tindex_name);
         type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
         type_set.insert(type_trim);
       }
       if (include_addrs.find((uint64_t) event.addr / page_size) == include_addrs.end()) {
         include_addrs.insert((uint64_t) event.addr / page_size);
-        seen_types[typenamestr.str()] = seen_types[typenamestr.str()] + 1;
+        seen_types[(uintptr_t) event.tindex_name] = seen_types[(uintptr_t) event.tindex_name] + 1;
       }
     }
     if (event.size > 0) {
@@ -448,80 +496,185 @@ int main(int argc, char* argv[]) {
 
   cout << "Beginning to copy records to database..." << endl;
 
+  unordered_map<uint64_t, size_t> last_alloc{};
+
+  sqlite3_stmt* stmt = 0;
+  rc = sqlite3_prepare_v2(db, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE) " \
+                              "VALUES ('?', ?NNN, ?NNN, ?NNN, ?NNN, ?NNN, '?');", -1, &stmt, 0);
+
+  if (rc != SQLITE_DONE) {
+    fprintf(stderr, "Error after sqlite prepare: %s\n", sqlite3_errstr(rc));
+    fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+    sqlite3_free(zErrMsg);
+    fclose(input_file);
+    sqlite3_close(db);
+    exit(-1);
+  }
+
+  rc = sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
+
+  if (rc != SQLITE_DONE) {
+    fprintf(stderr, "Error after begin transaction: %s\n", sqlite3_errstr(rc));
+    fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+    sqlite3_free(zErrMsg);
+    fclose(input_file);
+    sqlite3_close(db);
+    exit(-1);
+  }
+
   for (int i = 0, recs_taken = 0, num_file_writes = 0, bytes_copied = 0; i < num_structs; i++) {
     struct info_t event = *(filemap + i);
     uint64_t page_num = (uint64_t) event.addr / page_size;
-    uint64_t page_num_end = ((uint64_t) event.addr + event.size - 1) / page_size;
-    stringstream filenamestr, typenamestr;
-    filenamestr << static_cast<const void*>(event.file);
-    typenamestr << static_cast<const void*>(event.tindex_name);
+    size_t eventSize = event.typeofop ? event.size : last_alloc.find((uint64_t) event.addr) != last_alloc.end() ? last_alloc.at((uint64_t) event.addr) : 0;
+    if (event.typeofop)
+      last_alloc.insert(pair<uint64_t, size_t>{(uint64_t) event.addr, event.size});
+
+    uint64_t page_num_end = ((uint64_t) event.addr + eventSize - 1) / page_size;
+    // stringstream filenamestr, typenamestr;
+    // filenamestr << static_cast<const void*>(event.file);
+    // typenamestr << static_cast<const void*>(event.tindex_name);
 
     flip_coin(sample_portion, page_num, include_addrs, skip_addrs);
     flip_coin(sample_portion, page_num_end, include_addrs, skip_addrs);
 
+    const char* fname = file_map.at((uintptr_t) event.file).c_str();
+    const char* tname = type_map.at((uintptr_t) event.tindex_name).c_str();
+
     if (sample_portion <= 0 || (include_addrs.find(page_num) != include_addrs.end() &&
         include_addrs.find(page_num_end) != include_addrs.end())) {
-      bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
-                                                      "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
-                                                event.file ?  file_map.at(filenamestr.str()).c_str() : "NULL",
-                                                event.line,
-                                                event.timestamp,
-                                                event.size,
-                                                (long) event.addr,
-                                                event.typeofop,
-                                                event.tindex_name ? type_map.at(typenamestr.str()).c_str() : "NULL");
-      recs_taken++;
-    }
-    else if (include_addrs.find(page_num) != include_addrs.end()) {
-      bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
-                                                      "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
-                                                event.file ?  file_map.at(filenamestr.str()).c_str() : "NULL",
-                                                event.line,
-                                                event.timestamp,
-                                                page_size - ((uint64_t) event.addr % page_size),
-                                                (long) event.addr,
-                                                event.typeofop,
-                                                event.tindex_name ? type_map.at(typenamestr.str()).c_str() : "NULL");
-      recs_taken++;
-    }
-    else if (include_addrs.find(page_num_end) != include_addrs.end()) {
-      bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
-                                                      "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
-                                                event.file ?  file_map.at(filenamestr.str()).c_str() : "NULL",
-                                                event.line,
-                                                event.timestamp,
-                                                event.size - (page_size - ((uint64_t) event.addr % page_size)),
-                                                (long) event.addr,
-                                                event.typeofop,
-                                                event.tindex_name ? type_map.at(typenamestr.str()).c_str() : "NULL");
-      recs_taken++;
-    }
 
-    if (recs_taken == STRUCTS_PER_BLOCK || i == num_structs - 1) {
-      cout << "Done mem copy" << endl;
-      sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
-      rc = sqlite3_exec(db, charmap, nullptr, 0, &zErrMsg);
-      sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
+      // bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
+      //                                                 "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
+      //                                           event.file ?  file_map.at((uintptr_t) event.file).c_str() : "NULL",
+      //                                           event.line,
+      //                                           event.timestamp,
+      //                                           eventSize,
+      //                                           (long) event.addr,
+      //                                           event.typeofop,
+      //                                           event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL");
 
-      if (rc != SQLITE_OK) {
-        cout << "SQL error: " << zErrMsg << endl;
+      recs_taken++;
+
+      sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
+      sqlite3_bind_int(stmt, 2, event.line);
+      sqlite3_bind_int64(stmt, 3, event.timestamp);
+      sqlite3_bind_int64(stmt, 4, eventSize);
+      sqlite3_bind_int64(stmt, 5, (uint64_t) event.addr);
+      sqlite3_bind_int(stmt, 6, event.typeofop);
+      sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+
+      rc = sqlite3_step(stmt);
+      if (rc != SQLITE_DONE) {
+        fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
+        fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
         sqlite3_free(zErrMsg);
-        free(charmap);
         fclose(input_file);
         sqlite3_close(db);
         exit(-1);
       }
 
-      cout << "Done file write " << num_file_writes++ << endl;
-      recs_taken = 0;
-      bytes_copied = 0;
+      sqlite3_step(stmt);
+      sqlite3_clear_bindings(stmt);
+      sqlite3_reset(stmt);
+    }
+    else if (include_addrs.find(page_num) != include_addrs.end()) {
+      // bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
+      //                                                 "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
+      //                                           event.file ?  file_map.at((uintptr_t) event.file).c_str() : "NULL",
+      //                                           event.line,
+      //                                           event.timestamp,
+      //                                           page_size - ((uint64_t) event.addr % page_size),
+      //                                           (long) event.addr,
+      //                                           event.typeofop,
+      //                                           event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL");
+      recs_taken++;
+
+      sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
+      sqlite3_bind_int(stmt, 2, event.line);
+      sqlite3_bind_int64(stmt, 3, event.timestamp);
+      sqlite3_bind_int64(stmt, 4, page_size - ((uint64_t) event.addr % page_size));
+      sqlite3_bind_int64(stmt, 5, (uint64_t) event.addr);
+      sqlite3_bind_int(stmt, 6, event.typeofop);
+      sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+
+      rc = sqlite3_step(stmt);
+      if (rc != SQLITE_DONE) {
+        fprintf(stderr, "Error in case 2: %s\n", sqlite3_errstr(rc));
+        fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+        sqlite3_free(zErrMsg);
+        fclose(input_file);
+        sqlite3_close(db);
+        exit(-1);
+      }
+
+      sqlite3_step(stmt);
+      sqlite3_clear_bindings(stmt);
+      sqlite3_reset(stmt);
+    }
+    else if (include_addrs.find(page_num_end) != include_addrs.end()) {
+      // bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
+      //                                                 "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
+      //                                           event.file ?  file_map.at((uintptr_t) event.file).c_str() : "NULL",
+      //                                           event.line,
+      //                                           event.timestamp,
+      //                                           eventSize - (page_size - ((uint64_t) event.addr % page_size)),
+      //                                           (long) event.addr + (page_size - ((uint64_t) event.addr % page_size)),
+      //                                           event.typeofop,
+      //                                           event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL");
+      recs_taken++;
+
+      sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
+      sqlite3_bind_int(stmt, 2, event.line);
+      sqlite3_bind_int64(stmt, 3, event.timestamp);
+      sqlite3_bind_int64(stmt, 4, eventSize - (page_size - ((uint64_t) event.addr % page_size)));
+      sqlite3_bind_int64(stmt, 5, (uint64_t) event.addr + (page_size - ((uint64_t) event.addr % page_size)));
+      sqlite3_bind_int(stmt, 6, event.typeofop);
+      sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+
+      rc = sqlite3_step(stmt);
+      if (rc != SQLITE_DONE) {
+        fprintf(stderr, "Error in case 3: %s\n", sqlite3_errstr(rc));
+        fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+        sqlite3_free(zErrMsg);
+        fclose(input_file);
+        sqlite3_close(db);
+        exit(-1);
+      }
+
+      sqlite3_step(stmt);
+      sqlite3_clear_bindings(stmt);
+      sqlite3_reset(stmt);
     }
   }
+  rc = sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
+
+  if (rc != SQLITE_OK) {
+    cout << "SQL error: " << zErrMsg << endl;
+    sqlite3_free(zErrMsg);
+    // free(charmap);
+    fclose(input_file);
+    sqlite3_close(db);
+    exit(-1);
+  }
+
+    // if (recs_taken == STRUCTS_PER_BLOCK || i == num_structs - 1) {
+    //   cout << "Done mem copy" << endl;
+    //   sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
+    //   rc = sqlite3_exec(db, charmap, nullptr, 0, &zErrMsg);
+    //   sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
+
+      
+
+    //   cout << "Done file write " << num_file_writes++ << endl;
+    //   memset(charmap, '\0', bytes_copied);
+    //   recs_taken = 0;
+    //   bytes_copied = 0;
+    // }
 
   cout << "Number of pages included in output: " << include_addrs.size() << endl;
   cout << "Number of pages excluded in output: " << skip_addrs.size() << endl;
 
-  free(charmap);
+  // free(charmap);
   fclose(input_file);
   sqlite3_close(db);
 }

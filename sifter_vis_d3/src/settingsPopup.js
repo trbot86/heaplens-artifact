@@ -5,7 +5,7 @@ export class SettingsPopup {
         const TOP_BUFF = 50;
         const LEFT_BUFF = 40;
         const LINE_SEP = 50;
-        const BUTTON_WIDTH = 90;
+        const BUTTON_WIDTH = 96;
         const BUTTON_HEIGHT = 30;
 
         const algOptions = ['DBSCAN', 'Agglomerative Clustering', 'MeanShift'];
