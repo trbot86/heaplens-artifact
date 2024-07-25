@@ -2,6 +2,8 @@ __pycache__
 -1
 *.so
 *.o
+ASCYLIB
+ssmem
 fielddump.txt
 newfielddump.txt
 typedump.txt

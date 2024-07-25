@@ -59,50 +59,6 @@ static unsigned long tmpallocs = 0;
 static volatile int initialized = 0;
 
 __attribute__((constructor)) static void init() {
-    // // fprintf(stdout, "loading rtld_next functions...\n");
-    // next_malloc         = (void * (*)(size_t ))dlsym(RTLD_NEXT, "malloc");
-    // if (!next_malloc) exit(43);
-    // // fprintf(stdout, "    next_malloc@%p \n", next_malloc);
-    // next_free           = (void   (*)(void *))dlsym(RTLD_NEXT, "free");
-    // // fprintf(stdout, "    free@%p\n");
-    // next_calloc         = (void * (*)(size_t , size_t ))dlsym(RTLD_NEXT, "calloc");
-    // // fprintf(stdout, "    calloc@%p\n");
-    // next_ssmem_alloc    = (void * (*)(ssmem_allocator_t*, size_t))dlsym(RTLD_NEXT, "ssmem_alloc");
-    // // fprintf(stdout, "    next_ssmem_alloc@%p \n", next_ssmem_alloc);
-    // next_ssmem_free     = (void   (*)(ssmem_allocator_t*, void*))dlsym(RTLD_NEXT, "ssmem_free");
-    // // fprintf(stdout, "    next_ssmem_free@%p \n", next_ssmem_free);
-
-    // test_ssmem_free = (void   (*)(ssmem_allocator_t*, void*))dlsym(RTLD_DEFAULT, "ssmem_free");
-    // fprintf(stdout, "    test_ssmem_free@%p \n", test_ssmem_free);
-    // next_valloc         = dlsym(RTLD_NEXT, "valloc");
-    // fprintf(stdout, "    valloc\n");
-    // next_pvalloc        = dlsym(RTLD_NEXT, "pvalloc");
-    // fprintf(stdout, "    pvalloc\n");
-    // next_memalign       = dlsym(RTLD_NEXT, "memalign");
-    // fprintf(stdout, "    memalign\n");
-    // next_posix_memalign = dlsym(RTLD_NEXT, "posix_memalign");
-    // fprintf(stdout, "    posix_memalign\n");
-    // next_aligned_alloc  = dlsym(RTLD_NEXT, "aligned_alloc");
-    // fprintf(stdout, "    aligned_alloc\n");
-    // next_realloc        = dlsym(RTLD_NEXT, "realloc");
-    // fprintf(stdout, "    realloc\n");
-    // next_reallocf       = dlsym(RTLD_NEXT, "reallocf");
-    // fprintf(stdout, "    reallocf\n");
-    // next_reallocarray   = dlsym(RTLD_NEXT, "reallocarray");
-    // fprintf(stdout, "    reallocarray\n");
-
-
-
-    // fprintf(stdout, "    done.\n");
-    // if (!next_ssmem_alloc || !next_ssmem_free) {
-    //     fprintf(stderr, "Error in dlsym!!!\n");
-    //     fprintf(stdout, "    next_ssmem_alloc@%p \n", next_ssmem_alloc);
-    //     fprintf(stdout, "    next_ssmem_free@%p \n", next_ssmem_free);
-    //     // fprintf(stderr, "Error in `dlsym`: %s\n", dlerror());
-    //     exit(1);
-    // }
-
-    // fprintf(stdout, "About to load global fd\n");
     global_fd = open(file_path,O_RDWR|O_APPEND|O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
     initialized = 1;
     fprintf(stdout, "Done memhook constructor\n");
@@ -207,17 +163,6 @@ void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, boo
 // //     // }
 //     return next_realloc(ptr, size);
 // }
-void *memhook_calloc(size_t nmemb, size_t size, char* file, int line, bool log) {
-    if ((!initialized)) {
-        // printf("nmemb*size=%lu\n", (nmemb*size));
-        void *ptr = memhook_malloc(nmemb*size, file, line, false);
-        // printf("nmemb*size=%lu\n", (nmemb*size));
-        if (ptr) memset(ptr, 0, nmemb*size);
-        if (!ptr) exit(70);
-        return ptr;
-    }
-    return calloc(nmemb, size);
-}
 
 void alloc_log(void* ptr, size_t size, const char* filename, int line, const char* name_of_type) {
     unit_log.timestamp = memhook_get_server_clock();
@@ -237,14 +182,17 @@ void free_log(void* ptr) {
     collector.copy(unit_log);
 }
 
+// void* memhook_calloc(size_t nmemb, size_t size, int line, const char* filename, const char* name_of_type) {
+    
+// }
+
 extern "C" {
 
     // Used for C/C++ projects which do not support templating
     void* malloc_s(size_t size, int line, const char* filename, const char* name_of_type) {
-        unit_log.tindex_name = typetable.insert(name_of_type);
-        
         void* ptr = memhook_malloc(size, filename, line, true);
         if (initialized) {
+            unit_log.tindex_name = typetable.insert(name_of_type);
             // cout << "CALLED CUSTOM MALLOC" << endl;
             collector.copy(unit_log);
         }
@@ -357,9 +305,19 @@ extern "C" {
         return ptr;
     }
 
-    // void *calloc(size_t nmemb, size_t size) {
-    //     return memhook_calloc(nmemb, size, true);
-    // }
+    void* calloc_s(size_t nmemb, size_t size, int line, const char* filename, const char* name_of_type) {
+        if (!initialized) {
+            void *ptr = memhook_malloc(nmemb*size, filename, line, false);
+            if (ptr) memset(ptr, 0, nmemb*size);
+            if (!ptr) exit(70);
+            return ptr;
+        }
+
+        void* ptr = calloc(nmemb, size);
+        alloc_log(ptr, size * nmemb, filename, line, name_of_type);
+
+        return ptr;
+    }
 }
 
 /**********************

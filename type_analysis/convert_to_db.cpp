@@ -28,29 +28,6 @@
 using namespace std;
 
 // thread_local sqlite3* my_db;
-// atomic<int> id{};
-
-// int init_id() {
-//   return id++;
-// }
-
-// const uint64_t FNV_OFFSET_BASIS = 14695981039346656037;
-// const uint64_t FNV_PRIME = 1099511628211;
-
-// size_t fnv_hash(const char* data, size_t size) {
-//   size_t hash = FNV_OFFSET_BASIS;
-//   for (int i = 0; i < size; i++) {
-//     hash *= FNV_PRIME;
-//     hash ^= data[i];
-//   }
-//   return hash;
-// }
-
-// struct myhash {
-//   size_t operator()(const char* const s) const noexcept {
-//     return fnv_hash(s, strlen(s));
-//   }
-// };
 
 struct info_t {
     const char* file;
@@ -387,6 +364,9 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  cout << "Sample percent: " << sample_portion << endl;
+  cout << "Number of pages: " << num_pages_per_type << endl;
+
   sqlite3* db;
   int rc = sqlite3_open("allocs.sqlite", &db);
   char* zErrMsg = 0;
@@ -453,6 +433,8 @@ int main(int argc, char* argv[]) {
 
   for (int i = 0; i < num_structs; i++) {
     struct info_t event = *(filemap + i);
+    if (i % 1000000 == 0)
+      cout << "Starting iteration " << i << " of first loop" << endl;
     if (!event.typeofop)
       continue;
     stringstream typenamestr;
@@ -500,9 +482,9 @@ int main(int argc, char* argv[]) {
 
   sqlite3_stmt* stmt = 0;
   rc = sqlite3_prepare_v2(db, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE) " \
-                              "VALUES ('?', ?NNN, ?NNN, ?NNN, ?NNN, ?NNN, '?');", -1, &stmt, 0);
+                              "VALUES (?, ?, ?, ?, ?, ?, ?);", -1, &stmt, 0);
 
-  if (rc != SQLITE_DONE) {
+  if (rc != SQLITE_OK) {
     fprintf(stderr, "Error after sqlite prepare: %s\n", sqlite3_errstr(rc));
     fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
     sqlite3_free(zErrMsg);
@@ -513,7 +495,7 @@ int main(int argc, char* argv[]) {
 
   rc = sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
 
-  if (rc != SQLITE_DONE) {
+  if (rc != SQLITE_OK) {
     fprintf(stderr, "Error after begin transaction: %s\n", sqlite3_errstr(rc));
     fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
     sqlite3_free(zErrMsg);
@@ -524,6 +506,8 @@ int main(int argc, char* argv[]) {
 
   for (int i = 0, recs_taken = 0, num_file_writes = 0, bytes_copied = 0; i < num_structs; i++) {
     struct info_t event = *(filemap + i);
+    if (i % 1000000 == 0)
+      cout << "Starting iteration " << i << " of second loop" << endl;
     uint64_t page_num = (uint64_t) event.addr / page_size;
     size_t eventSize = event.typeofop ? event.size : last_alloc.find((uint64_t) event.addr) != last_alloc.end() ? last_alloc.at((uint64_t) event.addr) : 0;
     if (event.typeofop)
@@ -537,8 +521,8 @@ int main(int argc, char* argv[]) {
     flip_coin(sample_portion, page_num, include_addrs, skip_addrs);
     flip_coin(sample_portion, page_num_end, include_addrs, skip_addrs);
 
-    const char* fname = file_map.at((uintptr_t) event.file).c_str();
-    const char* tname = type_map.at((uintptr_t) event.tindex_name).c_str();
+    const char* fname = event.file ? file_map.at((uintptr_t) event.file).c_str() : "NULL";
+    const char* tname = event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL";
 
     if (sample_portion <= 0 || (include_addrs.find(page_num) != include_addrs.end() &&
         include_addrs.find(page_num_end) != include_addrs.end())) {
@@ -573,7 +557,7 @@ int main(int argc, char* argv[]) {
         exit(-1);
       }
 
-      sqlite3_step(stmt);
+      // sqlite3_step(stmt);
       sqlite3_clear_bindings(stmt);
       sqlite3_reset(stmt);
     }
@@ -607,7 +591,7 @@ int main(int argc, char* argv[]) {
         exit(-1);
       }
 
-      sqlite3_step(stmt);
+      // sqlite3_step(stmt);
       sqlite3_clear_bindings(stmt);
       sqlite3_reset(stmt);
     }
@@ -641,7 +625,7 @@ int main(int argc, char* argv[]) {
         exit(-1);
       }
 
-      sqlite3_step(stmt);
+      // sqlite3_step(stmt);
       sqlite3_clear_bindings(stmt);
       sqlite3_reset(stmt);
     }

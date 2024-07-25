@@ -83,11 +83,12 @@ extern "C"
 
     void* malloc_s(size_t, int, const char*, const char*);
     // void free_s(void *, int, const char*);
-    void* ssalloc_s(size_t size, int line, const char* filename, const char* name_of_type);
-    void* ssalloc_aligned_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type);
+    void* ssalloc_s(size_t, int, const char*, const char*);
+    void* ssalloc_aligned_s(size_t, size_t, int, const char*, const char*);
     void* ssmem_alloc_s(ssmem_allocator_t*, size_t, int, const char*, const char*);
-    int posix_memalign_s(void** memptr, size_t alignment, size_t size, int line, const char* filename, const char* name_of_type);
-    void* memalign_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type);
+    int posix_memalign_s(void**, size_t, size_t, int, const char*, const char*);
+    void* memalign_s(size_t, size_t, int, const char*, const char*);
+    void* calloc_s(size_t, size_t, int, const char*, const char*);
     // void ssmem_free_s(ssmem_allocator_t*, void*, int, const char*);
     // void free(void* ptr);
 

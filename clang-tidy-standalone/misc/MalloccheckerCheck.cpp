@@ -14,20 +14,22 @@
 
 #include <iostream>
 
-#define MTDFNAME "_mm_malloc"
+#define MTDFNAME1 "_mm_malloc"
 #define MTDFNAME2 "alloc"
 #define MTDFNAME3 "malloc"
 #define MTDFNAME4 "ssmem_alloc"
 #define MTDFNAME5 "ssalloc"
 #define MTDFNAME6 "memalign"
 #define MTDFNAME7 "posix_memalign"
-#define MATCH_FUNCTIONS allOf(anyOf(hasName(MTDFNAME), \
+#define MTDFNAME8 "calloc"
+#define MATCH_FUNCTIONS allOf(anyOf(hasName(MTDFNAME1), \
                                     hasName(MTDFNAME2), \
                                     hasName(MTDFNAME3), \
                                     hasName(MTDFNAME4), \
                                     hasName(MTDFNAME5), \
                                     hasName(MTDFNAME6), \
-                                    hasName(MTDFNAME7)), unless(isTemplateInstantiation()))
+                                    hasName(MTDFNAME7), \
+                                    hasName(MTDFNAME8)), unless(isTemplateInstantiation()))
 // #define MATCH_FUNCTIONS hasName(MTDFNAME)
 
 using namespace clang::ast_matchers;
