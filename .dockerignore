@@ -1,3 +1,4 @@
 # .dockerignore
 sifter_vis_d3
 docker
+ssmem

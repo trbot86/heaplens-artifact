@@ -18,18 +18,28 @@
 #include <getopt.h>
 #include <string>
 #include <thread>
+#include <cmath>
 
 #define PADDING 64
 #ifndef STRUCTS_PER_BLOCK
   #define STRUCTS_PER_BLOCK 1000000
 #endif
 #define MINIMUM_STRUCT_PER_BLOCK 1000000
+#define CTD_NOT_SAMPLED 0
+#define CTD_SAMPLED_YES 1
+#define CTD_SAMPLED_NO 2
 
 using namespace std;
 
-// thread_local sqlite3* my_db;
+thread_local sqlite3* my_db;
+unordered_map<uintptr_t, string> type_map;
+unordered_map<uintptr_t, string> file_map;
+const int num_classes = 31;
+const size_t size_classes [num_classes] = { 8, 16, 32, 48, 64, 80, 96, 128, 192, 224, 256, 320, 384, 512, 640, 768, 1024, 1280, 
+                                            1536, 2048, 3584, 8192, 28672, 40960, 81920, 163840, 655360, 917504, 10485760, 20971520, 99999999999};
+int page_size;
 
-struct info_t {
+typedef struct info {
     const char* file;
     const char* tindex_name;
     unsigned int line;
@@ -38,15 +48,71 @@ struct info_t {
     void* addr;
     bool typeofop;
 
-    info_t() : file(nullptr), tindex_name(nullptr), line(0), timestamp(0), size(0), addr(nullptr) {}
-};
+    info() : file(nullptr), tindex_name(nullptr), line(0), timestamp(0), size(0), addr(nullptr) {}
+    info(const char* f, const char* t, unsigned int l, uint64_t ts, size_t s, void* a, bool tp) :
+                file(f),
+                tindex_name(t),
+                line(l),
+                timestamp(ts),
+                size(s),
+                addr(a),
+                typeofop(tp) {}
+} info_t;
+
+typedef struct node {
+  info_t* data;
+  struct node* next;
+  node(info_t* d) : data(d), next(nullptr) {}
+} node_t;
+
+typedef struct linkedlist {
+  node_t* head;
+  node_t* tail;
+  linkedlist() : head(nullptr), tail(nullptr) {}
+
+  void push(node_t* n) {
+    if (tail == nullptr)
+      head = tail = n;
+    else {
+      tail->next = n;
+      tail = n;
+    }
+  }
+  void concat(struct linkedlist& other) {
+    if (tail == nullptr)
+      head = other.head;
+    else
+      tail->next = other.head;
+    tail = other.tail;
+  }
+} linkedlist_t;
+
+typedef struct memory_page {
+  unordered_set<uintptr_t> included_types;
+  linkedlist_t events;
+  bool has_perf_addr;
+  char sampled;
+  uint64_t size;
+  memory_page() : included_types(unordered_set<uintptr_t>{}), events(linkedlist_t{}), has_perf_addr(false), sampled(CTD_NOT_SAMPLED) {}
+
+  void add_event(info_t* ev) {
+    events.push(new node_t{ev});
+    size++;
+    if (included_types.find((uintptr_t) ev->tindex_name) == included_types.end())
+      included_types.insert((uintptr_t) ev->tindex_name);
+  }
+  void join(struct memory_page& other) {
+    included_types.insert(other.included_types.begin(), other.included_types.end());
+    events.concat(other.events);
+  }
+} memory_page_t;
 
 struct perf_data {
   uint64_t addr;
   float hitm;
 };
 
-size_t bin_search(size_t* arr, size_t x, int begin, int end) {
+size_t bin_search(const size_t* arr, size_t x, int begin, int end) {
   if (begin == end)
     return begin;
   int m = (begin + end) / 2;
@@ -70,7 +136,7 @@ unordered_map<uintptr_t, string> construct_map(const char* filename) {
   return retmap;
 }
 
-void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size, unordered_set<uint64_t> &addrs, sqlite3* db) {
+void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size, unordered_map<uint64_t, memory_page_t>& pages, sqlite3* db) {
   ifstream pfile;
   pfile.open(fname);
   string line;
@@ -83,7 +149,13 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
         float hitm = stof(matches[2].str());
         if (hitm >= cutoff) {
           uint64_t cl_addr = strtoull(matches[1].str().c_str(), nullptr, 16);
-          addrs.insert((cl_addr * cl_size) / page_size);
+          uint64_t page_num = (cl_addr * cl_size) / page_size;
+          if (pages.find(page_num) == pages.end()) {
+            cout << "Perf page num not present in data: " << page_num << endl;
+          }
+          else {
+            pages[page_num].has_perf_addr = true;
+          }
           // cout << "PERF ACTUAL PAGE ADDRESS: " << cl_addr / cl_size << endl;
           struct perf_data new_entry{cl_addr, hitm};
           entries.push_back(new_entry);
@@ -274,19 +346,42 @@ void create_supertable(sqlite3* db) {
   }
 }
 
-void flip_coin(float sample_portion, uint64_t page_num, unordered_set<uint64_t>& include_addrs, unordered_set<uint64_t>& skip_addrs) {
-  if (skip_addrs.find(page_num) == skip_addrs.end() &&
-      include_addrs.find(page_num) == include_addrs.end()) {
-      if (rand() < sample_portion*RAND_MAX) {
-        include_addrs.insert(page_num);
-      }
-      else {
-        skip_addrs.insert(page_num);
-      }
+void get_types_in_chunk(int id, int chunk_size, int start_ind, info_t* filemap, 
+                        unordered_map<uint64_t, memory_page_t>& pages, unordered_set<uintptr_t>& raw_type_set,
+                        unordered_map<size_t, int>& size_class_counts) {
+  for (int i = 0; i < chunk_size; i++) {
+    info_t* event = filemap + start_ind + i;
+    
+    uint64_t page_num = (uint64_t)event->addr / page_size;
+    // uint64_t page_num_end = ((uint64_t)event->addr + event->size) / page_size;
+    if (pages.find(page_num) == pages.end()) {
+      pages.insert(pair<uint64_t, memory_page_t>{page_num, memory_page_t{}});
+      // printf("Address of new page: %p\n", &pages[page_num]);
+    }
+    // if (page_num_end != page_num && pages.find(page_num_end) == pages.end())
+    //   pages.insert(pair<uint64_t, memory_page_t>{page_num_end, memory_page_t{}});
+
+    pages[page_num].add_event(event);
+
+    if (i % 1000000 == 0) {
+      cout << "thread " << id << " iteration " << i << " of first loop" << endl;
+    }
+
+    // if (type_map.find((uintptr_t) event->tindex_name) != type_map.end()) {
+      // string type_trim = type_map.at((uintptr_t) event->tindex_name);
+      // type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
+      // type_set.insert(type_trim);
+    if (event->typeofop)
+      raw_type_set.insert((uintptr_t) event->tindex_name);
+    // }
+
+    if (event->size > 0) {
+      int ind = bin_search(size_classes, event->size, 0, num_classes);
+      // cout << "Size: " << event->size << " Index: " << ind << " Size class: " << size_classes[ind] << endl;
+      size_class_counts[size_classes[ind]] = size_class_counts[size_classes[ind]] + 1;
+    }
   }
 }
-
-
 
 
 
@@ -304,8 +399,6 @@ int main(int argc, char* argv[]) {
   };
   int opt_ind = 0;
 
-  unordered_set<uint64_t> include_addrs{};
-  unordered_set<uint64_t> skip_addrs{};
   int c;
   float sample_portion = -1.0;
   float cutoff = 5.0;
@@ -313,13 +406,13 @@ int main(int argc, char* argv[]) {
   bool is_perf_file = false;
   const char* field_file;
   bool is_field_file = false;
-  int page_size = 4096;
+  page_size = 4096;
   int cacheline_size = 64;
   int num_pages_per_type = 1;
   unsigned int num_threads = 1;
   const char* type_c_file;
   bool is_type_c = false;
-  while ((c = getopt_long(argc, argv, "p:c:s:t:j", long_opts, &opt_ind)) != -1) {
+  while ((c = getopt_long(argc, argv, "p:c:s:t:j:", long_opts, &opt_ind)) != -1) {
     switch (c) {
       case 0:
         switch (opt_ind) {
@@ -365,22 +458,25 @@ int main(int argc, char* argv[]) {
   }
 
   cout << "Sample percent: " << sample_portion << endl;
-  cout << "Number of pages: " << num_pages_per_type << endl;
+  cout << "Number of pages per type: " << num_pages_per_type << endl;
+  cout << "Number of threads: " << num_threads << endl;
+
+  int rc = sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
+  if (rc) {
+    cout << "Cannot configure sqlite3: " << sqlite3_errstr(rc) << endl;
+    exit(-1);
+  }
 
   sqlite3* db;
-  int rc = sqlite3_open("allocs.sqlite", &db);
-  char* zErrMsg = 0;
+  rc = sqlite3_open("allocs.sqlite", &db);
 
   if (rc) {
-    cout << "Can't open database allocs.sqlite" << endl;
+    cout << "Can't open database allocs.sqlite: " << sqlite3_errstr(rc) << endl;
     exit(-1);
   }
   else {
     cout << "Opened database allocs.sqlite successfully" << endl;
   }
-
-  if (is_perf_file)
-    get_perf_addrs(perf_file, cutoff, page_size, cacheline_size, include_addrs, db);
 
   unsigned long int file_byte_size = 0;
   struct stat sb;
@@ -393,26 +489,27 @@ int main(int argc, char* argv[]) {
 	
 	fstat(fileno(input_file), &sb);
   file_byte_size = (unsigned long int) sb.st_size;
-  long int num_structs = file_byte_size / sizeof(struct info_t);
+  long int num_structs = file_byte_size / sizeof(info_t);
 
-  unordered_map<uintptr_t, string> type_map = construct_map("typeset_dump.txt");
-  unordered_map<uintptr_t, string> file_map = construct_map("fileset_dump.txt");
-  unordered_map<uintptr_t, int> seen_types{};
-  unordered_set<string> type_set{};
+  type_map = construct_map("typeset_dump.txt");
+  file_map = construct_map("fileset_dump.txt");
+  // vector<unordered_map<uintptr_t, unordered_set<uint64_t>>> include_addrs{num_threads, unordered_map};
+  // unordered_set<uint64_t> skip_addrs{};
+  // vector<unordered_map<uintptr_t, int>> seen_types{num_threads, unordered_map<uintptr_t, int>{}};
+  vector<unordered_map<uint64_t, memory_page_t>> pages{num_threads, unordered_map<uint64_t, memory_page_t>{}};
+  vector<unordered_set<uintptr_t>> raw_type_set{num_threads, unordered_set<uintptr_t>{}};
+  vector<unordered_set<string>> type_set{num_threads, unordered_set<string>{}};
+  vector<unordered_map<size_t, int>> size_class_counts{num_threads, unordered_map<size_t, int>{}};
 
-  const int num_classes = 31;
-  size_t size_classes [num_classes] = { 8, 16, 32, 48, 64, 80, 96, 128, 192, 224, 256, 320, 384, 512, 640, 768, 1024, 1280, 
-                                        1536, 2048, 3584, 8192, 28672, 40960, 81920, 163840, 655360, 917504, 10485760, 20971520, 99999999999};
-  unordered_map<size_t, int> size_class_counts{};
-  for (int i = 0; i < num_classes; i++) {
-    size_class_counts.insert(pair<size_t, int>{size_classes[i], 0});
+  for (int t = 0; t < num_threads; t++) {
+    for (int i = 0; i < num_classes; i++) {
+      size_class_counts[t].insert(pair<size_t, int>{size_classes[i], 0});
+    }
   }
 
   create_supertable(db);
-
   printf("Number of structs in file: %ld\n", num_structs);
-
-  struct info_t* filemap = (struct info_t*) mmap(NULL, file_byte_size, PROT_READ, MAP_PRIVATE, fileno(input_file), 0);
+  info_t* filemap = (info_t*) mmap(NULL, file_byte_size, PROT_READ, MAP_SHARED, fileno(input_file), 0);
 
   if (filemap == MAP_FAILED) {
     cout << "Failed to map input file to memory" << endl;
@@ -421,64 +518,69 @@ int main(int argc, char* argv[]) {
     cout << "Successfully mapped file" << endl;
   }
 
-  // char* charmap = (char *) malloc(800 * sizeof(char) * STRUCTS_PER_BLOCK);
-  // memset(charmap, '\0', 800 * sizeof(char) * STRUCTS_PER_BLOCK);
+  int chunk_size = ceil((double)num_structs / (double)num_threads);
+  vector<thread> workers{num_threads};
+  unordered_map<uint64_t, memory_page_t> all_pages{};
+  unordered_map<uintptr_t, int> all_raw_type_count{};
+  unordered_set<string> all_type_set{};
+  unordered_map<size_t, int> all_size_class_counts{};
 
-  // uint64_t x = 0;
-  // cout << "Beginning RT test" << endl;
-  // for (int i = 0; i < num_structs; i++) {
-  //   x++;
-  // }
-  // cout << "End test! " << x << endl;
+  cout << "Starting worker threads..." << endl;
 
-  for (int i = 0; i < num_structs; i++) {
-    struct info_t event = *(filemap + i);
-    if (i % 1000000 == 0)
-      cout << "Starting iteration " << i << " of first loop" << endl;
-    if (!event.typeofop)
-      continue;
-    stringstream typenamestr;
-    typenamestr << static_cast<const void*>(event.tindex_name);
-
-    if (seen_types.find((uintptr_t) event.tindex_name) == seen_types.end()) {
-      seen_types.insert(pair<uintptr_t, int>{(uintptr_t) event.tindex_name, 0});
-    }
-    if (seen_types.at((uintptr_t) event.tindex_name) < num_pages_per_type) {
-      if (type_map.find((uintptr_t) event.tindex_name) != type_map.end()) {
-        string type_trim = type_map.at((uintptr_t) event.tindex_name);
-        type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
-        type_set.insert(type_trim);
+  for (int t = 0; t < num_threads; t++) {
+    workers[t] = thread(get_types_in_chunk, t, (int) min((long) chunk_size, num_structs - (t*chunk_size)),
+                        t*chunk_size, filemap, ref(pages[t]), ref(raw_type_set[t]), ref(size_class_counts[t]));
+  }
+  for (int t = 0; t < num_threads; t++) {
+    workers[t].join();
+    for (auto& p: pages[t]) {
+      if (all_pages.find(p.first) == all_pages.end()) {
+        all_pages[p.first] = p.second;
       }
-      if (include_addrs.find((uint64_t) event.addr / page_size) == include_addrs.end()) {
-        include_addrs.insert((uint64_t) event.addr / page_size);
-        seen_types[(uintptr_t) event.tindex_name] = seen_types[(uintptr_t) event.tindex_name] + 1;
+      else {
+        all_pages[p.first].join(p.second);
       }
     }
-    if (event.size > 0) {
-      int ind = bin_search(size_classes, event.size, 0, num_classes);
-      // cout << "Size: " << event.size << " Index: " << ind << " Size class: " << size_classes[ind] << endl;
-      size_class_counts[size_classes[ind]] = size_class_counts[size_classes[ind]] + 1;
+    for (auto& tp: raw_type_set[t]) {
+      all_raw_type_count.insert(pair<uintptr_t, int>{tp, 0});
+    }
+    for (auto& s: size_class_counts[t]) {
+      if (all_size_class_counts.find(s.first) == all_size_class_counts.end()) {
+        all_size_class_counts[s.first] = s.second;
+      }
+      else {
+        all_size_class_counts[s.first] += s.second;
+      }
     }
   }
 
-  cout << "Size of the include_addrs: " << include_addrs.size() << endl;
+  cout << "All worker threads joined!" << endl;
+
+  for (const auto& tp: all_raw_type_count) {
+    if (type_map.find(tp.first) != type_map.end()) {
+      string type_trim = type_map.at(tp.first);
+      type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
+      all_type_set.insert(type_trim);
+    }
+  }
+
+  if (is_perf_file)
+    get_perf_addrs(perf_file, cutoff, page_size, cacheline_size, all_pages, db);
 
   cout << "----- SIZE CLASS TABLE -----" << endl;
   for (int i = 0; i < num_classes; i++) {
-    cout << size_classes[i] << ":\t" << size_class_counts[size_classes[i]] << endl;
+    cout << size_classes[i] << ":\t" << all_size_class_counts[size_classes[i]] << endl;
   }
   cout << "----- END SIZE CLASS TABLE -----" << endl;
 
-  cout << "Number of unique types found: " << seen_types.size() << endl;
+  cout << "Number of unique types found: " << all_type_set.size() << endl;
 
   if (is_field_file) {
     cout << "Field file name: " << field_file << endl;
-    get_fields(field_file, type_set, db);
+    get_fields(field_file, all_type_set, db);
   }
 
   cout << "Beginning to copy records to database..." << endl;
-
-  unordered_map<uint64_t, size_t> last_alloc{};
 
   sqlite3_stmt* stmt = 0;
   rc = sqlite3_prepare_v2(db, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE) " \
@@ -487,7 +589,6 @@ int main(int argc, char* argv[]) {
   if (rc != SQLITE_OK) {
     fprintf(stderr, "Error after sqlite prepare: %s\n", sqlite3_errstr(rc));
     fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
-    sqlite3_free(zErrMsg);
     fclose(input_file);
     sqlite3_close(db);
     exit(-1);
@@ -498,143 +599,145 @@ int main(int argc, char* argv[]) {
   if (rc != SQLITE_OK) {
     fprintf(stderr, "Error after begin transaction: %s\n", sqlite3_errstr(rc));
     fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
-    sqlite3_free(zErrMsg);
     fclose(input_file);
     sqlite3_close(db);
     exit(-1);
   }
 
-  for (int i = 0, recs_taken = 0, num_file_writes = 0, bytes_copied = 0; i < num_structs; i++) {
-    struct info_t event = *(filemap + i);
-    if (i % 1000000 == 0)
-      cout << "Starting iteration " << i << " of second loop" << endl;
-    uint64_t page_num = (uint64_t) event.addr / page_size;
-    size_t eventSize = event.typeofop ? event.size : last_alloc.find((uint64_t) event.addr) != last_alloc.end() ? last_alloc.at((uint64_t) event.addr) : 0;
-    if (event.typeofop)
-      last_alloc.insert(pair<uint64_t, size_t>{(uint64_t) event.addr, event.size});
+  unordered_map<uint64_t, memory_page_t> boundary_crossers{};
+  cout << "Number of pages: " << all_pages.size() << endl;
+  int count = 0;
 
-    uint64_t page_num_end = ((uint64_t) event.addr + eventSize - 1) / page_size;
-    // stringstream filenamestr, typenamestr;
-    // filenamestr << static_cast<const void*>(event.file);
-    // typenamestr << static_cast<const void*>(event.tindex_name);
-
-    flip_coin(sample_portion, page_num, include_addrs, skip_addrs);
-    flip_coin(sample_portion, page_num_end, include_addrs, skip_addrs);
-
-    const char* fname = event.file ? file_map.at((uintptr_t) event.file).c_str() : "NULL";
-    const char* tname = event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL";
-
-    if (sample_portion <= 0 || (include_addrs.find(page_num) != include_addrs.end() &&
-        include_addrs.find(page_num_end) != include_addrs.end())) {
-
-      // bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
-      //                                                 "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
-      //                                           event.file ?  file_map.at((uintptr_t) event.file).c_str() : "NULL",
-      //                                           event.line,
-      //                                           event.timestamp,
-      //                                           eventSize,
-      //                                           (long) event.addr,
-      //                                           event.typeofop,
-      //                                           event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL");
-
-      recs_taken++;
-
-      sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
-      sqlite3_bind_int(stmt, 2, event.line);
-      sqlite3_bind_int64(stmt, 3, event.timestamp);
-      sqlite3_bind_int64(stmt, 4, eventSize);
-      sqlite3_bind_int64(stmt, 5, (uint64_t) event.addr);
-      sqlite3_bind_int(stmt, 6, event.typeofop);
-      sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
-
-      rc = sqlite3_step(stmt);
-      if (rc != SQLITE_DONE) {
-        fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
-        fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
-        sqlite3_free(zErrMsg);
-        fclose(input_file);
-        sqlite3_close(db);
-        exit(-1);
-      }
-
-      // sqlite3_step(stmt);
-      sqlite3_clear_bindings(stmt);
-      sqlite3_reset(stmt);
+  for (auto& p: all_pages) {
+    count++;
+    if (count % 1000 == 0) {
+      cout << "Done " << count << " pages" << endl;
     }
-    else if (include_addrs.find(page_num) != include_addrs.end()) {
-      // bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
-      //                                                 "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
-      //                                           event.file ?  file_map.at((uintptr_t) event.file).c_str() : "NULL",
-      //                                           event.line,
-      //                                           event.timestamp,
-      //                                           page_size - ((uint64_t) event.addr % page_size),
-      //                                           (long) event.addr,
-      //                                           event.typeofop,
-      //                                           event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL");
-      recs_taken++;
-
-      sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
-      sqlite3_bind_int(stmt, 2, event.line);
-      sqlite3_bind_int64(stmt, 3, event.timestamp);
-      sqlite3_bind_int64(stmt, 4, page_size - ((uint64_t) event.addr % page_size));
-      sqlite3_bind_int64(stmt, 5, (uint64_t) event.addr);
-      sqlite3_bind_int(stmt, 6, event.typeofop);
-      sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
-
-      rc = sqlite3_step(stmt);
-      if (rc != SQLITE_DONE) {
-        fprintf(stderr, "Error in case 2: %s\n", sqlite3_errstr(rc));
-        fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
-        sqlite3_free(zErrMsg);
-        fclose(input_file);
-        sqlite3_close(db);
-        exit(-1);
+    if (p.second.sampled == CTD_NOT_SAMPLED) {
+      bool take_for_type = false;
+      for (auto& tp: p.second.included_types) {
+        if (all_raw_type_count[tp] < num_pages_per_type) {
+          p.second.sampled = CTD_SAMPLED_YES;
+          take_for_type = true;
+          break;
+        }
       }
-
-      // sqlite3_step(stmt);
-      sqlite3_clear_bindings(stmt);
-      sqlite3_reset(stmt);
+      if (take_for_type) {
+        for (auto& tp: p.second.included_types)
+          all_raw_type_count[tp]++;
+      }
     }
-    else if (include_addrs.find(page_num_end) != include_addrs.end()) {
-      // bytes_copied += sprintf(charmap + bytes_copied, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE)" \
-      //                                                 "VALUES ('%s', %d, %lu, %lu, %ld, %d, '%s');",
-      //                                           event.file ?  file_map.at((uintptr_t) event.file).c_str() : "NULL",
-      //                                           event.line,
-      //                                           event.timestamp,
-      //                                           eventSize - (page_size - ((uint64_t) event.addr % page_size)),
-      //                                           (long) event.addr + (page_size - ((uint64_t) event.addr % page_size)),
-      //                                           event.typeofop,
-      //                                           event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL");
-      recs_taken++;
+    if (p.second.sampled == CTD_NOT_SAMPLED)
+        p.second.sampled = rand() < sample_portion*RAND_MAX ? CTD_SAMPLED_YES : CTD_SAMPLED_NO;
 
-      sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
-      sqlite3_bind_int(stmt, 2, event.line);
-      sqlite3_bind_int64(stmt, 3, event.timestamp);
-      sqlite3_bind_int64(stmt, 4, eventSize - (page_size - ((uint64_t) event.addr % page_size)));
-      sqlite3_bind_int64(stmt, 5, (uint64_t) event.addr + (page_size - ((uint64_t) event.addr % page_size)));
-      sqlite3_bind_int(stmt, 6, event.typeofop);
-      sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+    if (p.second.sampled == CTD_SAMPLED_YES) {
+      node_t* n = p.second.events.head;
+      unordered_map<uint64_t, size_t> last_alloc_size{};
+      while (n != nullptr) {
+        info_t* event = n->data;
+        size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uint64_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uint64_t) event->addr) : 0;
+        if (event->typeofop)
+          last_alloc_size.insert(pair<uint64_t, size_t>{(uint64_t) event->addr, event->size});
 
-      rc = sqlite3_step(stmt);
-      if (rc != SQLITE_DONE) {
-        fprintf(stderr, "Error in case 3: %s\n", sqlite3_errstr(rc));
-        fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
-        sqlite3_free(zErrMsg);
-        fclose(input_file);
-        sqlite3_close(db);
-        exit(-1);
+        uint64_t page_num = (uint64_t) event->addr / page_size;
+        uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary
+
+        if (page_num != page_num_end) {
+          eventSize = page_size - ((uint64_t) event->addr % page_size);
+          uint64_t new_event_addr = (uint64_t) event->addr + eventSize;
+          int64_t rem_size = event->size - eventSize;
+          do {
+            uint64_t new_event_page_num = new_event_addr / page_size;
+            if (boundary_crossers.find(new_event_page_num) == boundary_crossers.end())
+              boundary_crossers.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
+            boundary_crossers[new_event_page_num].add_event(new info_t{ event->file,
+                                                                        event->tindex_name,
+                                                                        event->line,
+                                                                        event->timestamp,
+                                                                        min((uint64_t)rem_size, page_num),
+                                                                        (void*) new_event_addr,
+                                                                        event->typeofop});
+            new_event_addr += page_size;
+            rem_size -= page_size;
+          } while (rem_size > 0);
+        }
+        
+        const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
+        const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
+        sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
+        sqlite3_bind_int(stmt, 2, event->line);
+        sqlite3_bind_int64(stmt, 3, event->timestamp);
+        sqlite3_bind_int64(stmt, 4, eventSize);
+        sqlite3_bind_int64(stmt, 5, (uint64_t) event->addr);
+        sqlite3_bind_int(stmt, 6, event->typeofop);
+        sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+
+        rc = sqlite3_step(stmt);
+        if (rc != SQLITE_DONE) {
+          fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
+          fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+          fclose(input_file);
+          sqlite3_close(db);
+          exit(-1);
+        }
+
+        // sqlite3_step(stmt);
+        sqlite3_clear_bindings(stmt);
+        sqlite3_reset(stmt);
+        n = n->next;
       }
+    }
+  }
 
-      // sqlite3_step(stmt);
-      sqlite3_clear_bindings(stmt);
-      sqlite3_reset(stmt);
+  cout << "Number of boundary crossing pages: " << boundary_crossers.size() << endl;
+  count = 0;
+
+  for (auto& p: boundary_crossers) {
+    count++;
+    if (count % 1000 == 0) {
+      cout << "Done " << count << " boundary pages" << endl;
+    }
+    if (all_pages.find(p.first) != all_pages.end()) {
+      if (all_pages[p.first].sampled == CTD_SAMPLED_YES) {
+        node_t* n = p.second.events.head;
+        int count_ev = 0;
+        while (n != nullptr) {
+          count_ev++;
+          if (count_ev % 1000000 == 0) {
+            cout << "   Done " << count_ev << " boundary events" << endl;
+          }
+          info_t* event = n->data;
+          const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
+          const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
+          sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
+          sqlite3_bind_int(stmt, 2, event->line);
+          sqlite3_bind_int64(stmt, 3, event->timestamp);
+          sqlite3_bind_int64(stmt, 4, event->size);
+          sqlite3_bind_int64(stmt, 5, (uint64_t) event->addr);
+          sqlite3_bind_int(stmt, 6, event->typeofop);
+          sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+
+          rc = sqlite3_step(stmt);
+          if (rc != SQLITE_DONE) {
+            fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
+            fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+            fclose(input_file);
+            sqlite3_close(db);
+            exit(-1);
+          }
+
+          // sqlite3_step(stmt);
+          sqlite3_clear_bindings(stmt);
+          sqlite3_reset(stmt);
+          n = n->next;
+        }
+      }
     }
   }
   rc = sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
 
   if (rc != SQLITE_OK) {
-    cout << "SQL error: " << zErrMsg << endl;
-    sqlite3_free(zErrMsg);
+    cout << "SQL error: " << sqlite3_errstr(rc) << endl;
     // free(charmap);
     fclose(input_file);
     sqlite3_close(db);
@@ -655,8 +758,8 @@ int main(int argc, char* argv[]) {
     //   bytes_copied = 0;
     // }
 
-  cout << "Number of pages included in output: " << include_addrs.size() << endl;
-  cout << "Number of pages excluded in output: " << skip_addrs.size() << endl;
+  // cout << "Number of pages included in output: " << include_addrs.size() << endl;
+  // cout << "Number of pages excluded in output: " << skip_addrs.size() << endl;
 
   // free(charmap);
   fclose(input_file);
