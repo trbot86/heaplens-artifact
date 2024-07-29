@@ -744,24 +744,6 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
-    // if (recs_taken == STRUCTS_PER_BLOCK || i == num_structs - 1) {
-    //   cout << "Done mem copy" << endl;
-    //   sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
-    //   rc = sqlite3_exec(db, charmap, nullptr, 0, &zErrMsg);
-    //   sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
-
-      
-
-    //   cout << "Done file write " << num_file_writes++ << endl;
-    //   memset(charmap, '\0', bytes_copied);
-    //   recs_taken = 0;
-    //   bytes_copied = 0;
-    // }
-
-  // cout << "Number of pages included in output: " << include_addrs.size() << endl;
-  // cout << "Number of pages excluded in output: " << skip_addrs.size() << endl;
-
-  // free(charmap);
   fclose(input_file);
   sqlite3_close(db);
 }

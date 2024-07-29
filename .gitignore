@@ -4,6 +4,7 @@ __pycache__
 *.o
 ASCYLIB
 ssmem
+setbench
 fielddump.txt
 newfielddump.txt
 typedump.txt
