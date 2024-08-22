@@ -8,7 +8,7 @@ export function getCurrTime() {
     return mainVis.getGraphLayout().getCurrTime();
 }
 
-const numBuckets = 500000;
+const numBuckets = 5000;
 
 async function getDb(srcName) {
     document.title = srcName;

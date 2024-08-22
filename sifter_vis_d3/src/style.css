@@ -166,3 +166,13 @@ div.loadingAnim {
         fill-opacity: 0.0;
     }
 }
+
+td.allocCol {
+    position: relative;
+    left: 20px;
+}
+
+td.pageCol {
+    position: relative;
+    left: 40px;
+}

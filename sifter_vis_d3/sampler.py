@@ -8,7 +8,7 @@ import numpy as np
 import ruptures as rpt
 import matplotlib.pyplot as plt
 import sys
-import json
+import simplejson as json
 import math
 import os
 from random import randint, shuffle
@@ -74,6 +74,17 @@ class Sampler:
                                 #        'ts': int,
                                 #        'is_alloc': int})
         return df
+    
+    def get_counts(self):
+        try:
+            df = pd.read_sql_query("""SELECT TYPE as type,
+                                        ALLOCS as numAllocs,
+                                        PAGES as numPages
+                                    FROM STATS""",
+                                    self.con)
+            return df
+        except:
+            return pd.DataFrame(columns=['type', 'numAllocs', 'numPages'])
     
     def get_stats(self, recs, cls=64):
         objs = self.get_objects(recs)
@@ -187,8 +198,17 @@ class Sampler:
         # # return {'total': merged.groupby('type')['addr'].count().to_dict(),
         # #         'coloc': {k: {pair[1]: v['count'] for pair, v in g.to_dict(orient='index').items()} for k, g in sums.groupby(level=0)}}
         
+    def get_last_object_per_bucket(self, df, num_buckets):
+        min_ts = df[['allocTs', 'freeTs']].min().min()
+        max_ts = df[['allocTs', 'freeTs']].max().max()
+        bucket_size = (max_ts - min_ts) / num_buckets
+        df.loc[:,'bucket'] = ((df['allocTs'] - min_ts) // bucket_size).astype('Int64')
+
+        last_allocs = df.groupby(['addr', 'bucket']).agg({'allocTs': 'last'})
+        last_allocs = last_allocs.merge(df, how='left', on=['addr', 'allocTs'])
+        return last_allocs
     
-    def get_all_lines_and_stats(self, num_buckets=50000, cls=64):
+    def get_all_lines_and_stats(self, num_buckets=1000, cls=64):
         recs = self.get_all_records()
         df = self.add_free_types(recs).dropna(subset=['file','size','type'])
         min_ts = df['ts'].min()
@@ -214,7 +234,15 @@ class Sampler:
             #     change_point_alg = rpt.Window(width=150, model='l2', min_size=CHANGE_POINT_THRESHOLD).fit(df_pts)
             #     change_pts[tp] = list(map(int, change_point_alg.predict(pen=20)))
 
-        return {'pts': pts, 'changes': change_pts, 'stats': {'single': self.get_stats(recs, cls), 'double': self.get_stats(recs, 2*cls)}}
+        objects = self.get_objects(recs) if len(recs.index) < 2000000 else self.get_last_object_per_bucket(self.get_objects(recs), num_buckets).drop(columns=['bucket'])
+
+        # print(f"cols in objects: {self.get_objects(recs).columns}")
+        # print(f"cols in objects: {objects.columns}")
+
+        return {'recs': objects.drop(columns=['file']).to_dict('records'), 'pts': pts, 'changes': change_pts,
+                'stats': {'single': self.get_stats(recs, cls), 'double': self.get_stats(recs, 2*cls)},
+                'fields': self.get_fields(s.replace(' ', '') for s in df['type'].unique()),
+                'counts': self.get_counts().set_index('type').to_dict('index')}
         # 'records': df.to_dict(orient='records'), 
 
     def get_records_in_interval(self, start_ts, end_ts, page_size=4096):
@@ -261,7 +289,7 @@ class Sampler:
         except:
             return dict()
 
-    def get_clusters_of_pages(self, start_ts, end_ts, type_data, page_size=4096, alg='dbscan', cls=64, num_buckets=5000):
+    def get_clusters_of_pages(self, start_ts, end_ts, type_data, page_size=4096, alg='dbscan', cls=64, num_buckets=1000):
         recs = self.get_records_in_interval(start_ts, end_ts, page_size) if start_ts > 0 and end_ts > 0 else self.get_all_records()
         # df = self.__add_free_types(recs).dropna(subset=['size'])
         df = self.get_objects(recs)
@@ -280,15 +308,7 @@ class Sampler:
         pages_to_keep = type_entries[type_entries['mask']]['page_num']
         df = df[df['page_num'].isin(pages_to_keep)]
 
-        fields = self.get_fields(s.replace(' ', '') for s in df['type'].unique())
-
-        min_ts = df[['allocTs', 'freeTs']].min().min()
-        max_ts = df[['allocTs', 'freeTs']].max().max()
-        bucket_size = (max_ts - min_ts) / num_buckets
-        df.loc[:,'bucket'] = ((df['allocTs'] - min_ts) // bucket_size).astype('Int64')
-
-        last_allocs = df.groupby(['addr', 'bucket']).agg({'allocTs': 'last'})
-        last_allocs = last_allocs.merge(df, how='left', on=['allocTs'])
+        last_allocs = self.get_last_object_per_bucket(df, num_buckets)
 
         # last_allocs.loc[:,'page_num'] = last_allocs.loc[:,'addr'] // page_size
         # df.loc[:,'page_num'] = df.loc[:,'addr'] // page_size
@@ -348,18 +368,22 @@ class Sampler:
                     for page, group in last_allocs.groupby('page_num')}, orient='index')
         pages.index.name = 'page_num'
         labeled = pages.merge(merged.loc[:,'cluster'], on='page_num')
+        # labeled = pages
+        # merged['cluster'] = 0
+        # labeled['cluster'] = 0
 
-        return labeled, merged, fields, perf_df
+        return labeled, merged, perf_df
 
     def get_sample_of_pages(self, start_ts, end_ts, type_data, page_size=4096, cls=64, cluster_alg='dbscan', 
-                            max_run_length=3, max_runs_from_cluster=2, num_buckets=5000, include_all_noise=True):
-        labeled_data, features, fields, perf_df = self.get_clusters_of_pages(start_ts, end_ts, type_data, page_size, alg=cluster_alg, cls=cls, num_buckets=num_buckets)
+                            max_run_length=3, max_runs_from_cluster=2, num_buckets=1000, include_all_noise=True):
+        labeled_data, features, perf_df = self.get_clusters_of_pages(start_ts, end_ts, type_data, page_size, alg=cluster_alg, cls=cls, num_buckets=num_buckets)
         # .reset_index().set_index('cluster')
         clusters = labeled_data.groupby('cluster', sort=False).groups
 
         max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(page_size, 2), 2))
         # max_pages = 1 # DEBUGGING
         sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
+        
         taken = 0
         cluster_keys = list(clusters.keys())
         shuffle(cluster_keys)
@@ -381,13 +405,12 @@ class Sampler:
         sampled_pages_df = pd.DataFrame({'page_num': sorted(sampled_pages)})
         features = sampled_pages_df.merge(features, how='left', on='page_num')
         merged = sampled_pages_df.merge(labeled_data, how='left', on='page_num')
-        # .drop(34253184624) PROBLEM PAGE with row_t and char
+        
         dict_merged = merged.set_index('page_num').set_axis(['events', 'cluster'], axis='columns').to_dict(orient='index')
         fts = event_labels.index("freeTs")
         return {'page_num_events': {pn: {'events': [dict(zip(event_labels, replace_nan(event, fts))) for event in v['events']], 'cluster': v['cluster']} for pn, v in dict_merged.items()},
                 'clusters': features.reset_index().loc[:,['cluster','page_num']].groupby('cluster').agg(lambda x: x.tolist()).to_dict(orient='index'),
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()},
-                'fields': fields,
                 'perf': perf_df.set_index('cl_addr').to_dict(orient='index')}
 
 
@@ -399,9 +422,7 @@ if __name__ == "__main__":
 
     if sys.argv[1] == "all":
         retval = s.get_all_lines_and_stats(num_buckets=int(sys.argv[3]), cls=64)
-        # print(retval['pts'])
     else:
-        # sys.stderr.write(sys.argv[8].replace("\\'", '"'))
         type_data = json.loads(sys.argv[11].replace("\\'", '"')) if len(sys.argv) >= 12 else dict()
         retval = s.get_sample_of_pages(int(sys.argv[3]),                        # start_ts
                                        int(sys.argv[4]),                        # end_ts
@@ -413,8 +434,5 @@ if __name__ == "__main__":
                                        max_runs_from_cluster=int(sys.argv[9]),
                                        num_buckets=int(sys.argv[10]))
 
-    print(json.dumps(retval))
+    print(json.dumps(retval, ignore_nan=True))
     sys.stdout.flush()
-
-# abtree_ns::Node<11,longlong>_alloc
-# KeyGeneratorUniform<longlong> 34230449716 34230449754

@@ -3,6 +3,7 @@ import { colourOfType } from './vis.js';
 import objectLayout from './objectFieldLayout.js';
 import { getCurrTime } from './dbloader.js';
 import { trimString } from './statsTracker.js';
+import { mainVis } from './dbloader.js';
 
 const   SORT_PAGE_NUM = 0,
         SORT_CLUSTER = 1,
@@ -28,11 +29,12 @@ function pageLayout() {
         pageRectWidth = 520,
         pageRectBorder = 2,
         sortMode = SORT_PAGE_NUM,
-        expandedTypes = [],
         zoomThreshold = 8192,
         zoomLevel = 0,
         numSubSlices = 32,
-        selAddr = 0;
+        selAddr = 0,
+        expandedTypes = undefined,
+        cacheSetLayout = undefined;
 
     function drawPageLayout(selection) {
         clusters = selection.datum().clusters;
@@ -49,20 +51,8 @@ function pageLayout() {
             .map((d) => d.events)
             .reduce((acc, curr) => acc.concat(curr), []);
         
-        
         const   pages = splitEvents(0, allEvents, pageAddrToEvents, pageSize),
                 fields = selection.datum().fields;
-
-        let subtypes = Array.from(new Set(Object.values(fields).reduce((acc, curr) => acc.concat(curr), []).map((obj) => obj.subtype)))
-        const colScale = d3.scaleSequential()
-                            .domain([0, subtypes.length])
-                            .interpolator(d3.interpolateTurbo);
-        let col = 0;
-        for (let type of subtypes) {
-            if (!colourOfType[type])
-                colourOfType[type] = colScale(col);
-            col++;
-        }
 
         sliceScale = d3.scaleLinear().domain([0, pageSize]).range([0, pageRectWidth]);
         allPageDataOriginal = dataDict = pages;
@@ -79,7 +69,7 @@ function pageLayout() {
                         }, {});
 
         constructPageTabs();
-
+        
         selection.append('svg')
                 .attr('id', 'pageLayout')
                 .style('width', '100%')
@@ -263,6 +253,7 @@ function pageLayout() {
                 iSlice += sliceSize;
             }
         }
+
         return keyMap;
     }
 
@@ -287,6 +278,8 @@ function pageLayout() {
     }
 
     function updatePagesByTimestamp(ts) {
+        if (ts == undefined)
+            ts = getCurrTime();
         objLayout.addElementsByTimestamp(ts);
         const groups = d3.select('#pageLayout')
             .selectAll('.pageGroup')
@@ -421,7 +414,11 @@ function pageLayout() {
         
         const elements = groups.selectAll('.dataObject')
             .data((d) => {
-                    const ev = d[1].events.filter((obj) => obj.allocTs <= ts && (obj.freeTs == null || obj.freeTs >= ts));
+                    const ev = d[1].events.filter((obj) => obj.allocTs <= ts && (obj.freeTs == null || obj.freeTs >= ts))
+                                            .map((obj) => {
+                                                obj.vis = mainVis.isTypeSampled(obj.type);
+                                                return obj;
+                                            });
                     // if (ev.length > 0) console.log(ev);
                     const ret = zoomedOut ? getZoomGroups(ev) : ev;
                     return ret;
@@ -429,9 +426,10 @@ function pageLayout() {
                 (d) => d.ID);
         
         elements.join(
-            enter => {
+            (enter) => {
                 const gp = enter.insert('g', ':first-child')
-                    .attr('class', 'dataObject');
+                    .attr('class', 'dataObject')
+                    .style('visibility', (d) => d.vis ? 'visible' : 'hidden');
                 gp.append('rect')
                     .attr('class', 'dataObjectRect')
                     .attr('x', (d) => sliceScale(d.addr % sliceSize))
@@ -456,20 +454,13 @@ function pageLayout() {
                         .style('stroke', 'black');
                 }
             },
-            update => update.select('.dataObjectRect')
-                .style('fill', (d) => zoomedOut ? d.col : colourOfType[d.type]),
-            exit => exit.remove()
+            (update) => {
+                update.style('visibility', (d) => d.vis ? 'visible' : 'hidden');
+                update.select('.dataObjectRect')
+                    .style('fill', (d) => zoomedOut ? d.col : colourOfType[d.type]);
+            },
+            (exit) => exit.remove()
         );
-    }
-
-    function getObjMixCol(typeProps, chunkSize) {
-        const colObj = Object.keys(typeProps).reduce((acc, curr) => {
-            acc.r *= (colourOfType[curr].r / 255)*(1.0 - (typeProps[curr] / chunkSize));
-            acc.g *= (colourOfType[curr].g / 255)*(1.0 - (typeProps[curr] / chunkSize));
-            acc.b *= (colourOfType[curr].b / 255)*(1.0 - (typeProps[curr] / chunkSize));
-            return acc;
-        }, {r: 1.0, g: 1.0, b: 1.0});
-        return d3.color(`rgb(${colObj.r*255}, ${colObj.g*255}, ${colObj.b*255})`);
     }
 
     function getZoomGroups(events) {
@@ -518,7 +509,9 @@ function pageLayout() {
             .height(actualHeight)
             .stats(statsTracker)
             .fields(fields)
-            .perf(dataPerf);
+            .perf(dataPerf)
+            .expandedTypes(expandedTypes)
+            .cacheSetLayout(cacheSetLayout);
         memLayout.datum({objects: objects,
             startAddr: startAddr,
             initTs: initTs,
@@ -526,6 +519,14 @@ function pageLayout() {
             cachelineSize: cachelineSize})
             .call(objLayout);
         objLayout.perfVisible(sortMode == SORT_PERF);
+    }
+
+    drawPageLayout.toggleExpandType = function(tp) {
+        objLayout.toggleExpandType(tp);
+    }
+
+    drawPageLayout.getObjLayout = function() {
+        return objLayout;
     }
 
     drawPageLayout.updatePagesByTimestamp = function(ts) {
@@ -553,6 +554,18 @@ function pageLayout() {
     drawPageLayout.initTs = function(val) {
         if (!arguments) return initTs;
         initTs = val;
+        return drawPageLayout;
+    }
+
+    drawPageLayout.expandedTypes = function(val) {
+        if (!arguments) return expandedTypes;
+        expandedTypes = val;
+        return drawPageLayout;
+    }
+
+    drawPageLayout.cacheSetLayout = function(val) {
+        if (!arguments) return cacheSetLayout;
+        cacheSetLayout = val;
         return drawPageLayout;
     }
 

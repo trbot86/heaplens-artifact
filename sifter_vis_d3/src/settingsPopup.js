@@ -52,8 +52,8 @@ export class SettingsPopup {
         });
 
         let sliderGroup = window.selectAll('.sliderGroup')
-            .data([{init: 3, min: 1, max: 10, id: 'runLength'},
-                    {init: 2, min: 1, max: 6, id: 'numRuns'}])
+            .data([{init: 5, min: 1, max: 20, id: 'runLength'},
+                    {init: 3, min: 1, max: 10, id: 'numRuns'}])
             .enter()
             .append('div')
             .attr('class', 'sliderGroup')
@@ -92,7 +92,7 @@ export class SettingsPopup {
             .attr('min', 1000)
             .attr('max', 100000)
             .attr('step', 100)
-            .attr('value', 5000)
+            .attr('value', 1000)
             .attr('size', 8);
 
         window.append('div')

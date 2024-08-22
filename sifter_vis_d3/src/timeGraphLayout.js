@@ -19,7 +19,7 @@ function timeGraphLayout() {
         sampleInfo = {algorithm: 'dbscan',
                     runLength: 3,
                     numRuns: 2,
-                    buckets: 5000},
+                    buckets: 1000},
         minTs = 0,
         maxTs = 0,
         boundaryBuffer = 0,
@@ -175,6 +175,7 @@ function timeGraphLayout() {
                 .style('display', 'table-row');
             changeRegions(changePts);
             sampleRegion();
+            sampledBuckets = sampleInfo.buckets;
             // slider(xScale(minTs - boundaryBuffer));
             let ts = getCurrTime();
             for (let func of timeChangeCallbacks) func(ts);
@@ -326,6 +327,8 @@ function timeGraphLayout() {
                     d3.select('#memLayoutDiv').remove();
     
                     if (mainVis.isCacheFocus()) mainVis.toggleCacheFocus();
+                    // console.log('Here is the sample data:');
+                    // console.log(sampleData);
                     mainVis.constructPageVis(sampleData, currCacheLineSize);
                     slider(parseInt(leftHandle.attr('x')), parseInt(rightHandle.attr('x')) + handleWidth);
                     let ts = getCurrTime();
@@ -598,12 +601,40 @@ function timeGraphLayout() {
         for (let func of timeChangeCallbacks) func(ts);
     }
 
+    function getSizeOfBucket() {
+        return Math.floor((xScale.domain()[1] - xScale.domain()[0]) / sampledBuckets);
+    }
+
+    function getBucketIndexFromTs(ts) {
+        // return (ts - xScale.domain()[0]) / getSizeOfBucket();
+        const sizeOfBucket = getSizeOfBucket();
+        // console.log(`   sizeOfBucket: ${sizeOfBucket}`);
+        // console.log(`   ts: ${ts}`);
+        // console.log(`   val: ${Math.round((ts - xScale.domain()[0]) / sizeOfBucket)}`);
+        return Math.ceil((ts - xScale.domain()[0]) / sizeOfBucket);
+    }
+
+    // function getNearestBucketTs(ts) {
+    //     // tabPosition.x = (Math.round((tabPosition.x - xScale.range()[0]) * (sampledBuckets / (xScale.range()[1] - xScale.range()[0]))) *
+    //         // ((xScale.range()[1] - xScale.range()[0]) / sampledBuckets)) + xScale.range()[0];
+    //     const sizeOfBucket = getSizeOfBucket();
+    //     console.log(`   sizeOfBucket: ${sizeOfBucket}`);
+    //     console.log(`   ts: ${ts}`);
+    //     console.log(`   val: ${Math.round((ts - xScale.domain()[0]) / sizeOfBucket)}`);
+    //     return (Math.round((ts - xScale.domain()[0]) / sizeOfBucket)*sizeOfBucket) + xScale.domain()[0];
+    // }
+
     function snapToBucket(e) {
-        tabPosition.x = (Math.round((tabPosition.x - xScale.range()[0]) * (sampledBuckets / (xScale.range()[1] - xScale.range()[0]))) *
-            ((xScale.range()[1] - xScale.range()[0]) / sampledBuckets)) + xScale.range()[0];
+        const currTime = getCurrTime();
+        let newTs = (getBucketIndexFromTs(currTime)*getSizeOfBucket()) + xScale.domain()[0];
+        console.log(`Snapping to bucket index: ${getBucketIndexFromTs(currTime)}`);
+        console.log(`ts: ${newTs}`);
+        tabPosition.x = xScale(newTs);
+        // tabPosition.x = (Math.round((tabPosition.x - xScale.range()[0]) * (sampledBuckets / (xScale.range()[1] - xScale.range()[0]))) *
+            // ((xScale.range()[1] - xScale.range()[0]) / sampledBuckets)) + xScale.range()[0];
         updateTab();
-        let ts = getCurrTime();
-        for (let func of timeChangeCallbacks) func(ts);
+        // let ts = getCurrTime();
+        for (let func of timeChangeCallbacks) func(newTs);
     }
 
     function slider(minPos, maxPos) {
@@ -699,6 +730,18 @@ function timeGraphLayout() {
         return xScale.invert(tabPosition.x);
     }
 
+    // drawTimeGraphLayout.getNearestBucketTs = function(ts) {
+    //     return getNearestBucketTs(ts);
+    // }
+
+    drawTimeGraphLayout.getBucketIndexFromTs = function(ts) {
+        return getBucketIndexFromTs(ts);
+    }
+
+    drawTimeGraphLayout.sizeOfBucket = function(ts) {
+        return getSizeOfBucket();
+    }
+
     // drawTimeGraphLayout.zoom = function() {
     //     zoomed = true;
     //     return drawTimeGraphLayout;
@@ -718,6 +761,12 @@ function timeGraphLayout() {
     drawTimeGraphLayout.maxTs = function(val) {
         if (!arguments.length) return maxTs;
         maxTs = val;
+        return drawTimeGraphLayout;
+    }
+
+    drawTimeGraphLayout.sampleInfo = function(val) {
+        if (!arguments.length) return sampleInfo;
+        sampleInfo = val;
         return drawTimeGraphLayout;
     }
 

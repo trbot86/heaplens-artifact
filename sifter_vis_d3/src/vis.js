@@ -8,6 +8,7 @@ import { pageSize } from './timeGraphLayout.js';
 import { currCacheLineSize } from './cacheSetLayout.js';
 
 export const colourOfType = {};
+export const sizeOfType = {};
 const TIMEGRAPH_TRANSLATE_Y = 15;
 
 export function binarySearchSuccessor(arr, v, start=undefined, end=undefined) {
@@ -31,6 +32,13 @@ export function binarySearchSuccessor(arr, v, start=undefined, end=undefined) {
     }
 }
 
+function addlch(col, sl, sc, sh) {
+    const {l, c, h} = d3.lch(col);
+    return d3.lch(Math.max(Math.min(l+sl, 100), 0),
+            Math.max(Math.min(c+sc, 150), 30),
+            Math.max(Math.min(h+sh, 360), 0));
+}
+
 class MainVisualization {
     #fname;
     #initTs;
@@ -40,6 +48,7 @@ class MainVisualization {
     #pageLayoutChart;
     #typesToShowOnGraph;
     #typesToSample;
+    #subtypesToSample;
     #tsToIndexMap;
     #data;
     #zoomed;
@@ -49,11 +58,21 @@ class MainVisualization {
     #origMinTs;
     #origMaxTs;
     #cacheInfo;
+    #legend;
+    #fields;
+    #expandedTypes;
+    #recsLabeled;
 
     constructor(fname, data) {
         console.log('Number of points in input: ', Object.keys(data['pts']).reduce((acc, curr) => acc + data.pts[curr].length, 0));
         this.#fname = fname;
         // const types = [...new Set(data['records'].map((rec) => rec.type))];
+
+        console.log('Here is a pt:');
+        console.log(data['pts'][Object.keys(data['pts'])[0]][0]);
+        console.log('Here is a rec:');
+        console.log(data['recs'][0]);
+
         const types = Object.keys(data['pts']);
         const colScale = d3.scaleSequential()
                             .domain([0, types.length])
@@ -64,6 +83,21 @@ class MainVisualization {
             col++;
         }
 
+        let allFields = Object.values(data.fields).reduce((acc, curr) => acc.concat(curr), []);
+        for (let field of allFields)
+            sizeOfType[field.subtype] = field.size;
+
+        let subtypes = Array.from(new Set(allFields.map((obj) => obj.subtype)))
+        const stColScale = d3.scaleSequential()
+                            .domain([0, subtypes.length])
+                            .interpolator(d3.interpolateTurbo);
+        col = 0;
+        for (let type of subtypes) {
+            if (!colourOfType[type])
+                colourOfType[type] = addlch(stColScale(col), 20, 10, 1);
+            col++;
+        }
+
         this.#cacheInfo = [
             {associativity: 8, size: 32768, width: 270, initWidth: 270, currDragX: 320, initDragX: 320},
             {associativity: 8, size: 2097152, width: 270, initWidth: 270, currDragX: 320, initDragX: 320},
@@ -71,17 +105,26 @@ class MainVisualization {
         ];
 
         this.#data = data;
+        this.#fields = data.fields;
         this.#zoomed = false;
         this.#cacheFocus = false;
         this.#zoomTs = {'startTs': 0, 'endTs': 0};
+        this.#expandedTypes = new Set();
         this.#typesToShowOnGraph = types.reduce((acc, curr) => {
             acc[curr] = true;
-            return acc
+            return acc;
         }, {});
         this.#typesToSample = types.reduce((acc, curr) => {
             acc[curr] = true;
-            return acc
+            return acc;
         }, {});
+        this.#subtypesToSample = Array.from(Object.keys(this.#fields)
+            .map((tp) => new Set(this.#fields[tp].map((st) => st.subtype)))
+            .reduce((acc, curr) => acc.union(curr), new Set()))
+            .reduce((acc, curr) => {
+                acc[curr] = true;
+                return acc;
+            }, {});
         this.#tsToIndexMap = types.reduce((acc, curr) => {
             acc[curr] = data['pts'][curr].reduce((tsmap, elem, i) => {
                 tsmap[elem.ts] = i + 1;
@@ -118,19 +161,37 @@ class MainVisualization {
 
         // this.#graphLayout = TimeGraphLayout.build(data['pts'], data['changes']);
 
+        this.#legend = legendLayout()
+                        .fields(Object.keys(this.#fields).reduce((acc, curr) => {
+                            acc[curr] = [...new Set(this.#fields[curr].map((fd) => fd.subtype))];
+                            return acc;
+                        }, {}))
+                        .expandedTypes(this.#expandedTypes)
+                        .typeCounts(this.#data['counts']);
+
         d3.select('#visPanels')
             .append('div')
-            .attr('id', 'legendLayout')
-            .style('width', '85%')
-            .style('height', '50%')
+            .attr('id', 'legendDiv')
+            .style('overflow', 'scroll')
+            .style('width', '110%')
+            .style('height', '60%')
             .style('grid-column', 3)
             .style('grid-row', 2)
             .style('justify-self', 'start')
             .style('position', 'relative')
+            .style('left', '-80px')
+            .append('table')
+            .attr('id', 'legendLayout')
+            // .style('display', 'table')
+            .style('border-collapse', 'separate')
+            .style('border-spacing', '5px')
+            .style('position', 'relative')
             .style('top', '10px')
-            // .style('overflow', 'hidden')
-            .datum(colourOfType)
-            .call(legendLayout());
+            // .style('overflow', 'visible')
+            .datum(types)
+            .call(this.#legend);
+
+        this.#recsLabeled = data['recs'];//.map((item) => ({size: item[1], addr: item[2], type: item[3], allocTs: item[4], freeTs: item[5]}));
     }
 
     getGraphLayout() {
@@ -208,13 +269,37 @@ class MainVisualization {
         return this.#typesToSample;
     }
 
-    changeTypeSampled(type) {
-        this.#typesToSample[type] = !this.#typesToSample[type];
+    getLegend() {
+        return this.#legend;
+    }
+
+    getPageLayout() {
+        return this.#pageLayoutChart;
+    }
+
+    changeTypeSampled(type, isSubtype=false) {
+        if (isSubtype)
+            this.#subtypesToSample[type] = !this.#subtypesToSample[type];
+        else
+            this.#typesToSample[type] = !this.#typesToSample[type];
         // TODO add a warning telling user to resample?
+        if (this.#pageLayoutChart)
+            this.#pageLayoutChart.updatePagesByTimestamp();
+        if (this.#cacheSetChart)
+            this.#cacheSetChart.redraw();
     }
 
     isTypeSampled(type) {
         return this.#typesToSample[type];
+    }
+
+    isSubtypeSampled(sType) {
+        return this.#subtypesToSample[sType];
+    }
+
+    toggleExpandType(tp) {
+        if (this.#pageLayoutChart)
+            this.#pageLayoutChart.toggleExpandType(tp);
     }
 
     zoom(startTs, endTs) {
@@ -258,42 +343,17 @@ class MainVisualization {
     constructPageVis(data, currCacheLineSize) {
         let pages = data.page_num_events;
 
-        // let currID = 0;
-
-        // for (let [page, attrs] of Object.entries(pages)) {
-        //     page = parseInt(page);
-        //     attrs.events.sort((a, b) => a.alloc_ts - b.alloc_ts);
-           
-        //     for (let event of attrs.events) {
-        //         event.isDup = false;
-        //         event.ID = currID++;
-        //         let endOffsetLastObject = (event.addr % pageSize) + event.size;
-        //         let iPage = page + 1;
-
-        //         while (endOffsetLastObject > pageSize && pages[iPage]) {
-        //             /*  NOTE: at this point, we rely on the fact that the objects are sorted in ascending order
-        //                 by the address. Actually I don't think this is true anymore?? */
-        //             let newEvent = structuredClone(event);
-        //             newEvent.size = Math.min(endOffsetLastObject - pageSize, pageSize);
-        //             newEvent.addr = iPage * pageSize;
-        //             // newObj.alloc_addr = (objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) -
-        //             //     ((objs[objs.length - 1].alloc_addr + objs[objs.length - 1].alloc_size) % pageSize);
-        //             newEvent.isDup = true;
-        //             newEvent.ID = currID++;
-
-        //             pages[iPage].events.push(newEvent);
-        //             // objs[objs.length - 1].alloc_size -= newObj.alloc_size;
-        //             endOffsetLastObject -= pageSize;
-        //             iPage++;
-        //         }
-        //     }
-        // }
-
         this.#cacheSetChart = cacheSetLayout()
             .pageSize(pageSize)
             .cacheInfo(this.#cacheInfo)
             .defaultWidth(270)
-            .mainVis(this);
+            .mainVis(this)
+            .expandedTypes(this.#expandedTypes)
+            .fields(this.#fields)
+            .numBuckets(this.#timeGraphChart.sampleInfo().buckets)
+            // .getNearestBucketTs(this.#timeGraphChart.getNearestBucketTs)
+            .getBucketIndexFromTs(this.#timeGraphChart.getBucketIndexFromTs)
+            .records(this.#recsLabeled);
         d3.select('#visPanels')
             .insert('div', '#memLayoutDiv')
             .attr('id', 'cacheSetLayout')
@@ -303,14 +363,16 @@ class MainVisualization {
             .style('grid-row', 1)
             .style('overflow', 'visible')
             .style('transform', 'translateX(10px)')
-            .datum(Object.values(pages).reduce((acc, curr) => acc.concat(curr.events), []))
+            // .datum(recsLabeled)
             .call(this.#cacheSetChart);
 
         this.#pageLayoutChart = pageLayout()
             .pageSize(pageSize)
             .cachelineSize(currCacheLineSize)
             .statsTracker(this.#statsTracker)
-            .initTs(this.#initTs);
+            .initTs(this.#initTs)
+            .expandedTypes(this.#expandedTypes)
+            .cacheSetLayout(this.#cacheSetChart);
         d3.select('#visPanels')
             .append('div')
             .attr('id', 'pageLayoutDiv')
@@ -325,7 +387,7 @@ class MainVisualization {
                 pages: pages,
                 clusters: data.clusters,
                 features: data.features,
-                fields: data.fields,
+                fields: this.#fields,
                 perf: data.perf
             })
             .call(this.#pageLayoutChart);

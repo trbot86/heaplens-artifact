@@ -1,21 +1,22 @@
 import * as d3 from 'd3';
-import { colourOfType } from './vis.js';
+import { mainVis } from './dbloader.js';
+import { colourOfType, sizeOfType } from './vis.js';
 import { typeInfoPopup, trimString } from './statsTracker.js';
 
 
 function objectLayout() {
-    let memLayout, data, xScale, yScale, pageSize, statsTracker, fields, perf, perfGroup = undefined;
+    let memLayout, data, xScale, yScale, pageSize, statsTracker, fields, perf, perfGroup, expandedTypes = undefined;
     let x = 0,
         y = 0,
         width = 300,
         actualHeight = 300,
-        expandedTypes = new Set(),
         prevTs = 0,
         objects,
         startAddr,
         cachelineSize,
         canvas,
-        perfVis = false;
+        perfVis = false,
+        cacheSetLayout = undefined;
 
     function drawObjectLayout(selection) {
         objects = selection.datum().objects;
@@ -98,24 +99,24 @@ function objectLayout() {
         addElementsByTimestamp(ts);
     }
 
-    function addlch(col, sl, sc, sh) {
-        const {l, c, h} = d3.lch(col);
-        return d3.lch(Math.max(Math.min(l+sl, 100), 0),
-                Math.max(Math.min(c+sc, 150), 30),
-                Math.max(Math.min(h+sh, 360), 0));
-    }
-
     function addElementsByTimestamp(ts) {
         if (!memLayout) return;
         prevTs = ts;
+        // console.log('Here are the objs in objLayout');
+        // console.log(data);
         let elements = memLayout.select('#blockGroup')
             .selectAll('.zoomDataObject')
-            .data(data.filter((d) => d.start <= ts && (d.end == null || d.end >= ts)),
+            .data(data.filter((d) => d.start <= ts && (d.end == null || d.end >= ts))
+                        .map((obj) => {
+                            obj.vis = (obj.isSubtype && mainVis.isSubtypeSampled(obj.type)) || (!obj.isSubtype && mainVis.isTypeSampled(obj.type));
+                            return obj;
+                        }),
                 (d) => d.id)
             .join(
                 (enter) => {
                     let enterGroup = enter.append('g')
-                        .attr('class', 'zoomDataObject');
+                        .attr('class', 'zoomDataObject')
+                        .style('visibility', (d) => d.vis ? 'visible' : 'hidden');
                     enterGroup.append('rect')
                         .attr('class', (d) => `block-${d.trimType}`)
                         .attr('x', (d) => xScale(d.x))
@@ -138,7 +139,7 @@ function objectLayout() {
                             const textWidth = context.measureText(type).width + 20;
 
                             let typeHintSvg = memLayout.append('svg')
-                                    .attr('id', 'typeHint')
+                                    .attr('class', 'typeHint')
                                     .attr('data-type', type)
                                     .attr('x', d3.pointer(e)[0])
                                     .attr('y', d3.pointer(e)[1])
@@ -163,12 +164,12 @@ function objectLayout() {
                                     .text(type);
                         })
                         .on('mousemove', function(e, d) {
-                            let typeHint = memLayout.select('#typeHint');
+                            let typeHint = memLayout.select('.typeHint');
                             typeHint.attr('x', d3.pointer(e)[0])
                                 .attr('y', d3.pointer(e)[1]);
                         })
                         .on('mouseout', function(e, d) {
-                            memLayout.select('#typeHint')
+                            memLayout.selectAll('.typeHint')
                                 .remove();
                             memLayout.selectAll(`.block-${d.trimType}`)
                                 .transition()
@@ -212,16 +213,10 @@ function objectLayout() {
                                     });
                             }
                             else if (e.altKey && fields[d.type.replaceAll(' ', '')] && !(e.ctrlKey || e.metaKey)) {
-                                memLayout.select('#typeHint')
+                                memLayout.selectAll('.typeHint')
                                     .remove();
-                                if (!expandedTypes.has(d.type)) {
-                                    expandedTypes.add(d.type);
-                                }
-                                else {
-                                    expandedTypes.delete(d.type);
-                                }
-                                data = splitBlocks(objects, startAddr, pageSize, cachelineSize);
-                                addElementsByTimestamp(prevTs);
+                                toggleExpand(d.type);
+                                mainVis.getLegend().redraw();
                             }
                         });
                     enterGroup.append('line')
@@ -242,6 +237,7 @@ function objectLayout() {
                         .style('stroke-width', '1px');
                 },
                 (update) => {
+                    update.style('visibility', (d) => d.vis ? 'visible' : 'hidden');
                     update.selectAll('rect')
                         .transition()
                         .style('fill', (d) => expandedTypes.has(d.type) && !d.isSubtype ? 'url(#crosshatch)' : d.colour);
@@ -250,17 +246,50 @@ function objectLayout() {
             );
     }
 
+    function toggleExpand(tp) {
+        if (!expandedTypes.has(tp)) {
+            expandedTypes.add(tp);
+        }
+        else {
+            expandedTypes.delete(tp);
+        }
+        data = splitBlocks(objects, startAddr, pageSize, cachelineSize);
+        addElementsByTimestamp(prevTs);
+        cacheSetLayout.refreshExpandedTypes();
+    }
+
     function splitBlocks(objects, startAddr, pageSize, cachelineSize) {
         const pageBlocks = [];
         // const startAddr = objects[0].alloc_addr - (objects[0].alloc_addr % cachelineSize);
         
+        console.log('Here is the start addr of the page:');
+        console.log(startAddr);
         for (let i = 0; i < objects.length; i++) {
             let noSpacesType = objects[i].type.replaceAll(' ', '');
-            for (let obj of [objects[i]].concat(expandedTypes.has(objects[i].type) && fields[noSpacesType] ? fields[noSpacesType].map(
-                    (subtype) => ({type: subtype.subtype, addr: objects[i].addr + subtype.offset,
-                        allocTs: objects[i].allocTs, freeTs: objects[i].freeTs, isDup: objects[i].isDup,
-                        size: subtype.size, isSubtype: true})) : [])) {
+            // TODO the following does not work if an object can span more than one page boundary
+            let startDiff = (objects[i].size < sizeOfType[objects[i].type] && objects[i].addr == startAddr) ? sizeOfType[objects[i].type] - objects[i].size : 0;
+            let objsToAdd = [objects[i]].concat(expandedTypes.has(objects[i].type) && fields[noSpacesType] ? fields[noSpacesType].map(
+                (subtype) => ({type: subtype.subtype, addr: objects[i].addr + subtype.offset - startDiff,
+                    allocTs: objects[i].allocTs, freeTs: objects[i].freeTs, isDup: (objects[i].isDup || startDiff > 0),
+                    size: subtype.size, isSubtype: true})) : []);
+            // console.log(objsToAdd);
+            for (let obj of objsToAdd) {
                 // console.log(obj);
+                if (obj.addr + obj.size <= startAddr) {
+                    console.log('SKIPPED');
+                    console.log(`${obj.addr} + ${obj.size} <= ${startAddr}`);
+                    console.log(obj);
+                    console.log(`Actual size of type: ${sizeOfType[objects[i].type]}`);
+                    console.log(`Size of obj: ${objects[i].size}`);
+                    console.log(`Start diff: ${startDiff}`);
+                    continue;
+                }
+                else if (obj.addr < startAddr) {
+                    obj.size -= startAddr - obj.addr;
+                    obj.addr = startAddr;
+                    obj.isDup = true;
+                }
+
                 let trimType = obj.type.replace(/[^a-zA-Z]+/g, '');
                 let col = colourOfType[obj.type];
                 const normAddr = (obj.addr - startAddr);
@@ -274,7 +303,7 @@ function objectLayout() {
                                     height: 1,
                                     start: obj.allocTs,
                                     end: obj.freeTs,
-                                    colour: obj.isSubtype ? addlch(col, 20, 10, 1) : col,
+                                    colour: col,
                                     isBegin: !obj.isDup,
                                     isSubtype: obj.isSubtype
                                     };
@@ -298,7 +327,7 @@ function objectLayout() {
                                         height: midHeight,
                                         start: obj.allocTs,
                                         end: obj.freeTs,
-                                        colour: obj.isSubtype ? addlch(col, 20, 10, 1) : col,
+                                        colour: col,
                                         isStart: false,
                                         isEnd: false,
                                         isSubtype: obj.isSubtype
@@ -315,7 +344,7 @@ function objectLayout() {
                                         height: 1,
                                         start: obj.allocTs,
                                         end: obj.freeTs,
-                                        colour: obj.isSubtype ? addlch(col, 20, 10, 1) : col,
+                                        colour: col,
                                         isStart: false,
                                         isEnd: true,
                                         isSubtype: obj.isSubtype
@@ -329,6 +358,10 @@ function objectLayout() {
             }
         }
         return pageBlocks;
+    }
+
+    drawObjectLayout.toggleExpandType = function(tp) {
+        toggleExpand(tp);
     }
 
     drawObjectLayout.x = function(val) {
@@ -370,6 +403,18 @@ function objectLayout() {
     drawObjectLayout.perf = function(val) {
         if (!arguments) return perf;
         perf = val;
+        return drawObjectLayout;
+    }
+
+    drawObjectLayout.expandedTypes = function(val) {
+        if (!arguments) return expandedTypes;
+        expandedTypes = val;
+        return drawObjectLayout;
+    }
+    
+    drawObjectLayout.cacheSetLayout = function(val) {
+        if (!arguments) return cacheSetLayout;
+        cacheSetLayout = val;
         return drawObjectLayout;
     }
 
