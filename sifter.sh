@@ -13,6 +13,7 @@ fielddump=""
 pagespertype=""
 sample=""
 cutoff=""
+threads=1
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -25,7 +26,7 @@ while [ $# -gt 0 ]; do
         -t | --template)
             template=true
         ;;
-        -s | --subdir)
+        -s | --subdirectory)
             if [[ -z "$2" || "$2" == -* ]]; then
                 echo "Must specify a subdirectory with option -s/--subdir." >&2
                 exit 1
@@ -41,12 +42,21 @@ while [ $# -gt 0 ]; do
             buildcmd=$2
             shift
         ;;
+        -j | --threads)
+            echo "THREADS"
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Must specify number of threads with option -j/--threads." >&2
+                exit 1
+            fi
+            threads=$2
+            shift
+        ;;
         --perf-file)
             if [[ -z "$2" || "$2" == -* ]]; then
                 echo "Must specify a file name with option --perf-file." >&2
                 exit 1
             fi
-            perffile="--perf-file $2"
+            perffile=$2
             shift
         ;;
         --field-dump)
@@ -54,7 +64,7 @@ while [ $# -gt 0 ]; do
                 echo "Must specify a file name with option --field-dump." >&2
                 exit 1
             fi
-            fielddump="--field-dump $2"
+            fielddump=$2
             shift
         ;;
         --pages-per-type)
@@ -126,18 +136,28 @@ elif [ -z "$outdir" -a "$database" = false -a "$includesOnly" = false ]; then
     echo "      (or run with --database flag to create a database after running experiment)"
     exit 1
 elif [ "$database" = true ]; then
+    if ! [ -z $subdirectory ]; then
+        indir="$indir"/"$subdirectory"
+    fi
     if ! [ -f $indir/binary_dump.txt ]; then
         echo "ERROR the directory $indir does not contain binary_dump.txt"
         echo "(Did you forget to run your application?)"
         exit 1
     fi
     mv $indir/binary_dump.txt type_analysis ; mv $indir/fileset_dump.txt type_analysis ; mv $indir/typeset_dump.txt type_analysis
-    mv $indir/perfout.txt type_analysis ; mv $indir/fielddump.txt type_analysis
+    if ! [[ -z "$perffile" ]]; then
+        mv "$indir"/"$perffile" type_analysis
+        perffile="--perf-file $perffile"
+    fi
+    if ! [[ -z "$fielddump" ]]; then
+        mv $indir/"$fielddump" type_analysis
+        fielddump="--field-dump $fielddump"
+    fi
 
     cd type_analysis
     make convert_to_db
-    echo "./bin/convert_to_db $perffile $fielddump $pagespertype $sample $cutoff"
-    ./bin/convert_to_db $perffile $fielddump $pagespertype $sample $cutoff
+    echo "./bin/convert_to_db -j $threads $perffile $fielddump $pagespertype $sample $cutoff"
+    ./bin/convert_to_db -j $threads $perffile $fielddump $pagespertype $sample $cutoff
     exit 0
 elif [ "$includesOnly" = true ]; then
     add_includes $indir
@@ -189,6 +209,7 @@ eval "$buildcmd"
 if [ "$?" -ne 0 ]; then echo "ERROR running build command" ; exit 1 ; fi
 echo ""
 
+# TODO fix this
 echo "performing field extraction..."
 /root/sifter/type_analysis/bin/fieldandtypedumper compile_commands.json
 if [ "$?" -ne 0 ]; then echo "ERROR running field extraction" ; exit 1 ; fi
@@ -207,9 +228,7 @@ else
     echo "performed refactoring with clang-tidy"
     add_includes $outdir
 fi
-# clang-apply-replacements-10 ./
 if [ "$?" -ne 0 ]; then echo "ERROR templating mallocs" ; exit 1 ; fi
-# rm fixes.yaml # commented for debugging
 echo ""
 
 echo "You need to include the memhook library in your Makefile:"

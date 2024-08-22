@@ -175,16 +175,10 @@ void ssmem_term();
  * might have been freed (and is still in use) by other allocators */
 void ssmem_alloc_term(ssmem_allocator_t* a);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 /* allocate some memory using allocator a */
 void* ssmem_alloc(ssmem_allocator_t* a, size_t size);
 /* free some memory using allocator a */
 void ssmem_free(ssmem_allocator_t* a, void* obj);
-#ifdef __cplusplus
-}
-#endif
 
 /* release some memory to the OS using allocator a */
 void ssmem_release(ssmem_allocator_t* a, void* obj);

@@ -53,9 +53,6 @@
 #  define SSALLOC_SIZE (4 * 1024 * 1024 * 1024LL)
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 void ssalloc_set(void* mem);
 void ssalloc_init();
 void ssalloc_offset(size_t size);
@@ -65,9 +62,6 @@ void ssfree_alloc(unsigned int allocator, void* ptr);
 void* ssalloc(size_t size);
 void* ssalloc_aligned(size_t alignment, size_t size);
 void ssfree(void* ptr);
-#ifdef __cplusplus
-}
-#endif
 
 
 #endif

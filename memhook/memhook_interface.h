@@ -7,10 +7,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+
+#if defined(MEMHOOK_ASCYLIB)
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "memhook_ssmem.h"
 #include "memhook_ssalloc.h"
 #ifdef __cplusplus
+}
+#endif
+#endif // MEMHOOK_ASCYLIB
 
+#ifdef __cplusplus
 #include <iostream>
 #include <new>
 #include <typeinfo>
@@ -58,14 +67,18 @@ using namespace std;
         MACRO_GET_16(str, i + 32), \
         MACRO_GET_16(str, i + 48)
 
-#define MACRO_GET_STR(str) MACRO_GET_64(str, 0), 0
+#define MACRO_GET_128(str, i)      \
+    MACRO_GET_64(str, i + 0),      \
+        MACRO_GET_64(str, i + 64)
+
+#define MACRO_GET_STR(str) MACRO_GET_128(str, 0), 0
 
 struct slot;
 struct memhook_info_t;
 
 uint64_t memhook_get_server_clock();
 
-inline size_t roundUp(size_t size, size_t mult) {
+inline size_t memhook_roundUp(size_t size, size_t mult) {
     if (mult <= 1)
         return size;
 
@@ -83,9 +96,11 @@ extern "C"
 
     void* malloc_s(size_t, int, const char*, const char*);
     // void free_s(void *, int, const char*);
+    #if defined(MEMHOOK_ASCYLIB)
     void* ssalloc_s(size_t, int, const char*, const char*);
     void* ssalloc_aligned_s(size_t, size_t, int, const char*, const char*);
     void* ssmem_alloc_s(ssmem_allocator_t*, size_t, int, const char*, const char*);
+    #endif
     int posix_memalign_s(void**, size_t, size_t, int, const char*, const char*);
     void* memalign_s(size_t, size_t, int, const char*, const char*);
     void* calloc_s(size_t, size_t, int, const char*, const char*);
@@ -97,7 +112,7 @@ extern "C"
     // void ssfree_alloc_s(unsigned int allocator, void* ptr, const char* filepath, int line);
 
 // #define SIFTER_NEW
-// #define new MemStamp((__FILE__), (__LINE__)) * new
+#define new MemStamp((__FILE__), (__LINE__)) * new
 // #define delete MemStamp((__FILE__), (__LINE__)) * delete
 
 #ifdef __cplusplus
@@ -112,8 +127,8 @@ extern thread_local memhook_info_t unit_log;
 // extern thread_local unordered_set<const char*> typeFiles;
 extern memhook_hashtable filetable;
 extern memhook_hashtable typetable;
-extern void *memhook_malloc(size_t size, const char *file, int line, bool log, bool ssmem, ssmem_allocator_t* a);
-extern void memhook_free(void *ptr, const char* file, int line, bool log, bool ssmem, ssmem_allocator_t* a);
+extern void *memhook_malloc(size_t size, const char *file, int line, bool log);
+extern void memhook_free(void *ptr, const char* file, int line, bool log);
 
 // template <typename T>
 // T malloc(size_t size, bool fakearg=true);
@@ -148,7 +163,7 @@ _mm_malloc(size_t __size, size_t __align)
     unit_log.tindex_name = typetable.insert(typeid(T).name());
     if (__align == 1)
     {
-        void* ptr = memhook_malloc(__size, unit_log.file, line, true, false, nullptr);
+        void* ptr = memhook_malloc(__size, unit_log.file, line, true);
         collector.copy(unit_log);
         return ptr;
     }
@@ -166,7 +181,7 @@ _mm_malloc(size_t __size, size_t __align)
     __mallocedMemory = _mm_malloc(__size, __align);
 #endif
     unit_log.timestamp = memhook_get_server_clock();
-    unit_log.size = roundUp(__size, __align);
+    unit_log.size = memhook_roundUp(__size, __align);
     unit_log.addr = __mallocedMemory;
     unit_log.line = line;
     unit_log.typeofop = true;
@@ -183,7 +198,7 @@ void* malloc(size_t size, bool fakearg=true)
     unit_log.file = filetable.insert<filename...>();
     unit_log.tindex_name = typetable.insert(typeid(T).name());
 
-    void* ptr = memhook_malloc(size, unit_log.file, line, true, false, nullptr);
+    void* ptr = memhook_malloc(size, unit_log.file, line, true);
 
     collector.copy(unit_log);
     return ptr;

@@ -244,8 +244,8 @@ int get_slot(thread::id id);
 void insert_type(void *p, const MemStamp &stamp, const type_index);
 void insert_info(size_t size, void* ptr, type_index tindex);
 
-void  (memhook_free)(void *ptr, const char* file, int line, bool log, bool ssmem, ssmem_allocator_t* a);
-void* memhook_malloc(size_t size, const char* file, int line, bool log, bool ssmem, ssmem_allocator_t* a);
+void  (memhook_free)(void *ptr, const char* file, int line, bool log);
+void* memhook_malloc(size_t size, const char* file, int line, bool log);
 // void* memhook_calloc(size_t nmemb, size_t size, int line, const char* filename, const char* name_of_type);
 
 #warning This binary is being compiled with memhook.
@@ -253,9 +253,11 @@ void* memhook_malloc(size_t size, const char* file, int line, bool log, bool ssm
 void   (*next_free)(void *ptr);
 // void * (*next_malloc)(size_t size);
 // void * (*next_calloc)(size_t nmemb, size_t size);
+#if defined(MEMHOOK_ASCYLIB)
 void   (*next_ssmem_free)(ssmem_allocator_t* a, void* ptr);
 // void * (*ssmem_alloc)(ssmem_allocator_t* a, size_t size);
 void   (*next_ssfree)(void* ptr);
+#endif
 // void * (*ssalloc)(size_t size);
 // void * (*ssalloc_aligned)(size_t alignment, size_t size);
 

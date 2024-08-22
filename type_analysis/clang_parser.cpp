@@ -43,51 +43,32 @@ using namespace clang::tooling;
 static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 
 set<string> typenameset;
-
 multimap<string, vector<string>> fieldnameset;
 
 DeclarationMatcher classMatcher =
     // cxxRecordDecl(unless(isExpansionInSystemHeader()), unless(classTemplateDecl())).bind("class");
     // cxxRecordDecl(unless(isExpansionInSystemHeader()), hasDefinition(), classTemplateDecl()).bind("class");
-    cxxRecordDecl(unless(isExpansionInSystemHeader())).bind("class");
-
-DeclarationMatcher templateClassMatcher =
-    classTemplateDecl(unless(isExpansionInSystemHeader())).bind("templatedclass");
-
-DeclarationMatcher insttemplatedClassMatcher =
-    cxxRecordDecl(unless(isExpansionInSystemHeader()), isTemplateInstantiation()).bind("insttemplatedclass");
-
-DeclarationMatcher fieldMatcher =
-    fieldDecl(unless(isExpansionInSystemHeader())).bind("field");
-
-StatementMatcher deleteMatcher =
-    cxxDeleteExpr().bind("deletecall");
-
-StatementMatcher newMatcher =
-    cxxNewExpr().bind("newcall");
-
-StatementMatcher CStyleMallocMatcher =
-    callExpr(callee(functionDecl(anyOf(hasName(MTDFNAME1), hasName(MTDFNAME2), hasName(MTDFNAME3), hasName(MTDFNAME4), hasName(MTDFNAME5)))));
+    recordDecl(unless(isExpansionInSystemHeader())).bind("class");
 
 class ClassnamePrinter : public MatchFinder::MatchCallback
 {
 public:
   virtual void run(const MatchFinder::MatchResult &Result)
   {
-    const CXXRecordDecl *rd = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("class");
+    const RecordDecl *rd = Result.Nodes.getNodeAs<clang::RecordDecl>("class");
     cout << "general class matcher: " << rd->getQualifiedNameAsString() << " ";
-    cout << "DCT: " << (ClassTemplateDecl *)rd->getDescribedClassTemplate() << " ";
-    cout << "TIP: " << (uint64_t)rd->getTemplateInstantiationPattern() << " ";
-    cout << "DEF: " << (uint64_t)rd->getDefinition() << " ";
+    // cout << "DCT: " << (ClassTemplateDecl *)rd->getDescribedClassTemplate() << " ";
+    // cout << "TIP: " << (uint64_t)rd->getTemplateInstantiationPattern() << " ";
+    // cout << "DEF: " << (uint64_t)rd->getDefinition() << " ";
     if (rd->getDefinition())
     {
-      cout << "CD: " << (uint64_t)rd->getCanonicalDecl() << " ";
-      cout << "IFMC: " << (uint64_t)rd->getInstantiatedFromMemberClass() << " ";
-      cout << "TSK: " << (uint64_t)rd->getTemplateSpecializationKind() << " ";
-      cout << "MSI: " << (uint64_t)rd->getMemberSpecializationInfo() << " ";
-      cout << "HF: " << (uint64_t)rd->hasFriends() << " ";
-      cout << "IL: " << (uint64_t)rd->isLambda() << " ";
-      cout << "ILC: " << (uint64_t)rd->isLocalClass() << " ";
+      // cout << "CD: " << (uint64_t)rd->getCanonicalDecl() << " ";
+      // cout << "IFMC: " << (uint64_t)rd->getInstantiatedFromMemberClass() << " ";
+      // cout << "TSK: " << (uint64_t)rd->getTemplateSpecializationKind() << " ";
+      // cout << "MSI: " << (uint64_t)rd->getMemberSpecializationInfo() << " ";
+      // cout << "HF: " << (uint64_t)rd->hasFriends() << " ";
+      // cout << "IL: " << (uint64_t)rd->isLambda() << " ";
+      // cout << "ILC: " << (uint64_t)rd->isLocalClass() << " ";
       cout << "ICN: " << (uint64_t)rd->isInjectedClassName() << " ";
       cout << "IASOU: " << (uint64_t)rd->isAnonymousStructOrUnion() << " ";
       cout << "ITDAD: " << (uint64_t)rd->isThisDeclarationADefinition() << " ";
@@ -162,45 +143,6 @@ public:
   }
 };
 
-class NewExprPrinter : public MatchFinder::MatchCallback
-{
-public:
-  virtual void run(const MatchFinder::MatchResult &Result)
-  {
-    const CXXNewExpr *newex = Result.Nodes.getNodeAs<clang::CXXNewExpr>("newcall");
-    QualType allocType = newex->getAllocatedType();
-    cout << "new: " << allocType.getAsString() << endl;
-  }
-};
-
-//Callback for all C-Style allocation functions
-/**
- * Figure out how to get types:
- * If it is a C++ project, typecasts in malloc are not compulsory.
- * First check if typecast is there. If it's there, problem solved.
- * If not, check the type of lhs of binary operator (if malloc is assigned to pointer)
- * Else, check inside the malloc for sizeof() and figure out the type used.
- * Else, throw error ¯\_(ツ)_/¯
-**/
-
-class CStyleAllocPrinter : public MatchFinder::MatchCallback
-{
-public:
-  virtual void run(const MatchFinder::MatchResult &Result)
-  {
-  }
-};
-
-class DeleteExprPrinter : public MatchFinder::MatchCallback
-{
-public:
-  virtual void run(const MatchFinder::MatchResult &Result)
-  {
-    const CXXDeleteExpr *delex = Result.Nodes.getNodeAs<clang::CXXDeleteExpr>("deletecall");
-    QualType destroyedType = delex->getDestroyedType();
-    cout << "delete: " << destroyedType.getAsString() << endl;
-  }
-};
 
 int main(int argc, const char **argv)
 {
@@ -212,16 +154,10 @@ int main(int argc, const char **argv)
   ClassnamePrinter cp;
   // TemplatedClassPrinter tcp;
   // instTemplatedClassnamePrinter itcp;
-  DeleteExprPrinter dp;
-  NewExprPrinter np;
 
   MatchFinder Finder;
 
   Finder.addMatcher(classMatcher, &cp);
-  // Finder.addMatcher(templateClassMatcher, &tcp);
-  // Finder.addMatcher(insttemplatedClassMatcher, &itcp);
-  // Finder.addMatcher(deleteMatcher, &dp);
-  // Finder.addMatcher(newMatcher, &np);
 
   Tool.run(newFrontendActionFactory(&Finder).get());
   // Tool.run(newFrontendActionFactory<SyntaxOnlyAction>().get());

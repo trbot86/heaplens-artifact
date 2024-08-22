@@ -3,8 +3,13 @@ __pycache__
 *.so
 *.o
 ASCYLIB
+fielddump_tester
 ssmem
 setbench
+setbench-artifact
+synchrobench
+testing_stuff
+veb_new
 fielddump.txt
 newfielddump.txt
 typedump.txt

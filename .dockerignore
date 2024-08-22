@@ -2,3 +2,5 @@
 sifter_vis_d3
 docker
 ssmem
+ASCYLIB/exp*
+fielddump_tester

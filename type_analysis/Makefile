@@ -22,7 +22,7 @@ convert_to_db: convert_to_db.cpp
 
 # NEEDED
 fieldandtypedumper: clang_parser.cpp
-	$(CC) $(Includes) -DMTDFNAME1="\"malloc\"" -DMTDFNAME2="\"realloc\"" -DMTDFNAME3="\"calloc\"" -DMTDFNAME4="\"reallocArray\"" -DMTDFNAME5="\"alloc\"" clang_parser.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o bin/fieldandtypedumper
+	$(CC) $(Includes) clang_parser.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o bin/fieldandtypedumper
 
 # NEEDED
 malloctypedumper: malloctypedumper.cpp

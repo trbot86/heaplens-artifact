@@ -193,7 +193,7 @@ extern "C" {
         void* ptr = memhook_malloc(size, filename, line, true);
         if (initialized) {
             unit_log.tindex_name = typetable.insert(name_of_type);
-            // cout << "CALLED CUSTOM MALLOC" << endl;
+            // cout << "CALLED CUSTOM MALLOC, TYPE: " << (void*) unit_log.tindex_name << endl;
             collector.copy(unit_log);
         }
         return ptr;
@@ -218,6 +218,7 @@ extern "C" {
     //     }
     // }
 
+    #if defined(MEMHOOK_ASCYLIB)
     void* ssmem_alloc_s(ssmem_allocator_t* a, size_t size, int line, const char* filename, const char* name_of_type) {
         // if (!next_ssmem_alloc) next_ssmem_alloc = (void * (*)(ssmem_allocator_t*, size_t))dlsym(RTLD_NEXT, "ssmem_alloc");
         // if (!next_ssmem_alloc) fprintf(stdout, "failed to find next ssmem alloc\n");
@@ -274,7 +275,7 @@ extern "C" {
         void* ptr = ssalloc_aligned(alignment, size);
         #endif
 
-        alloc_log(ptr, roundUp(size, alignment), filename, line, name_of_type);
+        alloc_log(ptr, memhook_roundUp(size, alignment), filename, line, name_of_type);
 
         return ptr;
     }
@@ -292,16 +293,17 @@ extern "C" {
         free_log(ptr);
         #endif
     }
+    #endif // MEMHOOK_ASCYLIB
 
     int posix_memalign_s(void** memptr, size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
         int ret = posix_memalign(memptr, alignment, size);
-        alloc_log(memptr, roundUp(size, alignment), filename, line, name_of_type);
+        alloc_log(memptr, memhook_roundUp(size, alignment), filename, line, name_of_type);
         return ret;
     }
 
     void* memalign_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
         void* ptr = memalign(alignment, size);
-        alloc_log(ptr, roundUp(size, alignment), filename, line, name_of_type);
+        alloc_log(ptr, memhook_roundUp(size, alignment), filename, line, name_of_type);
         return ptr;
     }
 
@@ -335,6 +337,7 @@ void * operator new(size_t size) {
         throw bad_alloc();
     }
 
+    // collector.copy(unit_log);
     return mem;
 }
 
@@ -361,6 +364,7 @@ void *operator new[] (size_t size) {
         throw bad_alloc();
     }
 
+    collector.copy(unit_log);
     return mem;
 }
 

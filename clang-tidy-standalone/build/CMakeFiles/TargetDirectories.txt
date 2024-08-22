@@ -1,9 +1,0 @@
-/root/sifter/clang-tidy-standalone/build/CMakeFiles/rebuild_cache.dir
-/root/sifter/clang-tidy-standalone/build/CMakeFiles/intrinsics_gen.dir
-/root/sifter/clang-tidy-standalone/build/CMakeFiles/edit_cache.dir
-/root/sifter/clang-tidy-standalone/build/misc/CMakeFiles/rebuild_cache.dir
-/root/sifter/clang-tidy-standalone/build/misc/CMakeFiles/clangTidyMiscModule.dir
-/root/sifter/clang-tidy-standalone/build/misc/CMakeFiles/edit_cache.dir
-/root/sifter/clang-tidy-standalone/build/tool/CMakeFiles/rebuild_cache.dir
-/root/sifter/clang-tidy-standalone/build/tool/CMakeFiles/clang-tidy.dir
-/root/sifter/clang-tidy-standalone/build/tool/CMakeFiles/edit_cache.dir
