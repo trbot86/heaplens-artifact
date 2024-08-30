@@ -68,10 +68,10 @@ class MainVisualization {
         this.#fname = fname;
         // const types = [...new Set(data['records'].map((rec) => rec.type))];
 
-        console.log('Here is a pt:');
-        console.log(data['pts'][Object.keys(data['pts'])[0]][0]);
-        console.log('Here is a rec:');
-        console.log(data['recs'][0]);
+        // console.log('Here is a pt:');
+        // console.log(data['pts'][Object.keys(data['pts'])[0]][0]);
+        // console.log('Here is a rec:');
+        // console.log(data['recs'][0]);
 
         const types = Object.keys(data['pts']);
         const colScale = d3.scaleSequential()
@@ -284,7 +284,7 @@ class MainVisualization {
             this.#typesToSample[type] = !this.#typesToSample[type];
         // TODO add a warning telling user to resample?
         if (this.#pageLayoutChart)
-            this.#pageLayoutChart.updatePagesByTimestamp();
+            this.#pageLayoutChart.recalculateBuckets();
         if (this.#cacheSetChart)
             this.#cacheSetChart.redraw();
     }
@@ -325,7 +325,7 @@ class MainVisualization {
         if (this.#cacheFocus) {
             d3.select('#pageLayoutDiv')
                 .style('visibility', 'hidden');
-            d3.select('#memLayout')
+            d3.select('#memLayoutDiv')
                 .style('visibility', 'hidden');
             d3.select('#cacheSetLayout')
                 .style('grid-column', 2);
@@ -333,7 +333,7 @@ class MainVisualization {
         else {
             d3.select('#pageLayoutDiv')
                 .style('visibility', 'visible');
-            d3.select('#memLayout')
+            d3.select('#memLayoutDiv')
                 .style('visibility', 'visible');
             d3.select('#cacheSetLayout')
                 .style('grid-column', 3);
@@ -342,6 +342,9 @@ class MainVisualization {
 
     constructPageVis(data, currCacheLineSize) {
         let pages = data.page_num_events;
+
+        console.log('Here are the pages in vis.js');
+        console.log(pages);
 
         this.#cacheSetChart = cacheSetLayout()
             .pageSize(pageSize)
@@ -372,7 +375,9 @@ class MainVisualization {
             .statsTracker(this.#statsTracker)
             .initTs(this.#initTs)
             .expandedTypes(this.#expandedTypes)
-            .cacheSetLayout(this.#cacheSetChart);
+            .cacheSetLayout(this.#cacheSetChart)
+            .numBuckets(this.#timeGraphChart.sampleInfo().buckets)
+            .getBucketIndexFromTs(this.#timeGraphChart.getBucketIndexFromTs);
         d3.select('#visPanels')
             .append('div')
             .attr('id', 'pageLayoutDiv')

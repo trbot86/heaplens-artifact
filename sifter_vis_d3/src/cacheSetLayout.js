@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import { currCacheLineSize } from './timeGraphLayout.js';
 import { mainVis } from './dbloader.js';
+import { trimLongTypeName, noSpaces } from './legend.js';
 
 
 const CACHE_LAYOUT_WIDTH = '350px';
@@ -62,27 +63,30 @@ function cacheSetLayout() {
             .attr('id', 'cacheSetTabs')
             .style('display', 'inline-block')
             .style('position', 'relative')
+            .style('z-index', 1)
             .style('width', '100%')
             .style('height', '22%')
             .style('transform', 'translate(10px, 0px)');
+
+        currCache = cacheInfo[0];
     
         let tabGroup = cacheSetTabs.selectAll('.cacheTab')
             .data(cacheInfo)
             .enter()
             .append('div')
-            .attr('class', 'classTab')
+            .attr('class', 'cacheTab')
             .style('width', '45px')
             .style('height', '37px')
             .style('float', 'left')
             .style('margin', '0px')
             .style('padding', '0px')
             .style('border', '1px solid #ccc')
-            .style('background-color', 'white')
+            .style('background-color', (d) => d === currCache ? '#ccc' : 'white')
             .style('pointer-events', 'visible')
             .style('cursor', 'pointer')
             .style('position', 'relative')
             .style('top', '50%')
-            .style('transform', 'translateY(-50%)')
+            .style('transform', (d, i) => `translate(-${i}px, -50%)`)
             .style('border-top-left-radius', (d, i) => i == 0 ? '7px' : '0px')
             .style('border-bottom-left-radius', (d, i) => i == 0 ? '7px' : '0px')
             .style('border-top-right-radius', (d, i) => i == cacheInfo.length - 1 ? '7px' : '0px')
@@ -96,6 +100,8 @@ function cacheSetLayout() {
                     .property('value', Math.floor(parseInt(currCache.size) / CACHE_SIZE_LABELS[chosenUnit]));
                 d3.select('#assocInput')
                     .property('value', currCache.associativity);
+                d3.selectAll('.cacheTab')
+                    .style('background-color', (d) => d === currCache ? '#ccc' : 'white');
                 // currSize = d.size;
                 // currAssoc = d.associativity;
                 // currWidth = d.width;
@@ -109,7 +115,7 @@ function cacheSetLayout() {
             .on('mouseout', function() {
                 d3.select(this)
                     .transition()
-                    .style('background-color', 'white');
+                    .style('background-color', (d) => d === currCache ? '#ccc' : 'white');
             })
             .append('p')
             // .attr('text-anchor', 'middle')
@@ -124,7 +130,6 @@ function cacheSetLayout() {
             .text((d, i) => `L${i+1}`);
 
         // Set the current cache to L1 (first cache in cacheInfo)
-        currCache = cacheInfo[0];
         // currCacheLineSize = currCache.cls;
         // currAssociativity = currCache.associativity;
 
@@ -228,28 +233,30 @@ function cacheSetLayout() {
             .attr('id', 'cacheSetSVG')
             .style('width', CACHE_LAYOUT_WIDTH)
             .style('height', '78%')
+            .style('position', 'relative')
+            .style('z-index', 2)
             .style('overflow', 'visible')
             .append('defs')
             .append('pattern')
             .attr('id', 'pattern-check')
             .attr('x', 0)
             .attr('y', 0)
-            .attr('width', 8)
-            .attr('height', 8)
+            .attr('width', 4)
+            .attr('height', 4)
             .attr('patternUnits', 'userSpaceOnUse');
         
         pattern.append('rect')
             .attr('x', 0)
             .attr('y', 0)
-            .attr('width', 4)
-            .attr('height', 4)
+            .attr('width', 2)
+            .attr('height', 2)
             .style('fill', 'black');
         
         pattern.append('rect')
-            .attr('x', 4)
-            .attr('y', 4)
-            .attr('width', 4)
-            .attr('height', 4)
+            .attr('x', 2)
+            .attr('y', 2)
+            .attr('width', 2)
+            .attr('height', 2)
             .style('fill', 'black');
 
         drawToggle();
@@ -263,7 +270,8 @@ function cacheSetLayout() {
         let numCacheSets = Math.ceil(currCache.size / (currCache.associativity*currCacheLineSize));
         let retBucketData = new Array(numBuckets+2).fill(0).map(() => new Array(numCacheSets).fill(undefined));
 
-        objects.forEach((obj) => {
+        objects.filter((obj) => obj.type != null)
+            .forEach((obj) => {
             const startBucketIndex = getBucketIndexFromTs(obj.allocTs);
             const endBucketIndex = obj.freeTs ? getBucketIndexFromTs(obj.freeTs) : undefined;
             // console.log(`startBucketIndex = ${startBucketIndex}`);
@@ -421,7 +429,7 @@ function cacheSetLayout() {
         objects = [];
         origObjects.forEach((obj) => {
             if (expandedTypes.has(obj.type)) {
-                fields[obj.type].map((st) => ({ ID: obj.ID,
+                fields[noSpaces(obj.type)].map((st) => ({ ID: obj.ID,
                                                         addr: obj.addr + st.offset,
                                                         allocTs: obj.allocTs,
                                                         file: obj.file,
@@ -508,12 +516,6 @@ function cacheSetLayout() {
     drawLayout.getBucketIndexFromTs = function(val) {
         if (!arguments) return getBucketIndexFromTs;
         getBucketIndexFromTs = val;
-        return drawLayout;
-    }
-
-    drawLayout.sizeOfBucket = function(val) {
-        if (!arguments) return sizeOfBucket;
-        sizeOfBucket = val;
         return drawLayout;
     }
 
@@ -759,7 +761,7 @@ function cacheSetLayout() {
     
         const textHeight = 12;
         const buffer = 3;
-        cacheLayout.selectAll('rect')
+        cacheLayout.selectAll('.dataPatternRect')
             .data(squaresData)
             .join((enter) => {
                 if (zoomedOut()) {
@@ -775,7 +777,7 @@ function cacheSetLayout() {
                         .style('fill', 'white');
                 }
                 enter.append('rect')
-                    .attr('id', 'dataPatternRect')
+                    .attr('class', 'dataPatternRect')
                     .attr('x', (d, i) => ((i % groupsPerRow)*squareSize))
                     .attr('y', (d, i) => (Math.floor(i / groupsPerRow)*squareSize))
                     .attr('width', squareSize / (zoomedOut() ? CACHE_GROUP_PAD : 1))
@@ -801,11 +803,11 @@ function cacheSetLayout() {
                             const labels = zoomedOut() ? [`occupancy variance: ${d.variance}`] : Object.keys(d.types)
                                 .filter((tp) => d.types[tp] > 0)
                                 .sort((a, b) => d.types[b] - d.types[a])
-                                .map((tp) => `${tp}: ${d.types[tp]} (${Math.round((d.types[tp] / sumAllTypes(d.types))*1000)/10}%)`);
+                                .map((tp) => `${trimLongTypeName(tp, 30)}: ${d.types[tp]} (${Math.round((d.types[tp] / sumAllTypes(d.types))*1000)/10}%)`);
                             const textWidth = labels.reduce((acc, curr) => Math.max(acc, context.measureText(curr).width), 0) + 20;
                             let typeGroup = cacheLayout.append('g')
                                 .attr('id', 'cacheSetHint')
-                                .style('transform', `translate(${d3.pointer(e)[0]}px, ${d3.pointer(e)[1] - (textHeight*labels.length) - buffer}px)`);
+                                .style('transform', `translate(${d3.pointer(e)[0]}px, ${d3.pointer(e)[1] - (textHeight*labels.length) - buffer - (zoomedOut() ? 3 : 0)}px)`);
                             typeGroup.append('rect')
                                 .attr('fill', 'white')
                                 .style('position', 'fixed')
@@ -833,7 +835,7 @@ function cacheSetLayout() {
                             const labels = zoomedOut() ? [`occupancy variance: ${d.variance}`] : Object.keys(d.types)
                                 .filter((tp) => d.types[tp] > 0);
                             cacheLayout.select('#cacheSetHint')
-                                .style('transform', `translate(${d3.pointer(e)[0]}px, ${d3.pointer(e)[1] - (textHeight*labels.length) - buffer}px)`);
+                                .style('transform', `translate(${d3.pointer(e)[0]}px, ${d3.pointer(e)[1] - (textHeight*labels.length) - buffer - (zoomedOut() ? 3 : 0)}px)`);
                         }
                     })
                     .on('mouseout', function() {

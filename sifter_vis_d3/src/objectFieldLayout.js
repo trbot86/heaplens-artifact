@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import { mainVis } from './dbloader.js';
 import { colourOfType, sizeOfType } from './vis.js';
 import { typeInfoPopup, trimString } from './statsTracker.js';
+import { trimLongTypeName } from './legend.js';
 
 
 function objectLayout() {
@@ -79,7 +80,7 @@ function objectLayout() {
 
     function perfVisible() {
         perfGroup.selectAll('.perfHighlight')
-            .style('visibility', perfVis ? 'visible' : 'hidden');
+            .style('visibility', perfVis ? 'inherit' : 'hidden');
     }
 
     function perfHighlight() {
@@ -92,7 +93,7 @@ function objectLayout() {
             .attr('y', (d) => yScale(Math.floor((d - (parseInt(startAddr)*pageSize)) / cachelineSize)))
             .attr('width', xScale(cachelineSize))
             .attr('height', yScale(1))
-            .style('visibility', perfVis ? 'visible' : 'hidden');
+            .style('visibility', perfVis ? 'inherit' : 'hidden');
     }
 
     drawObjectLayout.addElementsByTimestamp = function(ts) {
@@ -110,13 +111,15 @@ function objectLayout() {
                         .map((obj) => {
                             obj.vis = (obj.isSubtype && mainVis.isSubtypeSampled(obj.type)) || (!obj.isSubtype && mainVis.isTypeSampled(obj.type));
                             return obj;
-                        }),
+                        })
+                        .sort((a, b) => a.start - b.start),
                 (d) => d.id)
+            .order()
             .join(
                 (enter) => {
                     let enterGroup = enter.append('g')
                         .attr('class', 'zoomDataObject')
-                        .style('visibility', (d) => d.vis ? 'visible' : 'hidden');
+                        .style('visibility', (d) => d.vis ? 'inherit' : 'hidden');
                     enterGroup.append('rect')
                         .attr('class', (d) => `block-${d.trimType}`)
                         .attr('x', (d) => xScale(d.x))
@@ -133,19 +136,25 @@ function objectLayout() {
                                     .style('fill', d3.color(d.colour).darker(2));
                             }
 
-                            let type = trimString(d.type, 250);
+                            let type = trimLongTypeName(d.type, 65);
                             const context = canvas.getContext('2d');
                             context.font = '10px monospace';
                             const textWidth = context.measureText(type).width + 20;
 
-                            let typeHintSvg = memLayout.append('svg')
+                            let typeHintSvg = d3.select('#memLayoutDiv')
+                                    .append('svg')
                                     .attr('class', 'typeHint')
                                     .attr('data-type', type)
-                                    .attr('x', d3.pointer(e)[0])
-                                    .attr('y', d3.pointer(e)[1])
+                                    // .attr('x', d3.pointer(e)[0])
+                                    // .attr('y', d3.pointer(e)[1])
+                                    // .attr('x', e.clientX)
+                                    // .attr('y', e.clientY - 15)
+                                    .style('left', `${e.clientX}px`)
+                                    .style('top', `${e.clientY - 15}px`)
+                                    .style('position', 'fixed')
                                     .style('width', `${textWidth}px`)
                                     .style('height', '20px')
-                                    .style('transform', `translate(${x}, calc(${y} - 15px))`)
+                                    // .style('transform', `translate(${x}, ${y})`)
                                     .style('overflow', 'visible');
                             typeHintSvg.append('rect')
                                     .attr('x', 0)
@@ -164,12 +173,12 @@ function objectLayout() {
                                     .text(type);
                         })
                         .on('mousemove', function(e, d) {
-                            let typeHint = memLayout.select('.typeHint');
-                            typeHint.attr('x', d3.pointer(e)[0])
-                                .attr('y', d3.pointer(e)[1]);
+                            let typeHint = d3.select('#memLayoutDiv').select('.typeHint');
+                            typeHint.style('left', `${e.clientX}px`)
+                                .style('top', `${e.clientY - 15}px`);
                         })
                         .on('mouseout', function(e, d) {
-                            memLayout.selectAll('.typeHint')
+                            d3.select('#memLayoutDiv').selectAll('.typeHint')
                                 .remove();
                             memLayout.selectAll(`.block-${d.trimType}`)
                                 .transition()
@@ -181,7 +190,7 @@ function objectLayout() {
                                     .append('div')
                                     .attr('id', 'statsPopup')
                                     .attr('class', 'popup')
-                                    .style('visibility', 'visible')
+                                    .style('visibility', 'inherit')
                                     .style('text-align', 'center')
                                     .style('height', `${Math.min((1 + statsTracker.getTypes().length) * 19, 400)}px`);
                                 textGroup.call(typeInfoPopup().y('10%')
@@ -237,7 +246,7 @@ function objectLayout() {
                         .style('stroke-width', '1px');
                 },
                 (update) => {
-                    update.style('visibility', (d) => d.vis ? 'visible' : 'hidden');
+                    update.style('visibility', (d) => d.vis ? 'inherit' : 'hidden');
                     update.selectAll('rect')
                         .transition()
                         .style('fill', (d) => expandedTypes.has(d.type) && !d.isSubtype ? 'url(#crosshatch)' : d.colour);
@@ -262,8 +271,8 @@ function objectLayout() {
         const pageBlocks = [];
         // const startAddr = objects[0].alloc_addr - (objects[0].alloc_addr % cachelineSize);
         
-        console.log('Here is the start addr of the page:');
-        console.log(startAddr);
+        // console.log('Here is the start addr of the page:');
+        // console.log(startAddr);
         for (let i = 0; i < objects.length; i++) {
             let noSpacesType = objects[i].type.replaceAll(' ', '');
             // TODO the following does not work if an object can span more than one page boundary

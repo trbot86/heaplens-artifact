@@ -16,9 +16,9 @@ function timeGraphLayout() {
         tabPosition = {x: x, y: y + height, min: 0, max: 0},
         timeChangeCallbacks = [],
         initialized = false,
-        sampleInfo = {algorithm: 'dbscan',
-                    runLength: 3,
-                    numRuns: 2,
+        sampleInfo = {algorithm: 'agglomerative',
+                    runLength: 5,
+                    numRuns: 3,
                     buckets: 1000},
         minTs = 0,
         maxTs = 0,
@@ -627,8 +627,8 @@ function timeGraphLayout() {
     function snapToBucket(e) {
         const currTime = getCurrTime();
         let newTs = (getBucketIndexFromTs(currTime)*getSizeOfBucket()) + xScale.domain()[0];
-        console.log(`Snapping to bucket index: ${getBucketIndexFromTs(currTime)}`);
-        console.log(`ts: ${newTs}`);
+        // console.log(`Snapping to bucket index: ${getBucketIndexFromTs(currTime)}`);
+        // console.log(`ts: ${newTs}`);
         tabPosition.x = xScale(newTs);
         // tabPosition.x = (Math.round((tabPosition.x - xScale.range()[0]) * (sampledBuckets / (xScale.range()[1] - xScale.range()[0]))) *
             // ((xScale.range()[1] - xScale.range()[0]) / sampledBuckets)) + xScale.range()[0];

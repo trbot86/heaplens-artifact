@@ -7,16 +7,6 @@ rect.pageBorder {
     stroke: black;
 }
 
-rect.pageSliceSelector {
-    cursor: zoom-in;
-    pointer-events: visible;
-}
-
-rect.wholeSliceSelector {
-    cursor: pointer;
-    pointer-events: visible;
-}
-
 circle.toggle {
     cursor: pointer;
 }
@@ -144,6 +134,7 @@ div.loadingAnim {
     background-color: whitesmoke;
     border: solid #ccc 1px;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+    z-index: 10;
 }
 
 .changeRegion {
