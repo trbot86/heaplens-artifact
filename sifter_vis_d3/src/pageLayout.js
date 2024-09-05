@@ -13,7 +13,7 @@ const   SORT_PAGE_NUM = 0,
         OBJ_LIST = 1;
 
 const   tabLabelToCode = {
-    'Page #': SORT_PAGE_NUM,
+    'Address': SORT_PAGE_NUM,
     'Cluster': SORT_CLUSTER,
     'Perf C2C': SORT_PERF
 };
@@ -56,12 +56,7 @@ function pageLayout() {
         features = selection.datum().features;
         perf = selection.datum().perf;
 
-        console.log('Here is what clusters looks like:');
-        console.log(clusters);
-
         const pageNumToEvents = selection.datum().pages;
-        // console.log('Here is pageNumToEvents');
-        // console.log(pageNumToEvents);
         pageAddrs = Object.keys(pageNumToEvents).map((pn) => pn*pageSize);
         // ToEvents = Object.keys(pageNumToEvents)
         //                 .reduce((acc, curr) => {
@@ -84,16 +79,14 @@ function pageLayout() {
                         pageAddrs.reduce((acc, pageAddr) => {
                             acc[pageAddr] = new Array(numSubSlices*NUM_OBJS_PER_SUBSLICE).fill(0).map((e, i) => parseInt(pageAddr) + i*(pageSize / (numSubSlices*NUM_OBJS_PER_SUBSLICE)));
                             return acc;
-                        }, {}));
+                        }, {}))
+                        .map((entry) => [entry[0], entry[1], getPageKey(entry[0])]);
         subsliceAddrToSplitEvents = splitEvents(allEvents, pageSize / (zoomedOut() ? numSubSlices : 1));
         objAddrToSplitEvents = splitEvents(allEvents, pageSize / (zoomedOut() ? numSubSlices*NUM_OBJS_PER_SUBSLICE : 1));
         sliceScale = d3.scaleLinear().domain([0, pageSize]).range([0, pageRectWidth]);
         // allObjDataOriginal = objAddrToSplitEvents;
         if (zoomedOut())
             bucketData = getBucketData(Object.entries(objAddrToSplitEvents));
-
-        console.log('subSliceAddrToSplitEvents:');
-        console.log(subsliceAddrToSplitEvents);
 
         dataPerf = Object.keys(perf)
                         .filter((d) => Object.keys(objAddrToSplitEvents).includes(Math.floor(parseInt(d) / pageSize).toString()))
@@ -109,14 +102,12 @@ function pageLayout() {
         selection.append('svg')
                 .attr('id', 'pageLayout')
                 .style('width', '100%')
-                .style('height', `${Object.keys(sliceAddrAndObjList).length*(pageRectHeight+10)}px`);
+                .style('height', `${pageAddrs.length*(pageRectHeight+10)}px`);
 
         selAddr = sliceAddrAndObjList[0][SLICE_ADDR];
-        console.log('Here is sliceAddrAndObjList');
-        console.log(sliceAddrAndObjList);
         refreshObjectLayout(objAddrToSplitEvents[sliceAddrAndObjList[0][OBJ_LIST][0]] ? objAddrToSplitEvents[sliceAddrAndObjList[0][OBJ_LIST][0]] : [],
                             sliceAddrAndObjList[0][SLICE_ADDR], initTs, dataFields,
-                            zoomedOut() ? zoomThreshold : pageSize / Math.pow(numSubSlices, zoomLevel), cachelineSize);
+                            zoomedOut() ? zoomThreshold : currentSliceSize(), cachelineSize);
         updatePagesByTimestamp(initTs);
     }
 
@@ -147,7 +138,7 @@ function pageLayout() {
     }
 
     function zoomedOut() {
-        return pageSize / Math.pow(numSubSlices, zoomLevel) > zoomThreshold;
+        return pageSize / (zoomLevel > 0 ? Math.pow(numSubSlices, 2)*zoomLevel : 1) > zoomThreshold;
     }
 
     function constructPageTabs() {
@@ -160,7 +151,7 @@ function pageLayout() {
             }, 'indent': 37}};
 
         if (zoomLevel == 0) {
-            sorters["Cluster"] = {'sortFunc': function() {
+            sorters['Cluster'] = {'sortFunc': function() {
                     if (sortMode = SORT_PERF)
                         objLayout.perfVisible(false);
                     sliceAddrAndObjList = sliceAddrAndObjList.sort((a, b) => parseInt(pageAddrToCluster[a[SLICE_ADDR]]) - parseInt(pageAddrToCluster[b[SLICE_ADDR]]));
@@ -168,7 +159,7 @@ function pageLayout() {
                 }, 'indent': 50};
         }
         
-        sorters["Perf C2C"] = {'sortFunc': function() {
+        sorters['Perf C2C'] = {'sortFunc': function() {
                 const perfPageStrings = Object.keys(perf).map((d) => Math.floor(parseInt(d) / pageSize).toString());
                 if (sortMode != SORT_PERF) {
                     objLayout.perfVisible(true);
@@ -275,7 +266,8 @@ function pageLayout() {
                             pageAddrs.reduce((acc, pageAddr) => {
                                 acc[pageAddr] = new Array(numSubSlices*NUM_OBJS_PER_SUBSLICE).fill(0).map((e, i) => parseInt(pageAddr) + i*(pageSize / (numSubSlices*NUM_OBJS_PER_SUBSLICE)));
                                 return acc;
-                            }, {}));
+                            }, {}))
+                            .map((entry) => [entry[0], entry[1], getPageKey(entry[0])]);
                         sliceScale = d3.scaleLinear().domain([0, pageSize]).range([0, pageRectWidth]);
                         subsliceAddrToSplitEvents = splitEvents(allEvents, pageSize / (zoomedOut() ? numSubSlices : 1));
                         objAddrToSplitEvents = splitEvents(allEvents, pageSize / (zoomedOut() ? numSubSlices*NUM_OBJS_PER_SUBSLICE : 1));
@@ -287,7 +279,7 @@ function pageLayout() {
                         //     .transition()
                         //     .style('background-color', (d1) => tabLabelToCode[d1] == sortMode ? '#ccc' : 'white');
                         d3.select('#pageLayout')
-                            .style('height', `${Object.keys(objAddrToSplitEvents).length*(pageRectHeight+10)}px`);
+                            .style('height', `${pageAddrs.length*(pageRectHeight+10)}px`);
                         // updatePagesByTimestamp(getCurrTime());  // TODO: weird hack, not sure how to fix
                         updatePagesByTimestamp(getCurrTime());
                         constructPageTabs();
@@ -295,7 +287,7 @@ function pageLayout() {
                         // const zoomedOut = oldSliceSize > zoomThreshold;
                         refreshObjectLayout(objAddrToSplitEvents[sliceAddrAndObjList[0][OBJ_LIST][0]] ? objAddrToSplitEvents[sliceAddrAndObjList[0][OBJ_LIST][0]] : [],
                             sliceAddrAndObjList[0][SLICE_ADDR], getCurrTime(), dataFields,
-                            zoomedOut() ? zoomThreshold : pageSize / Math.pow(numSubSlices, zoomLevel), cachelineSize);
+                            zoomedOut() ? zoomThreshold : pageSize / Math.pow(numSubSlices, 2)*(zoomLevel), cachelineSize);
                     })
                     .on('mouseover', function() {
                         d3.select(this)
@@ -321,15 +313,16 @@ function pageLayout() {
     function splitEvents(events, sliceSize) {
         let currID = 0;
         const sliceAddrToEventMap = {};
+        if (!events)
+            return {}
         events.forEach((event) => {
             let sliceAddr = Math.floor(event.addr / sliceSize) * sliceSize;
             event.ID = currID++;
             let endOffsetLastObject = (event.addr % sliceSize) + event.size;
             
-            if (sliceAddrToEventMap[sliceAddr])
-                sliceAddrToEventMap[sliceAddr].push(event);
-            else
-                sliceAddrToEventMap[sliceAddr] = [event];
+            if (!sliceAddrToEventMap[sliceAddr])
+                sliceAddrToEventMap[sliceAddr] = [];
+            sliceAddrToEventMap[sliceAddr].push(event);
 
             let nextSliceAddr = sliceAddr + sliceSize;
             while (endOffsetLastObject > sliceSize) {
@@ -349,29 +342,12 @@ function pageLayout() {
         return sliceAddrToEventMap;
     }
 
+    function currentSliceSize() {
+        return pageSize / (zoomLevel > 0 ? Math.pow(numSubSlices, 2)*(zoomLevel) : 1);
+    }
+
     function getObjData(spaceUsed, index) {
-        // let newKeys = new Array(numSubSlices).fill(0).map((item, i) => newAddr + i*newSliceSize);
-
-        // console.log('HERE ARE THE newKeys');
-        // console.log(newKeys);
-        // console.log('HERE is the oldSliceAddr ', oldSliceAddr);
-        // console.log('Here is the newSliceSize', newSliceSize);
-        // console.log('Here is oldSliceAddr% newSliceSize', oldSliceAddr % newSliceSize);
-        // console.log('dataDict[oldSliceAddr].events[0].addr - newAddr % newSliceSize?');
-        // console.log((dataDict[oldSliceAddr].events[0].addr - newAddr) % newSliceSize);
-            
-        // newKeys = newKeys.reduce((acc, curr) => {
-        //         acc[curr] = {events: sliceAddrToSplitEvents[oldSliceAddr].events
-        //                                     .filter((d) => Math.floor((d.addr - newAddr) / newSliceSize) == Math.floor((curr - newAddr) / newSliceSize))};
-        //         return acc;
-        //     }, {});
-        // return splitEvents(newAddr, sliceAddrToSplitEvents[oldSliceAddr].events, newKeys, newSliceSize);
-
-        // const subSliceDiv = Math.pow(numSubSlices, zoomLevel+1);
-        // const objWidth = 
-        const objCapacity = pageSize / (Math.pow(numSubSlices, zoomLevel+1)*NUM_OBJS_PER_SUBSLICE);
-        // console.log('objCapacity=');
-        // console.log(objCapacity);
+        const objCapacity = currentSliceSize() / (numSubSlices*NUM_OBJS_PER_SUBSLICE);
         // const displaySize = pageRectWidth / (numSubSlices*NUM_OBJS_PER_SUBSLICE);
         const fullnessScale = d3.scaleLinear().domain([0, Math.ceil(objCapacity)]).range(['#d4d4d4', 'black']);
         return {
@@ -386,17 +362,10 @@ function pageLayout() {
         if (ts == undefined)
             ts = getCurrTime();
         objLayout.addElementsByTimestamp(ts);
-        console.log('JOININGTH FOLLOWING');
-        console.log(sliceAddrAndObjList);
         const groups = d3.select('#pageLayout')
             .selectAll('.pageGroup')
-            .data(sliceAddrAndObjList, (d) => parseInt(d[0])*zoomLevel);
-
-        console.log('Here are groups afer fsdfsdfdsfsdfsdfsdfd:');
-        console.log(groups);
+            .data(sliceAddrAndObjList, (d) => d[2]);
         
-        // const oldSliceSize = pageSize / Math.pow(numSubSlices, zoomLevel);
-        // const zoomedOut = oldSliceSize > zoomThreshold;
         groups.join(
                 (enter) => {
                     let pageGroups = enter.append('g')
@@ -410,10 +379,11 @@ function pageLayout() {
                         .style('min-height', `${pageRectHeight}px`)
                         .style('stroke-width', (d) => parseInt(d[0]) == parseInt(selAddr) ? pageRectBorder + 2 : pageRectBorder)
                         .style('fill', 'none');
-                    const newSliceSize = pageSize / Math.pow(numSubSlices, zoomLevel + 1);
+                    const oldSliceSize = pageSize / (zoomLevel > 0 ? Math.pow(numSubSlices, 2)*(zoomLevel) : 1);
+                    const newSliceSize = pageSize / (Math.pow(numSubSlices, 2)*(zoomLevel + 1));
                     const sliceWidth = pageRectWidth / numSubSlices;
                     pageGroups.selectAll('.pageSliceSelector')
-                        .data((d) => zoomedOut() ? new Array(numSubSlices).fill(0).map((en, i) => parseInt(d[0]) + i*newSliceSize) : [parseInt(d[0])])
+                        .data((d) => zoomedOut() ? new Array(numSubSlices).fill(0).map((en, i) => parseInt(d[0]) + i*(oldSliceSize / numSubSlices)) : [parseInt(d[0])])
                         .enter()
                         .append('rect')
                         .attr('class', 'pageSliceSelector')
@@ -430,8 +400,9 @@ function pageLayout() {
                                 zoomLevel++;
                                 sliceAddrAndObjList = new Array(numSubSlices).fill(0)
                                     .map((entry, i) => zoomedOut() ? [parseInt(selAddr) + i*newSliceSize,
-                                                    new Array(numSubSlices*NUM_OBJS_PER_SUBSLICE).fill(0).map((e, j) => parseInt(selAddr) + i*newSliceSize + j*(newSliceSize / (numSubSlices*NUM_OBJS_PER_SUBSLICE)))] : 
-                                        [parseInt(selAddr) + i*(newSliceSize / numSubSlices)]);
+                                                    new Array(numSubSlices*NUM_OBJS_PER_SUBSLICE).fill(0).map((e, j) => parseInt(selAddr) + i*(newSliceSize) + j*(newSliceSize / (numSubSlices*NUM_OBJS_PER_SUBSLICE))),
+                                                    getPageKey(parseInt(selAddr) + i*newSliceSize)] : 
+                                        [parseInt(selAddr) + i*newSliceSize, [], getPageKey(parseInt(selAddr) + i*newSliceSize)]);
                                     // .reduce((acc, sliceAddr) => {
                                     //     acc[sliceAddr] = zoomedOut() ? new Array(numSubSlices*NUM_OBJS_PER_SUBSLICE).map((e, i) => parseInt(sliceAddr) + i*(newSliceSize / (numSubSlices*NUM_OBJS_PER_SUBSLICE))) :
                                     //                                     [sliceAddr];
@@ -443,20 +414,21 @@ function pageLayout() {
                                 //     return acc;
                                 // }, {});
                                 objAddrToSplitEvents = splitEvents(subsliceAddrToSplitEvents[selAddr], newSliceSize / (zoomedOut() ? numSubSlices*NUM_OBJS_PER_SUBSLICE : 1));
-                                subsliceAddrToSplitEvents = splitEvents(subsliceAddrToSplitEvents[selAddr], pageSize / (zoomedOut() ? numSubSlices : 1));
+                                subsliceAddrToSplitEvents = splitEvents(subsliceAddrToSplitEvents[selAddr], newSliceSize / (zoomedOut() ? numSubSlices : 1));
                                 sliceScale = d3.scaleLinear().domain([0, newSliceSize]).range([0, pageRectWidth]);
                                 //getSliceData(parseInt(this.parentNode.getAttribute('data-addr')), selAddr, newSliceSize);
                                 if (zoomedOut())
                                     bucketData = getBucketData(Object.entries(objAddrToSplitEvents));
 
-                                console.log(`New zoomLevel: ${zoomLevel}`);
-                                console.log(`zoomedOut? ${zoomedOut()}`);
-                                console.log('New sliceAddrAndObjList:');
-                                console.log(sliceAddrAndObjList);
-                                console.log('New objAddrToSplitEvents:');
-                                console.log(objAddrToSplitEvents);
-                                console.log('New subsliceAddrToSplitEvents:');
-                                console.log(subsliceAddrToSplitEvents);
+                                // console.log(`New zoomLevel: ${zoomLevel}`);
+                                // console.log(`zoomedOut? ${zoomedOut()}`);
+                                // console.log(`New slice size: ${newSliceSize}`);
+                                // console.log('New sliceAddrAndObjList:');
+                                // console.log(sliceAddrAndObjList);
+                                // console.log('New objAddrToSplitEvents:');
+                                // console.log(objAddrToSplitEvents);
+                                // console.log('New subsliceAddrToSplitEvents:');
+                                // console.log(subsliceAddrToSplitEvents);
                                 d3.select('#pageLayout')
                                     .style('height', `${Object.keys(sliceAddrAndObjList).length*(pageRectHeight+10)}px`);
                                 // updatePagesByTimestamp(getCurrTime());  // TODO: weird hack, not sure how to fix
@@ -470,8 +442,9 @@ function pageLayout() {
                             gp.select('.pageLabel')
                                 .style('font-weight', (d1) => parseInt(d1[0]) == parseInt(selAddr) ? 'bold' : 'normal');
 
-                            refreshObjectLayout(objAddrToSplitEvents[selAddr], selAddr, getCurrTime(), dataFields,
-                                    zoomedOut() ? zoomThreshold : pageSize / Math.pow(numSubSlices, zoomLevel), cachelineSize);
+                            refreshObjectLayout(subsliceAddrToSplitEvents[selAddr] ? subsliceAddrToSplitEvents[selAddr] : [],
+                                    selAddr, getCurrTime(), dataFields,
+                                    zoomedOut() ? zoomThreshold : currentSliceSize(), cachelineSize);
                         })
                         .on('mouseover', function() {
                             d3.select(this)
@@ -542,7 +515,7 @@ function pageLayout() {
                 (exit) => exit.remove()
             );
 
-        const sliceSize = pageSize / Math.pow(numSubSlices, zoomLevel);
+        const sliceSize = currentSliceSize();
         
         groups.selectAll('.perfHighlight')
             .data((d) => dataPerf[d[0]] ? dataPerf[d[0]] : [])
@@ -557,30 +530,21 @@ function pageLayout() {
                 (update) => update.style('visibility', sortMode == SORT_PERF ? 'inherit' : 'hidden'),
                 (exit) => exit.remove()
             );
-
-        // console.log('sliceToSbuObjsdflf');
-        // console.log(sliceAddrAndObjList);
-        // console.log("objAddrToSplitEvents:");
-        // console.log(objAddrToSplitEvents);
-        // console.log("bucketData:");
-        // console.log(bucketData);
-
-        console.log('Here are groups:');
-        console.log(groups);
         
-        const elements = groups.selectAll('.dataObject')
+        const elements = d3.select('#pageLayout')
+            .selectAll('.pageGroup')
+            .selectAll('.dataObject')
             .data((d) => {
-                    console.log(`here is slice addr: ${d[0]}`);
                     const retData = zoomedOut() ? d[1].map((objAddr, i) => {
                         return getObjData(bucketData[objAddr] ? bucketData[objAddr][getBucketIndexFromTs(ts)] : 0, i);
                     }) : 
-                        subsliceAddrToSplitEvents[parseInt(d[0])].filter((obj) => obj.allocTs <= ts && (obj.freeTs == null || obj.freeTs >= ts))
+                        (subsliceAddrToSplitEvents[parseInt(d[0])] ? subsliceAddrToSplitEvents[parseInt(d[0])] : [])
+                            .filter((obj) => obj.allocTs <= ts && (obj.freeTs == null || obj.freeTs >= ts))
                                                 .map((obj) => {
                                                     obj.vis = mainVis.isTypeSampled(obj.type);
                                                     return obj;
                                                 })
-                                                .sort((a, b) => a.allocTs - b.allocTs);
-                    console.log(retData);
+                                                .sort((a, b) => b.allocTs - a.allocTs);
                     return retData;
                 },
                 (d) => d.ID)
@@ -593,7 +557,7 @@ function pageLayout() {
                     .style('visibility', (d) => (d.vis || zoomedOut()) ? 'inherit' : 'hidden');
                 gp.append('rect')
                     .attr('class', 'dataObjectRect')
-                    .attr('x', (d) => sliceScale(d.addr % sliceSize))
+                    .attr('x', (d) =>  sliceScale(d.addr % sliceSize))
                     .attr('y', 0)
                     .attr('width', (d) => sliceScale(Math.min(d.size, sliceSize - (d.addr % sliceSize))))
                     .attr('height', pageRectHeight)
@@ -622,6 +586,10 @@ function pageLayout() {
             },
             (exit) => exit.remove()
         );
+    }
+
+    function getPageKey(pageAddr) {
+        return (1 + parseInt(pageAddr))*(1 + zoomLevel);
     }
 
     // function getZoomGroups(events) {

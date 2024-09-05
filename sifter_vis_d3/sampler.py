@@ -356,7 +356,9 @@ class Sampler:
         #TODO Take a look at FeatureAgglomeration?
         page_pattern = StandardScaler().fit_transform(merged)
         clusters = None
-        if (alg == 'dbscan'):
+        if (len(merged.index) <= 1):
+            clusters = [0]
+        elif (alg == 'dbscan'):
             clusters = DBSCAN(eps=0.9, min_samples=1).fit_predict(page_pattern)
         elif (alg == 'agglomerative'):
             clusters = AgglomerativeClustering(n_clusters=None, distance_threshold=10).fit_predict(page_pattern)

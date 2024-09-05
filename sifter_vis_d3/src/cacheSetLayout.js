@@ -292,14 +292,35 @@ function cacheSetLayout() {
                 // if (startBucketIndex <= 1 && obj.addr % 4096 == 0)
                 //     console.log(`   Adding 1 to cache set ${i}`);
                 if (retBucketData[startBucketIndex][i] == undefined)
-                    retBucketData[startBucketIndex][i] = {}
-                retBucketData[startBucketIndex][i][obj.type] ?  retBucketData[startBucketIndex][i][obj.type] += 1 : 
-                                                                retBucketData[startBucketIndex][i][obj.type] = 1;
+                    retBucketData[startBucketIndex][i] = {};
+                
+                if (!retBucketData[startBucketIndex][i][obj.type])
+                    retBucketData[startBucketIndex][i][obj.type] = {count: 0, parents: {}};
+
+                if (obj.isSubtype) {
+                    if (!retBucketData[startBucketIndex][i][obj.type].parents[obj.isSubtype])
+                        retBucketData[startBucketIndex][i][obj.type].parents[obj.isSubtype] = 0;
+                    retBucketData[startBucketIndex][i][obj.type].parents[obj.isSubtype] += 1;
+                }
+                else {
+                    retBucketData[startBucketIndex][i][obj.type].count += 1;
+                }
+
                 if (endBucketIndex != undefined) {
                     if (retBucketData[endBucketIndex][i] == undefined)
-                        retBucketData[endBucketIndex][i] = {}
-                    retBucketData[endBucketIndex][i][obj.type] ?    retBucketData[endBucketIndex][i][obj.type] -= 1 : 
-                                                                    retBucketData[endBucketIndex][i][obj.type] = -1;
+                        retBucketData[endBucketIndex][i] = {};
+
+                    if (!retBucketData[endBucketIndex][i][obj.type])
+                        retBucketData[endBucketIndex][i][obj.type] = {count: 0, parents: {}};
+
+                    if (obj.isSubtype) {
+                        if (!retBucketData[endBucketIndex][i][obj.type].parents[obj.isSubtype])
+                            retBucketData[endBucketIndex][i][obj.type].parents[obj.isSubtype] = 0;
+                        retBucketData[endBucketIndex][i][obj.type].parents[obj.isSubtype] -= 1;
+                    }
+                    else {
+                        retBucketData[endBucketIndex][i][obj.type].count -= 1;
+                    }
                 }
                 i = (i + 1) % numCacheSets;
                 afterFirstLoop = true;
@@ -316,7 +337,10 @@ function cacheSetLayout() {
         let c = a ? structuredClone(a) : {};
         if (b) {
             Object.keys(b).forEach((tp) => {
-                c[tp] ? c[tp] += b[tp] : c[tp] = b[tp];
+                c[tp] ? c[tp].count += b[tp].count : c[tp] = b[tp];
+                Object.keys(b[tp].parents).forEach((par) => {
+                    c[tp].parents[par] ? c[tp].parents[par] += b[tp].parents[par] : c[tp].parents[par] = b[tp].parents[par];
+                });
             });
         }
         return c;
@@ -330,6 +354,15 @@ function cacheSetLayout() {
         return numCacheSetsInView() > maxSquares;
     }
 
+    /* cs = {
+            count: x,
+            parents: {
+                tp1: y1,
+                tp2: y2,
+                ...
+            }
+            }
+    */
     function sumAllTypes(cs, excludeNonVis=false) {
         // if (excludeNonVis) {
         //     console.log('Here are the keys:');
@@ -338,7 +371,7 @@ function cacheSetLayout() {
         //         console.log(`Is type ${tp} NOT sampled? ${!mainVis.isTypeSampled(tp)}`);
         //     });
         // }
-        return cs ? Object.keys(cs).reduce((acc, curr) => acc + ((excludeNonVis && !mainVis.isTypeSampled(curr)) ? 0 : parseInt(cs[curr])), 0) : 0;
+        return cs ? Object.keys(cs).reduce((acc, curr) => acc + ((excludeNonVis && !mainVis.isTypeSampled(curr)) ? 0 : parseInt(cs[curr].count)), 0) : 0;
     }
 
     function mean(data) {
@@ -436,7 +469,7 @@ function cacheSetLayout() {
                                                         freeTs: obj.freeTs,
                                                         size: st.size,
                                                         type: st.subtype,
-                                                        isSubtype: true
+                                                        isSubtype: obj.type
                         })).forEach((st) => objects.push(st));
             }
             else {
@@ -734,8 +767,13 @@ function cacheSetLayout() {
         const squaresData = bucketData[bucketIndex].map((sq) => {
             const nsq = structuredClone(sq);
             Object.keys(nsq.types).forEach((tp) => {
-                if (!mainVis.isTypeSampled(tp) && !mainVis.isSubtypeSampled(tp)) // TODO subtypes???
-                    nsq.types[tp] = 0;
+                if (!mainVis.isTypeSampled(tp))
+                    nsq.types[tp].count = 0;
+                Object.keys(nsq.types[tp].parents).forEach((par) => {
+                    if (expandedTypes.has(par) && mainVis.isSubtypeSampled(tp)) {
+                        nsq.types[tp].count += nsq.types[tp].parents[par];
+                    }
+                });
             });
             return nsq;
         });
@@ -801,9 +839,9 @@ function cacheSetLayout() {
                             const context = canvas.getContext('2d');
                             context.font = '10px monospace';
                             const labels = zoomedOut() ? [`occupancy variance: ${d.variance}`] : Object.keys(d.types)
-                                .filter((tp) => d.types[tp] > 0)
-                                .sort((a, b) => d.types[b] - d.types[a])
-                                .map((tp) => `${trimLongTypeName(tp, 30)}: ${d.types[tp]} (${Math.round((d.types[tp] / sumAllTypes(d.types))*1000)/10}%)`);
+                                .filter((tp) => d.types[tp].count > 0)
+                                .sort((a, b) => d.types[b].count - d.types[a].count)
+                                .map((tp) => `${trimLongTypeName(tp, 30)}: ${d.types[tp].count} (${Math.round((d.types[tp].count / sumAllTypes(d.types))*1000)/10}%)`);
                             const textWidth = labels.reduce((acc, curr) => Math.max(acc, context.measureText(curr).width), 0) + 20;
                             let typeGroup = cacheLayout.append('g')
                                 .attr('id', 'cacheSetHint')
@@ -833,7 +871,7 @@ function cacheSetLayout() {
                     .on('mousemove', function(e, d) {
                         if (Object.keys(d.types).length > 0) {
                             const labels = zoomedOut() ? [`occupancy variance: ${d.variance}`] : Object.keys(d.types)
-                                .filter((tp) => d.types[tp] > 0);
+                                .filter((tp) => d.types[tp].count > 0);
                             cacheLayout.select('#cacheSetHint')
                                 .style('transform', `translate(${d3.pointer(e)[0]}px, ${d3.pointer(e)[1] - (textHeight*labels.length) - buffer - (zoomedOut() ? 3 : 0)}px)`);
                         }

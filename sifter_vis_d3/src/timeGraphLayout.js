@@ -602,7 +602,7 @@ function timeGraphLayout() {
     }
 
     function getSizeOfBucket() {
-        return Math.floor((xScale.domain()[1] - xScale.domain()[0]) / sampledBuckets);
+        return Math.max(1, Math.floor((xScale.domain()[1] - xScale.domain()[0]) / sampledBuckets));
     }
 
     function getBucketIndexFromTs(ts) {
@@ -611,6 +611,7 @@ function timeGraphLayout() {
         // console.log(`   sizeOfBucket: ${sizeOfBucket}`);
         // console.log(`   ts: ${ts}`);
         // console.log(`   val: ${Math.round((ts - xScale.domain()[0]) / sizeOfBucket)}`);
+        // console.log(`   ts=${ts}, sizeOfBucket=${sizeOfBucket}, xScale.domain()[0]=${xScale.domain()[0]}`);
         return Math.ceil((ts - xScale.domain()[0]) / sizeOfBucket);
     }
 
