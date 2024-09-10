@@ -112,7 +112,7 @@ extern "C"
     // void ssfree_alloc_s(unsigned int allocator, void* ptr, const char* filepath, int line);
 
 // #define SIFTER_NEW
-#define new MemStamp((__FILE__), (__LINE__)) * new
+// #define new MemStamp((__FILE__), (__LINE__)) * new
 // #define delete MemStamp((__FILE__), (__LINE__)) * delete
 
 #ifdef __cplusplus
@@ -134,8 +134,9 @@ extern void memhook_free(void *ptr, const char* file, int line, bool log);
 // T malloc(size_t size, bool fakearg=true);
 
 template <class T>
-inline T *operator*(const MemStamp &stamp, T *p)
+inline T* operator*(const MemStamp &stamp, T* p)
 {
+    //cout << "CALLED operator *" << endl;
     /************************************************/
     /* Rationale: placement new cannot be           */
     /* overloaded for now, hence timestamp is 0.    */
@@ -143,6 +144,12 @@ inline T *operator*(const MemStamp &stamp, T *p)
     /************************************************/
     if (unit_log.timestamp == 0)
         unit_log.timestamp = memhook_get_server_clock();
+    // Following is a hack for placement new
+    if (!unit_log.typeofop) {
+        unit_log.size = sizeof(T);
+        unit_log.addr = (void*) p;
+        unit_log.typeofop = true;
+    }
     unit_log.file = filetable.insert(stamp.filename);
     unit_log.line = stamp.lineNum;
     unit_log.tindex_name = typetable.insert(typeid(T).name());
@@ -193,7 +200,24 @@ _mm_malloc(size_t __size, size_t __align)
 #endif
 
 template <typename T, int line, char... filename>
-void* malloc(size_t size, bool fakearg=true)
+int posix_memalign(void** ptr, size_t align, size_t size) {
+    unit_log.file = filetable.insert<filename...>();
+    unit_log.tindex_name = typetable.insert(typeid(T).name());
+    unit_log.timestamp = memhook_get_server_clock();
+    unit_log.size = memhook_roundUp(size, align);
+    unit_log.line = line;
+    unit_log.typeofop = true;
+
+    int r = posix_memalign<int, 210, MACRO_GET_STR("/home/s2ovens/sifter/memhook/memhook_interface.h")>(ptr, align, size);
+    unit_log.addr = *ptr;
+
+    collector.copy(unit_log);
+
+    return r;
+}
+
+template <typename T, int line, char... filename>
+void* malloc(size_t size)
 {
     unit_log.file = filetable.insert<filename...>();
     unit_log.tindex_name = typetable.insert(typeid(T).name());
@@ -204,16 +228,5 @@ void* malloc(size_t size, bool fakearg=true)
     return ptr;
 }
 
-#endif
-
-// #define ssalloc_alloc(a, s) ssalloc_alloc_s(a, s, __FILE__, __LINE__)
-// #define ssalloc_aligned_alloc(a, l, s) ssalloc_aligned_alloc_s(a, l, s, __FILE__, __LINE__)
-// #define ssfree_alloc(a, s) ssfree_alloc_s(a, s, __FILE__, __LINE__)
-
-// #define ssalloc_alloc(a, s) ssalloc_alloc_s((a), (s), (__FILE__), (__LINE__))
-// #define ssalloc_aligned_alloc(a, l, s) ssalloc_aligned_alloc_s((a), (l), (s), (__FILE__), (__LINE__))
-// #define ssfree_alloc(a, s) ssfree_alloc_s((a), (s), (__FILE__), (__LINE__))
-
-// #define malloc(s) malloc_s((s), (__FILE__), (__LINE__))
-// #define free(s) free_s((s), (__FILE__), (__LINE__))
+#endif // __cplusplus
 #endif //__MEMHOOK_INTERFACE_H

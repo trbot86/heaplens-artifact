@@ -81,32 +81,17 @@ void *memhook_malloc(size_t size, const char* file = "specialfile", int line = 0
     // if (!next_malloc) next_malloc = (void * (*)(size_t ))dlsym(RTLD_NEXT, "malloc");
     // if (!next_malloc) fprintf(stdout, "failed to find next malloc\n");
 
-    // fprintf(stdout, "TESTING PASSED INIT IN MEMHOOK MALLOC, initialized = %d\n", initialized);
-
     if(!setup) {
         exiter.add();
         setup = true;
     }
 
-    // fprintf(stdout, "passed setup stuff\n");
-
     void* mem;
-    // if (malloc == 0) exit(42);
     mem = malloc(size);
-
-    // fprintf(stdout, "passed next malloc\n");
-
-    // if (!mem) exit(71);
 
     if(mem == 0) {
         throw bad_alloc();
     }
-
-    // fprintf(stdout, "passed bad alloc\n");
-
-    //**************INITIALISE INFO_T OBJECT AND COPY LATER***************//
-    // collector.add(memhook_get_server_clock(), size, mem, true);
-    // collector.update(file, line, NULL);
     
     unit_log.timestamp = memhook_get_server_clock();
     unit_log.size = size;
@@ -117,19 +102,11 @@ void *memhook_malloc(size_t size, const char* file = "specialfile", int line = 0
         unit_log.line = line;
     }
 
-    // fprintf(stdout, "passed unit log stuff\n");
-
-    // printf("real malloc called!\n");
-
     return mem;
 }
 
-void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, bool log = true) {
-    // // something wrong if we call free before one of the allocators!
-    // if (mallog_unlikely(next_malloc == 0)) {
-    //     fprintf(stdout, "Free called before first allocation!\n");
-    // }
-    if(!setup) {
+void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, bool log = false) {
+    if (!setup) {
         exiter.add();
         setup = true;
     }
@@ -147,7 +124,7 @@ void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, boo
     unit_log.size = 0;
     unit_log.addr = ptr;
     unit_log.typeofop = false;
-    if(log) {
+    if (log) {
         unit_log.file = file;
         unit_log.line = line;
     }
@@ -330,41 +307,22 @@ extern "C" {
  * 
  **********************/
 void * operator new(size_t size) {
-
     void* mem = memhook_malloc(size == 0?1:size, NULL, 0, false);
 
     if(mem == 0) {
         throw bad_alloc();
     }
 
-    // collector.copy(unit_log);
     return mem;
 }
 
-//placement new operator. VIOLATES CPP STANDARD
-// void * operator new(size_t size, void* ptr, bool fakearg=true) _GLIBCXX_USE_NOEXCEPT {
-
-//     if(ptr == 0) {
-//         throw bad_alloc();
-//     }
-
-//     unit_log.timestamp = memhook_get_server_clock();
-//     unit_log.size = size;
-//     unit_log.addr = ptr;
-//     unit_log.typeofop = true;
-
-//     return ptr;
-// }
-
 void *operator new[] (size_t size) {
-    // cout << "size requested is: " << size << endl;
     void* mem = memhook_malloc(size == 0?1:size, NULL, 0, false);
     
     if(mem == 0) {
         throw bad_alloc();
     }
 
-    collector.copy(unit_log);
     return mem;
 }
 

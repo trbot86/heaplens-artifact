@@ -84,20 +84,10 @@ public:
     }
 
     char* insert(const char* str);
-
-    // char* insert(const char* str);
-
-    // bool contains(const char* str);
-    // item_t bucket[MEMHOOK_HASH_TABLE_SIZE] = { NULL };
+    
     entry bucket[MEMHOOK_HASH_TABLE_SIZE];
     mutex guard[MEMHOOK_HASH_TABLE_SIZE];
 
-    // template<unsigned long hash>
-    // unsigned long djb2(const char* str);
-    // template<unsigned long hash>
-    // unsigned long djb2();
-    // template<unsigned long hash, char first, char... str>
-    // unsigned long djb2();
     template<unsigned long hash>
     unsigned long djb2() {
         return hash;
@@ -118,6 +108,5 @@ public:
         return hashval;
     }
 };
-
 
 #endif //__MEMHOOK_HASH_H

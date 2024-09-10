@@ -8,7 +8,7 @@ include(utils)
 in_source_build_guard()
 set_default_build_type(Debug)
 
-find_package(LLVM 10.0.1 EXACT REQUIRED CONFIG)
+find_package(LLVM 10.0.0 EXACT REQUIRED CONFIG)
 
 set(LLVM_PATH /usr/lib/llvm-10)
 

@@ -26,7 +26,8 @@ public:
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 private:
-  void emitDiagnostics(const ast_matchers::MatchFinder::MatchResult &Result, std::string allocnodebind, std::string typenodebind, std::string declnodebind);
+  void emitDiagnosticsMalloc(const ast_matchers::MatchFinder::MatchResult &Result, std::string allocnodebind, std::string typenodebind, std::string declnodebind);
+  void emitDiagnosticsNew(const ast_matchers::MatchFinder::MatchResult &Result, std::string newbind);
 };
 
 } // namespace misc

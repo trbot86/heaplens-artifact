@@ -57,6 +57,10 @@ DeclarationMatcher declMallocMatcher = varDecl(
         callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fdeclmalloc"))).bind("declmalloc")),
     hasType(type().bind("decltype")));
 
+// Matches allocation with new AND possibly placement new
+StatementMatcher newMatcher = cxxNewExpr().bind("newExpr");
+
+
 namespace clang {
 namespace tidy {
 namespace misc {
@@ -66,9 +70,12 @@ void MalloccheckerCheck::registerMatchers(MatchFinder *Finder) {
   Finder->addMatcher(sizeofMallocMatcher, this);
   Finder->addMatcher(lhsofMallocMatcher, this);
   Finder->addMatcher(declMallocMatcher, this);
+#ifdef MALLOCCHECKER_TEMPLATE
+  Finder->addMatcher(newMatcher, this);
+#endif
 }
 
-void MalloccheckerCheck::emitDiagnostics(const MatchFinder::MatchResult &Result, string allocnodebind, string typenodebind, string declnodebind) {
+void MalloccheckerCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResult &Result, string allocnodebind, string typenodebind, string declnodebind) {
   const clang::CallExpr *mnode =
       Result.Nodes.getNodeAs<clang::CallExpr>(allocnodebind);
   const clang::FunctionDecl *declnode =
@@ -81,8 +88,8 @@ void MalloccheckerCheck::emitDiagnostics(const MatchFinder::MatchResult &Result,
       std::string type;
 
       static PrintingPolicy print_policy((Result.Context)->getLangOpts());
-      print_policy.FullyQualifiedName = 1;
-      print_policy.SuppressScope = 0;
+      print_policy.FullyQualifiedName = 0;
+      print_policy.SuppressScope = 1;
 
       if (typenode->isBuiltinType()) {
         type =
@@ -97,12 +104,12 @@ void MalloccheckerCheck::emitDiagnostics(const MatchFinder::MatchResult &Result,
       string FileName = fsrcloc.getFileEntry()->getName().str();
       int line = fsrcloc.getLineNumber();
 
-      SmallString<200> pathVector;
-        std::cout << "FILENAME: "
-                  << pathVector.c_str() + fsrcloc.getFileEntry()->getName().str()
-                  << ": " << line << endl;
+      // SmallString<200> pathVector;
+      //   std::cout << "FILENAME: "
+      //             << pathVector.c_str() + fsrcloc.getFileEntry()->getName().str()
+      //             << ": " << line << endl;
 
-      std::cout << "DeclName: " << declnode->getNameAsString() << endl;
+      // std::cout << "DeclName: " << declnode->getNameAsString() << endl;
       int offset = declnode->getNameAsString().size();
 
 #ifndef MALLOCCHECKER_TEMPLATE
@@ -129,14 +136,41 @@ void MalloccheckerCheck::emitDiagnostics(const MatchFinder::MatchResult &Result,
   }
 }
 
+void MalloccheckerCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &Result, string newbind) {
+  const clang::CXXNewExpr* node =
+      Result.Nodes.getNodeAs<clang::CXXNewExpr>(newbind);
+
+  if (node) {
+    if (node->getNumPlacementArgs() == 0) {
+      diag(node->getExprLoc(), "insert MemStamp",
+            DiagnosticIDs::Error)
+            << FixItHint::CreateInsertion(
+                  node->getExprLoc(),
+                  "MemStamp((__FILE__), (__LINE__)) * ");
+    }
+    else if (node->getNumPlacementArgs() > 0) {
+      std::string type = node->getAllocatedType().getUnqualifiedType().getAsString();
+      std::string out = "MemStamp((__FILE__), (__LINE__)) * (" + type + "*) ";
+      diag(node->getExprLoc(), "insert MemStamp (placement new)",
+            DiagnosticIDs::Error)
+            << FixItHint::CreateInsertion(
+                  node->getExprLoc(),
+                  out);
+    }
+  }
+}
+
 void MalloccheckerCheck::check(const MatchFinder::MatchResult &Result) {
   // FIXME: Add callback implementation.
   // std::cout << "CHECK\n" << std::endl;
 
-  MalloccheckerCheck::emitDiagnostics(Result, "sizeofmalloc", "sizeof-arg-type", "fdeclsizeofmalloc");
-  MalloccheckerCheck::emitDiagnostics(Result, "lhsmalloc", "lhs-type", "fdecllhsmalloc");
-  MalloccheckerCheck::emitDiagnostics(Result, "declmalloc", "decltype", "fdeclmalloc");
+  MalloccheckerCheck::emitDiagnosticsMalloc(Result, "sizeofmalloc", "sizeof-arg-type", "fdeclsizeofmalloc");
+  MalloccheckerCheck::emitDiagnosticsMalloc(Result, "lhsmalloc", "lhs-type", "fdecllhsmalloc");
+  MalloccheckerCheck::emitDiagnosticsMalloc(Result, "declmalloc", "decltype", "fdeclmalloc");
 
+#ifdef MALLOCCHECKER_TEMPLATE  
+  MalloccheckerCheck::emitDiagnosticsNew(Result, "newExpr");
+#endif
 }
 
 } // namespace misc

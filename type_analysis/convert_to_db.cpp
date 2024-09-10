@@ -162,7 +162,7 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
         float hitm = stof(matches[2].str());
         if (hitm >= cutoff) {
           uint64_t cl_addr = strtoull(matches[1].str().c_str(), nullptr, 16);
-          uint64_t page_num = (cl_addr * cl_size) / page_size;
+          uint64_t page_num = cl_addr / page_size;
           if (pages.find(page_num) == pages.end()) {
             cout << "Perf page num not present in data: " << page_num << endl;
           }
@@ -487,8 +487,8 @@ int main(int argc, char* argv[]) {
   int opt_ind = 0;
 
   int c;
-  float sample_portion = -1.0;
-  float cutoff = 5.0;
+  float sample_portion = 1.0;
+  float cutoff = 0.0001;
   const char* perf_file;
   bool is_perf_file = false;
   const char* field_file;
@@ -580,6 +580,9 @@ int main(int argc, char* argv[]) {
 
   type_map = construct_map("typeset_dump.txt", true);
   file_map = construct_map("fileset_dump.txt");
+  for (auto const& f : file_map) {
+    printf("File in map: %p\n", f.first);
+  }
   // vector<unordered_map<uintptr_t, unordered_set<uint64_t>>> include_addrs{num_threads, unordered_map};
   // unordered_set<uint64_t> skip_addrs{};
   // vector<unordered_map<uintptr_t, int>> seen_types{num_threads, unordered_map<uintptr_t, int>{}};
@@ -724,9 +727,6 @@ int main(int argc, char* argv[]) {
 
   for (auto& p: all_pages) {
     count++;
-    if (count % 1000 == 0) {
-      // cout << "Done " << count << " pages" << endl;
-    }
     if (p.second.sampled == CTD_NOT_SAMPLED) {
       bool take_for_type = false;
       for (auto& tp: p.second.included_types) {
@@ -742,7 +742,7 @@ int main(int argc, char* argv[]) {
       }
     }
     if (p.second.sampled == CTD_NOT_SAMPLED)
-        p.second.sampled = rand() < sample_portion*RAND_MAX ? CTD_SAMPLED_YES : CTD_SAMPLED_NO;
+        p.second.sampled = (p.second.has_perf_addr || rand() < sample_portion*RAND_MAX) ? CTD_SAMPLED_YES : CTD_SAMPLED_NO;
 
     if (p.second.sampled == CTD_SAMPLED_YES) {
       node_t* n = p.second.events.head;
@@ -778,6 +778,9 @@ int main(int argc, char* argv[]) {
           } while (rem_size > 0);
         }
         
+        if (event->file && file_map.find((uintptr_t) event->file) == file_map.end()) {
+          printf("FAILED to find file: %p\n", (uintptr_t) event->file);
+        }
         const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
         const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
         sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);

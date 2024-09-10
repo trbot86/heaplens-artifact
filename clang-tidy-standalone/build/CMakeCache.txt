@@ -212,11 +212,11 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
-//No help, variable specified on the command line.
-CPP_TEMPLATE:UNINITIALIZED=OFF
+//Specify whether the target application supports templating.
+CPP_TEMPLATE:BOOL=ON
 
 //The directory containing a CMake configuration file for LLVM.
-LLVM_DIR:PATH=LLVM_DIR-NOTFOUND
+LLVM_DIR:PATH=/usr/lib/llvm-10/cmake
 
 //Value Computed by CMake
 clang-tidy-standalone_BINARY_DIR:STATIC=/home/s2ovens/sifter/clang-tidy-standalone/build
@@ -334,7 +334,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

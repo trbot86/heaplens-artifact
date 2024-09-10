@@ -4,10 +4,12 @@ __pycache__
 *.o
 ASCYLIB
 fielddump_tester
+jemalloc
 ssmem
 setbench
 setbench-artifact
 synchrobench
+masstree-beta
 testing_stuff
 veb_new
 fielddump.txt

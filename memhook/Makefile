@@ -40,4 +40,4 @@ install:
 	cp memhook.h ../prac/setbench-master/microbench
 
 clean:
-	rm libmemhook.so info_t_dump.txt hash.o memhook.o
+	rm libmemhook.so *.o
