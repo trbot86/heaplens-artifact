@@ -204,8 +204,8 @@ class Sampler:
         bucket_size = (max_ts - min_ts) / num_buckets
         df.loc[:,'bucket'] = ((df['allocTs'] - min_ts) // bucket_size).astype('Int64')
 
-        last_allocs = df.groupby(['addr', 'bucket']).agg({'allocTs': 'last'})
-        last_allocs = last_allocs.merge(df, how='left', on=['addr', 'allocTs'])
+        last_allocs = df.groupby(['addr', 'type', 'bucket']).agg({'allocTs': 'last'})
+        last_allocs = last_allocs.merge(df, how='left', on=['addr', 'type', 'allocTs'])
         return last_allocs
     
     def get_all_lines_and_stats(self, num_buckets=1000, cls=64):
@@ -356,7 +356,9 @@ class Sampler:
         #TODO Take a look at FeatureAgglomeration?
         page_pattern = StandardScaler().fit_transform(merged)
         clusters = None
-        if (alg == 'dbscan'):
+        if (len(merged.index) <= 1):
+            clusters = [0]
+        elif (alg == 'dbscan'):
             clusters = DBSCAN(eps=0.9, min_samples=1).fit_predict(page_pattern)
         elif (alg == 'agglomerative'):
             clusters = AgglomerativeClustering(n_clusters=None, distance_threshold=10).fit_predict(page_pattern)
@@ -383,6 +385,7 @@ class Sampler:
         max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(page_size, 2), 2))
         # max_pages = 1 # DEBUGGING
         sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
+        # sampled_pages.add(34165069575)
         
         taken = 0
         cluster_keys = list(clusters.keys())
@@ -401,6 +404,7 @@ class Sampler:
                     while start + num_s < len(clusters[c]) and clusters[c][start + num_s] == clusters[c][start + num_s - 1] + 1 and num_s < max_run_length:
                         sampled_pages.add(clusters[c][start + num_s])
                         num_s += 1
+        # print(sampled_pages)
         
         sampled_pages_df = pd.DataFrame({'page_num': sorted(sampled_pages)})
         features = sampled_pages_df.merge(features, how='left', on='page_num')

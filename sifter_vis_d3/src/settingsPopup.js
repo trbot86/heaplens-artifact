@@ -8,7 +8,7 @@ export class SettingsPopup {
         const BUTTON_WIDTH = 96;
         const BUTTON_HEIGHT = 30;
 
-        const algOptions = ['DBSCAN', 'Agglomerative Clustering', 'MeanShift'];
+        const algOptions = ['Agglomerative Clustering', 'DBSCAN', 'MeanShift'];
         const textFields = ['Page clustering algorithm:',
                             'Max run length:',
                             'Max runs from cluster:',

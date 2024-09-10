@@ -12,6 +12,14 @@ const COL_INDENT = SAMPLEBOX_INDENT + LINE_SEP + 22;
 const ICON_SIZE = 1.4*LINE_SEP;
 const LEGEND_HEIGHT = 250;
 
+export function noSpaces(string) {
+    return string.replaceAll(' ', '');
+}
+
+export function trimLongTypeName(tp, len=28) {
+    return tp.length > len ? '...' + tp.substring(tp.length - (len - 3), tp.length) : tp;
+}
+
 
 function legendLayout() {
     let legendGroup = undefined,
@@ -21,7 +29,7 @@ function legendLayout() {
         expandedTypes = undefined,
         typeCounts = undefined,
         sorters = {
-            'alph': (a, b) => a.type.localeCompare(b.type),
+            'alph': (a, b) => b.type.localeCompare(a.type),
             'allocs': (a, b) => a.numAllocs - b.numAllocs,
             'pages': (a, b) => a.numPages - b.numPages
         },
@@ -31,7 +39,8 @@ function legendLayout() {
         },
         arrow = d3.symbol()
                 .type(d3.symbolTriangle)
-                .size(40);
+                .size(40),
+        canvas;
 
     function drawLegendLayout(selection) {
         types = selection.datum().map((elem) => ({  type: elem,
@@ -40,8 +49,10 @@ function legendLayout() {
                                                     numPages: typeCounts[elem] ? typeCounts[elem].numPages : undefined
                                                 }));
 
-        console.log('In legend layout, here are the typeCounts:');
-        console.log(typeCounts);
+        // console.log('In legend layout, here are the typeCounts:');
+        // console.log(typeCounts);
+
+        canvas = document.createElement('canvas');
 
         const headerBar = selection.append('thead')
             .style('overflow', 'hidden')
@@ -49,7 +60,8 @@ function legendLayout() {
             .style('width', '100%')
             .style('height', `${1.2*LINE_SEP}px`)
             .style('top', '0px')
-            .style('background-color', 'white');
+            .style('background-color', 'white')
+            .style('z-index', 2);
             // .style('display', 'table-row');
 
         headerBar.append('td')
@@ -217,7 +229,8 @@ function legendLayout() {
             .style('height', `${Math.min((types.length+0.8)*LINE_SEP, LEGEND_HEIGHT)}px`)
             .style('overflow', 'scroll')
             .style('position', 'relative')
-            .style('top', '5px');
+            .style('top', '5px')
+            .style('z-index', 1);
             // .style('display', 'table-row-group');
             // .style('top', `${1.5*LINE_SEP}px`);
             // .append('svg')
@@ -230,7 +243,8 @@ function legendLayout() {
             .style('bottom', '0px')
             .style('width', '100%')
             .style('height', `${1.2*LINE_SEP}px`)
-            .style('background-color', 'white');
+            .style('background-color', 'white')
+            .style('z-index', 2);
             // .style('display', 'table-row');
             // .style('top', `${legendGroup.attr('height') + 2*LINE_SEP}px`);
 
@@ -282,18 +296,15 @@ function legendLayout() {
         let filteredTypesPre = [];
         types.filter((elem) => elem.type.includes(currFilter))
             .forEach((d) => {
-                filteredTypesPre.push({type: d.type, col: d.col, hasFields: fields[d.type] ? true : false, numAllocs: d.numAllocs, numPages: d.numPages});
+                filteredTypesPre.push({type: d.type, col: d.col, hasFields: fields[noSpaces(d.type)] ? true : false, numAllocs: d.numAllocs, numPages: d.numPages});
             });
         filteredTypesPre = filteredTypesPre.sort((a, b) => sorters[currSorter.mode](a, b)*(currSorter.rev ? 1 : -1));
         filteredTypesPre.forEach((d) => {
             filteredTypes.push(d);
-            if (fields[d.type] && expandedTypes.has(d.type)) {
-                fields[d.type].forEach((st) => filteredTypesPre.push({type: st, col: colourOfType[st], parent: d.type}));
+            if (fields[noSpaces(d.type)] && expandedTypes.has(d.type)) {
+                fields[noSpaces(d.type)].forEach((st) => filteredTypes.push({type: st, col: colourOfType[st], parent: d.type}));
             }
         });
-
-        console.log('Here is the sorted data');
-        console.log(filteredTypes);
 
         d3.select('#typesBox')
             .style('height', `${Math.min((Math.max(filteredTypes.length, types.length)+0.8)*LINE_SEP, LEGEND_HEIGHT)}px`)
@@ -303,6 +314,7 @@ function legendLayout() {
 
         // filteredTypes = filteredTypes.concat(filteredSubtypes);
         
+        const buffer = 3;
         legendGroup.selectAll('.legendGroup')
             .data(filteredTypes, (d) => d.type)
             .order()
@@ -433,27 +445,29 @@ function legendLayout() {
                         .style('vertical-align', 'middle')
                         .style('text-align', 'left')
                         // .style('display', 'table-cell')
-                        .text((d) => trimType(d.type))
+                        .text((d) => trimLongTypeName(d.type))
                         .on('mouseover', function(e, d) {
                             d3.select('#legendTypeHint')
                                 .remove();
                             if (d.type.length > 28) {
-                                const context = canvas.getContext('2d');
-                                context.font = '10px monospace';
-                                let [text, width, height] = getTextBlockForType(d.type);
-                                let typeGroup = d3.select('#legendDiv')
-                                    .append('svg')
+                                let [text, width, height] = getTextBlockForType(d.type, '10pt monospace', 45);
+                                const legendDiv = d3.select('#legendDiv');
+                                const body = d3.select('body').node();
+                                let typeGroup = legendDiv.append('svg')
                                     .attr('id', 'legendTypeHint')
-                                    .style('transform', `translate(${d3.pointer(e)[0]}px, ${d3.pointer(e)[1] - (textHeight*labels.length) - buffer}px)`)
+                                    // .style('transform', `translate(${e.pageX}px, ${e.pageY - (height*text.length) - buffer}px)`)
+                                    // .style('transform', `translate(${d3.pointer(e)[0]}px, ${d3.pointer(e)[1] - (height*text.length) - buffer}px)`)
                                     .style('position', 'fixed')
-                                    .style('width', `${textWidth}px`)
-                                    .style('height', `${labels.length*textHeight + buffer}px`)
-                                    .style('left', '0px')
-                                    .style('top', '0px')
-                                    .style('pointer-events', 'none');
+                                    .style('width', `${width}px`)
+                                    .style('height', `${text.length*height + 3}px`)
+                                    .style('left', `${e.clientX}px`)
+                                    .style('top', `${e.clientY - height*(text.length+1) - buffer}px`)
+                                    .style('pointer-events', 'none')
+                                    .style('background-color', 'white')
+                                    .style('z-index', 3);
                                     
                                 typeGroup.selectAll('.cacheSetHintText')
-                                    .data(labels)
+                                    .data(text)
                                     .enter()
                                     .append('text')
                                     .attr('font-family', 'monospace')
@@ -461,21 +475,22 @@ function legendLayout() {
                                     .style('position', 'fixed')
                                     .style('top', '0px')
                                     .style('left', '0px')
-                                    .style('transform', (d, i) => `translateY(${(i+1)*textHeight}px)`)
+                                    .style('transform', (d, i) => `translateY(${(i+1)*height}px)`)
                                     .style('pointer-events', 'none')
-                                    .text((lb) => lb);
+                                    .text((tx) => tx);
                             }
                         })
                         .on('mousemove', function(e, d) {
-                            if (Object.keys(d.types).length > 0) {
-                                const labels = zoomedOut() ? [`occupancy variance: ${d.variance}`] : Object.keys(d.types)
-                                    .filter((tp) => d.types[tp] > 0);
-                                cacheLayout.select('#cacheSetHint')
-                                    .style('transform', `translate(${d3.pointer(e)[0]}px, ${d3.pointer(e)[1] - (textHeight*labels.length) - buffer}px)`);
-                            }
+                            const body = d3.select('body').node();
+                            let [text, width, height] = getTextBlockForType(d.type, '10pt monospace', 45);
+                            d3.select('#legendTypeHint')
+                                .style('left', `${e.clientX}px`)
+                                .style('top', `${e.clientY - height*(text.length+1) - buffer}px`);
+                                // .style('transform', `translate(${e.pageX}px, ${e.pageY - (height*text.length) - buffer}px)`)
+                                // .style('transform', `translate(${d3.pointer(e)[0]}px, ${d3.pointer(e)[1] - (height*text.length) - buffer}px)`);
                         })
                         .on('mouseout', function() {
-                            d3.select('#cacheSetHint')
+                            d3.select('#legendTypeHint')
                                 .remove();
                         });
 
@@ -568,8 +583,15 @@ function legendLayout() {
         //         );
     }
 
-    function trimType(tp) {
-        return tp.length > 28 ? tp.substring(0, 25) + '...' : tp;
+    function getTextBlockForType(tp, font, len=28) {
+        const context = canvas.getContext('2d');
+        context.font = font;
+        const textHeight = 12;
+        const lines = [];
+        for (let i = 0; i < tp.length; i += len) {
+            lines.push(tp.substring(i, Math.min(i + len, tp.length)));
+        }
+        return [lines, context.measureText(lines[0]).width, textHeight];
     }
 
     drawLegendLayout.redraw = function() {
@@ -579,6 +601,8 @@ function legendLayout() {
     drawLegendLayout.fields = function(val) {
         if (!arguments) return fields;
         fields = val;
+        // console.log('Here are fields in legend:');
+        // console.log(fields);
         return drawLegendLayout;
     }
 
