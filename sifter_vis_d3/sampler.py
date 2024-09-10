@@ -300,6 +300,9 @@ class Sampler:
         #TODO: should the following be multiplied by cls? Or is this just raw virt address?
         perf_df.loc[:,'page_num'] = perf_df.loc[:,'cl_addr'] // page_size
 
+        # print("Here is perf df:")
+        # print(perf_df)
+
         filter_types = pd.DataFrame({'type': list(type_data.keys()), 'mask': list(type_data.values())})
         type_entries = df.merge(filter_types, how='left', on='type')
         type_entries.loc[:,'mask'] = type_entries.loc[:,'mask'].astype(object)
@@ -307,6 +310,9 @@ class Sampler:
         type_entries.loc[:,'mask'] = type_entries.loc[:,'mask'].fillna(True).astype(bool)
         pages_to_keep = type_entries[type_entries['mask']]['page_num']
         df = df[df['page_num'].isin(pages_to_keep)]
+
+        # print("Here are pages to keep:")
+        # print(pages_to_keep)
 
         last_allocs = self.get_last_object_per_bucket(df, num_buckets)
 

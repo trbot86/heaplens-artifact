@@ -337,10 +337,15 @@ function cacheSetLayout() {
         let c = a ? structuredClone(a) : {};
         if (b) {
             Object.keys(b).forEach((tp) => {
-                c[tp] ? c[tp].count += b[tp].count : c[tp] = b[tp];
-                Object.keys(b[tp].parents).forEach((par) => {
-                    c[tp].parents[par] ? c[tp].parents[par] += b[tp].parents[par] : c[tp].parents[par] = b[tp].parents[par];
-                });
+                if (c[tp]) {
+                    c[tp].count += b[tp].count;
+                    Object.keys(b[tp].parents).forEach((par) => {
+                        c[tp].parents[par] ? c[tp].parents[par] += b[tp].parents[par] : c[tp].parents[par] = b[tp].parents[par];
+                    });
+                }
+                else {
+                    c[tp] = b[tp];
+                }
             });
         }
         return c;
@@ -384,7 +389,6 @@ function cacheSetLayout() {
     }
 
     function computeZoomedBucketData() {
-        console.log(`startCs at begin of zoomedBucketData: ${startCs}`);
         const numberOfCacheSetsInCurrentView = currCache.size / (currCache.associativity*Math.pow(currCacheLineSize, zoomLevel));
         const numSetsInGroup = zoomedOut() ? Math.ceil(numberOfCacheSetsInCurrentView / currCacheLineSize) : 1;
 
@@ -762,8 +766,10 @@ function cacheSetLayout() {
         if (bucketIndex == prevIndex && !force)
             return;
         prevIndex = bucketIndex;
-        // console.log('bucket data:');
-        // console.log(bucketData[bucketIndex]);
+        console.log('bucket data:');
+        console.log(bucketData[bucketIndex]);
+        console.log('all bucket data:');
+        console.log(allBucketData[bucketIndex]);
         const squaresData = bucketData[bucketIndex].map((sq) => {
             const nsq = structuredClone(sq);
             Object.keys(nsq.types).forEach((tp) => {

@@ -28,7 +28,13 @@ function objectLayout() {
         canvas = document.createElement('canvas');
         let initTs = selection.datum().initTs;
 
-        perf = perf[startAddr] ? perf[startAddr].map((d) => d[0]) : undefined;
+        console.log('Here is perf in memLayout BEFORE:');
+        console.log(perf);
+
+        perf = perf[Math.floor(startAddr / pageSize)] ? perf[Math.floor(startAddr / pageSize)].map((d) => d[0]) : undefined;
+
+        console.log('Here is perf in memLayout AFTER:');
+        console.log(perf);
 
         // let memLayoutAxes = memLayout.append('g')
         //     .attr('id', 'memLayoutAxes');
@@ -90,7 +96,7 @@ function objectLayout() {
             .append('rect')
             .attr('class', 'perfHighlight')
             .attr('x', xScale(0))
-            .attr('y', (d) => yScale(Math.floor((d - (parseInt(startAddr)*pageSize)) / cachelineSize)))
+            .attr('y', (d) => yScale(Math.floor((d - parseInt(startAddr)) / cachelineSize)))
             .attr('width', xScale(cachelineSize))
             .attr('height', yScale(1))
             .style('visibility', perfVis ? 'inherit' : 'hidden');

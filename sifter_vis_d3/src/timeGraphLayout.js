@@ -304,8 +304,6 @@ function timeGraphLayout() {
             console.log('sample info: ', alg, rlen, numRuns, numBuckets);
             console.log('body: ', JSON.stringify(mainVis.getSampleVector()));
 
-            console.log('timeGraphLayout, here is the cls: ', currCacheLineSize);
-
             fetch(`/run-sampler/${mainVis.getFileName()}-${startTs}-${endTs}-${numericPageSizes[selPageSize]}-${currCacheLineSize}-${alg}-${rlen}-${numRuns}-${numBuckets}`, {
                     method: "POST",
                     mode: "cors",

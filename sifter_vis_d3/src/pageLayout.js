@@ -18,6 +18,12 @@ const   tabLabelToCode = {
     'Perf C2C': SORT_PERF
 };
 
+const   codeToTabLabel = [
+    'Address',
+    'Cluster',
+    'Perf C2C'
+];
+
 function pageLayout() {
     let allEvents,
         subsliceAddrToSplitEvents,
@@ -49,7 +55,8 @@ function pageLayout() {
         bucketData,
         sliceAddrAndObjList,
         pageAddrToEvents,
-        pageAddrToCluster;
+        pageAddrToCluster,
+        sorters;
 
     function drawPageLayout(selection) {
         clusters = selection.datum().clusters;
@@ -89,13 +96,17 @@ function pageLayout() {
             bucketData = getBucketData(Object.entries(objAddrToSplitEvents));
 
         dataPerf = Object.keys(perf)
-                        .filter((d) => Object.keys(objAddrToSplitEvents).includes(Math.floor(parseInt(d) / pageSize).toString()))
                         .map((d) => parseInt(d))
                         .reduce((acc, curr) => {
                             acc[Math.floor(curr / pageSize)] ? acc[Math.floor(curr / pageSize)].push([curr, perf[curr]]) :
                                 acc[Math.floor(curr / pageSize)] = [[curr, perf[curr]]];
                             return acc;
                         }, {});
+
+        console.log('Here is perf in pageLayout.js:');
+        console.log(perf);
+        console.log('Here is dataPerf in pageLayout.js:');
+        console.log(dataPerf);
 
         constructPageTabs();
         
@@ -143,7 +154,8 @@ function pageLayout() {
 
     function constructPageTabs() {
         d3.select('#pageSortTabs').remove();
-        const sorters = {'Address': {'sortFunc': function() {
+        sorters = {};
+        sorters = {'Address': {'sortFunc': function() {
                 if (sortMode = SORT_PERF)
                     objLayout.perfVisible(false);
                 sliceAddrAndObjList = sliceAddrAndObjList.sort((a, b) => parseInt(a[SLICE_ADDR]) - parseInt(b[SLICE_ADDR]));
@@ -160,11 +172,11 @@ function pageLayout() {
         }
         
         sorters['Perf C2C'] = {'sortFunc': function() {
-                const perfPageStrings = Object.keys(perf).map((d) => Math.floor(parseInt(d) / pageSize).toString());
+                const perfSlices = Object.keys(perf).map((d) => Math.floor(parseInt(d) / (zoomLevel == 0 ? pageSize : currentSliceSize())));
                 if (sortMode != SORT_PERF) {
                     objLayout.perfVisible(true);
-                    sliceAddrAndObjList = sliceAddrAndObjList.filter((d) => perfPageStrings.includes(d[SLICE_ADDR]))
-                                                            .concat(sliceAddrAndObjList.filter((d) => !perfPageStrings.includes(d[SLICE_ADDR])));
+                    sliceAddrAndObjList = sliceAddrAndObjList.filter((d) => perfSlices.includes(Math.floor(parseInt(d[SLICE_ADDR]) / (zoomLevel == 0 ? pageSize : currentSliceSize()))))
+                                                            .concat(sliceAddrAndObjList.filter((d) => !perfSlices.includes(Math.floor(parseInt(d[SLICE_ADDR]) / (zoomLevel == 0 ? pageSize : currentSliceSize())))));
                     sortMode = SORT_PERF;
                 }
             }, 'indent': 60};
@@ -273,8 +285,8 @@ function pageLayout() {
                         objAddrToSplitEvents = splitEvents(allEvents, pageSize / (zoomedOut() ? numSubSlices*NUM_OBJS_PER_SUBSLICE : 1));
                         if (zoomedOut())
                             bucketData = getBucketData(Object.entries(objAddrToSplitEvents));
-                        sortMode = SORT_PAGE_NUM;
-                        sorters['Address'].sortFunc();
+                        // sortMode = SORT_PAGE_NUM;
+                        sorters[codeToTabLabel[sortMode]].sortFunc();
                         // d3.selectAll('.pageTab')
                         //     .transition()
                         //     .style('background-color', (d1) => tabLabelToCode[d1] == sortMode ? '#ccc' : 'white');
@@ -432,8 +444,11 @@ function pageLayout() {
                                 d3.select('#pageLayout')
                                     .style('height', `${Object.keys(sliceAddrAndObjList).length*(pageRectHeight+10)}px`);
                                 // updatePagesByTimestamp(getCurrTime());  // TODO: weird hack, not sure how to fix
-                                updatePagesByTimestamp(getCurrTime());
                                 constructPageTabs();
+                                if (sortMode == SORT_CLUSTER)
+                                    sortMode = SORT_PAGE_NUM;
+                                sorters[codeToTabLabel[sortMode]].sortFunc();
+                                updatePagesByTimestamp(getCurrTime());
                             }
                             const gp = d3.select('#pageLayout')
                                 .selectAll('.pageGroup');
@@ -517,16 +532,24 @@ function pageLayout() {
 
         const sliceSize = currentSliceSize();
         
-        groups.selectAll('.perfHighlight')
-            .data((d) => dataPerf[d[0]] ? dataPerf[d[0]] : [])
+        d3.select('#pageLayout')
+            .selectAll('.pageGroup')
+            .selectAll('.perfHighlight')
+            .data((d) => {
+                const pageNum = Math.floor(parseInt(d[0]) / pageSize);
+                const pagePerfData = dataPerf[pageNum] ? dataPerf[pageNum] : [];
+                return zoomLevel == 0 ? pagePerfData : 
+                        pagePerfData.filter((perfEntry) => Math.floor(perfEntry[0] / currentSliceSize()) == 
+                            Math.floor(parseInt(d[0]) / currentSliceSize));
+            })
             .join(
                 (enter) => enter.append('rect')
                             .attr('class', 'perfHighlight')
                             .attr('x', (d) => sliceScale(d[0] % sliceSize))
                             .attr('y', 0)
-                            .attr('width', sliceScale(cachelineSize))
+                            .attr('width', Math.max(sliceScale(cachelineSize), 1))
                             .attr('height', pageRectHeight)
-                            .style('visibility', 'hidden'),
+                            .style('visibility', sortMode == SORT_PERF ? 'inherit' : 'hidden'),
                 (update) => update.style('visibility', sortMode == SORT_PERF ? 'inherit' : 'hidden'),
                 (exit) => exit.remove()
             );
@@ -635,6 +658,8 @@ function pageLayout() {
             .style('position', 'relative')
             .style('visibility', 'inherit');
 
+        console.log('Here is dataPerf in pageLayout:');
+        console.log(dataPerf);
         objLayout = objectLayout()
             .x(x)
             .y(y)
