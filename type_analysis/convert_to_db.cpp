@@ -450,10 +450,6 @@ void get_types_in_chunk(int id, int chunk_size, int start_ind, info_t* filemap,
 
     pages[page_num].add_event(event);
 
-    if (i % 1000000 == 0) {
-      // cout << "thread " << id << " iteration " << i << " of first loop" << endl;
-    }
-
     // if (type_map.find((uintptr_t) event->tindex_name) != type_map.end()) {
       // string type_trim = type_map.at((uintptr_t) event->tindex_name);
       // type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
@@ -580,9 +576,6 @@ int main(int argc, char* argv[]) {
 
   type_map = construct_map("typeset_dump.txt", true);
   file_map = construct_map("fileset_dump.txt");
-  for (auto const& f : file_map) {
-    printf("File in map: %p\n", f.first);
-  }
   // vector<unordered_map<uintptr_t, unordered_set<uint64_t>>> include_addrs{num_threads, unordered_map};
   // unordered_set<uint64_t> skip_addrs{};
   // vector<unordered_map<uintptr_t, int>> seen_types{num_threads, unordered_map<uintptr_t, int>{}};
@@ -723,10 +716,8 @@ int main(int argc, char* argv[]) {
 
   unordered_map<uint64_t, memory_page_t> boundary_crossers{};
   cout << "Number of pages: " << all_pages.size() << endl;
-  int count = 0;
 
   for (auto& p: all_pages) {
-    count++;
     if (p.second.sampled == CTD_NOT_SAMPLED) {
       bool take_for_type = false;
       for (auto& tp: p.second.included_types) {
@@ -762,15 +753,13 @@ int main(int argc, char* argv[]) {
           int64_t rem_size = event->size - eventSize;
           do {
             uint64_t new_event_page_num = new_event_addr / page_size;
-            if (new_event_addr == 140028518490112)
-              cout << "Found the special event" << endl;
             if (boundary_crossers.find(new_event_page_num) == boundary_crossers.end())
               boundary_crossers.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
             boundary_crossers[new_event_page_num].add_event(new info_t{ event->file,
                                                                         event->tindex_name,
                                                                         event->line,
                                                                         event->timestamp,
-                                                                        min((uint64_t)rem_size, page_num),
+                                                                        min((uint64_t)rem_size, (uint64_t)page_size),
                                                                         (void*) new_event_addr,
                                                                         event->typeofop});
             new_event_addr += page_size;
@@ -800,7 +789,6 @@ int main(int argc, char* argv[]) {
           exit(-1);
         }
 
-        // sqlite3_step(stmt);
         sqlite3_clear_bindings(stmt);
         sqlite3_reset(stmt);
         n = n->next;
@@ -809,21 +797,13 @@ int main(int argc, char* argv[]) {
   }
 
   cout << "Number of boundary crossing pages: " << boundary_crossers.size() << endl;
-  count = 0;
 
   for (auto& p: boundary_crossers) {
-    count++;
-    if (count % 1000 == 0) {
-      cout << "Done " << count << " boundary pages" << endl;
-    }
     if (all_pages.find(p.first) != all_pages.end()) {
       if (all_pages[p.first].sampled == CTD_SAMPLED_YES) {
         node_t* n = p.second.events.head;
         while (n != nullptr) {
           info_t* event = n->data;
-
-          if ((uint64_t)event->addr == 140028518490112)
-            cout << "Found the special event in boundary pages" << endl;
 
           const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
           const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
