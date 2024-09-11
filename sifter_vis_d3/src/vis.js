@@ -365,7 +365,7 @@ class MainVisualization {
             .style('grid-column', 3)
             .style('grid-row', 1)
             .style('overflow', 'visible')
-            .style('transform', 'translateX(10px)')
+            .style('transform', 'translateX(50px)')
             // .datum(recsLabeled)
             .call(this.#cacheSetChart);
 
