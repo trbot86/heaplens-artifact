@@ -31,7 +31,7 @@ function objectLayout() {
         console.log('Here is perf in memLayout BEFORE:');
         console.log(perf);
 
-        perf = perf[Math.floor(startAddr / pageSize)] ? perf[Math.floor(startAddr / pageSize)].map((d) => d[0]) : undefined;
+        perf = perf[Math.floor(startAddr / pageSize)] ? perf[Math.floor(startAddr / pageSize)].map((d) => ({addr: d[0], hitm: d[1].hitm})) : undefined;
 
         console.log('Here is perf in memLayout AFTER:');
         console.log(perf);
@@ -90,16 +90,26 @@ function objectLayout() {
     }
 
     function perfHighlight() {
-        perfGroup.selectAll('.perfHighlight')
+        const highlightGroup = perfGroup.selectAll('.perfHighlight')
             .data(perf ? perf : [])
             .enter()
-            .append('rect')
+            .append('g')
             .attr('class', 'perfHighlight')
+            .style('visibility', perfVis ? 'inherit' : 'hidden')
+            .style('overflow', 'visible');
+        highlightGroup.append('rect')
+            .attr('class', 'perfHighlightBar')
             .attr('x', xScale(0))
-            .attr('y', (d) => yScale(Math.floor((d - parseInt(startAddr)) / cachelineSize)))
+            .attr('y', (d) => yScale(Math.floor((d.addr - parseInt(startAddr)) / cachelineSize)))
             .attr('width', xScale(cachelineSize))
-            .attr('height', yScale(1))
-            .style('visibility', perfVis ? 'inherit' : 'hidden');
+            .attr('height', yScale(1));
+        highlightGroup.append('text')
+            .attr('x', xScale(cachelineSize) + 3)
+            .attr('y', (d) => yScale(Math.floor((d.addr - parseInt(startAddr)) / cachelineSize)) + 6)
+            .attr('font-family', 'monospace')
+            .style('font-size', '10px')
+            .style('overflow', 'visible')
+            .text((d) => `HITM: ${d.hitm}%`);
     }
 
     drawObjectLayout.addElementsByTimestamp = function(ts) {

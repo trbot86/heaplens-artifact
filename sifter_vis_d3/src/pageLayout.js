@@ -534,7 +534,7 @@ function pageLayout() {
         
         d3.select('#pageLayout')
             .selectAll('.pageGroup')
-            .selectAll('.perfHighlight')
+            .selectAll('.perfHighlightBar')
             .data((d) => {
                 const pageNum = Math.floor(parseInt(d[0]) / pageSize);
                 const pagePerfData = dataPerf[pageNum] ? dataPerf[pageNum] : [];
@@ -544,7 +544,7 @@ function pageLayout() {
             })
             .join(
                 (enter) => enter.append('rect')
-                            .attr('class', 'perfHighlight')
+                            .attr('class', 'perfHighlightBar')
                             .attr('x', (d) => sliceScale(d[0] % sliceSize))
                             .attr('y', 0)
                             .attr('width', Math.max(sliceScale(cachelineSize), 1))
@@ -643,12 +643,11 @@ function pageLayout() {
         let memLayout = d3.select('#visPanels')
             .append('div')
             .attr('id', 'memLayoutDiv')
-            .style('width', '100%')
+            .style('width', '115%')
             .style('height', '100%')
             .style('grid-column', 2)
             .style('grid-row', 1)
-            .style('overflow-x', 'visible')
-            .style('overflow-y', 'scroll')
+            .style('overflow', 'scroll')
             .style('position', 'relative')
             .style('z-index', 3)
             .append('svg')
@@ -656,7 +655,8 @@ function pageLayout() {
             .style('width', '100%')
             .style('height', `${actualHeight + y + 10}px`)
             .style('position', 'relative')
-            .style('visibility', 'inherit');
+            .style('visibility', 'inherit')
+            .style('overflow', 'visible');
 
         console.log('Here is dataPerf in pageLayout:');
         console.log(dataPerf);

@@ -143,7 +143,7 @@ div.loadingAnim {
     pointer-events: none;
 }
 
-.perfHighlight {
+.perfHighlightBar {
     animation: pulse 2.5s infinite;
     fill: red;
     fill-opacity: 0.8;
