@@ -1,0 +1,63 @@
+.inline {
+    display: inline-block;
+}
+
+/* Page layout */
+
+#pageAndObjectVis {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+}
+
+#pageRowContainer {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+#pageRow {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+}
+
+
+/* Legend */
+
+#legendTable {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr fit-content(128px) 1fr;
+}
+
+#legendTable :is(thead, tbody, tfoot, tr) {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / span 4;
+}
+
+#legendTable tbody tr {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#legendTable :is(th, td) {
+    align-self: center;
+}
+
+#legendTable tbody {
+    overflow: auto;
+}
+
+#legendTable tfoot {
+    position: sticky;
+    bottom: 0;
+    padding-top: 15px;
+}
+
+.justifyRightTableCell {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 15px;
+}
