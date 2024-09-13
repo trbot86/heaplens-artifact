@@ -1,16 +1,17 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './componentStyles.scss';
+import * as d3 from 'd3';
+import { TypeToColourMap } from '../vispanels/page';
 
 interface MemoryObject {
-    file: string,
+    file: string | null,
     line: number,
-    timestamp: number,
     size: number,
     address: number,
     allocTs: number,
-    freeTs: number,
-    type: string
+    freeTs: number | null,
+    type: string | null
 }
 
 interface PageContents {
@@ -35,13 +36,58 @@ function PageHeader() {
     );
 }
 
-function PageRow({ pageSize, addr, data, currTs, selAddr, onPageClicked, onFilterFocusData } : 
+function PageCard({ addr, pageSize, objectData } :
+    {
+        addr: number,
+        pageSize: number,
+        objectData: MemoryObject[],
+    }) {
+    const ref = useRef(null);
+
+    useEffect(() => {
+        const pageScale = d3.scaleLinear().domain([0, pageSize]).range([0, 520]);
+
+        const rectData = d3.select(ref.current)
+            .select('.pageCardClipGroup')
+            .selectAll('.pageCardObject')
+            .data(objectData);
+        rectData.enter()
+            .append('rect')
+            .attr('class', 'pageCardObject')
+            .style('left', (d) => `${pageScale(d.address % pageSize)}px`)
+            .style('width', (d) => `${pageScale(d.size)}px`);
+        rectData.exit()
+            .remove();
+    }, []); // MIGHT need currData in dependencies? Not sure...
+    
+    return (
+        <svg 
+            className='pageCard'
+            ref={ref} >
+            <defs>
+                <clipPath id={`pageCardClip${addr}`}>
+                    <rect className='pageCardBorder' />
+                </clipPath>
+            </defs>
+            <rect className='pageCardBorder pageCardBack' />
+            <g
+                className='pageCardClipGroup'
+                clipPath={`url(#pageCardClip${addr})`} >
+                <rect className='pageCardBorderBottom' />
+            </g>
+        </svg>
+    );
+}
+
+function PageRow({  pageSize, addr, data, currTs, selAddr,
+                    colourOfType, onPageClicked, onFilterFocusData } : 
     {
         pageSize: number,
         addr: number,
         data: PageContents,
         currTs: number,
         selAddr: number,
+        colourOfType: TypeToColourMap,
         onPageClicked: (a: number) => void,
         onFilterFocusData: (a: MemoryObject[]) => void
     }) {
@@ -49,7 +95,8 @@ function PageRow({ pageSize, addr, data, currTs, selAddr, onPageClicked, onFilte
 
     useEffect(() => {
         const filtered = {
-            events: data.events.filter((obj) => obj.allocTs <= currTs && obj.freeTs >= currTs),
+            events: data.events.filter((obj) => obj.allocTs <= currTs && 
+                                                (obj.freeTs == null || obj.freeTs >= currTs)),
             cluster: data.cluster
         };
         setCurrData(filtered);
@@ -59,19 +106,25 @@ function PageRow({ pageSize, addr, data, currTs, selAddr, onPageClicked, onFilte
     }, [currTs, selAddr, data]);
 
     return (
-        <div id='pageRow'>
-            <div>
-
+        <div className='pageRow'>
+            <PageCard 
+                addr={addr}
+                pageSize={pageSize}
+                objectData={currData.events} />
+            <div className='pageRowLabel'>
+                <div>{`0x${addr.toString(16)}`}</div>
+                <div>{`cluster: ${currData.cluster}`}</div>
             </div>
         </div>
     );
 }
 
-export default function Pages({ pageSize, pages, perf, currTs } :
+export default function Pages({ pageSize, pages, perf, colourOfType, currTs } :
     {
         pageSize: number,
         pages: PageMap,
         perf: PerfMap,
+        colourOfType: TypeToColourMap,
         currTs: number
     }) {
     const [selPageAddr, setSelPageAddr] = useState(parseInt(Object.keys(pages)[0]));
@@ -90,6 +143,7 @@ export default function Pages({ pageSize, pages, perf, currTs } :
                                                                         data={pages[parseInt(addr)]}
                                                                         currTs={currTs}
                                                                         selAddr={selPageAddr}
+                                                                        colourOfType={colourOfType}
                                                                         onPageClicked={setSelPageAddr}
                                                                         onFilterFocusData={setFocusData} />)
                     }

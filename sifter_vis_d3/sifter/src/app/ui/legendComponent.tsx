@@ -5,11 +5,7 @@ import { Paper, TextField } from '@mui/material';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import './componentStyles.scss';
-import { Color } from 'd3-color';
-
-interface TypeToColourMap {
-    [ tp: string ]: Color
-};
+import { TypeToColourMap } from '../vispanels/page';
 
 interface TypeStat {
     allocs: number,
@@ -109,7 +105,7 @@ function LegendTableFooter({ filterText, onFilterTextChange } :
 function LegendRow({ typeName, colour, stats } : 
     {   
         typeName: string,
-        colour: Color,
+        colour: d3.RGBColor | d3.HSLColor | null,
         stats: TypeStat
     }) {
 
@@ -124,7 +120,7 @@ function LegendRow({ typeName, colour, stats } :
                         sx={{
                             width: '20px',
                             height: '20px',
-                            backgroundColor: colour.formatHex()
+                            backgroundColor: colour == null ? 'white' : colour.formatHex()
                         }} />
                 </div>
             </td>
