@@ -6,6 +6,7 @@ import { Grid } from '@mui/system';
 import Pages from '../ui/pagesComponent';
 import { testColourOfType, testPageData, testPerfData, testTypeStats } from '../ui/testdata';
 import TimeGraph from '../ui/timeGraphComponent';
+import CssBaseline from '@mui/material/CssBaseline';
 
 export interface TypeToColourMap {
     [ tp: string ]: d3.RGBColor | d3.HSLColor | null
@@ -22,7 +23,7 @@ const theme: Theme = createTheme({
             main: '#bea7da',
         },
         background: {
-            default: '#212121',
+            default: '#282828',
             paper: '#212121',
         },
         success: {
@@ -39,6 +40,7 @@ export default function VisPanels() {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Grid container spacing={2}>
                 <Grid size={9}>
                     <Pages

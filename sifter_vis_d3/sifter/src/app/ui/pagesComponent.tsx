@@ -36,17 +36,18 @@ function PageHeader() {
     );
 }
 
-function PageCard({ addr, pageSize, objectData } :
+function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr } :
     {
         addr: number,
+        selAddr: number,
         pageSize: number,
         objectData: MemoryObject[],
+        setSelPageAddr: (a: number) => void
     }) {
     const ref = useRef(null);
+    const pageScale = d3.scaleLinear().domain([0, pageSize]).range([0, 520]); //TODO get rid of this 520 constant
 
     useEffect(() => {
-        const pageScale = d3.scaleLinear().domain([0, pageSize]).range([0, 520]);
-
         const rectData = d3.select(ref.current)
             .select('.pageCardClipGroup')
             .selectAll('.pageCardObject')
@@ -69,18 +70,20 @@ function PageCard({ addr, pageSize, objectData } :
                     <rect className='pageCardBorder' />
                 </clipPath>
             </defs>
-            <rect className='pageCardBorder pageCardBack' />
+            <rect className='pageCardBorder pageCardShadow' />
+            <rect
+                className={`pageCardBorder pageCardBack${selAddr == addr ? ' pageCardSelected' : ''}`}
+                onClick={() => setSelPageAddr(addr)} />
             <g
                 className='pageCardClipGroup'
                 clipPath={`url(#pageCardClip${addr})`} >
-                <rect className='pageCardBorderBottom' />
             </g>
         </svg>
     );
 }
 
 function PageRow({  pageSize, addr, data, currTs, selAddr,
-                    colourOfType, onPageClicked, onFilterFocusData } : 
+                    colourOfType, setSelPageAddr, setFocusData } : 
     {
         pageSize: number,
         addr: number,
@@ -88,8 +91,8 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
         currTs: number,
         selAddr: number,
         colourOfType: TypeToColourMap,
-        onPageClicked: (a: number) => void,
-        onFilterFocusData: (a: MemoryObject[]) => void
+        setSelPageAddr: (a: number) => void,
+        setFocusData: (a: MemoryObject[]) => void
     }) {
     const [currData, setCurrData] = useState(data);
 
@@ -101,7 +104,7 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
         };
         setCurrData(filtered);
         if (selAddr == addr) {
-            onFilterFocusData(filtered.events);
+            setFocusData(filtered.events);
         }
     }, [currTs, selAddr, data]);
 
@@ -109,8 +112,10 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
         <div className='pageRow'>
             <PageCard 
                 addr={addr}
+                selAddr={selAddr}
                 pageSize={pageSize}
-                objectData={currData.events} />
+                objectData={currData.events}
+                setSelPageAddr={setSelPageAddr} />
             <div className='pageRowLabel'>
                 <div>{`0x${addr.toString(16)}`}</div>
                 <div>{`cluster: ${currData.cluster}`}</div>
@@ -127,8 +132,8 @@ export default function Pages({ pageSize, pages, perf, colourOfType, currTs } :
         colourOfType: TypeToColourMap,
         currTs: number
     }) {
-    const [selPageAddr, setSelPageAddr] = useState(parseInt(Object.keys(pages)[0]));
-    const [focusData, setFocusData] = useState(pages[selPageAddr].events);
+    const [selPageAddr, setSelPageAddr] = useState(null);
+    const [focusData, setFocusData] = useState(null);
 
     return (
         <div>
@@ -144,8 +149,8 @@ export default function Pages({ pageSize, pages, perf, colourOfType, currTs } :
                                                                         currTs={currTs}
                                                                         selAddr={selPageAddr}
                                                                         colourOfType={colourOfType}
-                                                                        onPageClicked={setSelPageAddr}
-                                                                        onFilterFocusData={setFocusData} />)
+                                                                        setSelPageAddr={setSelPageAddr}
+                                                                        setFocusData={setFocusData} />)
                     }
                 </div>
                 <div id='objectContainer'></div>

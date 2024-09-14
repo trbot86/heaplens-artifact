@@ -15,7 +15,7 @@
 
 #pageRowContainer {
     width: 100%;
-    gap: 15px;
+    gap: 5px;
     overflow: auto;
 }
 
@@ -47,13 +47,9 @@ $pageCardBorderBottomHeightHi: 3px;
     width: $pageCardSVGWidth;
 }
 
-.pageCardBorderBottom {
-    height: $pageCardBorderBottomHeightLow;
-    width: $pageCardSVGWidth;
-    fill: rgb(139, 139, 139);
-    x: 0px;
-    y: calc($pageCardBorderHeight - $pageCardBorderBottomHeightLow + 50% - ($pageCardBorderHeight / 2));
-    transition: all 0.1s ease;
+.pageCardShadow {
+    fill: rgb(167, 167, 167);
+    pointer-events: none;
 }
 
 .pageCardBorder {
@@ -63,6 +59,10 @@ $pageCardBorderBottomHeightHi: 3px;
     x: calc(50% - ($pageCardBorderWidth / 2));
     y: calc(50% - ($pageCardBorderHeight / 2));
     transition: all 0.1s ease;
+
+    &:hover {
+        y: calc(50% - ($pageCardBorderHeight / 2) - $pageCardBorderBottomHeightHi + $pageCardBorderBottomHeightLow);
+    }
     
     &.pageCardBack {
         cursor: pointer;
@@ -71,9 +71,14 @@ $pageCardBorderBottomHeightHi: 3px;
         &:hover {
             fill: #e8e8e8;
             filter: drop-shadow(0px 2px 2px rgb(14, 14, 14));
-            & + g .pageCardBorderBottom {
-                height: $pageCardBorderBottomHeightHi;
-                y: calc($pageCardBorderHeight - $pageCardBorderBottomHeightHi + 50% - ($pageCardBorderHeight / 2));
+        }
+        &.pageCardSelected {
+            fill: #d9d9d9;
+            filter: drop-shadow(0px 0px 0px rgb(14, 14, 14));
+            y: calc(50% - ($pageCardBorderHeight / 2) + $pageCardBorderBottomHeightLow);
+
+            & + g .pageCardClipGroup {
+                y: calc(50% - ($pageCardBorderHeight / 2) + $pageCardBorderBottomHeightLow);
             }
         }
     }
