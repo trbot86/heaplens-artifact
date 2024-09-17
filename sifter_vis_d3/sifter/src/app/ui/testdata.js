@@ -60,3 +60,24 @@ export const testPerfData = {
         accesses: 51
     }
 }
+
+export const testLineData = {
+    'node_t<long, void*>': [
+        {ts: 223, size: 64}, {ts: 226, size: 96}, {ts: 250, size: 128},
+        {ts: 300, size: 96}, {ts: 310, size: 128}, {ts: 320, size: 160},
+        {ts: 400, size: 128}, {ts: 450, size: 160}, {ts: 491, size: 128},
+        {ts: 512, size: 96}, {ts: 521, size: 32}, {ts: 551, size: 0},
+        {ts: 600, size: 32}, {ts: 651, size: 0}
+    ],
+    'test1': [
+        {ts: 250, size: 16}, {ts: 521, size: 0}
+    ],
+    'test2': [
+        {ts: 310, size: 16}, {ts: 551, size: 16}
+    ],
+    'int': [
+        {ts: 223, size: 8}, {ts: 226, size: 16}, {ts: 491, size: 8}, {ts: 512, size: 0}
+    ]
+};
+
+export const testMaxPointsPerLine = 50;

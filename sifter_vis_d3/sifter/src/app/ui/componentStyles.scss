@@ -1,5 +1,33 @@
+/* Pages and objects vars */
+
+$pageCardSVGHeight: 50px;
+$pageCardSVGWidth: 530px;
+$pageCardBorderHeight: calc($pageCardSVGHeight - 10px);
+$pageCardBorderWidth: calc($pageCardSVGWidth - 10px);
+$pageCardBorderBottomHeightLow: 1px;
+$pageCardBorderBottomHeightHi: 3px;
+
+/* Time graph vars */
+
+$timeGraphWidth: 600px;
+$timeGraphHeight: 350px;
+$timeGraphYAxisWidth: 50px;
+$timeGraphXAxisHeight: 30px;
+$timeGraphLineStrokeWidth: 2px;
+$timeGraphRightPad: 10px;
+$timeGraphSliderThumbHeight: 15px;
+$timeGraphSliderThumbWidth: 12px;
+
+/* General rules */
+
 .inline {
     display: inline-block;
+}
+
+.visPanel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Pages and objects layout */
@@ -9,8 +37,13 @@
     top: 20px;
     left: 20px;
     display: flex;
-    width: 100%;
     flex-direction: row;
+}
+
+#pageVis {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
 }
 
 #pageRowContainer {
@@ -35,13 +68,6 @@
     align-items: center;
 }
 
-$pageCardSVGHeight: 50px;
-$pageCardSVGWidth: 530px;
-$pageCardBorderHeight: calc($pageCardSVGHeight - 10px);
-$pageCardBorderWidth: calc($pageCardSVGWidth - 10px);
-$pageCardBorderBottomHeightLow: 1px;
-$pageCardBorderBottomHeightHi: 3px;
-
 .pageCard {
     height: $pageCardSVGHeight;
     width: $pageCardSVGWidth;
@@ -52,6 +78,13 @@ $pageCardBorderBottomHeightHi: 3px;
     pointer-events: none;
 }
 
+.pageCardClipGroup {
+    clip-path: view-box inset(calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2) calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2) round 4px);
+    transition: clip-path 0.1s ease;
+    // transform: translateX($timeGraphYAxisWidth);
+}
+
+// The background of each page along with its shadow
 .pageCardBorder {
     height: $pageCardBorderHeight;
     width: $pageCardBorderWidth;
@@ -60,9 +93,10 @@ $pageCardBorderBottomHeightHi: 3px;
     y: calc(50% - ($pageCardBorderHeight / 2));
     transition: all 0.1s ease;
 
-    &:hover {
-        y: calc(50% - ($pageCardBorderHeight / 2) - $pageCardBorderBottomHeightHi + $pageCardBorderBottomHeightLow);
-    }
+    // &:hover {
+    //     transform: translateY($pageCardBorderBottomHeightLow - $pageCardBorderBottomHeightHi);
+    //     // y: calc(50% - ($pageCardBorderHeight / 2) - $pageCardBorderBottomHeightHi + $pageCardBorderBottomHeightLow);
+    // }
     
     &.pageCardBack {
         cursor: pointer;
@@ -71,25 +105,76 @@ $pageCardBorderBottomHeightHi: 3px;
         &:hover {
             fill: #e8e8e8;
             filter: drop-shadow(0px 2px 2px rgb(14, 14, 14));
+            transform: translateY($pageCardBorderBottomHeightLow - $pageCardBorderBottomHeightHi);
+
+            & + g.pageCardClipGroup {
+                clip-path: view-box inset(calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2 + $pageCardBorderBottomHeightLow - $pageCardBorderBottomHeightHi)
+                                            calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2)
+                                            calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2 - $pageCardBorderBottomHeightLow + $pageCardBorderBottomHeightHi)
+                                            calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2)
+                                            round 4px); 
+            }
         }
         &.pageCardSelected {
+            cursor: default;
             fill: #d9d9d9;
             filter: drop-shadow(0px 0px 0px rgb(14, 14, 14));
-            y: calc(50% - ($pageCardBorderHeight / 2) + $pageCardBorderBottomHeightLow);
+            transform: translateY($pageCardBorderBottomHeightLow);
+            // y: calc(50% - ($pageCardBorderHeight / 2) + $pageCardBorderBottomHeightLow);
 
-            & + g .pageCardClipGroup {
-                y: calc(50% - ($pageCardBorderHeight / 2) + $pageCardBorderBottomHeightLow);
+            & + g.pageCardClipGroup {
+                clip-path: view-box inset(calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2 - $pageCardBorderBottomHeightLow) calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2) round 4px);
+
+                clip-path: view-box inset(calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2)
+                                            calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2)
+                                            calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2 - $pageCardBorderBottomHeightLow)
+                                            calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2)
+                                            round 4px); 
             }
         }
     }
 }
 
+// Objects displayed in the page (top-left) view
+.pageCardObject {
+    height: calc($pageCardSVGHeight * 2);
+    pointer-events: none;
+    stroke: black;
+    stroke-width: 1px;
+    transform: translateX($timeGraphYAxisWidth);
+}
+
+
+
 
 /* Time line graph */
 
+#linesGroup {
+    transform: translate(calc($timeGraphYAxisWidth + ($timeGraphLineStrokeWidth / 2)), -($timeGraphLineStrokeWidth / 2));
+}
+
 .timeGraphLine {
     fill: none;
-    stroke-width: 2;
+    stroke-width: $timeGraphLineStrokeWidth;
+    transition: stroke-width 0.1s ease;
+    &:hover {
+        stroke-width: 3px;
+    }
+}
+
+#xAxisGroup {
+    transform: translate($timeGraphYAxisWidth, $timeGraphHeight);
+    clip-path: view-box inset(0)
+}
+
+#sliderGroup {
+    width: $timeGraphWidth;
+    height: $timeGraphXAxisHeight;
+    transform: translate($timeGraphYAxisWidth, - calc($timeGraphXAxisHeight + 20px));
+}
+
+#yAxisGroup {
+    transform: translateX($timeGraphYAxisWidth);
 }
 
 

@@ -30,19 +30,58 @@ interface PerfMap {
     }
 }
 
+function ObjectLayout({ data, colourOfType } :
+    {
+        data: PageContents,
+        colourOfType: TypeToColourMap
+    }) {
+    const objGroup = useRef(null);
+    const xScale = useRef();
+    const yScale = useRef();
+    const xAxis = useRef();
+    const yAxis = useRef();
+
+    useEffect(() => {
+        const objData = d3.select(objGroup.current)
+            .selectAll('.dataObjectGroup')
+            .data(data.events, (d: MemoryObject) => `${d.address}-${d.allocTs}`);
+        const blockGroup = objData.enter()
+            .append('g')
+            .attr('class', 'dataObjectGroup');
+
+        // Start chunk of data object
+        blockGroup.append('rect')
+            .attr('x', )
+
+        blockGroup.exit()
+            .remove();
+    }, [data]);
+    
+    return (
+        <svg
+            id='objectSVG'
+            ref={objGroup} >
+            <g id='objectGroup' />
+            <g id='objectXAxisGroup' />
+            <g id='objectYAxisGroup' />
+        </svg>
+    );
+}
+
 function PageHeader() {
     return (
         <></>
     );
 }
 
-function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr } :
+function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourOfType } :
     {
         addr: number,
         selAddr: number,
         pageSize: number,
-        objectData: MemoryObject[],
-        setSelPageAddr: (a: number) => void
+        objectData: PageContents,
+        setSelPageAddr: (a: number) => void,
+        colourOfType: TypeToColourMap,
     }) {
     const ref = useRef(null);
     const pageScale = d3.scaleLinear().domain([0, pageSize]).range([0, 520]); //TODO get rid of this 520 constant
@@ -51,32 +90,36 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr } :
         const rectData = d3.select(ref.current)
             .select('.pageCardClipGroup')
             .selectAll('.pageCardObject')
-            .data(objectData);
+            .data(objectData.events, (d: MemoryObject) => `${d.address}-${d.allocTs}`);
         rectData.enter()
             .append('rect')
             .attr('class', 'pageCardObject')
-            .style('left', (d) => `${pageScale(d.address % pageSize)}px`)
-            .style('width', (d) => `${pageScale(d.size)}px`);
+            .attr('x', (d) => `${pageScale(d.address % pageSize)}px`)
+            .attr('y', 0)
+            .attr('width', (d) => pageScale(d.size))
+            .attr('fill', (d) => d.type && colourOfType[d.type] ? colourOfType[d.type].toString() : 'black');
+            // .attr('height', 50);
         rectData.exit()
             .remove();
-    }, []); // MIGHT need currData in dependencies? Not sure...
+    }, [objectData.events]);
     
     return (
         <svg 
             className='pageCard'
             ref={ref} >
-            <defs>
+            {/* <defs>
                 <clipPath id={`pageCardClip${addr}`}>
-                    <rect className='pageCardBorder' />
+                    <rect
+                        className='pageCardBorder'
+                        clipPathUnits='objectBoundingBox' />
                 </clipPath>
-            </defs>
+            </defs> */}
             <rect className='pageCardBorder pageCardShadow' />
             <rect
                 className={`pageCardBorder pageCardBack${selAddr == addr ? ' pageCardSelected' : ''}`}
                 onClick={() => setSelPageAddr(addr)} />
             <g
-                className='pageCardClipGroup'
-                clipPath={`url(#pageCardClip${addr})`} >
+                className='pageCardClipGroup' >
             </g>
         </svg>
     );
@@ -102,6 +145,10 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
                                                 (obj.freeTs == null || obj.freeTs >= currTs)),
             cluster: data.cluster
         };
+        // if (addr == 0) {
+        //     console.log(`Updated filtered of ${addr} with ts ${currTs}:`);
+        //     console.log(filtered);
+        // }
         setCurrData(filtered);
         if (selAddr == addr) {
             setFocusData(filtered.events);
@@ -114,8 +161,9 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
                 addr={addr}
                 selAddr={selAddr}
                 pageSize={pageSize}
-                objectData={currData.events}
-                setSelPageAddr={setSelPageAddr} />
+                objectData={currData}
+                setSelPageAddr={setSelPageAddr}
+                colourOfType={colourOfType} />
             <div className='pageRowLabel'>
                 <div>{`0x${addr.toString(16)}`}</div>
                 <div>{`cluster: ${currData.cluster}`}</div>
@@ -132,13 +180,13 @@ export default function Pages({ pageSize, pages, perf, colourOfType, currTs } :
         colourOfType: TypeToColourMap,
         currTs: number
     }) {
-    const [selPageAddr, setSelPageAddr] = useState(null);
-    const [focusData, setFocusData] = useState(null);
+    const [selPageAddr, setSelPageAddr] = useState(parseInt(Object.keys(pages)[0]));
+    const [focusData, setFocusData] = useState(Object.values(pages)[0]);
 
     return (
-        <div>
-            <PageHeader />
-            <div id='pageAndObjectVis'>
+        <div id='pageAndObjectVis'>
+            <div id='pageVis'>
+                <PageHeader />
                 <div id='pageRowContainer'>
                     {
                         Object.keys(pages).map((addr: string) =>    <PageRow
@@ -153,7 +201,10 @@ export default function Pages({ pageSize, pages, perf, colourOfType, currTs } :
                                                                         setFocusData={setFocusData} />)
                     }
                 </div>
-                <div id='objectContainer'></div>
+            </div>
+            <div id='objectVis' >
+                <ObjectLayout
+                    data={focusData} />
             </div>
         </div>
     );

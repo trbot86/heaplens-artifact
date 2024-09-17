@@ -4,7 +4,7 @@ import Legend from '../ui/legendComponent';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
 import { Grid } from '@mui/system';
 import Pages from '../ui/pagesComponent';
-import { testColourOfType, testPageData, testPerfData, testTypeStats } from '../ui/testdata';
+import { testColourOfType, testLineData, testMaxPointsPerLine, testPageData, testPerfData, testTypeStats } from '../ui/testdata';
 import TimeGraph from '../ui/timeGraphComponent';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -12,7 +12,7 @@ export interface TypeToColourMap {
     [ tp: string ]: d3.RGBColor | d3.HSLColor | null
 };
 
-const theme: Theme = createTheme({
+export const theme: Theme = createTheme({
     palette: {
         mode: 'dark',
         primary: {
@@ -41,8 +41,13 @@ export default function VisPanels() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Grid container spacing={2}>
-                <Grid size={9}>
+            <Grid container 
+                id='visPanelGrid'
+                rowSpacing={4}
+                columnSpacing={2} >
+                <Grid 
+                    className='visPanel'
+                    size={8} >
                     <Pages
                         pageSize={pageSize}
                         pages={testPageData}
@@ -50,12 +55,21 @@ export default function VisPanels() {
                         colourOfType={testColourOfType}
                         currTs={currTs} />
                 </Grid>
-                <Grid size={3}></Grid>
+                <Grid size={4}></Grid>
 
-                <Grid size={7}>
-                    <TimeGraph />
+                <Grid
+                    className='visPanel' 
+                    size={6} >
+                    <TimeGraph
+                        lines={testLineData}
+                        maxPointsPerLine={testMaxPointsPerLine}
+                        colourOfType={testColourOfType}
+                        currTs={currTs}
+                        setCurrTs={setCurrTs} />
                 </Grid>
-                <Grid size={5}>
+                <Grid 
+                    className='visPanel'
+                    size={6} >
                     <Legend 
                         colourOfType={testColourOfType}
                         typeStats={testTypeStats} />

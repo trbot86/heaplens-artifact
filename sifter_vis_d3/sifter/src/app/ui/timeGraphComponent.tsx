@@ -1,7 +1,8 @@
 'use client';
-import { useEffect, useRef } from "react";
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from 'd3';
 import { TypeToColourMap } from "../vispanels/page";
+import { Slider, styled } from "@mui/material";
 
 interface SizePoint {
     ts: number,
@@ -12,8 +13,26 @@ interface LineData {
     [tp: string]: SizePoint[]
 };
 
-const LINE_GRAPH_WIDTH = 520;
+const LINE_GRAPH_WIDTH = 600;
 const LINE_GRAPH_HEIGHT = 350;
+const LINE_GRAPH_Y_AXIS_WIDTH = 50;
+const LINE_GRAPH_X_AXIS_HEIGHT = 30;
+const LINE_GRAPH_LINE_STROKE_WIDTH = 2;
+const LINE_GRAPH_RIGHT_PAD = 10;
+const SLIDER_THUMB_WIDTH = 12;
+const SLIDER_THUMB_HEIGHT = 15;
+const SIZE_UNITS = [
+    1,
+    2**10,
+    2**20,
+    2**30
+];
+const SIZE_UNIT_SUFF = [
+    'B',
+    'KiB',
+    'MiB',
+    'GiB'
+];
 
 function getSampledAndSortedLine(line: SizePoint[], maxPointsPerLine: number): SizePoint[] {
     const sortedLine = line.toSorted((a, b) => a.ts - b.ts);
@@ -37,63 +56,223 @@ function getSampledAndSortedLine(line: SizePoint[], maxPointsPerLine: number): S
     return retLine;
 }
 
-function ZoomableLineGraph({ lines, colourOfType } :
+function getTsTickValues(minTs: number, maxTs: number, maxValues: number): number[] {
+    const ret = [];
+    for (let i = minTs + Math.max((maxTs - minTs) / maxValues, 1); i <= maxTs - Math.max((maxTs - minTs) / maxValues, 1); i += Math.max((maxTs - minTs) / maxValues, 1))
+        ret.push(Math.floor(i));
+    return ret;
+}
+
+function getUnitIndex(size: number): number {
+    return Math.floor(Math.log2(size) / 10);
+}
+
+function getSizeTickValues(maxSize: number, maxValues: number): number[] {
+    const unitIdx = getUnitIndex(maxSize);
+    const mult = Math.max(Math.floor(Math.floor(maxSize / SIZE_UNITS[unitIdx]) / maxValues), 1);
+    const ret = [];
+    for (let i = mult*SIZE_UNITS[unitIdx]; i <= maxSize; i += mult*SIZE_UNITS[unitIdx]) {
+        ret.push(i);
+    }
+    return ret;
+}
+
+const CustomSlider = styled(Slider)({
+    '& .MuiSlider-thumb': {
+        height: SLIDER_THUMB_HEIGHT,
+        width: SLIDER_THUMB_WIDTH,
+        borderRadius: '0',
+        backgroundColor: '#e0e0e0',
+        clipPath: 'polygon(50% 0%, 100% 25%, 100% 100%, 0% 100%, 0% 25%)',
+    },
+});
+
+function TimeSlider({ xScale, currTs, setCurrTs } :
     {
-        lines: LineData,
-        colourOfType: TypeToColourMap
+        xScale: d3.ScaleLinear<number, number, never>,
+        currTs: number,
+        setCurrTs: (a: number) => void
     }) {
-    const ref = useRef(null);
-    const minTs = d3.min(Object.keys(lines), (tp: string) => lines[tp][0].ts);
-    const maxTs = d3.max(Object.keys(lines), (tp: string) => lines[tp][lines[tp].length - 1].ts);
-    const xScale = d3.scaleLinear().domain([minTs ? minTs : 0, maxTs ? maxTs : 1])
-                                    .range([0, LINE_GRAPH_WIDTH]);
-    const maxSize = d3.max(Object.keys(lines), (tp: string) => {
-        return d3.max(lines[tp], (pt: SizePoint) => pt.size);
-    });
-    const yScale = d3.scaleLinear().domain([0, maxSize ? maxSize*1.05 : 1])
-                                    .range([0, LINE_GRAPH_HEIGHT]);
-
-    useEffect(() => {
-        Object.keys(lines).forEach((tp: string) => {
-            d3.select(ref.current)
-                .select('#linesGroup')
-                .append('path')
-                .datum(lines[tp])
-                .attr('class', 'timeGraphLine')
-                .attr('stroke', colourOfType[tp])
-                .attr('d', d3.line((pt: SizePoint) => xScale(pt.ts), (pt: SizePoint) => yScale(pt.size)));
-        });
-
-        const zoom = d3.zoom()
-            .scaleExtent([1, 6]) // TODO: get rid of constants
-            .translateExtent([[minTs ? minTs : 0, 0], [maxTs ? maxTs : 1, maxSize ? maxSize : 1]])
-            .on('zoom', (event) => {
-                const newXScale = event.rescaleX(xScale);
-                d3.selectAll('.timeGraphLine')
-                    .attr('d', d3.line((pt: SizePoint) => newXScale(pt.ts), (pt: SizePoint) => yScale(pt.size)));
-            });
-        
-        d3.select(ref.current)
-            .call(zoom);
-    }, [lines]);
-    
-    return (
-        <svg
-            width={LINE_GRAPH_WIDTH}
-            height={LINE_GRAPH_HEIGHT}
-            ref={ref} >
-            <g id='linesGroup' />
-        </svg>
+    // TODO change step below to bucket size
+    return(
+        <div id='sliderGroup' >
+            <CustomSlider
+                value={currTs}
+                track={false}
+                min={xScale.invert(0)}
+                max={xScale.invert(LINE_GRAPH_WIDTH)}
+                step={1}
+                onChange={(e, val) => setCurrTs(val)} />
+        </div>
+        // <g
+        //     id='sliderGroup'
+        //     ref={ref} >
+        //     <rect 
+        //         id='sliderBar'
+        //         x={0}
+        //         y={0}
+        //         width={LINE_GRAPH_WIDTH}
+        //         height={3}
+        //         rx='2px' />
+        //     <rect
+        //         id='sliderThumb'
+        //         x={0}
+        //         y={0}
+        //         width={SLIDER_THUMB_WIDTH}
+        //         height={SLIDER_THUMB_HEIGHT} />
+        // </g>
     );
 }
 
-export default function TimeGraph({ lines, maxPointsPerLine, colourOfType } :
+function LinePath({ lineData, colour, lineGenerator } :
+    {
+        lineData: SizePoint[],
+        colour: d3.RGBColor | d3.HSLColor | null,
+        lineGenerator: d3.Line<SizePoint> | null
+    }) {
+    const pathRef = useRef(null);
+
+    useEffect(() => {
+        d3.select(pathRef.current)
+            .datum(lineData)
+            .attr('d', lineGenerator);
+    }, []);
+
+    return (
+        <path 
+            className='timeGraphLine'
+            stroke={colour ? colour.toString() : 'gray'}
+            ref={pathRef} />
+    );
+}
+
+function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs } :
+    {
+        lines: LineData,
+        colourOfType: TypeToColourMap,
+        currTs: number,
+        setCurrTs: (a: number) => void
+    }) {
+    const SVGref = useRef(null);
+    // const xScale = useRef<d3.ScaleLinear<number, number, never> | null>(null);
+    const lineGenerator = useRef<d3.Line<SizePoint> | null>(null);
+    const [xScale, setXScale] = useState<d3.ScaleLinear<number, number, never> | null>(null);
+
+    const minTs         = d3.min(Object.keys(lines), (tp: string) => lines[tp][0].ts);
+    const maxTs         = d3.max(Object.keys(lines), (tp: string) => lines[tp][lines[tp].length - 1].ts);
+    const xScaleOrig    = d3.scaleLinear().domain([minTs ? minTs : 0, maxTs ? maxTs : 1])
+                                    .range([0, LINE_GRAPH_WIDTH]);
+    
+    // if (!xScale.current)
+    //     xScale.current = xScaleOrig;
+    const maxSize       = d3.max(Object.keys(lines), (tp: string) => {
+                            return d3.max(lines[tp], (pt: SizePoint) => pt.size);
+                        });
+    const yScale        = d3.scaleLinear().domain([maxSize ? maxSize*1.05 : 1, 0])
+                                    .range([0, LINE_GRAPH_HEIGHT]);
+
+    let xAxis: d3.Axis<d3.NumberValue>;
+    if (!xScale) {
+        lineGenerator.current = d3.line((pt: SizePoint) => xScaleOrig(pt.ts), (pt: SizePoint) => yScale(pt.size));
+        xAxis = d3.axisBottom(xScaleOrig).tickSize(9).tickValues(getTsTickValues(minTs ? minTs : 0, maxTs ? maxTs : 1, 10))
+            .tickFormat((d) => `${(parseInt(d) / 100).toFixed(2)} s`);
+    }
+    else {
+        lineGenerator.current = d3.line((pt: SizePoint) => xScale(pt.ts), (pt: SizePoint) => yScale(pt.size));
+        xAxis = d3.axisBottom(xScale).tickSize(9).tickValues(getTsTickValues(minTs ? minTs : 0, maxTs ? maxTs : 1, 10))
+            .tickFormat((d) => `${(parseInt(d) / 100).toFixed(2)} s`);
+    }
+    
+    const yAxis = d3.axisLeft(yScale).tickSize(3).tickValues(getSizeTickValues(maxSize ? maxSize : 1, 6))
+        .tickFormat((d) => `${d} ${SIZE_UNIT_SUFF[getUnitIndex(maxSize ? maxSize : 1)]}`);
+
+    useEffect(() => {
+        d3.select('#xAxisGroup').call(xAxis);
+        d3.select('#yAxisGroup').call(yAxis);
+
+        if (xScale) {
+            d3.select('#xAxisGroup')
+                .call(xAxis.scale(xScale));
+                // .call(xAxis.scale(xScale.current));
+            d3.selectAll('.timeGraphLine')
+                .attr('d', lineGenerator.current);
+                // .attr('d', d3.line((pt: SizePoint) => xScale.current(pt.ts), (pt: SizePoint) => yScale(pt.size)));
+        }
+
+        // d3.select(SVGref.current)
+        //     .select('#linesGroup')
+        //     .selectAll('.timeGraphLine')
+        //     .data(Object.keys(lines))
+        //     .enter()
+        //     .append('path')
+        //     .attr('class', 'timeGraphLine')
+        //     .attr('stroke', (tp: string) => colourOfType[tp] ? colourOfType[tp].toString() : 'gray')
+        //     .datum((tp: string) => lines[tp])
+        //     .attr('d', lineGenerator);
+
+        const zoom = d3.zoom()
+            .scaleExtent([1, 10]) // TODO: get rid of constants
+            .translateExtent([[0, 0], [LINE_GRAPH_WIDTH + LINE_GRAPH_RIGHT_PAD + LINE_GRAPH_Y_AXIS_WIDTH + (LINE_GRAPH_LINE_STROKE_WIDTH / 2), LINE_GRAPH_HEIGHT + 31]])
+            .on('zoom', (event) => {
+                setXScale(() => event.transform.rescaleX(xScaleOrig));
+                // xScale.current = event.transform.rescaleX(xScaleOrig);
+            });
+        
+        d3.select(SVGref.current)
+            .call(zoom);
+    }, [lines, xScale]);
+    
+    return (
+        <div>
+            <svg
+                id='timeGraphSVG'
+                ref={SVGref}
+                width={LINE_GRAPH_WIDTH + LINE_GRAPH_Y_AXIS_WIDTH + (LINE_GRAPH_LINE_STROKE_WIDTH / 2) + LINE_GRAPH_RIGHT_PAD}
+                height={LINE_GRAPH_HEIGHT + LINE_GRAPH_X_AXIS_HEIGHT + (LINE_GRAPH_LINE_STROKE_WIDTH / 2)} >
+                <defs>
+                    <clipPath id='timeGraphClip'>
+                        <rect
+                            id='timeGraphClipRect'
+                            width={LINE_GRAPH_WIDTH}
+                            height={LINE_GRAPH_HEIGHT} />
+                    </clipPath>
+                </defs>
+                <g 
+                    id='linesGroup'
+                    clipPath={'url(#timeGraphClip)'} >
+                    {
+                        Object.keys(lines).map((tp) => <LinePath
+                                                            key={tp}
+                                                            lineData={lines[tp]}
+                                                            colour={colourOfType[tp]}
+                                                            lineGenerator={lineGenerator.current} />)
+                    }
+                </g>
+                <g id='xAxisGroup' />
+                <g id='yAxisGroup' />
+                {/* <TimeSlider 
+                    minTs={minTs ? minTs : 0}
+                    maxTs={maxTs ? maxTs : 1}
+                    xScale={xScale ? xScale : xScaleOrig}
+                    currTs={currTs}
+                    setCurrTs={setCurrTs} /> */}
+            </svg>
+            <TimeSlider 
+                xScale={xScale ? xScale : xScaleOrig}
+                currTs={currTs}
+                setCurrTs={setCurrTs} />
+        </div>
+    );
+}
+
+export default function TimeGraph({ lines, maxPointsPerLine, colourOfType, currTs, setCurrTs } :
     {
         lines: LineData,
         maxPointsPerLine: number,
-        colourOfType: TypeToColourMap
+        colourOfType: TypeToColourMap,
+        currTs: number,
+        setCurrTs: (a: number) => void
     }) {
-
     const sampledAndSortedLines = Object.keys(lines).reduce((retLines: LineData, tp: string) => {
         retLines[tp] = getSampledAndSortedLine(lines[tp], maxPointsPerLine);
         return retLines;
@@ -115,7 +294,9 @@ export default function TimeGraph({ lines, maxPointsPerLine, colourOfType } :
         <div>
             <ZoomableLineGraph
                 lines={sampledAndSortedLines}
-                colourOfType={colourOfType} />
+                colourOfType={colourOfType}
+                currTs={currTs}
+                setCurrTs={setCurrTs} />
         </div>
     );
 }

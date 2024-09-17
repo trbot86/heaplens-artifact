@@ -109,9 +109,6 @@ function LegendRow({ typeName, colour, stats } :
         stats: TypeStat
     }) {
 
-    console.log('Here is the colour:');
-    console.log(colour);
-
     return (
         <tr>
             <td>
