@@ -6,11 +6,12 @@ $pageCardBorderHeight: calc($pageCardSVGHeight - 10px);
 $pageCardBorderWidth: calc($pageCardSVGWidth - 10px);
 $pageCardBorderBottomHeightLow: 1px;
 $pageCardBorderBottomHeightHi: 3px;
+$objectLayoutLabelMargin: 25px;
 
 /* Time graph vars */
 
-$timeGraphWidth: 600px;
-$timeGraphHeight: 350px;
+$timeGraphWidth: 640px;
+$timeGraphHeight: 330px;
 $timeGraphYAxisWidth: 50px;
 $timeGraphXAxisHeight: 30px;
 $timeGraphLineStrokeWidth: 2px;
@@ -30,7 +31,21 @@ $timeGraphSliderThumbWidth: 12px;
     align-items: center;
 }
 
+
 /* Pages and objects layout */
+
+#pageHeaderGroup {
+    display: flex;
+    flex-direction: row;
+    gap: 7px;
+    align-items: center;
+    width: $pageCardBorderWidth;
+}
+
+#pageSortButtons {
+    margin-left: auto;
+    justify-content: flex-end;
+}
 
 #pageAndObjectVis {
     position: relative;
@@ -38,6 +53,7 @@ $timeGraphSliderThumbWidth: 12px;
     left: 20px;
     display: flex;
     flex-direction: row;
+    gap: 60px;
 }
 
 #pageVis {
@@ -141,10 +157,12 @@ $timeGraphSliderThumbWidth: 12px;
     pointer-events: none;
     stroke: black;
     stroke-width: 1px;
-    transform: translateX($timeGraphYAxisWidth);
+    // transform: translateX($timeGraphYAxisWidth);
 }
 
-
+#objectGroup, #objectXAxisGroup, #objectYAxisGroup, #objectYAxisGridGroup {
+    transform: translate($objectLayoutLabelMargin, $objectLayoutLabelMargin);
+}
 
 
 /* Time line graph */
@@ -181,9 +199,11 @@ $timeGraphSliderThumbWidth: 12px;
 /* Legend */
 
 #legendTable {
+    position: relative;
+    top: 0px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: 1fr fit-content(128px) 1fr;
+    grid-template-rows: 1fr fit-content(187px) 1fr;
 }
 
 #legendTable :is(thead, tbody, tfoot, tr) {

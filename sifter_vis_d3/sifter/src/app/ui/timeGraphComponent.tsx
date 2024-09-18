@@ -13,8 +13,8 @@ interface LineData {
     [tp: string]: SizePoint[]
 };
 
-const LINE_GRAPH_WIDTH = 600;
-const LINE_GRAPH_HEIGHT = 350;
+const LINE_GRAPH_WIDTH = 640;
+const LINE_GRAPH_HEIGHT = 330;
 const LINE_GRAPH_Y_AXIS_WIDTH = 50;
 const LINE_GRAPH_X_AXIS_HEIGHT = 30;
 const LINE_GRAPH_LINE_STROKE_WIDTH = 2;

@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 /* :root {
   --background: #e0e0e0;
   --foreground: #212121;

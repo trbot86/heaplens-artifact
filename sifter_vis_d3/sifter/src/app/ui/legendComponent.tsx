@@ -1,11 +1,11 @@
 'use client';
 import { useState } from 'react';
 import * as d3 from 'd3';
-import { Paper, TextField } from '@mui/material';
+import { IconButton, Paper, TextField } from '@mui/material';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import './componentStyles.scss';
-import { TypeToColourMap } from '../vispanels/page';
+import { generateColours, TypeToColourMap } from '../vispanels/page';
+import { Casino } from '@mui/icons-material';
 
 interface TypeStat {
     allocs: number,
@@ -22,10 +22,7 @@ function LegendTableHeader() {
             <tr>
                 <th>
                     <div className='justifyRightTableCell'>
-                        <div className='inline'>
-                            <KeyboardArrowLeftIcon />
-                            <VisibilityIcon />
-                        </div>
+                        <KeyboardArrowLeftIcon />
                     </div>
                 </th>
                 <th>Type names</th>
@@ -44,15 +41,24 @@ function LegendTableHeader() {
     );
 }
 
-function LegendTableFooter({ filterText, onFilterTextChange } : 
+function LegendTableFooter({ types, onFilterTextChange, setColourOfType } : 
     {
-        filterText: string,
-        onFilterTextChange: (a: string) => void
+        types: string[],
+        onFilterTextChange: (a: string) => void,
+        setColourOfType: (a: TypeToColourMap) => void
     }) {
     return (
         <tfoot>
             <tr>
-                <td></td>
+                <td>
+                    <div className='justifyRightTableCell' >
+                        <IconButton 
+                            id='randColours'
+                            onClick={() => setColourOfType(generateColours(types))} >
+                            <Casino />
+                        </IconButton>
+                    </div>
+                </td>
                 <td>
                     <TextField 
                             id='typeFilter'
@@ -128,9 +134,10 @@ function LegendRow({ typeName, colour, stats } :
     );
 }
 
-export default function Legend({ colourOfType, typeStats } : 
+export default function Legend({ colourOfType, setColourOfType, typeStats } : 
     {   
-        colourOfType: TypeToColourMap, 
+        colourOfType: TypeToColourMap,
+        setColourOfType: (a: TypeToColourMap) => void,
         typeStats: TypeToStatsMap
     }) {
             
@@ -151,8 +158,9 @@ export default function Legend({ colourOfType, typeStats } :
                 }
             </tbody>
             <LegendTableFooter
-                filterText={filterText}
-                onFilterTextChange={setFilterText} />
+                types={Object.keys(typeStats)}
+                onFilterTextChange={setFilterText}
+                setColourOfType={setColourOfType} />
         </table>
     );
 }

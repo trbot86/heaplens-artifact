@@ -17,7 +17,8 @@ export default function RootLayout({
             <head>
                 <meta name="viewport" content="initial-scale=1, width=device-width" />
             </head>
-            <body className={`${inriaSans.className} antialiased`}>
+            <body 
+                className={`${inriaSans.className} antialiased`} >
                 {children}
             </body>
         </html>
