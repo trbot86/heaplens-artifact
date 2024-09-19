@@ -4,7 +4,7 @@ import './componentStyles.scss';
 import * as d3 from 'd3';
 import { theme, TypeToColourMap } from '../vispanels/page';
 import { Check, Dangerous, DangerousOutlined, LocalFireDepartment, LocalFireDepartmentOutlined, SentimentDissatisfied, SentimentDissatisfiedOutlined, SentimentDissatisfiedRounded, SentimentDissatisfiedSharp, SentimentDissatisfiedTwoTone, SentimentVeryDissatisfied, SentimentVeryDissatisfiedOutlined } from '@mui/icons-material';
-import { Checkbox, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Checkbox, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 
 interface MemoryObject {
     file: string | null,
@@ -68,10 +68,10 @@ function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
         curObjSVG.select('#objectYAxisGridGroup')
             .call(yAxisGrid)
             .selectAll('.tick')
-            .filter((d, i) => i % 2 === 1)
+            // .filter((d, i) => i % 2 === 1)
             .select('line')
-            .style('stroke', theme.palette.background.default)
-            .attr('opacity', 0.2);
+            // .style('stroke', theme.palette.background.default)
+            .attr('stroke-opacity', 0.2);
         curObjSVG.select('#objectYAxisGridGroup')
             .select('path')
             .style('display', 'none');
@@ -119,7 +119,7 @@ function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
 
         objData.exit()
             .remove();
-    }, [data]);
+    }, [data, colourOfType]);
     
     return (
         <svg
@@ -142,14 +142,22 @@ function PageHeader({ sortMode, setSortMode } :
     }) {
     return (
         <div id='pageHeaderGroup' >
-            <Checkbox 
-                id='hotSelectorCheck'
-                icon={<LocalFireDepartmentOutlined />}
-                checkedIcon={<LocalFireDepartment />} />
-            <Checkbox 
-                id='contentionCheck'
-                icon={<DangerousOutlined />}
-                checkedIcon={<Dangerous />} />
+            <Tooltip 
+                title='Show hot cache lines'
+                placement='top' >
+                <Checkbox 
+                    id='hotSelectorCheck'
+                    icon={<LocalFireDepartmentOutlined />}
+                    checkedIcon={<LocalFireDepartment />} />
+            </Tooltip>
+            <Tooltip 
+                title='Show HITMs'
+                placement='top' >
+                <Checkbox 
+                    id='contentionCheck'
+                    icon={<DangerousOutlined />}
+                    checkedIcon={<Dangerous />} />
+            </Tooltip>
             <ToggleButtonGroup 
                 id='pageSortButtons'
                 exclusive
@@ -194,7 +202,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
             // .attr('height', 50);
         rectData.exit()
             .remove();
-    }, [objectData.events]);
+    }, [objectData.events, colourOfType]);
     
     return (
         <svg 

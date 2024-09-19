@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import * as d3 from 'd3';
-import { IconButton, Paper, TextField } from '@mui/material';
+import { IconButton, Paper, TextField, Tooltip } from '@mui/material';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import './componentStyles.scss';
 import { generateColours, TypeToColourMap } from '../vispanels/page';
@@ -52,11 +52,15 @@ function LegendTableFooter({ types, onFilterTextChange, setColourOfType } :
             <tr>
                 <td>
                     <div className='justifyRightTableCell' >
-                        <IconButton 
-                            id='randColours'
-                            onClick={() => setColourOfType(generateColours(types))} >
-                            <Casino />
-                        </IconButton>
+                        <Tooltip 
+                            title='Randomize colours'
+                            placement='bottom' >
+                            <IconButton 
+                                id='randColours'
+                                onClick={() => setColourOfType(generateColours(types))} >
+                                <Casino />
+                            </IconButton>
+                        </Tooltip>
                     </div>
                 </td>
                 <td>

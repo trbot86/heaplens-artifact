@@ -1,8 +1,9 @@
 'use client';
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from 'd3';
+import './componentStyles.scss';
 import { TypeToColourMap } from "../vispanels/page";
-import { Slider, styled } from "@mui/material";
+import { Slider, styled, Tooltip } from "@mui/material";
 
 interface SizePoint {
     ts: number,

@@ -14,7 +14,7 @@ $timeGraphWidth: 640px;
 $timeGraphHeight: 330px;
 $timeGraphYAxisWidth: 50px;
 $timeGraphXAxisHeight: 30px;
-$timeGraphLineStrokeWidth: 2px;
+$timeGraphLineStrokeWidth: 2.5px;
 $timeGraphRightPad: 10px;
 $timeGraphSliderThumbHeight: 15px;
 $timeGraphSliderThumbWidth: 12px;
@@ -157,7 +157,6 @@ $timeGraphSliderThumbWidth: 12px;
     pointer-events: none;
     stroke: black;
     stroke-width: 1px;
-    // transform: translateX($timeGraphYAxisWidth);
 }
 
 #objectGroup, #objectXAxisGroup, #objectYAxisGroup, #objectYAxisGridGroup {
@@ -176,7 +175,7 @@ $timeGraphSliderThumbWidth: 12px;
     stroke-width: $timeGraphLineStrokeWidth;
     transition: stroke-width 0.1s ease;
     &:hover {
-        stroke-width: 3px;
+        stroke-width: 3.5px;
     }
 }
 
@@ -235,4 +234,22 @@ $timeGraphSliderThumbWidth: 12px;
     display: flex;
     justify-content: flex-end;
     padding-right: 15px;
+}
+
+
+/* Cache layout */
+
+#cacheSetGroup {
+    width: 100%;
+}
+
+#cacheHeader {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+#cacheSettingsDiv {
+    margin-left: auto;
+    justify-content: flex-end;
 }

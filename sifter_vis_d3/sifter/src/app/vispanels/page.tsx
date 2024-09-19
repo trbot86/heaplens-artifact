@@ -5,9 +5,10 @@ import Legend from '../ui/legendComponent';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
 import { Grid } from '@mui/system';
 import Pages from '../ui/pagesComponent';
-import { testColourOfType, testLineData, testMaxPointsPerLine, testPageData, testPerfData, testTypeStats } from '../ui/testdata';
+import { testCacheInfo, testColourOfType, testLineData, testMaxPointsPerLine, testPageData, testPerfData, testTypeStats } from '../ui/testdata';
 import TimeGraph from '../ui/timeGraphComponent';
 import CssBaseline from '@mui/material/CssBaseline';
+import CacheSets from '../ui/cacheSetComponent';
 
 export interface TypeToColourMap {
     [ tp: string ]: d3.RGBColor | d3.HSLColor | null
@@ -57,6 +58,7 @@ export default function VisPanels() {
     const [currTs, setCurrTs] = useState(0); //TODO: CHANGE TO INIT TS
     const [cacheLineSize, setCacheLineSize] = useState(INIT_CACHELINE_SIZE);
     const [colourOfType, setColourOfType] = useState(generateColours(Object.keys(testLineData)));
+    const [highlightType, setHighlightType] = useState<string | null>(null);
 
     return (
         <ThemeProvider theme={theme}>
@@ -76,7 +78,12 @@ export default function VisPanels() {
                         currTs={currTs}
                         cacheLineSize={cacheLineSize} />
                 </Grid>
-                <Grid size={4}></Grid>
+                <Grid
+                    className='visPanel'
+                    size={4} >
+                    <CacheSets
+                        cacheInfo={testCacheInfo} />
+                </Grid>
 
                 <Grid
                     className='visPanel' 
