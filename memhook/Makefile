@@ -5,6 +5,10 @@ Libs=
 OBJ= memhook.o hash.o
 DEPS=hash.h memhook.h memhook_interface.h memstamp.h memhook_xoshiro256p.h
 
+ifdef MEMHOOK_ASCYLIB
+	CFLAGS += -DMEMHOOK_ASCYLIB
+endif
+
 libmemhook.so: $(OBJ)
 	$(CC) -o $@ $^ -lrt -shared $(CFLAGS)
 
