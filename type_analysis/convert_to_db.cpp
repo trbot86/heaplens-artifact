@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <sqlite3.h>
 #include <fstream>
+#include <map>
 #include <unordered_map>
 #include <sstream>
 #include <cstring>
@@ -149,7 +150,7 @@ unordered_map<uintptr_t, string> construct_map(const char* filename, bool remove
   return retmap;
 }
 
-void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size, unordered_map<uint64_t, memory_page_t>& pages, sqlite3* db) {
+void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size, map<uint64_t, memory_page_t>& pages, sqlite3* db) {
   ifstream pfile;
   pfile.open(fname);
   string line;
@@ -604,7 +605,7 @@ int main(int argc, char* argv[]) {
 
   int chunk_size = ceil((double)num_structs / (double)num_threads);
   vector<thread> workers{num_threads};
-  unordered_map<uint64_t, memory_page_t> all_pages{};
+  map<uint64_t, memory_page_t> all_pages{};
   unordered_map<uintptr_t, int> all_raw_type_count{};
   unordered_set<string> all_type_set{};
   unordered_map<size_t, int> all_size_class_counts{};
@@ -717,26 +718,31 @@ int main(int argc, char* argv[]) {
   unordered_map<uint64_t, memory_page_t> boundary_crossers{};
   cout << "Number of pages: " << all_pages.size() << endl;
 
-  for (auto& p: all_pages) {
-    if (p.second.sampled == CTD_NOT_SAMPLED) {
+  for (map<uint64_t, memory_page_t>::reverse_iterator p = all_pages.rbegin(); p != all_pages.rend(); p++) {
+    if (p->second.sampled == CTD_NOT_SAMPLED) {
       bool take_for_type = false;
-      for (auto& tp: p.second.included_types) {
+      for (auto& tp: p->second.included_types) {
         if (all_raw_type_count[tp] < num_pages_per_type) {
-          p.second.sampled = CTD_SAMPLED_YES;
+          p->second.sampled = CTD_SAMPLED_YES;
           take_for_type = true;
           break;
         }
       }
       if (take_for_type) {
-        for (auto& tp: p.second.included_types)
+        for (auto& tp: p->second.included_types)
           all_raw_type_count[tp]++;
       }
     }
-    if (p.second.sampled == CTD_NOT_SAMPLED)
-        p.second.sampled = (p.second.has_perf_addr || rand() < sample_portion*RAND_MAX) ? CTD_SAMPLED_YES : CTD_SAMPLED_NO;
+    if (p->second.sampled == CTD_NOT_SAMPLED)
+        p->second.sampled = (p->second.has_perf_addr || rand() < sample_portion*RAND_MAX) ? CTD_SAMPLED_YES : CTD_SAMPLED_NO;
 
-    if (p.second.sampled == CTD_SAMPLED_YES) {
-      node_t* n = p.second.events.head;
+
+    /* BUG: if you don't take page A and then you DO take page A+1, and there are events that cross the boundary from 
+    page A to page A+1, these events won't be taken
+      POSSIBLE SOLUTION: sort pages in descending order so that you consider A+1 first?
+    */
+    if (p->second.sampled == CTD_SAMPLED_YES) {
+      node_t* n = p->second.events.head;
       unordered_map<uint64_t, size_t> last_alloc_size{};
       while (n != nullptr) {
         info_t* event = n->data;
@@ -768,7 +774,7 @@ int main(int argc, char* argv[]) {
         }
         
         if (event->file && file_map.find((uintptr_t) event->file) == file_map.end()) {
-          printf("FAILED to find file: %p\n", (uintptr_t) event->file);
+          printf("FAILED to find file: %lu\n", (uintptr_t) event->file);
         }
         const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
         const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
