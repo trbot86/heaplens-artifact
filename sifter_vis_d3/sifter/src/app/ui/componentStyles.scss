@@ -261,16 +261,23 @@ $timeGraphSliderThumbWidth: 12px;
 /* Cache layout */
 
 #cacheSetGroup {
+    display: flex;
     width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 10px;
 }
 
 #cacheHeader {
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 100%;
 }
 
-#cacheSettingsDiv {
-    margin-left: auto;
-    justify-content: flex-end;
+#cacheBoxesContainer {
+    display: flex;
+    align-items: center;
+    justify-items: center;
 }

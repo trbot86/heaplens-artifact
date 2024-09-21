@@ -80,6 +80,9 @@ export const testLineData = {
     ]
 };
 
+export const testMinTs = 223;
+export const testMaxTs = 512;
+
 export const testMaxPointsPerLine = 50;
 
 export const testCacheInfo = {
@@ -87,3 +90,29 @@ export const testCacheInfo = {
     'L2': {size: 2097152, assoc: 8},
     'L3': {size: 4194304, assoc: 8}
 };
+
+export const testNumBuckets = 2000;
+
+export const testMinAndMaxOccPerBucket = new Array(testMaxTs - testMinTs).fill(undefined);
+export const testCacheDataPerBucket = new Array(64).fill(undefined)
+    .map(() => {
+            return new Array(testMaxTs - testMinTs).fill(undefined).map((d, i) => {
+                    const typeData = Object.keys(testLineData).reduce((map, tp) => {
+                        map[tp] = Math.floor(Math.random()*10);
+                        return map;
+                    }, {});
+                    const totalOcc = Object.values(typeData).reduce((acc, curr) => acc + curr, 0);
+                    if (!testMinAndMaxOccPerBucket[i]) {
+                        testMinAndMaxOccPerBucket[i] = {min: totalOcc, max: totalOcc};
+                    }
+                    else {
+                        testMinAndMaxOccPerBucket[i].min = Math.min(testMinAndMaxOccPerBucket[i].min, totalOcc);
+                        testMinAndMaxOccPerBucket[i].max = Math.max(testMinAndMaxOccPerBucket[i].max, totalOcc);
+                    }
+                    return {
+                        type: typeData,
+                        total: totalOcc
+                    };
+                });
+            }
+        );

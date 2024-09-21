@@ -192,8 +192,8 @@ function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
                         x2={0}
                         y2={3}
                         style={{
-                            'stroke': 'black',
-                            'stroke-width': '1px'
+                            stroke: 'black',
+                            strokeWidth: '1px'
                         }} />
                 </pattern>
                 <mask id='hatchMask' >

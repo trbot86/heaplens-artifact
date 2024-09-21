@@ -5,7 +5,7 @@ import Legend from '../ui/legendComponent';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
 import { Grid } from '@mui/system';
 import Pages from '../ui/pagesComponent';
-import { testCacheInfo, testColourOfType, testLineData, testMaxPointsPerLine, testPageData, testPerfData, testTypeStats } from '../ui/testdata';
+import { testCacheInfo, testColourOfType, testLineData, testMaxPointsPerLine, testMaxTs, testMinTs, testNumBuckets, testPageData, testPerfData, testTypeStats } from '../ui/testdata';
 import TimeGraph from '../ui/timeGraphComponent';
 import CssBaseline from '@mui/material/CssBaseline';
 import CacheSets from '../ui/cacheSetComponent';
@@ -50,9 +50,20 @@ export function generateColours(types: string[]): TypeToColourMap {
 
 export default function VisPanels() {
     const [pageSize, setPageSize] = useState(INIT_PAGE_SIZE);
-    const [currTs, setCurrTs] = useState(0); //TODO: CHANGE TO INIT TS
+    const [currTs, setCurrTs] = useState(testMinTs); //TODO: CHANGE TO INIT TS
     const [cacheLineSize, setCacheLineSize] = useState(INIT_CACHELINE_SIZE);
     const [colourOfType, setColourOfType] = useState(generateColours(Object.keys(testLineData)));
+
+    const minTs = testMinTs;
+    const maxTs = testMaxTs;
+    const numBuckets = testNumBuckets;
+
+    const [getBucketIdx, setGetBucketTs] = useState(() => {
+        return (ts: number) => {
+            const sizeOfBucket = Math.max(Math.floor((maxTs - minTs) / numBuckets), 1);
+            return Math.floor((ts - minTs) / sizeOfBucket);
+        }
+    });
 
     return (
         <ThemeProvider theme={theme}>
@@ -76,7 +87,8 @@ export default function VisPanels() {
                     className='visPanel'
                     size={4} >
                     <CacheSets
-                        cacheInfo={testCacheInfo} />
+                        cacheInfo={testCacheInfo}
+                        bucketIdx={getBucketIdx(currTs)} />
                 </Grid>
 
                 <Grid
