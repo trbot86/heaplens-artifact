@@ -1,5 +1,5 @@
 'use client';
-import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from 'd3';
 import './componentStyles.scss';
 import { TypeToColourMap } from "../vispanels/page";
@@ -125,12 +125,12 @@ function TimeSlider({ xScale, currTs, setCurrTs } :
     );
 }
 
-function LinePath({ lineData, colour, lineGenerator } :
+const LinePath = forwardRef(({ lineData, colour, lineGenerator, ...props } :
     {
         lineData: SizePoint[],
         colour: d3.RGBColor | d3.HSLColor | null,
         lineGenerator: d3.Line<SizePoint> | null
-    }) {
+    }, ref) => {
     const pathRef = useRef(null);
 
     useEffect(() => {
@@ -140,12 +140,16 @@ function LinePath({ lineData, colour, lineGenerator } :
     }, []);
 
     return (
-        <path 
-            className='timeGraphLine'
-            stroke={colour ? colour.toString() : 'gray'}
-            ref={pathRef} />
+        <g 
+            {...props}
+            ref={ref} >
+            <path
+                className='timeGraphLine'
+                stroke={colour ? colour.toString() : 'gray'}
+                ref={pathRef} />
+        </g>
     );
-}
+});
 
 function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs } :
     {
@@ -242,11 +246,16 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs } :
                     id='linesGroup'
                     clipPath={'url(#timeGraphClip)'} >
                     {
-                        Object.keys(lines).map((tp) => <LinePath
+                        Object.keys(lines).map((tp) =>  <Tooltip 
                                                             key={tp}
-                                                            lineData={lines[tp]}
-                                                            colour={colourOfType[tp]}
-                                                            lineGenerator={lineGenerator.current} />)
+                                                            title={tp}
+                                                            followCursor
+                                                            placement='top' >
+                                                            <LinePath
+                                                                lineData={lines[tp]}
+                                                                colour={colourOfType[tp]}
+                                                                lineGenerator={lineGenerator.current} />
+                                                        </Tooltip>)
                     }
                 </g>
                 <g id='xAxisGroup' />

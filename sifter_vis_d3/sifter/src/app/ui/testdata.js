@@ -82,8 +82,8 @@ export const testLineData = {
 
 export const testMaxPointsPerLine = 50;
 
-export const testCacheInfo = [
-    {name: 'L1', size: 32768, assoc: 8},
-    {name: 'L2', size: 2097152, assoc: 8},
-    {name: 'L3', size: 4194304, assoc: 8}
-];
+export const testCacheInfo = {
+    'L1': {size: 32768, assoc: 8},
+    'L2': {size: 2097152, assoc: 8},
+    'L3': {size: 4194304, assoc: 8}
+};

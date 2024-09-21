@@ -43,12 +43,7 @@ function getRand(min: number, max: number): number {
 
 export function generateColours(types: string[]): TypeToColourMap {
     return types.reduce((map: TypeToColourMap, tp: string) => {
-        const r = getRand(0, 255);
-        const g = r > 127 ? getRand(0, 127) : getRand(128, 255);
-        const b = getRand(0, 255);
-        map[tp] = d3.hsl(d3.color(`rgb(${r}, ${g}, ${b})`));
-        map[tp].s *= 0.8;
-        map[tp].l *= 1.4;
+        map[tp] = d3.color(`hsl(${getRand(0, 360)}, ${getRand(20, 60)}%, ${getRand(35, 55)}%)`);
         return map;
     }, {});
 }
@@ -58,7 +53,6 @@ export default function VisPanels() {
     const [currTs, setCurrTs] = useState(0); //TODO: CHANGE TO INIT TS
     const [cacheLineSize, setCacheLineSize] = useState(INIT_CACHELINE_SIZE);
     const [colourOfType, setColourOfType] = useState(generateColours(Object.keys(testLineData)));
-    const [highlightType, setHighlightType] = useState<string | null>(null);
 
     return (
         <ThemeProvider theme={theme}>

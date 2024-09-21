@@ -163,6 +163,19 @@ $timeGraphSliderThumbWidth: 12px;
     transform: translate($objectLayoutLabelMargin, $objectLayoutLabelMargin);
 }
 
+#objectYAxisGridGroup {
+    pointer-events: none;
+    & .tick:nth-child(odd) line {
+        stroke-opacity: 0.3;
+    }
+    & .tick:nth-child(even) line {
+        stroke-opacity: 0.7;
+    }
+    & path {
+        display: none;
+    }
+}
+
 
 /* Time line graph */
 
@@ -192,6 +205,14 @@ $timeGraphSliderThumbWidth: 12px;
 
 #yAxisGroup {
     transform: translateX($timeGraphYAxisWidth);
+}
+
+.objectBlock {
+    transition: all 0.1s ease;
+    & .objectBlockHovered {
+        filter: drop-shadow(0px 0px 1px rgb(14, 14, 14));
+        transform: translateY(-5px);
+    }
 }
 
 

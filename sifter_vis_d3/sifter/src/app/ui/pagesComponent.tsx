@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import './componentStyles.scss';
 import * as d3 from 'd3';
 import { theme, TypeToColourMap } from '../vispanels/page';
@@ -38,6 +38,68 @@ const OBJECT_LAYOUT_WIDTH = 300;
 const OBJECT_LAYOUT_HEIGHT = 300;
 const OBJECT_LAYOUT_MARGIN = 25;
 
+const SplitBlock = forwardRef(({ obj, colourOfType, pageSize, cacheLineSize, xScale, yScale,
+                                 /*hoveredType, setHoveredType,*/ ...props } : 
+    {
+        obj: MemoryObject,
+        colourOfType: TypeToColourMap,
+        pageSize: number,
+        cacheLineSize: number,
+        xScale: d3.ScaleLinear<number, number, never>,
+        yScale: d3.ScaleLinear<number, number, never>,
+        /*hoveredType: string | null,
+        setHoveredType: (a: string | null) => void*/
+    }, ref) => {
+    return (
+        <g
+            {...props}
+            ref={ref} >
+            {/* onMouseEnter={() => setHoveredType(obj.type)}
+            onMouseLeave={() => setHoveredType(null)} > */}
+            {/* Start chunk of data object */}
+            <rect
+                // className={`objectBlock${obj.type == hoveredType ? ' objectBlockHovered' : ''}`}
+                x={xScale(obj.address % cacheLineSize)}
+                y={yScale(Math.floor((obj.address % pageSize) / cacheLineSize))}
+                width={xScale(Math.min(obj.size, cacheLineSize - (obj.address % cacheLineSize)))}
+                height={yScale(1)}
+                fill={obj.type ? colourOfType[obj.type]?.toString() : 'gray'} />
+            {/* Middle chunk of data object */}
+            <rect
+                // className={`objectBlock${obj.type == hoveredType ? ' objectBlockHovered' : ''}`}
+                x={xScale(0)}
+                y={yScale(Math.floor((obj.address % pageSize) / cacheLineSize) + 1)}
+                width={xScale(cacheLineSize)}
+                height={yScale(Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize))}
+                fill={obj.type ? colourOfType[obj.type]?.toString() : 'gray'}
+                style={{
+                    'visibility': Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize) > 0 ? 'visible' : 'hidden'
+                }} />
+            {/* Last chunk of data object */}
+            <rect
+                // className={`objectBlock${obj.type == hoveredType ? ' objectBlockHovered' : ''}`}
+                x={xScale(0)}
+                y={
+                    yScale(Math.floor((obj.address % pageSize) / cacheLineSize) + 1 // y of middle chunk
+                        + Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize)) // height of middle chunk
+                }
+                width={
+                    xScale(Math.min(cacheLineSize, obj.size
+                        - (cacheLineSize - (obj.address % cacheLineSize)) // size of first chunk
+                        - Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize)*cacheLineSize)) // size of middle chunk
+                }
+                height={yScale(1)}
+                fill={obj.type ? colourOfType[obj.type]?.toString() : 'gray'}
+                style={{
+                    'visibility': obj.size
+                        - (cacheLineSize - (obj.address % cacheLineSize)) // size of first chunk
+                        - Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize)*cacheLineSize // size of middle chunk
+                        > 0 ? 'visible' : 'hidden'
+                }} />
+        </g>
+    );
+});
+
 function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
     {
         data: PageContents,
@@ -46,8 +108,7 @@ function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
         cacheLineSize: number
     }) {
     const objSVG = useRef(null);
-
-    console.log(`Here is cls: ${cacheLineSize}, ps: ${pageSize}`);
+    const [hoveredType, setHoveredType] = useState<string | null>(null);
 
     const xScale = d3.scaleLinear().domain([0, cacheLineSize]).range([0, OBJECT_LAYOUT_WIDTH]);
     const yScale = d3.scaleLinear().domain([0, Math.floor(pageSize / cacheLineSize)]).range([0, OBJECT_LAYOUT_HEIGHT]);
@@ -66,60 +127,51 @@ function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
         curObjSVG.select('#objectYAxisGroup')
             .call(yAxis);
         curObjSVG.select('#objectYAxisGridGroup')
-            .call(yAxisGrid)
-            .selectAll('.tick')
-            // .filter((d, i) => i % 2 === 1)
-            .select('line')
-            // .style('stroke', theme.palette.background.default)
-            .attr('stroke-opacity', 0.2);
-        curObjSVG.select('#objectYAxisGridGroup')
-            .select('path')
-            .style('display', 'none');
+            .call(yAxisGrid);
 
-        const objData = curObjSVG.select('#objectGroup')
-            .selectAll('.dataObjectGroup')
-            .data(data.events, (d: MemoryObject) => `${d.address}-${d.allocTs}`);
-        const blockGroup = objData.enter()
-            .append('g')
-            .attr('class', 'dataObjectGroup');
+        // const objData = curObjSVG.select('#objectGroup')
+        //     .selectAll('.dataObjectGroup')
+        //     .data(data.events, (d: MemoryObject) => `${d.address}-${d.allocTs}`);
+        // const blockGroup = objData.enter()
+        //     .append('g')
+        //     .attr('class', 'dataObjectGroup');
 
-
-        // Start chunk of data object
-        blockGroup.append('rect')
-            .attr('data-blockkind', 'start')
-            .attr('x', (d) => xScale(d.address % cacheLineSize))
-            .attr('y', (d) => yScale(Math.floor((d.address % pageSize) / cacheLineSize)))
-            .attr('width', (d) => xScale(Math.min(d.size, cacheLineSize - (d.address % cacheLineSize))))
-            .attr('height', (d) => yScale(1))
-            .attr('fill', (d) => d.type ? colourOfType[d.type]?.toString() : 'gray');
+        // // Start chunk of data object
+        // blockGroup.append('rect')
+        //     .attr('data-blockkind', 'start')
+        //     .attr('x', (d) => xScale(d.address % cacheLineSize))
+        //     .attr('y', (d) => yScale(Math.floor((d.address % pageSize) / cacheLineSize)))
+        //     .attr('width', (d) => xScale(Math.min(d.size, cacheLineSize - (d.address % cacheLineSize))))
+        //     .attr('height', (d) => yScale(1))
+        //     .attr('fill', (d) => d.type ? colourOfType[d.type]?.toString() : 'gray');
         
-        // Middle chunk of data object
-        blockGroup.append('rect')
-            .attr('x', (d) => xScale(0))
-            .attr('y', (d) => yScale(Math.floor((d.address % pageSize) / cacheLineSize) + 1))
-            .attr('width', xScale(cacheLineSize))
-            .attr('height', (d) => yScale(Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize)))
-            .attr('fill', (d) => d.type ? colourOfType[d.type]?.toString() : 'gray')
-            .style('visibility', (d) => Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize) > 0 ? 'visible' : 'hidden');
+        // // Middle chunk of data object
+        // blockGroup.append('rect')
+        //     .attr('x', (d) => xScale(0))
+        //     .attr('y', (d) => yScale(Math.floor((d.address % pageSize) / cacheLineSize) + 1))
+        //     .attr('width', xScale(cacheLineSize))
+        //     .attr('height', (d) => yScale(Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize)))
+        //     .attr('fill', (d) => d.type ? colourOfType[d.type]?.toString() : 'gray')
+        //     .style('visibility', (d) => Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize) > 0 ? 'visible' : 'hidden');
 
-        // Last chunk of data object
-        blockGroup.append('rect')
-            .attr('x', (d) => xScale(0))
-            .attr('y', (d) => yScale(Math.floor((d.address % pageSize) / cacheLineSize) + 1 // y of middle chunk
-                                    + Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize))) // height of middle chunk
-            .attr('width', (d) => xScale(Math.min(cacheLineSize, d.size
-                                                - (cacheLineSize - (d.address % cacheLineSize)) // size of first chunk
-                                                - Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize)*cacheLineSize))) // size of middle chunk
-            .attr('height', yScale(1))
-            .attr('fill', (d) => d.type ? colourOfType[d.type]?.toString() : 'gray')
-            .style('visibility', (d) => d.size
-                - (cacheLineSize - (d.address % cacheLineSize)) // size of first chunk
-                - Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize)*cacheLineSize // size of middle chunk
-                > 0 ? 'visible' : 'hidden');
+        // // Last chunk of data object
+        // blockGroup.append('rect')
+        //     .attr('x', (d) => xScale(0))
+        //     .attr('y', (d) => yScale(Math.floor((d.address % pageSize) / cacheLineSize) + 1 // y of middle chunk
+        //                             + Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize))) // height of middle chunk
+        //     .attr('width', (d) => xScale(Math.min(cacheLineSize, d.size
+        //                                         - (cacheLineSize - (d.address % cacheLineSize)) // size of first chunk
+        //                                         - Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize)*cacheLineSize))) // size of middle chunk
+        //     .attr('height', yScale(1))
+        //     .attr('fill', (d) => d.type ? colourOfType[d.type]?.toString() : 'gray')
+        //     .style('visibility', (d) => d.size
+        //         - (cacheLineSize - (d.address % cacheLineSize)) // size of first chunk
+        //         - Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize)*cacheLineSize // size of middle chunk
+        //         > 0 ? 'visible' : 'hidden');
 
-        objData.exit()
-            .remove();
-    }, [data, colourOfType]);
+        // objData.exit()
+        //     .remove();
+    }, [cacheLineSize]);
     
     return (
         <svg
@@ -127,7 +179,48 @@ function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
             width={OBJECT_LAYOUT_WIDTH + OBJECT_LAYOUT_MARGIN + 5}
             height={OBJECT_LAYOUT_HEIGHT + OBJECT_LAYOUT_MARGIN + 5}
             ref={objSVG} >
-            <g id='objectGroup' />
+            <defs>
+                <pattern
+                    id='diagHatch'
+                    width={3}
+                    height={3}
+                    patternTransform='rotate(45, 0, 0)'
+                    patternUnits='userSpaceOnUse' >
+                    <line 
+                        x1={0}
+                        y1={0}
+                        x2={0}
+                        y2={3}
+                        style={{
+                            'stroke': 'black',
+                            'stroke-width': '1px'
+                        }} />
+                </pattern>
+                <mask id='hatchMask' >
+                    <rect
+                        x={0}
+                        y={0}
+                        width={xScale(cacheLineSize)}
+                        height={yScale(cacheLineSize)}
+                        fill='url(#diagHatch)' />
+                </mask>
+            </defs>
+            <g id='objectGroup' >
+                {
+                    data.events.map((event: MemoryObject) => <Tooltip title={event.type} 
+                                                                key={`${event.address}-${event.allocTs}`} >
+                                                                <SplitBlock
+                                                                    obj={event}
+                                                                    colourOfType={colourOfType}
+                                                                    pageSize={pageSize}
+                                                                    cacheLineSize={cacheLineSize}
+                                                                    xScale={xScale}
+                                                                    yScale={yScale} />
+                                                                    {/* hoveredType={hoveredType}
+                                                                    setHoveredType={setHoveredType} /> */}
+                                                             </Tooltip>)
+                }
+            </g>
             <g id='objectXAxisGroup' />
             <g id='objectYAxisGridGroup' />
             <g id='objectYAxisGroup' />

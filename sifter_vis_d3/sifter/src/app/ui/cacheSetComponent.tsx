@@ -5,29 +5,38 @@ import { IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/mater
 import { useState } from "react";
 
 interface CacheInfo {
-    name: string,
     size: number,
     assoc: number
 }
 
-function CacheHeader({ allCacheInfo, selCache, setSelCache } : 
+interface CacheInfoMap {
+    [a: string]: CacheInfo
+}
+
+interface CacheContents {
+    [type: string]: number
+}
+
+function CacheHeader({ allCacheInfo, selCacheName, setSelCacheName } : 
     {
-        allCacheInfo: CacheInfo[],
-        selCache: CacheInfo,
-        setSelCache: (a: CacheInfo) => void
+        allCacheInfo: CacheInfoMap,
+        selCacheName: string,
+        setSelCacheName: (a: string) => void
     }) {
     return (
         <div id='cacheHeader' >
             <ToggleButtonGroup 
                 id='cacheSetSelector'
                 exclusive
-                value={selCache.name}
+                value={selCacheName}
                 size='small'
-                onChange={(e, val) => setSelCache(val)} >
+                onChange={(e, val) => setSelCacheName(val)} >
                 {
-                    allCacheInfo.map((cache) => <ToggleButton value={cache.name} >
-                                                    {cache.name}
-                                                </ToggleButton>)
+                    Object.keys(allCacheInfo).map((name) => <ToggleButton 
+                                                                key={name}
+                                                                value={name} >
+                                                                {name}
+                                                            </ToggleButton>)
                 }
             </ToggleButtonGroup>
             <div id='cacheSettingsDiv' >
@@ -43,24 +52,33 @@ function CacheHeader({ allCacheInfo, selCache, setSelCache } :
     );
 }
 
-function CacheBoxes() {
+function CacheBoxes({ cacheInfo, selCacheName, cacheDataPerBucket } : 
+    {
+        cacheInfo: CacheInfoMap,
+        selCacheName: string,
+        cacheDataPerBucket: {[bucket: number]: CacheContents[]}
+    }) {
+    const [cacheBoxesWidth, setCacheBoxesWidth] = useState();
+
     return (
-        <></>
+        <svg>
+            <></>
+        </svg>
     );
 }
 
 export default function CacheSets({ cacheInfo } : 
     {
-        cacheInfo: CacheInfo[]
+        cacheInfo: CacheInfoMap
     }) {
-    const [selCache, setSelCache] = useState(cacheInfo[0]);
+    const [selCacheName, setSelCacheName] = useState(Object.keys(cacheInfo)[0]);
 
     return (
         <div id='cacheSetGroup' >
             <CacheHeader
                 allCacheInfo={cacheInfo}
-                selCache={selCache}
-                setSelCache={setSelCache} />
+                selCacheName={selCacheName}
+                setSelCacheName={setSelCacheName} />
             <CacheBoxes />
         </div>
     );
