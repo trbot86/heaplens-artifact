@@ -1,0 +1,17 @@
+
+#fileSelectBox {
+  width: 30vw;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -15vw;
+  margin-top: -40vh;
+
+  & #fileListDiv {
+    height: 90%;
+    overflow: scroll;
+  }
+}

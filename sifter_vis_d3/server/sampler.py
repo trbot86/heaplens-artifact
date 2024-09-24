@@ -26,12 +26,15 @@ def replace_nan(event, key):
 
 class Sampler:
 
-    def __init__(self, dbfile, page_size=4096):
-        self.con = sqlite3.connect(dbfile)
+    def __init__(self, dbfile, page_size=4096, cache_line_size=64, num_buckets=2000):
+        self.fname = dbfile
         self.all_data = self.get_all_records(page_size)
+        self.page_size = page_size
+        self.cache_line_size = cache_line_size
+        self.num_buckets = num_buckets
 
     def __del__(self):
-        self.con.close()
+        return
 
     def add_free_types(self, df):
         df.sort_values('ts', inplace=True)
@@ -60,6 +63,7 @@ class Sampler:
         return df.loc[df["is_alloc"] == 1,:].drop(columns=["is_alloc"]).dropna(subset=["allocTs"])
     
     def get_all_records(self, page_size=4096):
+        con = sqlite3.connect(self.fname)
         df = pd.read_sql_query("""SELECT FILE as file,
                                     SIZE as size,
                                     ADDRESS as addr,
@@ -67,22 +71,30 @@ class Sampler:
                                     TIMESTAMP as ts,
                                     isNew as is_alloc
                                 FROM SUPERTABLE""",
-                                self.con)
+                                con = sqlite3.connect(self.fname))
                                 # dtype={'file': object,
                                 #        'size': int,
                                 #        'addr': int,
                                 #        'type': object,
                                 #        'ts': int,
                                 #        'is_alloc': int})
+        con.close()
         return df
+    
+    def types(self):
+        print("Here are the types:")
+        print(self.all_data['type'].unique().tolist())
+        return self.all_data['type'].unique().tolist()
     
     def get_counts(self):
         try:
+            con = sqlite3.connect(self.fname)
             df = pd.read_sql_query("""SELECT TYPE as type,
                                         ALLOCS as numAllocs,
                                         PAGES as numPages
                                     FROM STATS""",
-                                    self.con)
+                                    con)
+            con.close()
             return df
         except:
             return pd.DataFrame(columns=['type', 'numAllocs', 'numPages'])
@@ -209,12 +221,12 @@ class Sampler:
         last_allocs = last_allocs.merge(df, how='left', on=['addr', 'type', 'allocTs'])
         return last_allocs
     
-    def get_all_lines_and_stats(self, num_buckets=1000, cls=64):
-        recs = self.get_all_records()
+    def get_all_lines_and_stats(self):
+        recs = self.all_data
         df = self.add_free_types(recs).dropna(subset=['file','size','type'])
         min_ts = df['ts'].min()
         max_ts = df['ts'].max()
-        bucket_size = (max_ts - min_ts) / num_buckets
+        bucket_size = (max_ts - min_ts) / self.num_buckets
         df.loc[:,'bucket'] = ((df['ts'] - min_ts) // bucket_size).astype('Int64')
 
         # print(df)
@@ -235,18 +247,20 @@ class Sampler:
             #     change_point_alg = rpt.Window(width=150, model='l2', min_size=CHANGE_POINT_THRESHOLD).fit(df_pts)
             #     change_pts[tp] = list(map(int, change_point_alg.predict(pen=20)))
 
-        objects = self.get_objects(recs) if len(recs.index) < 2000000 else self.get_last_object_per_bucket(self.get_objects(recs), num_buckets).drop(columns=['bucket'])
+        # objects = self.get_objects(recs) if len(recs.index) < 2000000 else self.get_last_object_per_bucket(self.get_objects(recs), self.num_buckets).drop(columns=['bucket'])
 
         # print(f"cols in objects: {self.get_objects(recs).columns}")
         # print(f"cols in objects: {objects.columns}")
 
-        return {'recs': objects.drop(columns=['file']).to_dict('records'), 'pts': pts, 'changes': change_pts,
-                'stats': {'single': self.get_stats(recs, cls), 'double': self.get_stats(recs, 2*cls)},
+        return {'pts': pts,
+                'changes': change_pts,
+                'stats': {'single': self.get_stats(recs, self.cache_line_size), 'double': self.get_stats(recs, 2*self.cache_line_size)},
                 'fields': self.get_fields(s.replace(' ', '') for s in df['type'].unique()),
                 'counts': self.get_counts().set_index('type').to_dict('index')}
         # 'records': df.to_dict(orient='records'), 
 
     def get_records_in_interval(self, start_ts, end_ts, page_size=4096):
+        con = sqlite3.connect(self.fname)
         df = pd.read_sql_query("""SELECT FILE as file,
                                     SIZE as size,
                                     ADDRESS as addr,
@@ -255,13 +269,14 @@ class Sampler:
                                     isNew as is_alloc
                                 FROM SUPERTABLE
                                 WHERE is_alloc=0 OR (ts <= {} AND is_alloc=1)""".format(end_ts),
-                                self.con)
+                                con)
                                 # dtype={'file': object,
                                 #        'size': int,
                                 #        'addr': int,
                                 #        'type': object,
                                 #        'ts': int,
                                 #        'is_alloc': int})
+        con.close()
         return df
         # TODO: change this to get alloc events before start if matching free is after start
         # TODO: just send the objects themselves, not individual allocs & frees
@@ -269,37 +284,41 @@ class Sampler:
     
     def get_perf_data(self):
         try:
+            con = sqlite3.connect(self.fname)
             df = pd.read_sql_query("""SELECT CLADDRESS as cl_addr,
                                         HITM as hitm
                                     FROM PERF""",
-                                    self.con)
+                                    con)
+            con.close()
             return df
         except:
             return pd.DataFrame({"cl_addr": [], "hitm": []})
 
     def get_fields(self, types):
         try:
+            con = sqlite3.connect(self.fname)
             df = pd.read_sql_query("""SELECT TYPE as type,
                                         SUBTYPE as subtype,
                                         NAME as name,
                                         SIZE as size,
                                         OFFSET as offset
                                     FROM FIELDS""",
-                                    self.con)
+                                    con)
+            con.close()
             return {k: v.to_dict(orient='records') for k, v in df[df['type'].isin(types)].set_index('type').groupby(level=0)}
         except:
             return dict()
 
-    def get_clusters_of_pages(self, start_ts, end_ts, type_data, page_size=4096, alg='dbscan', cls=64, num_buckets=1000):
-        recs = self.get_records_in_interval(start_ts, end_ts, page_size) if start_ts > 0 and end_ts > 0 else self.get_all_records()
+    def get_clusters_of_pages(self, start_ts, end_ts, type_data, alg='dbscan'):
+        # recs = self.get_records_in_interval(start_ts, end_ts, page_size) if start_ts > 0 and end_ts > 0 else self.get_all_records()
+        recs = self.all_data
         # df = self.__add_free_types(recs).dropna(subset=['size'])
         df = self.get_objects(recs)
         df = df.drop(df[df['freeTs'] < start_ts].index)
-        df.loc[:,'page_num'] = df.loc[:,'addr'] // page_size
+        df.loc[:,'page_num'] = df.loc[:,'addr'] // self.page_size
 
         perf_df = self.get_perf_data()
-        #TODO: should the following be multiplied by cls? Or is this just raw virt address?
-        perf_df.loc[:,'page_num'] = perf_df.loc[:,'cl_addr'] // page_size
+        perf_df.loc[:,'page_num'] = perf_df.loc[:,'cl_addr'] // self.page_size
 
         filter_types = pd.DataFrame({'type': list(type_data.keys()), 'mask': list(type_data.values())})
         type_entries = df.merge(filter_types, how='left', on='type')
@@ -309,7 +328,7 @@ class Sampler:
         pages_to_keep = type_entries[type_entries['mask']]['page_num']
         df = df[df['page_num'].isin(pages_to_keep)]
 
-        last_allocs = self.get_last_object_per_bucket(df, num_buckets)
+        last_allocs = self.get_last_object_per_bucket(df, self.num_buckets)
 
         # last_allocs.loc[:,'page_num'] = last_allocs.loc[:,'addr'] // page_size
         # df.loc[:,'page_num'] = df.loc[:,'addr'] // page_size
@@ -329,7 +348,7 @@ class Sampler:
         # merged = pivot_allocs.merge(pivot_frees, how='left', on='page_num', suffixes=('_alloc', '_free')).fillna(value=0)
 
         # Add the double cacheline alignment to each row
-        df.loc[:,'align'] = df.loc[:,'addr'] % (2*cls)
+        df.loc[:,'align'] = df.loc[:,'addr'] % (2*self.cache_line_size)
         # For each page, type, and alignment, count the number of objects of that type at that alignment in that page
         grouped = df.groupby(['page_num', 'type', 'align'])['size'].count()
         # Rename the 'size' column to 'count'
@@ -377,13 +396,13 @@ class Sampler:
 
         return labeled, merged, perf_df
 
-    def get_sample_of_pages(self, start_ts, end_ts, type_data, page_size=4096, cls=64, cluster_alg='dbscan', 
-                            max_run_length=3, max_runs_from_cluster=2, num_buckets=1000, include_all_noise=True):
-        labeled_data, features, perf_df = self.get_clusters_of_pages(start_ts, end_ts, type_data, page_size, alg=cluster_alg, cls=cls, num_buckets=num_buckets)
+    def get_sample_of_pages(self, start_ts, end_ts, type_data, cluster_alg='dbscan', 
+                            max_run_length=3, max_runs_from_cluster=2, include_all_noise=True):
+        labeled_data, features, perf_df = self.get_clusters_of_pages(start_ts, end_ts, type_data, alg=cluster_alg)
         # .reset_index().set_index('cluster')
         clusters = labeled_data.groupby('cluster', sort=False).groups
 
-        max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(page_size, 2), 2))
+        max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(self.page_size, 2), 2))
         # max_pages = 1 # DEBUGGING
         sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
         # sampled_pages.add(34165069575)

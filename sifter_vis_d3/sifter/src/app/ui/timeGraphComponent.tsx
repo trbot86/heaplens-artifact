@@ -5,7 +5,7 @@ import './componentStyles.scss';
 import { TypeToColourMap } from "../vispanels/page";
 import { Slider, styled, Tooltip } from "@mui/material";
 
-interface SizePoint {
+export interface SizePoint {
     ts: number,
     size: number
 }
@@ -35,18 +35,18 @@ const SIZE_UNIT_SUFF = [
     'GiB'
 ];
 
-function getSampledAndSortedLine(line: SizePoint[], maxPointsPerLine: number): SizePoint[] {
-    const sortedLine = line.toSorted((a, b) => a.ts - b.ts);
+function getSampledLine(sortedLine: SizePoint[], maxPointsPerLine: number): SizePoint[] {
+    // const sortedLine = line.toSorted((a, b) => a.ts - b.ts);
     const retLine: SizePoint[] = [];
-    const minTs = line[0].ts;
-    const maxTs = line[line.length - 1].ts;
+    const minTs = sortedLine[0].ts;
+    const maxTs = sortedLine[sortedLine.length - 1].ts;
     const quantum: number = (maxTs - minTs) / maxPointsPerLine;
     
     let prevDiv = 0,
         prevSize = 0;
     sortedLine.forEach((pt) => {
         const currDiv = Math.ceil(pt.ts / quantum);
-        if (currDiv > prevDiv || line.length <= maxPointsPerLine) {
+        if (currDiv > prevDiv || sortedLine.length <= maxPointsPerLine) {
             retLine.push({ts: pt.ts, size: prevSize});
             retLine.push(pt);
             prevDiv = currDiv;
@@ -284,7 +284,7 @@ export default function TimeGraph({ lines, maxPointsPerLine, colourOfType, currT
         setCurrTs: (a: number) => void
     }) {
     const sampledAndSortedLines = Object.keys(lines).reduce((retLines: LineData, tp: string) => {
-        retLines[tp] = getSampledAndSortedLine(lines[tp], maxPointsPerLine);
+        retLines[tp] = getSampledLine(lines[tp], maxPointsPerLine);
         return retLines;
     }, {});
     const minTs: number = Object.keys(sampledAndSortedLines)

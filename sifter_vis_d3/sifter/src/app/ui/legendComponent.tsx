@@ -8,8 +8,8 @@ import { generateColours, TypeToColourMap } from '../vispanels/page';
 import { Casino } from '@mui/icons-material';
 
 interface TypeStat {
-    allocs: number,
-    pages: number
+    allocs: number | null,
+    pages: number | null
 }
 
 interface TypeToStatsMap {
@@ -41,10 +41,10 @@ function LegendTableHeader() {
     );
 }
 
-function LegendTableFooter({ types, onFilterTextChange, setColourOfType } : 
+function LegendTableFooter({ types, setFilterText, setColourOfType } : 
     {
         types: string[],
-        onFilterTextChange: (a: string) => void,
+        setFilterText: (a: string) => void,
         setColourOfType: (a: TypeToColourMap) => void
     }) {
     return (
@@ -71,39 +71,7 @@ function LegendTableFooter({ types, onFilterTextChange, setColourOfType } :
                             size='small'
                             fullWidth
                             maxRows={1}
-                            onChange={(e) => onFilterTextChange(e.target.value)}
-                            // sx={{
-                            //     '@media (prefers-color-scheme: dark)': {
-                            //         input: {
-                            //             '&:hover': {
-                            //                 backgroundColor: '#333333'
-                            //             },
-                            //             backgroundColor: '#2f2f2f',
-                            //             color: 'e0e0e0'
-                            //         },
-                            //         '& .MuiInputLabel-root': {
-                            //             color: '#a0a0a0',
-                            //             '&.Mui-focused': {
-                            //                 color: '#e0e0e0'
-                            //             }
-                            //         },
-                            //         '& .MuiInputBase-input': {
-                            //             color: '#e0e0e0'
-                            //         },
-                            //         '& .MuiFilledInput-underline': {
-                            //             '&.Mui-focused:after': {
-                            //                 borderBottomColor: '#e0e0e0'
-                            //             },
-                            //             '&:hover:before': {
-                            //                 borderBottomColor: '#161616'
-                            //             },
-                            //             ':after': {
-                            //                 borderBottomColor: '#161616'
-                            //             }
-                            //         }
-                            //     }
-                            // }} 
-                            />
+                            onChange={(e) => setFilterText(e.target.value)} />
                 </td>
                 <td></td>
                 <td></td>
@@ -163,7 +131,7 @@ export default function Legend({ colourOfType, setColourOfType, typeStats } :
             </tbody>
             <LegendTableFooter
                 types={Object.keys(typeStats)}
-                onFilterTextChange={setFilterText}
+                setFilterText={setFilterText}
                 setColourOfType={setColourOfType} />
         </table>
     );

@@ -2,7 +2,7 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import './componentStyles.scss';
 import * as d3 from 'd3';
-import { theme, TypeToColourMap } from '../vispanels/page';
+import { TypeToColourMap } from '../vispanels/page';
 import { Check, Dangerous, DangerousOutlined, LocalFireDepartment, LocalFireDepartmentOutlined, SentimentDissatisfied, SentimentDissatisfiedOutlined, SentimentDissatisfiedRounded, SentimentDissatisfiedSharp, SentimentDissatisfiedTwoTone, SentimentVeryDissatisfied, SentimentVeryDissatisfiedOutlined } from '@mui/icons-material';
 import { Checkbox, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 

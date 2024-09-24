@@ -124,14 +124,18 @@ function CacheBoxArray({ selCacheName, cacheDataPerBucket, minAndMaxOccPerBucket
 
     return (
         <div id='cacheBoxesContainer' >
-            <IconButton 
-                aria-label='decrease-width'
-                onClick={() => {
-                    if (cacheBoxesWidth > minWidth) {
-                        setCacheBoxesWidth(cacheBoxesWidth - 1);
-                    }}} >
-                <Remove />
-            </IconButton>
+            <Tooltip 
+                title='Decrease width'
+                placement='bottom' >
+                <IconButton 
+                    aria-label='decrease-width'
+                    onClick={() => {
+                        if (cacheBoxesWidth > minWidth) {
+                            setCacheBoxesWidth(cacheBoxesWidth - 1);
+                        }}} >
+                    <Remove />
+                </IconButton>
+            </Tooltip>
             {/* TODO: need to hide tooltip completely if mouse over svg but not cache box */}
             <Tooltip 
                 placement='left'
@@ -168,14 +172,18 @@ function CacheBoxArray({ selCacheName, cacheDataPerBucket, minAndMaxOccPerBucket
                     }
                 </svg>
             </Tooltip>
-            <IconButton 
-                aria-label='increase-width'
-                onClick={() => {
-                    if (cacheBoxesWidth < maxWidth) {
-                        setCacheBoxesWidth(cacheBoxesWidth + 1);
-                    }}} >
-                <Add />
-            </IconButton>
+            <Tooltip 
+                title='Increase width'
+                placement='bottom' >
+                <IconButton 
+                    aria-label='increase-width'
+                    onClick={() => {
+                        if (cacheBoxesWidth < maxWidth) {
+                            setCacheBoxesWidth(cacheBoxesWidth + 1);
+                        }}} >
+                    <Add />
+                </IconButton>
+            </Tooltip>
         </div>
     );
 }
