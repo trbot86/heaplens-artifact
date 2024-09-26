@@ -1,9 +1,11 @@
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from sampler import Sampler
+from threading import Lock
 import os
 
 db_sampler = None
+mutex = Lock()
 app = Flask(__name__)
 CORS(app)
 
@@ -16,7 +18,9 @@ def get_fnames():
 @cross_origin(origin='http://localhost:3000')
 def init_sampler(fname, page_size, cache_line_size, num_buckets):
     global db_sampler
-    db_sampler = Sampler(f"../{fname}", page_size, cache_line_size, num_buckets)
+    with mutex:
+        if db_sampler is None:        
+            db_sampler = Sampler(f"../{fname}", page_size, cache_line_size, num_buckets)
     return db_sampler.types() # TODO send error if init failed
 
 @app.route("/get-lines", methods=["GET"])

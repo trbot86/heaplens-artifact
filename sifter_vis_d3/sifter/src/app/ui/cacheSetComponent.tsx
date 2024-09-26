@@ -2,9 +2,12 @@
 
 import { Add, Remove, Settings } from "@mui/icons-material";
 import { IconButton, styled, Theme, ToggleButton, ToggleButtonGroup, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as d3 from 'd3';
 import { testCacheDataPerBucket, testMinAndMaxOccPerBucket } from "./testdata";
+import { getData } from "../vispanels/page";
+import React from "react";
+import { theme } from "../page";
 
 interface CacheInfo {
     size: number,
@@ -15,23 +18,36 @@ interface CacheInfoMap {
     [a: string]: CacheInfo
 }
 
-interface CacheContents {
-    type: {[type: string]: number},
-    total: number
+interface CacheWidthData {
+    min: number,
+    max: number,
+    curr: number
+}
+
+interface CacheData {
+    occ: number[][],
+    idxToTpAndSt: string[],
+    numSets: number
 }
 
 const MAX_CACHE_BOX_SIZE = 60;
 const MAX_CACHE_BOX_ARRAY_WIDTH = 300;
 
+async function getCacheData(cacheInfo: CacheInfo) {
+    return getData(`get-cache-data/${cacheInfo.size}-${cacheInfo.assoc}`, null)
+        .then((resp) => resp.json());
+}
+
+function isSubType(cacheData: CacheData, idx: number) {
+    return cacheData.idxToTpAndSt[idx % cacheData.idxToTpAndSt.length].startsWith('>');
+}
+
 const HtmlTooltip = styled(({ className, ...props } : TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
     ))(({ theme } : { theme: Theme }) => ({
         [`& .${tooltipClasses.tooltip}`]: {
-            backgroundColor: '#f5f5f9',
-            color: 'rgba(0, 0, 0, 0.87)',
-            maxWidth: 220,
+            maxWidth: 500,
             fontSize: theme.typography.pxToRem(12),
-            border: '1px solid #dadde9',
         },
 }));
 
@@ -70,12 +86,11 @@ function CacheHeader({ allCacheInfo, selCacheName, setSelCacheName } :
     );
 }
 
-function CacheBox({ occData, minOcc, maxOcc, bucketIdx, idx, x, y, size, setHoverIdx } : 
+function CacheBox({ totalData, minOcc, maxOcc, idx, x, y, size, setHoverIdx } : 
     {
-        occData: CacheContents[],
+        totalData: number,
         minOcc: number,
         maxOcc: number,
-        bucketIdx: number,
         idx: number,
         x: number,
         y: number,
@@ -85,41 +100,46 @@ function CacheBox({ occData, minOcc, maxOcc, bucketIdx, idx, x, y, size, setHove
     const colScale = d3.scaleLinear().domain([minOcc / 2, (maxOcc + minOcc) / 2, maxOcc]).range(['#ffff91', '#faca1e', '#cf3325']);
     
     return (
-        // <Tooltip 
-        //     title={
-        //         <table>
-        //             <tbody>
-        //             {
-        //                 Object.keys(occData[bucketIdx].type).map((tp: string) =>    <tr key={`cb-${x}-${y}-${tp}`} >
-        //                                                                                 <td>{tp}</td>
-        //                                                                                 <td>{`${occData[bucketIdx].type[tp]} (${(occData[bucketIdx].type[tp] / occData[bucketIdx].total).toFixed(2)}%)`}</td>
-        //                                                                             </tr>)
-        //             }
-        //             </tbody>
-        //         </table>
-        //     } >
         <rect
             x={x*size}
             y={y*size}
             width={size}
             height={size}
-            fill={colScale(occData[bucketIdx].total).toString()}
+            fill={totalData > 0 ? colScale(totalData).toString() : theme.palette.primary.main}
             onMouseEnter={() => setHoverIdx(idx)}
-            onMouseLeave={() => setHoverIdx(null)} />
-        // </Tooltip>
+            onMouseLeave={() => setHoverIdx(null)}
+            stroke={theme.palette.background.default}
+            strokeWidth={1} />
     );
 }
 
-function CacheBoxArray({ selCacheName, cacheDataPerBucket, minAndMaxOccPerBucket, bucketIdx } : 
+function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth, setCacheWidth } : 
     {
         selCacheName: string,
-        cacheDataPerBucket: CacheContents[][],
-        minAndMaxOccPerBucket: {min: number, max: number}[],
-        bucketIdx: number
+        cacheData: CacheData,
+        bucketIdx: number,
+        cacheWidth: CacheWidthData,
+        setCacheWidth: (a: CacheWidthData) => void
     }) {
-    const minWidth = useMemo(() => Math.floor(Math.sqrt(cacheDataPerBucket.length)), [selCacheName]);
-    const maxWidth = useMemo(() => cacheDataPerBucket.length, [selCacheName]);
-    const [cacheBoxesWidth, setCacheBoxesWidth] = useState(minWidth);
+    const aggDataPerBucket: {min: number, max: number}[] = useMemo(() => {
+        return  cacheData.occ.map((bucket) => {
+                    return  bucket.filter((v, i) => !isSubType(cacheData, i))
+                                .reduce((res: {min: number, max: number}, v: number) => {
+                                    res.min = Math.min(res.min, v);
+                                    res.max = Math.max(res.max, v);
+                                    return res;
+                                }, {min: Infinity, max: 0});
+                });
+    }, [cacheData]);
+    const totalData: number[][] = useMemo(() => {
+        return  cacheData.occ.map((bucket) => {
+                    return  bucket.reduce((res, v, i) => {
+                                    if (!isSubType(cacheData, i))
+                                        res[Math.floor(i / cacheData.idxToTpAndSt.length)] += v;
+                                    return res;
+                                }, new Array(cacheData.numSets).fill(0));
+                });
+    }, [cacheData]);
     const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
     return (
@@ -130,24 +150,32 @@ function CacheBoxArray({ selCacheName, cacheDataPerBucket, minAndMaxOccPerBucket
                 <IconButton 
                     aria-label='decrease-width'
                     onClick={() => {
-                        if (cacheBoxesWidth > minWidth) {
-                            setCacheBoxesWidth(cacheBoxesWidth - 1);
+                        if (cacheWidth.curr > cacheWidth.min) {
+                            setCacheWidth({
+                                min: cacheWidth.min,
+                                max: cacheWidth.max,
+                                curr: cacheWidth.curr - 1
+                            });
                         }}} >
                     <Remove />
                 </IconButton>
             </Tooltip>
             {/* TODO: need to hide tooltip completely if mouse over svg but not cache box */}
-            <Tooltip 
+            <HtmlTooltip 
                 placement='left'
                 title={
                     hoverIdx != null ?
                     <table>
                         <tbody>
                         {
-                            Object.keys(cacheDataPerBucket[hoverIdx][bucketIdx].type).map((tp: string) =>    <tr key={`cb-${tp}`} >
-                                                                                            <td>{tp}</td>
-                                                                                            <td>{`${cacheDataPerBucket[hoverIdx][bucketIdx].type[tp]} (${(cacheDataPerBucket[hoverIdx][bucketIdx].type[tp]*100 / cacheDataPerBucket[hoverIdx][bucketIdx].total).toFixed(2)}%)`}</td>
-                                                                                        </tr>)
+                            cacheData.occ[bucketIdx].slice(hoverIdx*cacheData.idxToTpAndSt.length, (hoverIdx+1)*cacheData.idxToTpAndSt.length)
+                                .map((v: number, tidx: number) => ({val: v, tidx: tidx}))
+                                .filter((v) => !isSubType(cacheData, v.tidx) && v.val > 0)
+                                .sort((a, b) => b.val - a.val)
+                                .map((v: {val: number, tidx: number}) =>    <tr key={`cb-${v.tidx}`} >
+                                                                                <td>{cacheData.idxToTpAndSt[v.tidx]}</td>
+                                                                                <td>{`${v.val} (${(v.val*100 / totalData[bucketIdx][hoverIdx]).toFixed(2)}%)`}</td>
+                                                                            </tr>)
                         }
                         </tbody>
                     </table> :
@@ -157,29 +185,34 @@ function CacheBoxArray({ selCacheName, cacheDataPerBucket, minAndMaxOccPerBucket
                     id='cacheBoxesSVG'
                     width={MAX_CACHE_BOX_ARRAY_WIDTH}
                     height={MAX_CACHE_BOX_ARRAY_WIDTH} >
-                    {
-                        cacheDataPerBucket.map((cacheBucketData, i) =>  <CacheBox
-                                                                            key={i}
-                                                                            occData={cacheDataPerBucket[i]}
-                                                                            minOcc={minAndMaxOccPerBucket[bucketIdx].min}
-                                                                            maxOcc={minAndMaxOccPerBucket[bucketIdx].max}
-                                                                            bucketIdx={bucketIdx}
-                                                                            idx={i}
-                                                                            x={i % cacheBoxesWidth}
-                                                                            y={Math.floor(i / cacheBoxesWidth)}
-                                                                            size={Math.min(MAX_CACHE_BOX_SIZE, MAX_CACHE_BOX_ARRAY_WIDTH / cacheBoxesWidth)}
-                                                                            setHoverIdx={setHoverIdx} />)
+                    {   
+                        new Array(cacheData.numSets)
+                            .fill(undefined)
+                            .map((e, i) =>  <CacheBox
+                                                key={i}
+                                                totalData={totalData[bucketIdx][i]}
+                                                minOcc={aggDataPerBucket[bucketIdx].min}
+                                                maxOcc={aggDataPerBucket[bucketIdx].max}
+                                                idx={i}
+                                                x={i % cacheWidth.curr}
+                                                y={Math.floor(i / cacheWidth.curr)}
+                                                size={Math.min(MAX_CACHE_BOX_SIZE, MAX_CACHE_BOX_ARRAY_WIDTH / cacheWidth.curr)}
+                                                setHoverIdx={setHoverIdx} />)
                     }
                 </svg>
-            </Tooltip>
+            </HtmlTooltip>
             <Tooltip 
                 title='Increase width'
                 placement='bottom' >
                 <IconButton 
                     aria-label='increase-width'
                     onClick={() => {
-                        if (cacheBoxesWidth < maxWidth) {
-                            setCacheBoxesWidth(cacheBoxesWidth + 1);
+                        if (cacheWidth.curr < cacheWidth.max) {
+                            setCacheWidth({
+                                min: cacheWidth.min,
+                                max: cacheWidth.max,
+                                curr: cacheWidth.curr + 1
+                            });
                         }}} >
                     <Add />
                 </IconButton>
@@ -193,7 +226,21 @@ export default function CacheSets({ cacheInfo, bucketIdx } :
         cacheInfo: CacheInfoMap,
         bucketIdx: number
     }) {
-    const [selCacheName, setSelCacheName] = useState(Object.keys(cacheInfo)[0]);
+    const [cacheData, setCacheData] = useState({occ: [[]], idxToTpAndSt: [''], numSets: 1});
+    const [selCacheName, setSelCacheName] = useState<string>(Object.keys(cacheInfo)[0]);
+    const [cacheWidth, setCacheWidth] = useState<CacheWidthData>({min: 1, max: 1, curr: 1});
+
+    useEffect(() => {
+        getCacheData(cacheInfo[selCacheName])
+            .then((data) => {
+                setCacheData(data)
+                setCacheWidth({
+                    min: Math.floor(Math.sqrt(data['numSets'])),
+                    max: data['numSets'],
+                    curr: Math.floor(Math.sqrt(data['numSets']))
+                });
+        });
+    }, []);
 
     return (
         <div id='cacheSetGroup' >
@@ -203,9 +250,10 @@ export default function CacheSets({ cacheInfo, bucketIdx } :
                 setSelCacheName={setSelCacheName} />
             <CacheBoxArray
                 selCacheName={selCacheName}
-                cacheDataPerBucket={testCacheDataPerBucket}
-                minAndMaxOccPerBucket={testMinAndMaxOccPerBucket}
-                bucketIdx={bucketIdx} />
+                cacheData={cacheData}
+                bucketIdx={bucketIdx}
+                cacheWidth={cacheWidth}
+                setCacheWidth={setCacheWidth} />
         </div>
     );
 }

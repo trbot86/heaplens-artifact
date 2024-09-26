@@ -8,8 +8,8 @@ import { generateColours, TypeToColourMap } from '../vispanels/page';
 import { Casino } from '@mui/icons-material';
 
 interface TypeStat {
-    allocs: number,
-    pages: number
+    numAllocs: number,
+    numPages: number
 }
 
 interface TypeToStatsMap {
@@ -100,8 +100,8 @@ function LegendRow({ typeName, colour, stats } :
                 </div>
             </td>
             <td>{typeName}</td>
-            <td>{stats.allocs}</td>
-            <td>{stats.pages}</td>
+            <td>{stats.numAllocs}</td>
+            <td>{stats.numPages}</td>
         </tr>
     );
 }
@@ -126,7 +126,7 @@ export default function Legend({ colourOfType, setColourOfType, typeStats } :
                                                     key={tp}
                                                     typeName={tp}
                                                     colour={colourOfType[tp]}
-                                                    stats={typeStats[tp] ? typeStats[tp] : {allocs: -1, pages: -1}} />)
+                                                    stats={typeStats[tp] ? typeStats[tp] : {numAllocs: -1, numPages: -1}} />)
                 }
             </tbody>
             <LegendTableFooter

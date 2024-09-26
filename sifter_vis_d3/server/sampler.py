@@ -31,8 +31,8 @@ def replace_nan(event, key):
         event[key] = None
     return event
 
-def get_joined_tname(t, st):
-    return t + "|" + st
+def get_sub_tname(t, st):
+    return ">" + t + "|" + st
 
 def get_bucket(min_ts, max_ts, num_buckets, ts):
     size_of_bucket = max(math.floor(max_ts - min_ts) / num_buckets, 1)
@@ -81,22 +81,19 @@ class Sampler:
     
     def get_all_records(self, page_size=4096):
         con = sqlite3.connect(self.fname)
-        df = pd.read_sql_query("""SELECT FILE as file,
+        dfs = []
+        for chunk in pd.read_sql_query("""SELECT FILE as file,
                                     SIZE as size,
                                     ADDRESS as addr,
                                     TYPE as type,
                                     TIMESTAMP as ts,
                                     isNew as is_alloc
                                 FROM SUPERTABLE""",
-                                con = sqlite3.connect(self.fname))
-                                # dtype={'file': object,
-                                #        'size': int,
-                                #        'addr': int,
-                                #        'type': object,
-                                #        'ts': int,
-                                #        'is_alloc': int})
+                                con = sqlite3.connect(self.fname),
+                                chunksize=100000):
+            dfs.append(chunk)
         con.close()
-        return df
+        return pd.concat(dfs)
     
     def types(self):
         return [tp for tp in self.all_data['type'].unique().tolist() if isinstance(tp, str)]
@@ -272,6 +269,7 @@ class Sampler:
                 'stats': {'single': self.get_stats(recs, self.cache_line_size), 'double': self.get_stats(recs, 2*self.cache_line_size)},
                 'fields': self.get_fields(s.replace(' ', '') for s in df['type'].unique()),
                 'counts': self.get_counts().set_index('type').to_dict('index'),
+                'perf': self.get_perf_data().set_index('cl_addr').to_dict(orient='index'),
                 'minTs': self.min_ts,
                 'maxTs': self.max_ts}
         # 'records': df.to_dict(orient='records'), 
@@ -451,8 +449,7 @@ class Sampler:
         fts = event_labels.index("freeTs")
         return {'page_num_events': {f"{pn*self.page_size}": {'events': [dict(zip(event_labels, replace_nan(event, fts))) for event in v['events']], 'cluster': v['cluster']} for pn, v in dict_merged.items()},
                 'clusters': features.reset_index().loc[:,['cluster','page_num']].groupby('cluster').agg(lambda x: x.tolist()).to_dict(orient='index'),
-                'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()},
-                'perf': perf_df.set_index('cl_addr').to_dict(orient='index')}
+                'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()}}
     
     def get_cache_data(self, size, assoc):
         num_cache_sets = size // (assoc * self.cache_line_size)
@@ -468,8 +465,8 @@ class Sampler:
             i += 1
             if tp in fields:
                 for st in fields[tp]:
-                    tp_and_st_in_order.append(get_joined_tname(tp, st["subtype"]))
-                    tp_and_st_to_idx[get_joined_tname(tp, st["subtype"])] = i
+                    tp_and_st_in_order.append(get_sub_tname(tp, st["subtype"]))
+                    tp_and_st_to_idx[get_sub_tname(tp, st["subtype"])] = i
                     i += 1
 
         data = np.empty(shape=(self.num_buckets + 1, num_cache_sets, len(tp_and_st_in_order)))
@@ -482,7 +479,7 @@ class Sampler:
                     entries.append([obj[FILE_IND],
                                     field_ent["size"],
                                     obj[ADDR_IND] + field_ent["offset"],
-                                    get_joined_tname(obj[TYPE_IND], field_ent["subtype"]),
+                                    get_sub_tname(obj[TYPE_IND], field_ent["subtype"]),
                                     obj[ALLOC_TS_IND],
                                     obj[FREE_TS_IND]])
             for entry in entries:
@@ -510,11 +507,12 @@ class Sampler:
         )
 
         df = pd.DataFrame(flat, index=row_idx, columns=col_idx)
-        df = df[::-1].cumsum()[::-1]
+        df = df.cumsum()
 
         return {
-            "cacheData": df.values.astype(int).tolist(),
-            "idxToTpAndSt": tp_and_st_in_order
+            "occ": df.values.astype(int).tolist(),
+            "idxToTpAndSt": tp_and_st_in_order,
+            "numSets": num_cache_sets
         }
         # return .to_dict(orient="index")
         # return df[::-1].cumsum()[::-1]

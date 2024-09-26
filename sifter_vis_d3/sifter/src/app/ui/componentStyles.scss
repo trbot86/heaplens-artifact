@@ -1,7 +1,7 @@
 /* Pages and objects vars */
 
 $pageCardSVGHeight: 50px;
-$pageCardSVGWidth: 530px;
+$pageCardSVGWidth: 540px;
 $pageCardBorderHeight: calc($pageCardSVGHeight - 10px);
 $pageCardBorderWidth: calc($pageCardSVGWidth - 10px);
 $pageCardBorderBottomHeightLow: 1px;
@@ -48,24 +48,28 @@ $timeGraphSliderThumbWidth: 12px;
 }
 
 #pageAndObjectVis {
+    width: 100%;
+    height: 49.5vh;
     position: relative;
-    top: 20px;
+    top: 5px;
     left: 20px;
     display: flex;
     flex-direction: row;
-    gap: 60px;
+    gap: 30px;
 }
 
 #pageVis {
     display: flex;
     width: 100%;
+    height: 100%;
     flex-direction: column;
 }
 
 #pageRowContainer {
     width: 100%;
+    height: 100%;
     gap: 5px;
-    overflow: auto;
+    overflow: scroll;
 }
 
 #pageRowContainer, .pageRowLabel {
@@ -159,6 +163,11 @@ $timeGraphSliderThumbWidth: 12px;
     stroke: black;
     stroke-width: 1px;
     transform: translateX(calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2));
+}
+
+#objectSVG {
+    position: relative;
+    top: 4vh;
 }
 
 #objectGroup, #objectXAxisGroup, #objectYAxisGroup, #objectYAxisGridGroup {
@@ -283,3 +292,4 @@ $timeGraphSliderThumbWidth: 12px;
     align-items: center;
     justify-items: center;
 }
+

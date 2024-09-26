@@ -1,10 +1,10 @@
 'use client';
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import './componentStyles.scss';
 import * as d3 from 'd3';
-import { TypeToColourMap } from '../vispanels/page';
-import { Check, Dangerous, DangerousOutlined, LocalFireDepartment, LocalFireDepartmentOutlined, SentimentDissatisfied, SentimentDissatisfiedOutlined, SentimentDissatisfiedRounded, SentimentDissatisfiedSharp, SentimentDissatisfiedTwoTone, SentimentVeryDissatisfied, SentimentVeryDissatisfiedOutlined } from '@mui/icons-material';
-import { Checkbox, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import { getData, TypeToColourMap } from '../vispanels/page';
+import { Check, Dangerous, DangerousOutlined, LocalFireDepartment, LocalFireDepartmentOutlined, RadioButtonChecked, SentimentDissatisfied, SentimentDissatisfiedOutlined, SentimentDissatisfiedRounded, SentimentDissatisfiedSharp, SentimentDissatisfiedTwoTone, SentimentVeryDissatisfied, SentimentVeryDissatisfiedOutlined } from '@mui/icons-material';
+import { Checkbox, Icon, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 
 interface MemoryObject {
     file: string | null,
@@ -32,7 +32,7 @@ interface PerfMap {
     }
 }
 
-const PAGE_CARD_SVG_WIDTH = 530;
+const PAGE_CARD_SVG_WIDTH = 540;
 const PAGE_CARD_BORDER_WIDTH = PAGE_CARD_SVG_WIDTH - 10;
 const OBJECT_LAYOUT_WIDTH = 300;
 const OBJECT_LAYOUT_HEIGHT = 300;
@@ -235,24 +235,24 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
         colourOfType: TypeToColourMap,
     }) {
     const ref = useRef(null);
-    const pageScale = d3.scaleLinear().domain([0, pageSize]).range([0, 520]); //TODO get rid of this 520 constant
+    const pageScale = useMemo(() => d3.scaleLinear().domain([0, pageSize]).range([0, PAGE_CARD_BORDER_WIDTH]), [pageSize]);
 
-    useEffect(() => {
-        const rectData = d3.select(ref.current)
-            .select('.pageCardClipGroup')
-            .selectAll('.pageCardObject')
-            .data(objectData.events, (d: MemoryObject) => `${d.addr}-${d.allocTs}`);
-        rectData.enter()
-            .append('rect')
-            .attr('class', 'pageCardObject')
-            .attr('x', (d) => pageScale(d.addr % pageSize))
-            .attr('y', 0)
-            .attr('width', (d) => pageScale(d.size))
-            .attr('fill', (d) => d.type && colourOfType[d.type] ? colourOfType[d.type].toString() : 'black');
-            // .attr('height', 50);
-        rectData.exit()
-            .remove();
-    }, [objectData.events, colourOfType]);
+    // useEffect(() => {
+    //     const rectData = d3.select(ref.current)
+    //         .select('.pageCardClipGroup')
+    //         .selectAll('.pageCardObject')
+    //         .data(objectData.events, (d: MemoryObject) => `${d.addr}-${d.allocTs}`);
+    //     rectData.enter()
+    //         .append('rect')
+    //         .attr('class', 'pageCardObject')
+    //         .attr('x', (d) => pageScale(d.addr % pageSize))
+    //         .attr('y', 0)
+    //         .attr('width', (d) => pageScale(d.size))
+    //         .attr('fill', (d) => d.type && colourOfType[d.type] ? colourOfType[d.type].toString() : 'black');
+    //         // .attr('height', 50);
+    //     rectData.exit()
+    //         .remove();
+    // }, [objectData.events, colourOfType]);
     
     return (
         <svg 
@@ -271,6 +271,15 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                 onClick={() => setSelPageAddr(addr)} />
             <g
                 className='pageCardClipGroup' >
+                {
+                    objectData.events.map((ev) =>   <rect
+                                                        key={`${ev.addr}-${ev.allocTs}`}
+                                                        className='pageCardObject'
+                                                        x={pageScale(ev.addr % pageSize)}
+                                                        y={0}
+                                                        width={pageScale(ev.size)}
+                                                        fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'} />)
+                }
             </g>
         </svg>
     );
@@ -315,25 +324,49 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
                 <div>{`0x${addr.toString(16)}`}</div>
                 <div>{`cluster: ${currData.cluster}`}</div>
             </div>
+            {
+            (addr == selAddr) &&
+            <Icon>
+                <RadioButtonChecked fontSize='small' />
+            </Icon>
+            }
         </div>
     );
 }
 
-export default function Pages({ pageSize, cacheLineSize, pages, perf, colourOfType, currTs } :
+export default function Pages({ pageSize, cacheLineSize, perf, colourOfType, currTs,
+                                clusterAlg, maxRunLength, maxRunsPerCluster, typesToSample } :
     {
         pageSize: number,
         cacheLineSize: number,
-        pages: PageMap,
         perf: PerfMap,
         colourOfType: TypeToColourMap,
-        currTs: number
+        currTs: number,
+        clusterAlg: string,
+        maxRunLength: number,
+        maxRunsPerCluster: number,
+        typesToSample: {[tp: string]: boolean}
     }) {
+    const [pages, setPages] = useState({});
+    const [clusters, setClusters] = useState({});
+    const [features, setFeatures] = useState({});
     const [selPageAddr, setSelPageAddr] = useState(parseInt(Object.keys(pages)[0]));
-    const [focusData, setFocusData] = useState({
-        events: Object.values(pages)[0].events.filter((obj: MemoryObject) => obj.allocTs <= currTs && (!obj.freeTs || obj.freeTs >= currTs)),
-        cluster: Object.values(pages)[0].cluster
-    });
+    const [focusData, setFocusData] = useState({events: [], cluster: 0});
     const [sortMode, setSortMode] = useState<'addr' | 'cluster'>('addr');
+
+    useEffect(() => {
+        getData(`get-pages/${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}`, typesToSample)
+                .then((resp) => resp.json())
+                .then((data) => {
+                    setPages(data['page_num_events']);
+                    setClusters(data['clusters']);
+                    setFeatures(data['features']);
+                    setFocusData({
+                        events: data['page_num_events'][Object.keys(data['page_num_events'])[0]].events.filter((obj: MemoryObject) => obj.allocTs <= currTs && (!obj.freeTs || obj.freeTs >= currTs)),
+                        cluster: data['page_num_events'][Object.keys(data['page_num_events'])[0]].cluster
+                    });
+                });
+    }, []);
 
     return (
         <div id='pageAndObjectVis'>
@@ -344,18 +377,18 @@ export default function Pages({ pageSize, cacheLineSize, pages, perf, colourOfTy
                 <div id='pageRowContainer'>
                     {
                         Object.keys(pages)
-                            .toSorted((ad1, ad2) => sortMode == 'addr' ? parseInt(ad1) - parseInt(ad2) : 
+                            .toSorted((ad1: string, ad2: string) => sortMode == 'addr' ? parseInt(ad1) - parseInt(ad2) : 
                                                     sortMode == 'cluster' ? pages[parseInt(ad1)].cluster - pages[parseInt(ad2)].cluster : 0)
                             .map((addr: string) =>    <PageRow
-                                                                        key={addr}
-                                                                        pageSize={pageSize}
-                                                                        addr={parseInt(addr)}
-                                                                        data={pages[parseInt(addr)]}
-                                                                        currTs={currTs}
-                                                                        selAddr={selPageAddr}
-                                                                        colourOfType={colourOfType}
-                                                                        setSelPageAddr={setSelPageAddr}
-                                                                        setFocusData={setFocusData} />)
+                                                            key={addr}
+                                                            pageSize={pageSize}
+                                                            addr={parseInt(addr)}
+                                                            data={pages[parseInt(addr)]}
+                                                            currTs={currTs}
+                                                            selAddr={selPageAddr}
+                                                            colourOfType={colourOfType}
+                                                            setSelPageAddr={setSelPageAddr}
+                                                            setFocusData={setFocusData} />)
                     }
                 </div>
             </div>
