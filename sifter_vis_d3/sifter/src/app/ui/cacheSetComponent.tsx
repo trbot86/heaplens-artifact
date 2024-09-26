@@ -221,26 +221,30 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth, setCach
     );
 }
 
-export default function CacheSets({ cacheInfo, bucketIdx } : 
+export default function CacheSets({ cacheData, cacheInfo, bucketIdx } : 
     {
+        cacheData: {occ: number[][], idxToTpAndSt: string[], numSets: number}
         cacheInfo: CacheInfoMap,
         bucketIdx: number
     }) {
-    const [cacheData, setCacheData] = useState({occ: [[]], idxToTpAndSt: [''], numSets: 1});
     const [selCacheName, setSelCacheName] = useState<string>(Object.keys(cacheInfo)[0]);
-    const [cacheWidth, setCacheWidth] = useState<CacheWidthData>({min: 1, max: 1, curr: 1});
+    const [cacheWidth, setCacheWidth] = useState<CacheWidthData>({
+        min: Math.floor(Math.sqrt(cacheData.numSets)),
+        max: cacheData.numSets,
+        curr: Math.floor(Math.sqrt(cacheData.numSets))
+    });
 
-    useEffect(() => {
-        getCacheData(cacheInfo[selCacheName])
-            .then((data) => {
-                setCacheData(data)
-                setCacheWidth({
-                    min: Math.floor(Math.sqrt(data['numSets'])),
-                    max: data['numSets'],
-                    curr: Math.floor(Math.sqrt(data['numSets']))
-                });
-        });
-    }, []);
+    // useEffect(() => {
+    //     getCacheData(cacheInfo[selCacheName])
+    //         .then((data) => {
+    //             setCacheData(data)
+    //             setCacheWidth({
+    //                 min: Math.floor(Math.sqrt(data['numSets'])),
+    //                 max: data['numSets'],
+    //                 curr: Math.floor(Math.sqrt(data['numSets']))
+    //             });
+    //     });
+    // }, []);
 
     return (
         <div id='cacheSetGroup' >

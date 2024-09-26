@@ -326,7 +326,7 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
             </div>
             {
             (addr == selAddr) &&
-            <Icon>
+            <Icon id='selPageIcon' >
                 <RadioButtonChecked fontSize='small' />
             </Icon>
             }
@@ -334,9 +334,11 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
     );
 }
 
-export default function Pages({ pageSize, cacheLineSize, perf, colourOfType, currTs,
+export default function Pages({ pages, features, pageSize, cacheLineSize, perf, colourOfType, currTs,
                                 clusterAlg, maxRunLength, maxRunsPerCluster, typesToSample } :
     {
+        pages: PageMap,
+        features: any,
         pageSize: number,
         cacheLineSize: number,
         perf: PerfMap,
@@ -347,26 +349,27 @@ export default function Pages({ pageSize, cacheLineSize, perf, colourOfType, cur
         maxRunsPerCluster: number,
         typesToSample: {[tp: string]: boolean}
     }) {
-    const [pages, setPages] = useState({});
-    const [clusters, setClusters] = useState({});
-    const [features, setFeatures] = useState({});
+    // const [clusters, setClusters] = useState({});
     const [selPageAddr, setSelPageAddr] = useState(parseInt(Object.keys(pages)[0]));
-    const [focusData, setFocusData] = useState({events: [], cluster: 0});
+    const [focusData, setFocusData] = useState({
+        events: Object.values(pages)[0].events.filter((obj: MemoryObject) => obj.allocTs <= currTs && (!obj.freeTs || obj.freeTs >= currTs)),
+        cluster: Object.values(pages)[0].cluster
+    });
     const [sortMode, setSortMode] = useState<'addr' | 'cluster'>('addr');
 
-    useEffect(() => {
-        getData(`get-pages/${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}`, typesToSample)
-                .then((resp) => resp.json())
-                .then((data) => {
-                    setPages(data['page_num_events']);
-                    setClusters(data['clusters']);
-                    setFeatures(data['features']);
-                    setFocusData({
-                        events: data['page_num_events'][Object.keys(data['page_num_events'])[0]].events.filter((obj: MemoryObject) => obj.allocTs <= currTs && (!obj.freeTs || obj.freeTs >= currTs)),
-                        cluster: data['page_num_events'][Object.keys(data['page_num_events'])[0]].cluster
-                    });
-                });
-    }, []);
+    // useEffect(() => {
+    //     getData(`get-pages/${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}`, typesToSample)
+    //             .then((resp) => resp.json())
+    //             .then((data) => {
+    //                 setPages(data['page_num_events']);
+    //                 setClusters(data['clusters']);
+    //                 setFeatures(data['features']);
+    //                 setFocusData({
+    //                     events: Object.values(data['page_num_events'])[0].events.filter((obj: MemoryObject) => obj.allocTs <= currTs && (!obj.freeTs || obj.freeTs >= currTs)),
+    //                     cluster: Object.values(data['page_num_events'])[0].cluster
+    //                 });
+    //             });
+    // }, []);
 
     return (
         <div id='pageAndObjectVis'>

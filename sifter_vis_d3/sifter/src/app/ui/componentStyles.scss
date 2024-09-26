@@ -165,6 +165,11 @@ $timeGraphSliderThumbWidth: 12px;
     transform: translateX(calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2));
 }
 
+#selPageIcon {
+    position: relative;
+    left: 7px;
+}
+
 #objectSVG {
     position: relative;
     top: 4vh;

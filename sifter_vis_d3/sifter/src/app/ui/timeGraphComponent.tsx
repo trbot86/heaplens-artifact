@@ -163,6 +163,9 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange, 
         timeRange: {min: number, max: number},
         numBuckets: number
     }) {
+
+    console.log('Here is time range in zoom line graph:');
+    console.log(timeRange);
     const SVGref = useRef(null);
     // const xScale = useRef<d3.ScaleLinear<number, number, never> | null>(null);
     const lineGenerator = useRef<d3.Line<SizePoint> | null>(null);

@@ -115,6 +115,9 @@ export default function Legend({ colourOfType, setColourOfType, typeStats } :
             
     const [filterText, setFilterText] = useState('');
 
+    console.log(`Here are type stats in legend:`);
+    console.log(typeStats);
+
     return (
         <table
             id='legendTable'>

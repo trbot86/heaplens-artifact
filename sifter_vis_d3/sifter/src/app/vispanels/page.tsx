@@ -32,6 +32,7 @@ const INIT_CACHE_INFO = {
     'L2': {size: 2097152, assoc: 8},
     'L3': {size: 4194304, assoc: 8}
 };
+const INIT_CACHE_DATA = {occ: [[]], idxToTpAndSt: [''], numSets: 1};
 const MAX_POINTS_PER_LINE = 3000;
 
 function getRand(min: number, max: number): number {
@@ -77,7 +78,7 @@ export default function VisPanels() {
     const [featuresData, setFeaturesData] = useState({});
     const [perfData, setPerfData] = useState({});
     const [cacheInfo, setCacheInfo] = useState(INIT_CACHE_INFO);
-    const [cacheData, setCacheData] = useState({});
+    const [cacheData, setCacheData] = useState(INIT_CACHE_DATA);
     const [numBuckets, setNumBuckets] = useState(INIT_NUM_BUCKETS);
     const [timeRange, setTimeRange] = useState(INIT_TIME_RANGE);
     const [getBucketIdx, setGetBucketTs] = useState(() => (ts: number) => 0);
@@ -87,39 +88,42 @@ export default function VisPanels() {
         if (shouldFetch.current) {
             shouldFetch.current = false;
             const fname = searchParams.get('fname');
-            getData(`init-sampler/${fname}-${pageSize}-${cacheLineSize}-${numBuckets}`, null)
+            getData(`init-app/${fname}-${pageSize}-${cacheLineSize}-${numBuckets}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${Object.values(INIT_CACHE_INFO)[0].size}-${Object.values(INIT_CACHE_INFO)[0].assoc}`, null)
                     .then((resp) => resp.json())
-                    .then((types) => {
-                        setTypesToSample(types.reduce((map: {[a: string]: boolean}, tp: string) => {
+                    .then((allData) => {
+                        console.log('Here is allData:');
+                        console.log(allData);
+                        setTypesToSample(allData['types'].reduce((map: {[a: string]: boolean}, tp: string) => {
                             map[tp] = true;
                             return map;
                         }, {}));
-                        setColourOfType(generateColours(types));
-                        getData('get-lines', null).then((resp) => resp.json())
-                            .then((data) => {
-                                        const sortedLineData = Object.keys(data['pts']).reduce((map: {[tp: string]: SizePoint[]}, tp: string) => {
-                                            map[tp] = data['pts'][tp].toSorted((a: SizePoint, b: SizePoint) => a.ts - b.ts);
-                                            return map;
-                                        }, {});
+                        setColourOfType(generateColours(allData['types']));
 
-                                        const minTs: number = data['minTs'];
-                                        const maxTs: number = data['maxTs'];
-                    
-                                        flushSync(() => {
-                                            setTimeRange({min: minTs, max: maxTs});
-                                            setGetBucketTs(() => {
-                                                return (ts: number) => {
-                                                    const sizeOfBucket = Math.max(Math.floor((maxTs - minTs) / numBuckets), 1);
-                                                    return Math.ceil((ts - minTs) / sizeOfBucket);
-                                                }
-                                            });
-                                            setCurrTs(minTs);
-                                            setLineData(sortedLineData);
-                                            setStatsData(data['stats']);
-                                            setFieldsData(data['fields']);
-                                            setCountsData(data['counts']);
-                                        });
-                            });
+                        const sortedLineData = Object.keys(allData['linesAndStats']['pts']).reduce((map: {[tp: string]: SizePoint[]}, tp: string) => {
+                            map[tp] = allData['linesAndStats']['pts'][tp].toSorted((a: SizePoint, b: SizePoint) => a.ts - b.ts);
+                            return map;
+                        }, {});
+                        const minTs: number = allData['linesAndStats']['minTs'];
+                        const maxTs: number = allData['linesAndStats']['maxTs'];
+                        setTimeRange({min: minTs, max: maxTs});
+                        setGetBucketTs(() => {
+                            return (ts: number) => {
+                                const sizeOfBucket = Math.max(Math.floor((maxTs - minTs) / numBuckets), 1);
+                                return Math.ceil((ts - minTs) / sizeOfBucket);
+                            }
+                        });
+                        setCurrTs(minTs);
+                        setLineData(sortedLineData);
+                        setStatsData(allData['linesAndStats']['stats']);
+                        setFieldsData(allData['linesAndStats']['fields']);
+                        setCountsData(allData['linesAndStats']['counts']);
+
+                        setPageData(allData['pagesData']['page_num_events']);
+                        setClustersData(allData['pagesData']['clusters']);
+                        setFeaturesData(allData['pagesData']['features']);
+
+                        setCacheData(allData['cacheData']);
+
                         setLoading(false);
                     });
         }
@@ -144,6 +148,9 @@ export default function VisPanels() {
                     className='visPanel'
                     size={8.5} >
                     <Pages
+                        pages={pageData}
+                        // clustersData={clustersData}
+                        features={featuresData}
                         pageSize={pageSize}
                         perf={perfData}
                         colourOfType={colourOfType}
@@ -158,6 +165,7 @@ export default function VisPanels() {
                     className='visPanel'
                     size={3.5} >
                     <CacheSets
+                        cacheData={cacheData}
                         cacheInfo={cacheInfo}
                         bucketIdx={getBucketIdx(currTs)} />
                 </Grid>

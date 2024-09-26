@@ -264,6 +264,8 @@ class Sampler:
         # print(f"cols in objects: {self.get_objects(recs).columns}")
         # print(f"cols in objects: {objects.columns}")
 
+        print("Returning from get_all_lines_and_stats")
+
         return {'pts': pts,
                 'changes': change_pts,
                 'stats': {'single': self.get_stats(recs, self.cache_line_size), 'double': self.get_stats(recs, 2*self.cache_line_size)},
@@ -388,6 +390,8 @@ class Sampler:
         merged = clamped
         # merged = merged.merge(clamped, how='left', on='page_num').fillna(value=0)
 
+        print("About to start clustering pages")
+
         #TODO Take a look at FeatureAgglomeration?
         page_pattern = StandardScaler().fit_transform(merged)
         clusters = None
@@ -400,6 +404,8 @@ class Sampler:
         elif (alg == 'meanshift'):
             clusters = MeanShift(min_bin_freq=1, cluster_all=False).fit_predict(page_pattern)
         merged['cluster'] = clusters
+
+        print("Done clustering pages")
         
         pages = pd.DataFrame.from_dict({page: [group[event_labels].values.tolist()]
                     for page, group in last_allocs.groupby('page_num')}, orient='index')
@@ -447,6 +453,9 @@ class Sampler:
         
         dict_merged = merged.set_index('page_num').set_axis(['events', 'cluster'], axis='columns').to_dict(orient='index')
         fts = event_labels.index("freeTs")
+
+        print("Returning from get_sample_of_pages")
+
         return {'page_num_events': {f"{pn*self.page_size}": {'events': [dict(zip(event_labels, replace_nan(event, fts))) for event in v['events']], 'cluster': v['cluster']} for pn, v in dict_merged.items()},
                 'clusters': features.reset_index().loc[:,['cluster','page_num']].groupby('cluster').agg(lambda x: x.tolist()).to_dict(orient='index'),
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()}}
@@ -508,6 +517,8 @@ class Sampler:
 
         df = pd.DataFrame(flat, index=row_idx, columns=col_idx)
         df = df.cumsum()
+
+        print("Returning from get_cache_data")
 
         return {
             "occ": df.values.astype(int).tolist(),
