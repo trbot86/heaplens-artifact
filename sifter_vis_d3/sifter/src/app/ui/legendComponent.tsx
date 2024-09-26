@@ -8,8 +8,8 @@ import { generateColours, TypeToColourMap } from '../vispanels/page';
 import { Casino } from '@mui/icons-material';
 
 interface TypeStat {
-    allocs: number | null,
-    pages: number | null
+    allocs: number,
+    pages: number
 }
 
 interface TypeToStatsMap {
@@ -126,11 +126,11 @@ export default function Legend({ colourOfType, setColourOfType, typeStats } :
                                                     key={tp}
                                                     typeName={tp}
                                                     colour={colourOfType[tp]}
-                                                    stats={typeStats[tp]} />)
+                                                    stats={typeStats[tp] ? typeStats[tp] : {allocs: -1, pages: -1}} />)
                 }
             </tbody>
             <LegendTableFooter
-                types={Object.keys(typeStats)}
+                types={Object.keys(colourOfType)}
                 setFilterText={setFilterText}
                 setColourOfType={setColourOfType} />
         </table>

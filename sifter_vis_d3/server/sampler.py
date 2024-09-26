@@ -18,10 +18,25 @@ MAX_OBJ_STATS = 1000000
 CHANGE_POINT_THRESHOLD = 10
 event_labels = ['file', 'size', 'addr', 'type', 'allocTs', 'freeTs']
 
+FILE_IND = 0
+SIZE_IND = 1
+ADDR_IND = 2
+TYPE_IND = 3
+ALLOC_TS_IND = 4
+FREE_TS_IND = 5
+TYPE_KIND_IND = 6
+
 def replace_nan(event, key):
     if math.isnan(event[key]):
         event[key] = None
     return event
+
+def get_joined_tname(t, st):
+    return t + "|" + st
+
+def get_bucket(min_ts, max_ts, num_buckets, ts):
+    size_of_bucket = max(math.floor(max_ts - min_ts) / num_buckets, 1)
+    return math.ceil((ts - min_ts) / size_of_bucket)
 
 
 class Sampler:
@@ -29,6 +44,8 @@ class Sampler:
     def __init__(self, dbfile, page_size=4096, cache_line_size=64, num_buckets=2000):
         self.fname = dbfile
         self.all_data = self.get_all_records(page_size)
+        self.min_ts = int(self.all_data["ts"].min())
+        self.max_ts = int(self.all_data["ts"].max())
         self.page_size = page_size
         self.cache_line_size = cache_line_size
         self.num_buckets = num_buckets
@@ -82,9 +99,7 @@ class Sampler:
         return df
     
     def types(self):
-        print("Here are the types:")
-        print(self.all_data['type'].unique().tolist())
-        return self.all_data['type'].unique().tolist()
+        return [tp for tp in self.all_data['type'].unique().tolist() if isinstance(tp, str)]
     
     def get_counts(self):
         try:
@@ -211,10 +226,10 @@ class Sampler:
         # # return {'total': merged.groupby('type')['addr'].count().to_dict(),
         # #         'coloc': {k: {pair[1]: v['count'] for pair, v in g.to_dict(orient='index').items()} for k, g in sums.groupby(level=0)}}
         
-    def get_last_object_per_bucket(self, df, num_buckets):
+    def get_last_object_per_bucket(self, df):
         min_ts = df[['allocTs', 'freeTs']].min().min()
         max_ts = df[['allocTs', 'freeTs']].max().max()
-        bucket_size = (max_ts - min_ts) / num_buckets
+        bucket_size = (max_ts - min_ts) / self.num_buckets
         df.loc[:,'bucket'] = ((df['allocTs'] - min_ts) // bucket_size).astype('Int64')
 
         last_allocs = df.groupby(['addr', 'type', 'bucket']).agg({'allocTs': 'last'})
@@ -256,7 +271,9 @@ class Sampler:
                 'changes': change_pts,
                 'stats': {'single': self.get_stats(recs, self.cache_line_size), 'double': self.get_stats(recs, 2*self.cache_line_size)},
                 'fields': self.get_fields(s.replace(' ', '') for s in df['type'].unique()),
-                'counts': self.get_counts().set_index('type').to_dict('index')}
+                'counts': self.get_counts().set_index('type').to_dict('index'),
+                'minTs': self.min_ts,
+                'maxTs': self.max_ts}
         # 'records': df.to_dict(orient='records'), 
 
     def get_records_in_interval(self, start_ts, end_ts, page_size=4096):
@@ -328,7 +345,7 @@ class Sampler:
         pages_to_keep = type_entries[type_entries['mask']]['page_num']
         df = df[df['page_num'].isin(pages_to_keep)]
 
-        last_allocs = self.get_last_object_per_bucket(df, self.num_buckets)
+        last_allocs = self.get_last_object_per_bucket(df)
 
         # last_allocs.loc[:,'page_num'] = last_allocs.loc[:,'addr'] // page_size
         # df.loc[:,'page_num'] = df.loc[:,'addr'] // page_size
@@ -432,31 +449,98 @@ class Sampler:
         
         dict_merged = merged.set_index('page_num').set_axis(['events', 'cluster'], axis='columns').to_dict(orient='index')
         fts = event_labels.index("freeTs")
-        return {'page_num_events': {pn: {'events': [dict(zip(event_labels, replace_nan(event, fts))) for event in v['events']], 'cluster': v['cluster']} for pn, v in dict_merged.items()},
+        return {'page_num_events': {f"{pn*self.page_size}": {'events': [dict(zip(event_labels, replace_nan(event, fts))) for event in v['events']], 'cluster': v['cluster']} for pn, v in dict_merged.items()},
                 'clusters': features.reset_index().loc[:,['cluster','page_num']].groupby('cluster').agg(lambda x: x.tolist()).to_dict(orient='index'),
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()},
                 'perf': perf_df.set_index('cl_addr').to_dict(orient='index')}
+    
+    def get_cache_data(self, size, assoc):
+        num_cache_sets = size // (assoc * self.cache_line_size)
+        rows = self.get_objects(self.all_data).to_numpy()
+        types = self.types()
+        fields = self.get_fields([s.replace(' ', '') for s in types])
+        i = 0
+        tp_and_st_in_order = []
+        tp_and_st_to_idx = dict()
+        for tp in types:
+            tp_and_st_in_order.append(tp)
+            tp_and_st_to_idx[tp] = i
+            i += 1
+            if tp in fields:
+                for st in fields[tp]:
+                    tp_and_st_in_order.append(get_joined_tname(tp, st["subtype"]))
+                    tp_and_st_to_idx[get_joined_tname(tp, st["subtype"])] = i
+                    i += 1
+
+        data = np.empty(shape=(self.num_buckets + 1, num_cache_sets, len(tp_and_st_in_order)))
+        data.fill(0)
+
+        for obj in rows:
+            entries = [obj]
+            if obj[TYPE_IND] in fields:
+                for field_ent in fields[obj[TYPE_IND]]:
+                    entries.append([obj[FILE_IND],
+                                    field_ent["size"],
+                                    obj[ADDR_IND] + field_ent["offset"],
+                                    get_joined_tname(obj[TYPE_IND], field_ent["subtype"]),
+                                    obj[ALLOC_TS_IND],
+                                    obj[FREE_TS_IND]])
+            for entry in entries:
+                start_set = math.floor(entry[ADDR_IND] / self.cache_line_size) % num_cache_sets
+                rem_size = entry[SIZE_IND] - (self.cache_line_size - (entry[ADDR_IND] % self.cache_line_size))
+                alloc_time_bucket = get_bucket(self.min_ts, self.max_ts, self.num_buckets, entry[ALLOC_TS_IND])
+                free_time_bucket = -1 if math.isnan(entry[FREE_TS_IND]) else get_bucket(self.min_ts, self.max_ts, self.num_buckets, entry[FREE_TS_IND])
+                data[alloc_time_bucket,start_set,tp_and_st_to_idx[entry[TYPE_IND]]] += 1
+                if free_time_bucket >= 0:
+                    data[free_time_bucket,start_set,tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
+                i = 1
+                while rem_size > 0 and i <= num_cache_sets:
+                    data[alloc_time_bucket,(start_set + i) % num_cache_sets,tp_and_st_to_idx[entry[TYPE_IND]]] += 1
+                    if free_time_bucket >= 0:
+                        data[free_time_bucket,(start_set + i) % num_cache_sets,tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
+                    rem_size -= self.cache_line_size
+                    i += 1
+
+        # flatten the data matrix to 2d
+        flat = np.array(data).reshape(len(data), -1)
+        row_idx = pd.Index(range(len(data)), name="time_bucket")
+        col_idx = pd.MultiIndex.from_product(
+            [range(len(data[0])), range(len(data[0][0]))],
+            names=["cache_set", "type_idx"]
+        )
+
+        df = pd.DataFrame(flat, index=row_idx, columns=col_idx)
+        df = df[::-1].cumsum()[::-1]
+
+        return {
+            "cacheData": df.values.astype(int).tolist(),
+            "idxToTpAndSt": tp_and_st_in_order
+        }
+        # return .to_dict(orient="index")
+        # return df[::-1].cumsum()[::-1]
 
 
 if __name__ == "__main__":
+    s = Sampler("../tpcc_bronson_n8.sqlite")
+    print(s.get_cache_data(32768, 8))
     # pd.set_option('display.max_columns', None)
-    pd.options.mode.chained_assignment = None
-    s = Sampler(sys.argv[2])
-    retval = None
+    # pd.options.mode.chained_assignment = None
+    # s = Sampler(sys.argv[2])
+    # retval = None
 
-    if sys.argv[1] == "all":
-        retval = s.get_all_lines_and_stats(num_buckets=int(sys.argv[3]), cls=64)
-    else:
-        type_data = json.loads(sys.argv[11].replace("\\'", '"')) if len(sys.argv) >= 12 else dict()
-        retval = s.get_sample_of_pages(int(sys.argv[3]),                        # start_ts
-                                       int(sys.argv[4]),                        # end_ts
-                                       type_data,                               # type_data
-                                       page_size=int(sys.argv[5]),
-                                       cls=int(sys.argv[6]),
-                                       cluster_alg=sys.argv[7],                 
-                                       max_run_length=int(sys.argv[8]),
-                                       max_runs_from_cluster=int(sys.argv[9]),
-                                       num_buckets=int(sys.argv[10]))
+    # if sys.argv[1] == "all":
+    #     retval = s.get_all_lines_and_stats(num_buckets=int(sys.argv[3]), cls=64)
+    # else:
+    #     type_data = json.loads(sys.argv[11].replace("\\'", '"')) if len(sys.argv) >= 12 else dict()
+    #     retval = s.get_sample_of_pages(int(sys.argv[3]),                        # start_ts
+    #                                    int(sys.argv[4]),                        # end_ts
+    #                                    type_data,                               # type_data
+    #                                    page_size=int(sys.argv[5]),
+    #                                    cls=int(sys.argv[6]),
+    #                                    cluster_alg=sys.argv[7],                 
+    #                                    max_run_length=int(sys.argv[8]),
+    #                                    max_runs_from_cluster=int(sys.argv[9]),
+    #                                    num_buckets=int(sys.argv[10]))
 
-    print(json.dumps(retval, ignore_nan=True))
-    sys.stdout.flush()
+    # print(json.dumps(retval, ignore_nan=True))
+    # sys.stdout.flush()

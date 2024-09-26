@@ -189,7 +189,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs } :
     }
     
     const yAxis = d3.axisLeft(yScale).tickSize(3).tickValues(getSizeTickValues(maxSize ? maxSize : 1, 6))
-        .tickFormat((d) => `${d} ${SIZE_UNIT_SUFF[getUnitIndex(maxSize ? maxSize : 1)]}`);
+        .tickFormat((d: number) => `${d / SIZE_UNITS[getUnitIndex(maxSize ? maxSize : 1)]} ${SIZE_UNIT_SUFF[getUnitIndex(maxSize ? maxSize : 1)]}`);
 
     useEffect(() => {
         d3.select('#xAxisGroup').call(xAxis);

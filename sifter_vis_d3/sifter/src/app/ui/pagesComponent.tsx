@@ -10,7 +10,7 @@ interface MemoryObject {
     file: string | null,
     line: number,
     size: number,
-    address: number,
+    addr: number,
     allocTs: number,
     freeTs: number | null,
     type: string | null
@@ -59,41 +59,41 @@ const SplitBlock = forwardRef(({ obj, colourOfType, pageSize, cacheLineSize, xSc
             {/* Start chunk of data object */}
             <rect
                 // className={`objectBlock${obj.type == hoveredType ? ' objectBlockHovered' : ''}`}
-                x={xScale(obj.address % cacheLineSize)}
-                y={yScale(Math.floor((obj.address % pageSize) / cacheLineSize))}
-                width={xScale(Math.min(obj.size, cacheLineSize - (obj.address % cacheLineSize)))}
+                x={xScale(obj.addr % cacheLineSize)}
+                y={yScale(Math.floor((obj.addr % pageSize) / cacheLineSize))}
+                width={xScale(Math.min(obj.size, cacheLineSize - (obj.addr % cacheLineSize)))}
                 height={yScale(1)}
                 fill={obj.type ? colourOfType[obj.type]?.toString() : 'gray'} />
             {/* Middle chunk of data object */}
             <rect
                 // className={`objectBlock${obj.type == hoveredType ? ' objectBlockHovered' : ''}`}
                 x={xScale(0)}
-                y={yScale(Math.floor((obj.address % pageSize) / cacheLineSize) + 1)}
+                y={yScale(Math.floor((obj.addr % pageSize) / cacheLineSize) + 1)}
                 width={xScale(cacheLineSize)}
-                height={yScale(Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize))}
+                height={yScale(Math.floor((obj.size - cacheLineSize + (obj.addr % cacheLineSize)) / cacheLineSize))}
                 fill={obj.type ? colourOfType[obj.type]?.toString() : 'gray'}
                 style={{
-                    'visibility': Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize) > 0 ? 'visible' : 'hidden'
+                    'visibility': Math.floor((obj.size - cacheLineSize + (obj.addr % cacheLineSize)) / cacheLineSize) > 0 ? 'visible' : 'hidden'
                 }} />
             {/* Last chunk of data object */}
             <rect
                 // className={`objectBlock${obj.type == hoveredType ? ' objectBlockHovered' : ''}`}
                 x={xScale(0)}
                 y={
-                    yScale(Math.floor((obj.address % pageSize) / cacheLineSize) + 1 // y of middle chunk
-                        + Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize)) // height of middle chunk
+                    yScale(Math.floor((obj.addr % pageSize) / cacheLineSize) + 1 // y of middle chunk
+                        + Math.floor((obj.size - cacheLineSize + (obj.addr % cacheLineSize)) / cacheLineSize)) // height of middle chunk
                 }
                 width={
                     xScale(Math.min(cacheLineSize, obj.size
-                        - (cacheLineSize - (obj.address % cacheLineSize)) // size of first chunk
-                        - Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize)*cacheLineSize)) // size of middle chunk
+                        - (cacheLineSize - (obj.addr % cacheLineSize)) // size of first chunk
+                        - Math.floor((obj.size - cacheLineSize + (obj.addr % cacheLineSize)) / cacheLineSize)*cacheLineSize)) // size of middle chunk
                 }
                 height={yScale(1)}
                 fill={obj.type ? colourOfType[obj.type]?.toString() : 'gray'}
                 style={{
                     'visibility': obj.size
-                        - (cacheLineSize - (obj.address % cacheLineSize)) // size of first chunk
-                        - Math.floor((obj.size - cacheLineSize + (obj.address % cacheLineSize)) / cacheLineSize)*cacheLineSize // size of middle chunk
+                        - (cacheLineSize - (obj.addr % cacheLineSize)) // size of first chunk
+                        - Math.floor((obj.size - cacheLineSize + (obj.addr % cacheLineSize)) / cacheLineSize)*cacheLineSize // size of middle chunk
                         > 0 ? 'visible' : 'hidden'
                 }} />
         </g>
@@ -128,49 +128,6 @@ function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
             .call(yAxis);
         curObjSVG.select('#objectYAxisGridGroup')
             .call(yAxisGrid);
-
-        // const objData = curObjSVG.select('#objectGroup')
-        //     .selectAll('.dataObjectGroup')
-        //     .data(data.events, (d: MemoryObject) => `${d.address}-${d.allocTs}`);
-        // const blockGroup = objData.enter()
-        //     .append('g')
-        //     .attr('class', 'dataObjectGroup');
-
-        // // Start chunk of data object
-        // blockGroup.append('rect')
-        //     .attr('data-blockkind', 'start')
-        //     .attr('x', (d) => xScale(d.address % cacheLineSize))
-        //     .attr('y', (d) => yScale(Math.floor((d.address % pageSize) / cacheLineSize)))
-        //     .attr('width', (d) => xScale(Math.min(d.size, cacheLineSize - (d.address % cacheLineSize))))
-        //     .attr('height', (d) => yScale(1))
-        //     .attr('fill', (d) => d.type ? colourOfType[d.type]?.toString() : 'gray');
-        
-        // // Middle chunk of data object
-        // blockGroup.append('rect')
-        //     .attr('x', (d) => xScale(0))
-        //     .attr('y', (d) => yScale(Math.floor((d.address % pageSize) / cacheLineSize) + 1))
-        //     .attr('width', xScale(cacheLineSize))
-        //     .attr('height', (d) => yScale(Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize)))
-        //     .attr('fill', (d) => d.type ? colourOfType[d.type]?.toString() : 'gray')
-        //     .style('visibility', (d) => Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize) > 0 ? 'visible' : 'hidden');
-
-        // // Last chunk of data object
-        // blockGroup.append('rect')
-        //     .attr('x', (d) => xScale(0))
-        //     .attr('y', (d) => yScale(Math.floor((d.address % pageSize) / cacheLineSize) + 1 // y of middle chunk
-        //                             + Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize))) // height of middle chunk
-        //     .attr('width', (d) => xScale(Math.min(cacheLineSize, d.size
-        //                                         - (cacheLineSize - (d.address % cacheLineSize)) // size of first chunk
-        //                                         - Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize)*cacheLineSize))) // size of middle chunk
-        //     .attr('height', yScale(1))
-        //     .attr('fill', (d) => d.type ? colourOfType[d.type]?.toString() : 'gray')
-        //     .style('visibility', (d) => d.size
-        //         - (cacheLineSize - (d.address % cacheLineSize)) // size of first chunk
-        //         - Math.floor((d.size - cacheLineSize + (d.address % cacheLineSize)) / cacheLineSize)*cacheLineSize // size of middle chunk
-        //         > 0 ? 'visible' : 'hidden');
-
-        // objData.exit()
-        //     .remove();
     }, [cacheLineSize]);
     
     return (
@@ -208,7 +165,7 @@ function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
             <g id='objectGroup' >
                 {
                     data.events.map((event: MemoryObject) => <Tooltip title={event.type} 
-                                                                key={`${event.address}-${event.allocTs}`} >
+                                                                key={`${event.addr}-${event.allocTs}`} >
                                                                 <SplitBlock
                                                                     obj={event}
                                                                     colourOfType={colourOfType}
@@ -284,11 +241,11 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
         const rectData = d3.select(ref.current)
             .select('.pageCardClipGroup')
             .selectAll('.pageCardObject')
-            .data(objectData.events, (d: MemoryObject) => `${d.address}-${d.allocTs}`);
+            .data(objectData.events, (d: MemoryObject) => `${d.addr}-${d.allocTs}`);
         rectData.enter()
             .append('rect')
             .attr('class', 'pageCardObject')
-            .attr('x', (d) => `${pageScale(d.address % pageSize)}px`)
+            .attr('x', (d) => pageScale(d.addr % pageSize))
             .attr('y', 0)
             .attr('width', (d) => pageScale(d.size))
             .attr('fill', (d) => d.type && colourOfType[d.type] ? colourOfType[d.type].toString() : 'black');
@@ -339,10 +296,6 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
                                                 (obj.freeTs == null || obj.freeTs >= currTs)),
             cluster: data.cluster
         };
-        // if (addr == 0) {
-        //     console.log(`Updated filtered of ${addr} with ts ${currTs}:`);
-        //     console.log(filtered);
-        // }
         setCurrData(filtered);
         if (selAddr == addr) {
             setFocusData(filtered);

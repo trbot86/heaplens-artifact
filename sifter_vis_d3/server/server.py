@@ -23,11 +23,14 @@ def init_sampler(fname, page_size, cache_line_size, num_buckets):
 @cross_origin(origin='http://localhost:3000')
 def get_lines():
     lines_and_stats = db_sampler.get_all_lines_and_stats()
-    print("Here are the lines and stats:")
-    print(lines_and_stats)
     return lines_and_stats
 
 @app.route("/get-pages/<string:cluster_alg>-<int:max_run_length>-<int:max_runs_from_cluster>", methods=["POST"])
 @cross_origin(origin='http://localhost:3000')
 def get_pages(cluster_alg, max_run_length, max_runs_from_cluster):
     return db_sampler.get_sample_of_pages(-1, -1, request.json, cluster_alg, max_run_length, max_runs_from_cluster)
+
+@app.route("/get-cache-data/<int:cache_size>-<int:assoc>", methods=["GET"])
+@cross_origin(origin='http://localhost:3000')
+def get_cache_data(cache_size, assoc):
+    return db_sampler.get_cache_data(cache_size, assoc)

@@ -12,6 +12,7 @@ import CacheSets from '../ui/cacheSetComponent';
 import { theme } from '../page';
 import { useSearchParams } from 'next/navigation';
 import { LinearProgress } from '@mui/material';
+import { flushSync } from 'react-dom';
 
 export interface TypeToColourMap {
     [ tp: string ]: d3.RGBColor | d3.HSLColor | null
@@ -23,6 +24,8 @@ const INIT_NUM_BUCKETS = 2000;
 const INIT_MAX_RUN_LENGTH = 5;
 const INIT_MAX_RUNS_PER_CLUSTER = 3;
 const INIT_CLUSTER_ALG = 'agglomerative';
+const INIT_CACHE_SIZE = 32768;
+const INIT_CACHE_ASSOC = 8;
 const MAX_POINTS_PER_LINE = 3000;
 
 function getRand(min: number, max: number): number {
@@ -66,10 +69,9 @@ export default function VisPanels() {
     const [clustersData, setClustersData] = useState({});
     const [featuresData, setFeaturesData] = useState({});
     const [perfData, setPerfData] = useState({});
-
-    const minTs = testMinTs;
-    const maxTs = testMaxTs;
-
+    const [cacheSize, setCacheSize] = useState(INIT_CACHE_SIZE);
+    const [cacheAssoc, setCacheAssoc] = useState(INIT_CACHE_ASSOC);
+    const [cacheData, setCacheData] = useState({});
     const [numBuckets, setNumBuckets] = useState(INIT_NUM_BUCKETS);
     const [getBucketIdx, setGetBucketTs] = useState(() => (ts: number) => 0);
 
@@ -85,54 +87,64 @@ export default function VisPanels() {
                         getData(`get-pages/${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}`, types.reduce((map: {[tp: string]: boolean}, tp: string) => {
                             map[tp] = true;
                             return map;
-                        }, {}))
-                    ]).then((resps) => resps.map((resp, i) => {
-                        resp.json().then((data) => {
-                            console.log('Here is the returned data:');
-                            console.log(data);
-                            if (i == 0) {
-                                const sortedLineData = Object.keys(data['pts']).reduce((map: {[tp: string]: SizePoint[]}, tp: string) => {
-                                    map[tp] = data['pts'][tp].toSorted((a: SizePoint, b: SizePoint) => a.ts - b.ts);
-                                    return map;
-                                }, {});
+                        }, {})),
+                        getData(`get-cache-data/${cacheSize}-${cacheAssoc}`, null)
+                    ]).then((resps) => {
+                        resps.map((resp, i) => {
+                            resp.json().then((data) => {
+                                if (i == 0) {
+                                    const sortedLineData = Object.keys(data['pts']).reduce((map: {[tp: string]: SizePoint[]}, tp: string) => {
+                                        map[tp] = data['pts'][tp].toSorted((a: SizePoint, b: SizePoint) => a.ts - b.ts);
+                                        return map;
+                                    }, {});
 
-                                const minTs: number = Object.keys(sortedLineData)
-                                        .reduce((min: number, tp: string) => Math.min(min, sortedLineData[tp][0].ts), Infinity);
-                                const maxTs: number = Object.keys(sortedLineData)
-                                        .reduce((max: number, tp: string) => Math.max(max, sortedLineData[tp][sortedLineData[tp].length - 1].ts), 0);
-                                setGetBucketTs(() => {
-                                    return (ts: number) => {
-                                        const sizeOfBucket = Math.max(Math.floor((maxTs - minTs) / numBuckets), 1);
-                                        return Math.floor((ts - minTs) / sizeOfBucket);
-                                    }
-                                });
-                                setCurrTs(minTs);
-                                setLineData(sortedLineData);
-                                setStatsData(data['stats']);
-                                setFieldsData(data['fields']);
-                                setCountsData(data['counts']);
-                            }
-                            else if (i == 1) {
-                                setPageData(data['page_num_events']);
-                                setClustersData(data['clusters']);
-                                setFeaturesData(data['features']);
-                                setPerfData(data['perf']);
-                            }
-                            // setLoading(false);
+                                    const minTs: number = data['minTs'];
+                                    const maxTs: number = data['maxTs'];
+                                    setGetBucketTs(() => {
+                                        return (ts: number) => {
+                                            const sizeOfBucket = Math.max(Math.floor((maxTs - minTs) / numBuckets), 1);
+                                            return Math.floor((ts - minTs) / sizeOfBucket);
+                                        }
+                                    });
+                                    flushSync(() => {
+                                        setCurrTs(minTs);
+                                        setLineData(sortedLineData);
+                                        setStatsData(data['stats']);
+                                        setFieldsData(data['fields']);
+                                        setCountsData(data['counts']);
+                                    });
+                                }
+                                else if (i == 1) {
+                                    flushSync(() => {
+                                        setPageData(data['page_num_events']);
+                                        setClustersData(data['clusters']);
+                                        setFeaturesData(data['features']);
+                                        setPerfData(data['perf']);
+                                    });
+                                }
+                                else if (i == 2) {
+                                    flushSync(() => {
+                                        setCacheData(data['cacheData']);
+                                    });
+                                }
+                                setLoading(false);
+                            });
                         });
-                    }));
+                    });
                 });
     }, []);
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            {
-            loading ? 
+            {/* {
+            loading && 
             <Box id='loadingBox' >
                 <LinearProgress />
             </Box>
-            :
+            }
+            {
+            !loading && */}
             <Grid container 
                 id='visPanelGrid'
                 rowSpacing={2}
@@ -152,7 +164,7 @@ export default function VisPanels() {
                     className='visPanel'
                     size={4} >
                     <CacheSets
-                        cacheInfo={testCacheInfo}
+                        cacheInfo={cacheData}
                         bucketIdx={getBucketIdx(currTs)} />
                 </Grid>
 
@@ -175,7 +187,7 @@ export default function VisPanels() {
                         typeStats={statsData} />
                 </Grid>
             </Grid>
-            }
+            {/* } */}
         </ThemeProvider>
     );
 }
