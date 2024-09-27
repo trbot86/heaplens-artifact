@@ -1,5 +1,7 @@
 import sqlite3
 from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import MiniBatchKMeans
+from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import MeanShift
@@ -397,6 +399,10 @@ class Sampler:
         clusters = None
         if (len(merged.index) <= 1):
             clusters = [0]
+        elif (alg == 'mbkmeans'):
+            clusters = MiniBatchKMeans(n_clusters=len(self.types())).fit_predict(page_pattern)
+        elif (alg == 'kmeans'):
+            clusters = KMeans(n_clusters=len(self.types())).fit_predict(page_pattern)
         elif (alg == 'dbscan'):
             clusters = DBSCAN(eps=0.9, min_samples=1).fit_predict(page_pattern)
         elif (alg == 'agglomerative'):
@@ -426,7 +432,7 @@ class Sampler:
         max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(self.page_size, 2), 2))
         # max_pages = 1 # DEBUGGING
         sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
-        # sampled_pages.add(34165069575)
+        # sampled_pages.add(34278619365)
         
         taken = 0
         cluster_keys = list(clusters.keys())

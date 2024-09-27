@@ -154,18 +154,17 @@ const LinePath = forwardRef(({ lineData, colour, lineGenerator, ...props } :
     );
 });
 
-function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange, numBuckets } :
+function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
+                             numBuckets, typeVisMatrix } :
     {
         lines: LineData,
         colourOfType: TypeToColourMap,
         currTs: number,
         setCurrTs: (a: number) => void,
         timeRange: {min: number, max: number},
-        numBuckets: number
+        numBuckets: number,
+        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
     }) {
-
-    console.log('Here is time range in zoom line graph:');
-    console.log(timeRange);
     const SVGref = useRef(null);
     // const xScale = useRef<d3.ScaleLinear<number, number, never> | null>(null);
     const lineGenerator = useRef<d3.Line<SizePoint> | null>(null);
@@ -252,7 +251,8 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange, 
                     id='linesGroup'
                     clipPath={'url(#timeGraphClip)'} >
                     {
-                        Object.keys(lines).map((tp) =>  <Tooltip 
+                        Object.keys(lines).filter((tp) => typeVisMatrix[tp].lineVis)
+                                        .map((tp) =>  <Tooltip 
                                                             key={tp}
                                                             title={tp}
                                                             followCursor
@@ -284,7 +284,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange, 
 }
 
 export default function TimeGraph({ lines, maxPointsPerLine, colourOfType, currTs, setCurrTs,
-                                    timeRange, numBuckets } :
+                                    timeRange, numBuckets, typeVisMatrix } :
     {
         lines: LineData,
         maxPointsPerLine: number,
@@ -292,7 +292,8 @@ export default function TimeGraph({ lines, maxPointsPerLine, colourOfType, currT
         currTs: number,
         setCurrTs: (a: number) => void,
         timeRange: {min: number, max: number},
-        numBuckets: number
+        numBuckets: number,
+        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
     }) {
     const sampledAndSortedLines = Object.keys(lines).reduce((retLines: LineData, tp: string) => {
         retLines[tp] = getSampledLine(lines[tp], maxPointsPerLine);
@@ -316,7 +317,8 @@ export default function TimeGraph({ lines, maxPointsPerLine, colourOfType, currT
                 currTs={currTs}
                 setCurrTs={setCurrTs}
                 timeRange={timeRange}
-                numBuckets={numBuckets} />
+                numBuckets={numBuckets}
+                typeVisMatrix={typeVisMatrix} />
         </div>
     );
 }

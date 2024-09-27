@@ -385,7 +385,7 @@ class Sampler:
         max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(page_size, 2), 2))
         # max_pages = 1 # DEBUGGING
         sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
-        # sampled_pages.add(34165069575)
+        # sampled_pages.add(34278619365)
         
         taken = 0
         cluster_keys = list(clusters.keys())

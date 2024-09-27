@@ -238,14 +238,27 @@ $timeGraphSliderThumbWidth: 12px;
     position: relative;
     top: 0px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 60px 320px 120px 120px;
     grid-template-rows: 1fr fit-content(187px) 1fr;
+
+    &.visExpanded {
+        grid-template-columns: 1fr 60px 320px 120px 120px;
+    }
+}
+
+.legendVisCheckboxContainer {
+    display: flex;
+    flex-direction: row;
 }
 
 #legendTable :is(thead, tbody, tfoot, tr) {
     display: grid;
     grid-template-columns: subgrid;
     grid-column: 1 / span 4;
+
+    &.visExpanded {
+        grid-column: 1 / span 5;
+    }
 }
 
 #legendTable tbody tr {
@@ -267,9 +280,9 @@ $timeGraphSliderThumbWidth: 12px;
     padding-top: 15px;
 }
 
-.justifyRightTableCell {
+.centerTableCell {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     padding-right: 15px;
 }
 

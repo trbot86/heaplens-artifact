@@ -97,7 +97,7 @@ function CacheBox({ totalData, minOcc, maxOcc, idx, x, y, size, setHoverIdx } :
         size: number,
         setHoverIdx: (a: number | null) => void
     }) {
-    const colScale = d3.scaleLinear().domain([minOcc / 2, (maxOcc + minOcc) / 2, maxOcc]).range(['#ffff91', '#faca1e', '#cf3325']);
+    const colScale = d3.scaleLinear().domain([minOcc / 2, (maxOcc + minOcc) / 2, maxOcc]).range(['#ffff91', '#e3ad24', '#e33a2b']);
     
     return (
         <rect

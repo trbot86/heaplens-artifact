@@ -93,7 +93,7 @@ const SplitBlock = forwardRef(({ obj, colourOfType, pageSize, cacheLineSize, xSc
                 style={{
                     'visibility': obj.size
                         - (cacheLineSize - (obj.addr % cacheLineSize)) // size of first chunk
-                        - Math.floor((obj.size - cacheLineSize + (obj.addr % cacheLineSize)) / cacheLineSize)*cacheLineSize // size of middle chunk
+                        - Math.max(0, Math.floor((obj.size - cacheLineSize + (obj.addr % cacheLineSize)) / cacheLineSize)*cacheLineSize) // size of middle chunk
                         > 0 ? 'visible' : 'hidden'
                 }} />
         </g>
@@ -129,6 +129,9 @@ function ObjectLayout({ data, colourOfType, pageSize, cacheLineSize } :
         curObjSVG.select('#objectYAxisGridGroup')
             .call(yAxisGrid);
     }, [cacheLineSize]);
+
+    console.log('Here is the data in Object Layout:');
+    console.log(data);
     
     return (
         <svg
@@ -326,9 +329,9 @@ function PageRow({  pageSize, addr, data, currTs, selAddr,
             </div>
             {
             (addr == selAddr) &&
-            <Icon id='selPageIcon' >
+            <div id='selPageIcon' >
                 <RadioButtonChecked fontSize='small' />
-            </Icon>
+            </div>
             }
         </div>
     );

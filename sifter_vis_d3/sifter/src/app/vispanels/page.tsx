@@ -23,7 +23,7 @@ const INIT_CACHELINE_SIZE = 64;
 const INIT_NUM_BUCKETS = 2000;
 const INIT_MAX_RUN_LENGTH = 5;
 const INIT_MAX_RUNS_PER_CLUSTER = 3;
-const INIT_CLUSTER_ALG = 'agglomerative';
+const INIT_CLUSTER_ALG = 'mbkmeans';
 const INIT_CACHE_SIZE = 32768;
 const INIT_CACHE_ASSOC = 8;
 const INIT_TIME_RANGE = {min: 0, max: 1};
@@ -83,6 +83,7 @@ export default function VisPanels() {
     const [timeRange, setTimeRange] = useState(INIT_TIME_RANGE);
     const [getBucketIdx, setGetBucketTs] = useState(() => (ts: number) => 0);
     const [typesToSample, setTypesToSample] = useState({});
+    const [typeVisMatrix, setTypeVisMatrix] = useState<{[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}>({});
 
     useEffect(() => {
         if (shouldFetch.current) {
@@ -91,10 +92,12 @@ export default function VisPanels() {
             getData(`init-app/${fname}-${pageSize}-${cacheLineSize}-${numBuckets}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${Object.values(INIT_CACHE_INFO)[0].size}-${Object.values(INIT_CACHE_INFO)[0].assoc}`, null)
                     .then((resp) => resp.json())
                     .then((allData) => {
-                        console.log('Here is allData:');
-                        console.log(allData);
-                        setTypesToSample(allData['types'].reduce((map: {[a: string]: boolean}, tp: string) => {
-                            map[tp] = true;
+                        // setTypesToSample(allData['types'].reduce((map: {[a: string]: boolean}, tp: string) => {
+                        //     map[tp] = true;
+                        //     return map;
+                        // }, {}));
+                        setTypeVisMatrix(allData['types'].reduce((map: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}, tp: string) => {
+                            map[tp] = {lineVis: true, pageVis: true, cacheVis: true};
                             return map;
                         }, {}));
                         setColourOfType(generateColours(allData['types']));
@@ -180,7 +183,8 @@ export default function VisPanels() {
                         currTs={currTs}
                         setCurrTs={setCurrTs}
                         timeRange={timeRange}
-                        numBuckets={numBuckets} />
+                        numBuckets={numBuckets}
+                        typeVisMatrix={typeVisMatrix} />
                 </Grid>
                 <Grid 
                     className='visPanel'
@@ -188,7 +192,9 @@ export default function VisPanels() {
                     <Legend 
                         colourOfType={colourOfType}
                         setColourOfType={setColourOfType}
-                        typeStats={countsData} />
+                        typeStats={countsData}
+                        typeVisMatrix={typeVisMatrix}
+                        setTypeVisMatrix={setTypeVisMatrix} />
                 </Grid>
             </Grid>
             }

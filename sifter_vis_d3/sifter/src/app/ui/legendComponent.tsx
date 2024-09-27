@@ -1,11 +1,11 @@
 'use client';
 import { useState } from 'react';
 import * as d3 from 'd3';
-import { IconButton, Paper, TextField, Tooltip } from '@mui/material';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import { Checkbox, IconButton, Paper, TextField, Tooltip } from '@mui/material';
 import './componentStyles.scss';
 import { generateColours, TypeToColourMap } from '../vispanels/page';
-import { Casino } from '@mui/icons-material';
+import { BarChart, Casino, KeyboardArrowLeft, KeyboardArrowRight, StackedLineChart, Window } from '@mui/icons-material';
+import { Box, styled } from '@mui/system';
 
 interface TypeStat {
     numAllocs: number,
@@ -16,14 +16,56 @@ interface TypeToStatsMap {
     [ tp: string ]: TypeStat
 }
 
-function LegendTableHeader() {
+const VisCheckbox = styled(Checkbox)({
+    padding: '2.5px',
+});
+
+function LegendTableHeader({ visExpanded, setVisExpanded } : 
+    {
+        visExpanded: boolean,
+        setVisExpanded: (a: boolean) => void
+    }) {
     return (
-        <thead>
-            <tr>
+        <thead className={visExpanded ? 'visExpanded' : ''} >
+            <tr className={visExpanded ? 'visExpanded' : ''} >
+                {
+                visExpanded &&
                 <th>
-                    <div className='justifyRightTableCell'>
-                        <KeyboardArrowLeftIcon />
+                    <div id='visibilityHeaders' >
+                        <Tooltip 
+                            title='Line graph visibility'
+                            placement='top' >
+                            <StackedLineChart />
+                        </Tooltip>
+                        <Tooltip 
+                            title='Pages visibility'
+                            placement='top' >
+                            <BarChart 
+                                sx={{
+                                    transform: 'rotate(90deg)'
+                                }} />
+                        </Tooltip>
+                        <Tooltip 
+                            title='Cache visibility'
+                            placement='top' >
+                            <Window />
+                        </Tooltip>
                     </div>
+                </th>
+                }
+                <th>
+                    <IconButton 
+                        className='centerTableCell'
+                        onClick={() => setVisExpanded(!visExpanded)} >
+                        {
+                        !visExpanded &&
+                        <KeyboardArrowLeft />
+                        }
+                        {
+                        visExpanded &&
+                        <KeyboardArrowRight />
+                        }
+                    </IconButton>
                 </th>
                 <th>Type names</th>
                 <th style={{
@@ -41,17 +83,22 @@ function LegendTableHeader() {
     );
 }
 
-function LegendTableFooter({ types, setFilterText, setColourOfType } : 
+function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded } : 
     {
         types: string[],
         setFilterText: (a: string) => void,
-        setColourOfType: (a: TypeToColourMap) => void
+        setColourOfType: (a: TypeToColourMap) => void,
+        visExpanded: boolean
     }) {
     return (
-        <tfoot>
-            <tr>
+        <tfoot className={visExpanded ? 'visExpanded' : ''} >
+            <tr className={visExpanded ? 'visExpanded' : ''} >
+                {
+                visExpanded &&
+                <td />
+                }
                 <td>
-                    <div className='justifyRightTableCell' >
+                    <div className='centerTableCell' >
                         <Tooltip 
                             title='Randomize colours'
                             placement='bottom' >
@@ -80,17 +127,50 @@ function LegendTableFooter({ types, setFilterText, setColourOfType } :
     );
 }
 
-function LegendRow({ typeName, colour, stats } : 
+function LegendRow({ typeName, colour, visExpanded, stats, typeVisMatrix, setTypeVisMatrix } : 
     {   
         typeName: string,
         colour: d3.RGBColor | d3.HSLColor | null,
-        stats: TypeStat
+        visExpanded: boolean,
+        stats: TypeStat,
+        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
+        setTypeVisMatrix: (a: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}) => void
     }) {
-
     return (
-        <tr>
+        <tr className={visExpanded ? 'visExpanded' : ''} >
+            {
+            visExpanded &&
             <td>
-                <div className='justifyRightTableCell'>
+                <div className='legendVisCheckboxContainer' >
+                    <VisCheckbox
+                        checked={typeVisMatrix[typeName].lineVis}
+                        size='small'
+                        onChange={() => {
+                            const newTypeVisMatrix = structuredClone(typeVisMatrix);
+                            newTypeVisMatrix[typeName].lineVis = !typeVisMatrix[typeName].lineVis;
+                            setTypeVisMatrix(newTypeVisMatrix);
+                        }} />
+                    <VisCheckbox
+                        checked={typeVisMatrix[typeName].pageVis}
+                        size='small'
+                        onChange={() => {
+                            const newTypeVisMatrix = structuredClone(typeVisMatrix);
+                            newTypeVisMatrix[typeName].pageVis = !typeVisMatrix[typeName].pageVis;
+                            setTypeVisMatrix(newTypeVisMatrix);
+                        }} />
+                    <VisCheckbox
+                        checked={typeVisMatrix[typeName].cacheVis}
+                        size='small'
+                        onChange={() => {
+                            const newTypeVisMatrix = structuredClone(typeVisMatrix);
+                            newTypeVisMatrix[typeName].cacheVis = !typeVisMatrix[typeName].cacheVis;
+                            setTypeVisMatrix(newTypeVisMatrix);
+                        }} />
+                </div>
+            </td>
+            }
+            <td>
+                <div className='centerTableCell'>
                     <Paper
                         sx={{
                             width: '20px',
@@ -106,36 +186,42 @@ function LegendRow({ typeName, colour, stats } :
     );
 }
 
-export default function Legend({ colourOfType, setColourOfType, typeStats } : 
+export default function Legend({ colourOfType, setColourOfType, typeStats, typeVisMatrix, setTypeVisMatrix } : 
     {   
         colourOfType: TypeToColourMap,
         setColourOfType: (a: TypeToColourMap) => void,
-        typeStats: TypeToStatsMap
+        typeStats: TypeToStatsMap,
+        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
+        setTypeVisMatrix: (a: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}) => void
     }) {
-            
     const [filterText, setFilterText] = useState('');
-
-    console.log(`Here are type stats in legend:`);
-    console.log(typeStats);
+    const [visExpanded, setVisExpanded] = useState(false);
 
     return (
         <table
-            id='legendTable'>
-            <LegendTableHeader />
-            <tbody>
+            id='legendTable'
+            className={visExpanded ? 'visExpanded' : ''} >
+            <LegendTableHeader
+                visExpanded={visExpanded}
+                setVisExpanded={setVisExpanded} />
+            <tbody className={visExpanded ? 'visExpanded' : ''} >
                 {
                     Object.keys(colourOfType).filter((tp: string) => tp.includes(filterText))
                         .map((tp: string) =>    <LegendRow
                                                     key={tp}
                                                     typeName={tp}
                                                     colour={colourOfType[tp]}
-                                                    stats={typeStats[tp] ? typeStats[tp] : {numAllocs: -1, numPages: -1}} />)
+                                                    visExpanded={visExpanded}
+                                                    stats={typeStats[tp] ? typeStats[tp] : {numAllocs: -1, numPages: -1}}
+                                                    typeVisMatrix={typeVisMatrix}
+                                                    setTypeVisMatrix={setTypeVisMatrix} />)
                 }
             </tbody>
             <LegendTableFooter
                 types={Object.keys(colourOfType)}
                 setFilterText={setFilterText}
-                setColourOfType={setColourOfType} />
+                setColourOfType={setColourOfType}
+                visExpanded={visExpanded} />
         </table>
     );
 }
