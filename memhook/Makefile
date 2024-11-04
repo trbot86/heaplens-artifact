@@ -9,6 +9,14 @@ ifdef MEMHOOK_ASCYLIB
 	CFLAGS += -DMEMHOOK_ASCYLIB
 endif
 
+ifdef MEMHOOK_C_LOG
+	CFLAGS += -DMEMHOOK_C_LOG
+endif
+
+ifdef USE_RALLOC
+	CFLAGS += -DUSE_RALLOC
+endif
+
 libmemhook.so: $(OBJ)
 	$(CC) -o $@ $^ -lrt -shared $(CFLAGS)
 

@@ -117,6 +117,8 @@ typedef struct memory_page {
 struct perf_data {
   uint64_t addr;
   float hitm;
+  uint64_t stores;
+  uint64_t loads;
 };
 
 size_t bin_search(const size_t* arr, size_t x, int begin, int end) {
@@ -156,7 +158,7 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
   string line;
   vector<struct perf_data> entries{};
   cmatch matches;
-  regex rgx("[0-9]+\\s+(0x[a-f0-9]+)\\s+\\S+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+\\.[0-9]+)%");
+  regex rgx("[0-9]+\\s+(0x[a-f0-9]+)\\s+\\S+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+\\.[0-9]+)%\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+)\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+)");
   if (pfile.good()) {
     while(getline(pfile, line)) {
       if (regex_search(line.c_str(), matches, rgx)) {
@@ -164,6 +166,9 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
         if (hitm >= cutoff) {
           uint64_t cl_addr = strtoull(matches[1].str().c_str(), nullptr, 16);
           uint64_t page_num = cl_addr / page_size;
+          uint64_t stores = stoul(matches[3].str());
+          uint64_t loads = stoul(matches[4].str());
+          
           if (pages.find(page_num) == pages.end()) {
             cout << "Perf page num not present in data: " << page_num << endl;
           }
@@ -171,8 +176,10 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
             pages[page_num].has_perf_addr = true;
           }
           // cout << "PERF ACTUAL PAGE ADDRESS: " << cl_addr / cl_size << endl;
-          struct perf_data new_entry{cl_addr, hitm};
-          entries.push_back(new_entry);
+          if (cl_addr < 18446462598732840960) {
+            struct perf_data new_entry{cl_addr, hitm, stores, loads};
+            entries.push_back(new_entry);
+          }
         }
         else
           break;
@@ -255,6 +262,7 @@ void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db
         string name = matches[3].str();
         size_t size = strtoull(matches[4].str().c_str(), nullptr, 10);
         size_t offset = strtoull(matches[5].str().c_str(), nullptr, 10);
+        string type_trim_t = type_trim + "_t";
 
         // if (seen_types.find(type) != seen_types.end())
         //   cout << "Seen types contains type " << type << endl;
@@ -265,6 +273,11 @@ void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db
             (entries.find(type_trim) == entries.end() || entries[type_trim].find(name) == entries[type_trim].end())) {
           struct field_data new_entry{subtype, size, offset};
           entries[type_trim][name] = new_entry;
+        }
+        else if (seen_types.find(type_trim_t.c_str()) != seen_types.end() &&
+            (entries.find(type_trim_t) == entries.end() || entries[type_trim_t].find(name) == entries[type_trim_t].end())) {
+          struct field_data new_entry{subtype, size, offset};
+          entries[type_trim_t][name] = new_entry;
         }
       }
     }
@@ -749,6 +762,7 @@ int main(int argc, char* argv[]) {
         size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uint64_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uint64_t) event->addr) : 0;
         if (event->typeofop)
           last_alloc_size.insert(pair<uint64_t, size_t>{(uint64_t) event->addr, event->size});
+        /* TODO: since big allocs are split across pages, do we insert a free event for each split part? */
 
         uint64_t page_num = (uint64_t) event->addr / page_size;
         uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary

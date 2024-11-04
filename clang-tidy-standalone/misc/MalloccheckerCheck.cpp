@@ -22,6 +22,8 @@
 #define MTDFNAME6 "memalign"
 #define MTDFNAME7 "posix_memalign"
 #define MTDFNAME8 "calloc"
+#define MTDFNAME9 "xmalloc"
+#define MTDFNAME10 "xcalloc"
 #define MATCH_FUNCTIONS allOf(anyOf(hasName(MTDFNAME1), \
                                     hasName(MTDFNAME2), \
                                     hasName(MTDFNAME3), \
@@ -29,7 +31,9 @@
                                     hasName(MTDFNAME5), \
                                     hasName(MTDFNAME6), \
                                     hasName(MTDFNAME7), \
-                                    hasName(MTDFNAME8)), unless(isTemplateInstantiation()))
+                                    hasName(MTDFNAME8), \
+                                    hasName(MTDFNAME9), \
+                                    hasName(MTDFNAME10)), unless(isTemplateInstantiation()))
 // #define MATCH_FUNCTIONS hasName(MTDFNAME)
 
 using namespace clang::ast_matchers;

@@ -2,6 +2,10 @@ __pycache__
 -1
 *.so
 *.o
+setbench_verlib*
+ralloc*
+gzip*
+zstd
 ASCYLIB
 fielddump_tester
 jemalloc

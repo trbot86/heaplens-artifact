@@ -141,39 +141,30 @@ void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, boo
 //     return next_realloc(ptr, size);
 // }
 
-void alloc_log(void* ptr, size_t size, const char* filename, int line, const char* name_of_type) {
-    unit_log.timestamp = memhook_get_server_clock();
-    unit_log.size = size;
-    unit_log.addr = ptr;
-    unit_log.typeofop = true;
-    unit_log.file = filetable.insert(filename);
-    unit_log.tindex_name = typetable.insert(name_of_type);
-    unit_log.line = line;
-    collector.copy(unit_log);
-}
-
-void free_log(void* ptr) {
-    unit_log.timestamp = memhook_get_server_clock();
-    unit_log.addr = ptr;
-    unit_log.typeofop = false;
-    collector.copy(unit_log);
-}
-
-// void* memhook_calloc(size_t nmemb, size_t size, int line, const char* filename, const char* name_of_type) {
-    
-// }
-
 extern "C" {
 
     // Used for C/C++ projects which do not support templating
-    void* malloc_s(size_t size, int line, const char* filename, const char* name_of_type) {
-        void* ptr = memhook_malloc(size, filename, line, true);
+    void* malloc_s(size_t size, int line, const char* filename, const char* name_of_type, bool do_alloc = true, void* log_ptr = nullptr) {
+        void* ptr = log_ptr;
+        if (mallog_likely(do_alloc)) {
+            ptr = memhook_malloc(size, filename, line, true);
+        }
+        else {
+#if defined(MEMHOOK_C_LOG)
+            MEMHOOK_LOG_ALLOC(ptr, size, filename, line, name_of_type)
+#endif
+            return ptr;
+        }
         if (initialized) {
             unit_log.tindex_name = typetable.insert(name_of_type);
             // cout << "CALLED CUSTOM MALLOC, TYPE: " << (void*) unit_log.tindex_name << endl;
             collector.copy(unit_log);
         }
         return ptr;
+    }
+
+    void free_log(void* ptr) {
+        MEMHOOK_LOG_FREE(ptr)
     }
 
     void free(void* ptr) {
@@ -185,6 +176,15 @@ extern "C" {
         }
     }
 
+    #ifdef USE_RALLOC
+    void RP_free(void* ptr) {
+        if (!next_RP_free) next_RP_free = (void (*)(void *))dlsym(RTLD_NEXT, "RP_free");
+        if (!next_RP_free) fprintf(stdout, "failed to find next RP_free\n");
+        next_RP_free(ptr);
+        MEMHOOK_LOG_FREE(ptr)
+    }
+    #endif
+
     // void free_s(void* ptr, int line, const char* filename, const char* typename) {
     //     filetable.insert(filename);
     //     if (!ptr) return;
@@ -195,6 +195,21 @@ extern "C" {
     //     }
     // }
 
+    #if defined(MEMHOOK_GZIP)
+    void* xmalloc_s(size_t size, int line, const char* filename, const char* name_of_type) {
+        void* ptr = xmalloc(size);
+        MEMHOOK_LOG_ALLOC(ptr, size, filename, line, name_of_type)
+        return ptr;
+    }
+
+    void* xcalloc_s(size_t nmemb, size_t size, int line, const char* filename, const char* name_of_type) {
+        void* ptr = xcalloc(nmemb, size);
+        MEMHOOK_LOG_ALLOC(ptr, size * nmemb, filename, line, name_of_type)
+        return ptr;
+    }
+    #endif
+
+    #if !defined(__cplusplus)
     #if defined(MEMHOOK_ASCYLIB)
     void* ssmem_alloc_s(ssmem_allocator_t* a, size_t size, int line, const char* filename, const char* name_of_type) {
         // if (!next_ssmem_alloc) next_ssmem_alloc = (void * (*)(ssmem_allocator_t*, size_t))dlsym(RTLD_NEXT, "ssmem_alloc");
@@ -206,7 +221,7 @@ extern "C" {
         #endif
         #ifndef MEMHOOK_FORCE_MALLOC
         void* ptr = ssmem_alloc(a, size);
-        alloc_log(ptr, size, filename, line, name_of_type);
+        MEMHOOK_LOG_ALLOC(ptr, size, filename, line, name_of_type)
         #endif
 
         return ptr;
@@ -222,7 +237,7 @@ extern "C" {
 
         next_ssmem_free(a, ptr);
         
-        free_log(ptr);
+        MEMHOOK_LOG_FREE(ptr)
         #endif
     }
 
@@ -235,7 +250,7 @@ extern "C" {
         #endif
         #ifndef MEMHOOK_FORCE_MALLOC
         void* ptr = ssalloc(size);
-        alloc_log(ptr, size, filename, line, name_of_type);
+        MEMHOOK_LOG_ALLOC(ptr, size, filename, line, name_of_type)
         #endif
 
         return ptr;
@@ -252,7 +267,7 @@ extern "C" {
         void* ptr = ssalloc_aligned(alignment, size);
         #endif
 
-        alloc_log(ptr, memhook_roundUp(size, alignment), filename, line, name_of_type);
+        MEMHOOK_LOG_ALLOC(ptr, memhook_roundUp(size, alignment), filename, line, name_of_type)
 
         return ptr;
     }
@@ -267,20 +282,20 @@ extern "C" {
 
         next_ssfree(ptr);
         
-        free_log(ptr);
+        MEMHOOK_LOG_FREE(ptr)
         #endif
     }
     #endif // MEMHOOK_ASCYLIB
 
     int posix_memalign_s(void** memptr, size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
         int ret = posix_memalign(memptr, alignment, size);
-        alloc_log(memptr, memhook_roundUp(size, alignment), filename, line, name_of_type);
+        MEMHOOK_LOG_ALLOC(memptr, memhook_roundUp(size, alignment), filename, line, name_of_type)
         return ret;
     }
 
     void* memalign_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
         void* ptr = memalign(alignment, size);
-        alloc_log(ptr, memhook_roundUp(size, alignment), filename, line, name_of_type);
+        MEMHOOK_LOG_ALLOC(ptr, memhook_roundUp(size, alignment), filename, line, name_of_type)
         return ptr;
     }
 
@@ -293,10 +308,11 @@ extern "C" {
         }
 
         void* ptr = calloc(nmemb, size);
-        alloc_log(ptr, size * nmemb, filename, line, name_of_type);
+        MEMHOOK_LOG_ALLOC(ptr, size * nmemb, filename, line, name_of_type)
 
         return ptr;
     }
+    #endif // !defined(__cplusplus)
 }
 
 /**********************

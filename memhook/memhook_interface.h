@@ -34,6 +34,7 @@ extern "C" {
 #include "memstamp.h"
 #include "hash.h"
 
+
 // #include "/root/teststatic/a.h"
 // #include "mem_alloc.h"
 //#include <execinfo.h>
@@ -73,6 +74,34 @@ using namespace std;
 
 #define MACRO_GET_STR(str) MACRO_GET_128(str, 0), 0
 
+#if defined(__cplusplus) && ! defined(MEMHOOK_C_LOG)
+#define MEMHOOK_LOG_ALLOC(ptr, sz, fname, ln, tname) \
+        unit_log.timestamp = memhook_get_server_clock(); \
+        unit_log.size = sz; \
+        unit_log.addr = ptr; \
+        unit_log.typeofop = true; \
+        unit_log.file = filetable.insert<fname>(); \
+        unit_log.tindex_name = typetable.insert(tname); \
+        unit_log.line = ln; \
+        collector.copy(unit_log);
+#else
+#define MEMHOOK_LOG_ALLOC(ptr, sz, fname, ln, tname) \
+        unit_log.timestamp = memhook_get_server_clock(); \
+        unit_log.size = sz; \
+        unit_log.addr = ptr; \
+        unit_log.typeofop = true; \
+        unit_log.file = filetable.insert(fname); \
+        unit_log.tindex_name = typetable.insert(tname); \
+        unit_log.line = ln; \
+        collector.copy(unit_log);
+#endif // __cplusplus
+
+#define MEMHOOK_LOG_FREE(ptr) \
+        unit_log.timestamp = memhook_get_server_clock(); \
+        unit_log.addr = ptr; \
+        unit_log.typeofop = false; \
+        collector.copy(unit_log);
+
 struct slot;
 struct memhook_info_t;
 
@@ -94,8 +123,9 @@ extern "C"
 {
 #endif
 
-    void* malloc_s(size_t, int, const char*, const char*);
+    void* malloc_s(size_t, int, const char*, const char*, bool, void*);
     // void free_s(void *, int, const char*);
+    void free_log(void*);
     #if defined(MEMHOOK_ASCYLIB)
     void* ssalloc_s(size_t, int, const char*, const char*);
     void* ssalloc_aligned_s(size_t, size_t, int, const char*, const char*);
@@ -104,6 +134,10 @@ extern "C"
     int posix_memalign_s(void**, size_t, size_t, int, const char*, const char*);
     void* memalign_s(size_t, size_t, int, const char*, const char*);
     void* calloc_s(size_t, size_t, int, const char*, const char*);
+    #if defined(MEMHOOK_GZIP)
+    void* xmalloc_s(size_t, int, const char*, const char*);
+    void* xcalloc_s(size_t, size_t, int, const char*, const char*);
+    #endif
     // void ssmem_free_s(ssmem_allocator_t*, void*, int, const char*);
     // void free(void* ptr);
 
