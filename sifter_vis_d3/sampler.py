@@ -415,7 +415,7 @@ class Sampler:
         return {'page_num_events': {pn: {'events': [dict(zip(event_labels, replace_nan(event, fts))) for event in v['events']], 'cluster': v['cluster']} for pn, v in dict_merged.items()},
                 'clusters': features.reset_index().loc[:,['cluster','page_num']].groupby('cluster').agg(lambda x: x.tolist()).to_dict(orient='index'),
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()},
-                'perf': perf_df.set_index('cl_addr').to_dict(orient='index')}
+                'perf': perf_df.drop_duplicates(subset=['cl_addr']).set_index('cl_addr').to_dict(orient='index')}
 
 
 if __name__ == "__main__":

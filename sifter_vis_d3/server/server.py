@@ -23,12 +23,17 @@ def init_app(fname, page_size, cache_line_size, num_buckets, cluster_alg, max_ru
         'cacheData': db_sampler.get_cache_data(cache_size, assoc)
     }
 
-@app.route("/get-pages/<string:cluster_alg>-<int:max_run_length>-<int:max_runs_from_cluster>", methods=["POST"])
+@app.route("/get-pages-and-cache-data/<string:fname>-<int:page_size>-<int:cache_line_size>-<int:num_buckets>-<string:cluster_alg>-<int:max_run_length>-<int:max_runs_from_cluster>-<int:cache_size>-<int:assoc>", methods=["POST"])
 @cross_origin(origin='http://localhost:3000')
-def get_pages(cluster_alg, max_run_length, max_runs_from_cluster):
-    return db_sampler.get_sample_of_pages(-1, -1, request.json, cluster_alg, max_run_length, max_runs_from_cluster)
+def get_pages_and_cache_data(fname, page_size, cache_line_size, num_buckets, cluster_alg, max_run_length, max_runs_from_cluster, cache_size, assoc):
+    db_sampler = Sampler(f"../{fname}", page_size, cache_line_size, num_buckets)
+    return {
+        'pagesData': db_sampler.get_sample_of_pages(-1, -1, request.json, cluster_alg, max_run_length, max_runs_from_cluster),
+        'cacheData': db_sampler.get_cache_data(cache_size, assoc)
+    }
 
-@app.route("/get-cache-data/<int:cache_size>-<int:assoc>", methods=["GET"])
+@app.route("/get-cache-data/<string:fname>-<int:page_size>-<int:cache_line_size>-<int:num_buckets>-<int:cache_size>-<int:assoc>", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
-def get_cache_data(cache_size, assoc):
+def get_cache_data(fname, page_size, cache_line_size, num_buckets, cache_size, assoc):
+    db_sampler = Sampler(f"../{fname}", page_size, cache_line_size, num_buckets)
     return db_sampler.get_cache_data(cache_size, assoc)

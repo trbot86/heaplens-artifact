@@ -22,13 +22,13 @@ const LINE_GRAPH_LINE_STROKE_WIDTH = 2;
 const LINE_GRAPH_RIGHT_PAD = 10;
 const SLIDER_THUMB_WIDTH = 12;
 const SLIDER_THUMB_HEIGHT = 15;
-const SIZE_UNITS = [
+export const SIZE_UNITS = [
     1,
     2**10,
     2**20,
     2**30
 ];
-const SIZE_UNIT_SUFF = [
+export const SIZE_UNIT_SUFF = [
     'B',
     'KiB',
     'MiB',
@@ -106,7 +106,10 @@ function TimeSlider({ xScale, currTs, setCurrTs, timeRange, numBuckets } :
                 min={xScale.invert(0)}
                 max={xScale.invert(LINE_GRAPH_WIDTH)}
                 step={Math.max(Math.floor(timeRange.max - timeRange.min) / numBuckets, 1)}
-                onChange={(e, val) => setCurrTs(val)} />
+                onChange={(e, val) => {
+                    console.log(`Timestamp: ${val - timeRange.min}`);
+                    setCurrTs(val);
+                }} />
         </div>
         // <g
         //     id='sliderGroup'
@@ -249,7 +252,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
                 </defs>
                 <g 
                     id='linesGroup'
-                    clipPath={'url(#timeGraphClip)'} >
+                    clipPath='url(#timeGraphClip)' >
                     {
                         Object.keys(lines).filter((tp) => typeVisMatrix[tp].lineVis)
                                         .map((tp) =>  <Tooltip 
@@ -293,7 +296,7 @@ export default function TimeGraph({ lines, maxPointsPerLine, colourOfType, currT
         setCurrTs: (a: number) => void,
         timeRange: {min: number, max: number},
         numBuckets: number,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
+        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}
     }) {
     const sampledAndSortedLines = Object.keys(lines).reduce((retLines: LineData, tp: string) => {
         retLines[tp] = getSampledLine(lines[tp], maxPointsPerLine);

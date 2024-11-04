@@ -18,7 +18,7 @@ from random import randint, shuffle
 MAX_PAGE_PROP = 7560
 MAX_OBJ_STATS = 1000000
 CHANGE_POINT_THRESHOLD = 10
-event_labels = ['file', 'size', 'addr', 'type', 'allocTs', 'freeTs']
+event_labels = ['file', 'size', 'addr', 'type', 'allocTs', 'freeTs', 'line']
 
 FILE_IND = 0
 SIZE_IND = 1
@@ -27,6 +27,7 @@ TYPE_IND = 3
 ALLOC_TS_IND = 4
 FREE_TS_IND = 5
 TYPE_KIND_IND = 6
+LINE_IND = 7
 
 def replace_nan(event, key):
     if math.isnan(event[key]):
@@ -34,7 +35,7 @@ def replace_nan(event, key):
     return event
 
 def get_sub_tname(t, st):
-    return ">" + t + "|" + st
+    return ">" + t.replace(' ', '') + "|" + st
 
 def get_bucket(min_ts, max_ts, num_buckets, ts):
     size_of_bucket = max(math.floor(max_ts - min_ts) / num_buckets, 1)
@@ -79,7 +80,7 @@ class Sampler:
         df.loc[:,"freeTs"] = df.groupby("addr")["freeTs"].bfill(limit=1)
 
         # Get rid of the old frees and drop the is_alloc column
-        return df.loc[df["is_alloc"] == 1,:].drop(columns=["is_alloc"]).dropna(subset=["allocTs"])
+        return df.loc[df["is_alloc"] == 1,:].drop(columns=["is_alloc"]).dropna(subset=["allocTs", "type"])
     
     def get_all_records(self, page_size=4096):
         con = sqlite3.connect(self.fname)
@@ -89,7 +90,8 @@ class Sampler:
                                     ADDRESS as addr,
                                     TYPE as type,
                                     TIMESTAMP as ts,
-                                    isNew as is_alloc
+                                    isNew as is_alloc,
+                                    LINE as line
                                 FROM SUPERTABLE""",
                                 con = sqlite3.connect(self.fname),
                                 chunksize=100000):
@@ -273,7 +275,7 @@ class Sampler:
                 'stats': {'single': self.get_stats(recs, self.cache_line_size), 'double': self.get_stats(recs, 2*self.cache_line_size)},
                 'fields': self.get_fields(s.replace(' ', '') for s in df['type'].unique()),
                 'counts': self.get_counts().set_index('type').to_dict('index'),
-                'perf': self.get_perf_data().set_index('cl_addr').to_dict(orient='index'),
+                'perf': self.get_perf_data().drop_duplicates(subset=['cl_addr']).set_index('cl_addr').to_dict(orient='index'),
                 'minTs': self.min_ts,
                 'maxTs': self.max_ts}
         # 'records': df.to_dict(orient='records'), 
@@ -285,7 +287,8 @@ class Sampler:
                                     ADDRESS as addr,
                                     TYPE as type,
                                     TIMESTAMP as ts,
-                                    isNew as is_alloc
+                                    isNew as is_alloc,
+                                    LINE as line
                                 FROM SUPERTABLE
                                 WHERE is_alloc=0 OR (ts <= {} AND is_alloc=1)""".format(end_ts),
                                 con)
@@ -400,9 +403,9 @@ class Sampler:
         if (len(merged.index) <= 1):
             clusters = [0]
         elif (alg == 'mbkmeans'):
-            clusters = MiniBatchKMeans(n_clusters=len(self.types())).fit_predict(page_pattern)
+            clusters = MiniBatchKMeans(n_clusters=min(2*len(self.types()), len(merged.index))).fit_predict(page_pattern)
         elif (alg == 'kmeans'):
-            clusters = KMeans(n_clusters=len(self.types())).fit_predict(page_pattern)
+            clusters = KMeans(n_clusters=min(2*len(self.types()), len(merged.index))).fit_predict(page_pattern)
         elif (alg == 'dbscan'):
             clusters = DBSCAN(eps=0.9, min_samples=1).fit_predict(page_pattern)
         elif (alg == 'agglomerative'):
@@ -460,8 +463,6 @@ class Sampler:
         dict_merged = merged.set_index('page_num').set_axis(['events', 'cluster'], axis='columns').to_dict(orient='index')
         fts = event_labels.index("freeTs")
 
-        print("Returning from get_sample_of_pages")
-
         return {'page_num_events': {f"{pn*self.page_size}": {'events': [dict(zip(event_labels, replace_nan(event, fts))) for event in v['events']], 'cluster': v['cluster']} for pn, v in dict_merged.items()},
                 'clusters': features.reset_index().loc[:,['cluster','page_num']].groupby('cluster').agg(lambda x: x.tolist()).to_dict(orient='index'),
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()}}
@@ -478,23 +479,24 @@ class Sampler:
             tp_and_st_in_order.append(tp)
             tp_and_st_to_idx[tp] = i
             i += 1
-            if tp in fields:
-                for st in fields[tp]:
+            if tp.replace(' ', '') in fields:
+            # if tp == "block<Node<long long, void*> >" or tp == "node_t":
+                for st in fields[tp.replace(' ', '')]:
                     tp_and_st_in_order.append(get_sub_tname(tp, st["subtype"]))
                     tp_and_st_to_idx[get_sub_tname(tp, st["subtype"])] = i
                     i += 1
 
-        data = np.empty(shape=(self.num_buckets + 1, num_cache_sets, len(tp_and_st_in_order)))
+        data = np.empty(shape=(self.num_buckets + 2, num_cache_sets, len(tp_and_st_in_order)))
         data.fill(0)
 
         for obj in rows:
             entries = [obj]
-            if obj[TYPE_IND] in fields:
-                for field_ent in fields[obj[TYPE_IND]]:
+            if obj[TYPE_IND].replace(' ', '') in fields: #and (obj[TYPE_IND] == "block<Node<long long, void*> >" or tp == "node_t"):
+                for field_ent in fields[obj[TYPE_IND].replace(' ', '')]:
                     entries.append([obj[FILE_IND],
                                     field_ent["size"],
                                     obj[ADDR_IND] + field_ent["offset"],
-                                    get_sub_tname(obj[TYPE_IND], field_ent["subtype"]),
+                                    get_sub_tname(obj[TYPE_IND].replace(' ', ''), field_ent["subtype"]),
                                     obj[ALLOC_TS_IND],
                                     obj[FREE_TS_IND]])
             for entry in entries:
@@ -502,16 +504,21 @@ class Sampler:
                 rem_size = entry[SIZE_IND] - (self.cache_line_size - (entry[ADDR_IND] % self.cache_line_size))
                 alloc_time_bucket = get_bucket(self.min_ts, self.max_ts, self.num_buckets, entry[ALLOC_TS_IND])
                 free_time_bucket = -1 if math.isnan(entry[FREE_TS_IND]) else get_bucket(self.min_ts, self.max_ts, self.num_buckets, entry[FREE_TS_IND])
-                data[alloc_time_bucket,start_set,tp_and_st_to_idx[entry[TYPE_IND]]] += 1
-                if free_time_bucket >= 0:
-                    data[free_time_bucket,start_set,tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
-                i = 1
-                while rem_size > 0 and i <= num_cache_sets:
-                    data[alloc_time_bucket,(start_set + i) % num_cache_sets,tp_and_st_to_idx[entry[TYPE_IND]]] += 1
+                try:
+                    data[alloc_time_bucket,start_set,tp_and_st_to_idx[entry[TYPE_IND]]] += 1
                     if free_time_bucket >= 0:
-                        data[free_time_bucket,(start_set + i) % num_cache_sets,tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
-                    rem_size -= self.cache_line_size
-                    i += 1
+                        data[free_time_bucket,start_set,tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
+                    i = 1
+                    while rem_size > 0 and i <= num_cache_sets:
+                        data[alloc_time_bucket,(start_set + i) % num_cache_sets,tp_and_st_to_idx[entry[TYPE_IND]]] += 1
+                        if free_time_bucket >= 0:
+                            data[free_time_bucket,(start_set + i) % num_cache_sets,tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
+                        rem_size -= self.cache_line_size
+                        i += 1
+                except KeyError:
+                    print('KEY ERROR!!!')
+                    print(tp_and_st_to_idx)
+                    print(entry)
 
         # flatten the data matrix to 2d
         flat = np.array(data).reshape(len(data), -1)

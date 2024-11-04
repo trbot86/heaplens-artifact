@@ -6,7 +6,11 @@ $pageCardBorderHeight: calc($pageCardSVGHeight - 10px);
 $pageCardBorderWidth: calc($pageCardSVGWidth - 10px);
 $pageCardBorderBottomHeightLow: 1px;
 $pageCardBorderBottomHeightHi: 3px;
+$objectLayoutWidth: 300px;
+$objectLayoutHeight: 300px;
 $objectLayoutLabelMargin: 25px;
+$pageCardBackColour: rgb(70, 70, 70);
+$pageCardBackColourHover: rgb(88, 88, 88);
 
 /* Time graph vars */
 
@@ -56,20 +60,22 @@ $timeGraphSliderThumbWidth: 12px;
     display: flex;
     flex-direction: row;
     gap: 30px;
+    overflow: visible;
 }
 
 #pageVis {
     display: flex;
-    width: 100%;
+    width: 65%;
     height: 100%;
     flex-direction: column;
+    overflow: visible;
 }
 
 #pageRowContainer {
     width: 100%;
     height: 100%;
-    gap: 5px;
-    overflow: scroll;
+    overflow-x: visible;
+    overflow-y: scroll;
 }
 
 #pageRowContainer, .pageRowLabel {
@@ -79,32 +85,44 @@ $timeGraphSliderThumbWidth: 12px;
 
 .pageRowLabel {
     padding-left: 10px;
+
+    & div {
+        font-size: 12px;
+    }
 }
 
-.pageRow {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
+.pageCardDiv {
+    display: inline;
+    overflow: visible;
 }
 
 .pageCard {
+    vertical-align: middle;
     height: $pageCardSVGHeight;
     width: $pageCardSVGWidth;
 }
 
 .pageCardShadow {
-    fill: rgb(167, 167, 167);
+    fill: rgb(24, 24, 24);
     pointer-events: none;
 }
 
 .pageCardClipGroup {
     clip-path: view-box inset(calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2)
                                 calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2)
+                                calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2 + $pageCardBorderBottomHeightLow)
                                 calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2 )
                                 round 4px);
     transition: clip-path 0.1s ease;
     // transform: translateX($timeGraphYAxisWidth);
+}
+
+.zoomedHugePageCard .pageCardClipGroup {
+    clip-path: view-box inset(calc(($pageCardSVGHeight - $pageCardBorderHeight) * 2)
+                                calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2)
+                                calc(($pageCardSVGHeight - $pageCardBorderHeight) * 2 + $pageCardBorderBottomHeightLow)
+                                calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2 )
+                                round 4px);
 }
 
 // The background of each page along with its shadow
@@ -123,10 +141,10 @@ $timeGraphSliderThumbWidth: 12px;
     
     &.pageCardBack {
         cursor: pointer;
-        fill: #d9d9d9;
+        fill: $pageCardBackColour;
         filter: drop-shadow(0px 0px 1px rgb(14, 14, 14));
         &:hover {
-            fill: #e8e8e8;
+            fill: $pageCardBackColourHover;
             filter: drop-shadow(0px 2px 2px rgb(14, 14, 14));
             transform: translateY($pageCardBorderBottomHeightLow - $pageCardBorderBottomHeightHi);
 
@@ -140,13 +158,13 @@ $timeGraphSliderThumbWidth: 12px;
         }
         &.pageCardSelected {
             cursor: default;
-            fill: #d9d9d9;
+            fill: $pageCardBackColour;
             filter: drop-shadow(0px 0px 0px rgb(14, 14, 14));
             transform: translateY($pageCardBorderBottomHeightLow);
             // y: calc(50% - ($pageCardBorderHeight / 2) + $pageCardBorderBottomHeightLow);
 
             & + g.pageCardClipGroup {
-                clip-path: view-box inset(calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2)
+                clip-path: view-box inset(calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2 + $pageCardBorderBottomHeightLow*2)
                                             calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2)
                                             calc(($pageCardSVGHeight - $pageCardBorderHeight) / 2 - $pageCardBorderBottomHeightLow)
                                             calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2)
@@ -156,13 +174,63 @@ $timeGraphSliderThumbWidth: 12px;
     }
 }
 
+.hugePageCardBack {
+    height: $pageCardBorderHeight;
+    width: $pageCardBorderWidth;
+    rx: 4px;
+    x: calc(50% - ($pageCardBorderWidth / 2));
+    y: calc(50% - ($pageCardBorderHeight / 2));
+    fill: $pageCardBackColour;
+    transition: all 0.2s ease;
+}
+
+.pageRow {
+    position: relative;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    overflow: visible;
+
+    &.pageRowZoomed {
+        & .pageCard {
+            height: calc(4*$pageCardSVGHeight);
+
+            & .hugePageCardBack {
+                height: calc(4*$pageCardBorderHeight);
+                y: calc(50% - ((4*$pageCardBorderHeight) / 2));
+            }
+        }
+    }
+}
+
+rect.selection {
+    fill: steelblue;
+    cursor: default;
+}
+
 // Objects displayed in the page (top-left) view
 .pageCardObject {
-    height: calc($pageCardSVGHeight * 2);
+    height: calc($pageCardSVGHeight * 5);
     pointer-events: none;
     stroke: black;
     stroke-width: 1px;
     transform: translateX(calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2));
+
+    &.slotObject {
+        stroke: none;
+    }
+}
+
+.hugePageCardBack .pageCardObject {
+    stroke: none;
+}
+
+.pagePerfIndicator {
+    position: absolute;
+    top: calc($pageCardSVGHeight / 2);
+    pointer-events: none;
+    transform: translate(-25%, -50%);
 }
 
 #selPageIcon {
@@ -170,12 +238,12 @@ $timeGraphSliderThumbWidth: 12px;
     left: 7px;
 }
 
-#objectSVG {
+#objectLayoutDiv {
     position: relative;
-    top: 4vh;
+    top: 30px;
 }
 
-#objectGroup, #objectXAxisGroup, #objectYAxisGroup, #objectYAxisGridGroup {
+#objectGroup rect, #objectGroup .objDelimLine, #objectXAxisGroup, #objectYAxisGroup, #objectYAxisGridGroup {
     transform: translate($objectLayoutLabelMargin, $objectLayoutLabelMargin);
 }
 
@@ -190,6 +258,38 @@ $timeGraphSliderThumbWidth: 12px;
     & path {
         display: none;
     }
+}
+
+.perfHighlight {
+    position: absolute;
+    border: 2px dotted red;
+    pointer-events: none;
+    opacity: 0.0;
+}
+
+.objectPerfIndicator {
+    display: flex;
+    flex-direction: row;
+    // align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    left: 0px;
+    transform: translate(calc($objectLayoutLabelMargin + $objectLayoutWidth), calc($objectLayoutLabelMargin));
+}
+
+.objectPerfIconContainer {
+    pointer-events: all;
+    position: relative;
+    transform: translateY(-20%);
+
+    &:hover ~ .perfHighlight {
+        opacity: 1.0;
+    }
+}
+
+.objDelimLine {
+    stroke: #e0e0e0;
+    stroke-width: 2px;
 }
 
 
@@ -236,14 +336,29 @@ $timeGraphSliderThumbWidth: 12px;
 
 #legendTable {
     position: relative;
-    top: 0px;
+    top: -18px;
     display: grid;
-    grid-template-columns: 60px 320px 120px 120px;
-    grid-template-rows: 1fr fit-content(187px) 1fr;
+    grid-template-columns: 55px 20px 449px 100px 100px;
+    grid-template-rows: 1fr fit-content(240px) 2fr;
 
     &.visExpanded {
-        grid-template-columns: 1fr 60px 320px 120px 120px;
+        grid-template-columns: 79px 55px 20px 370px 100px 100px;
     }
+}
+
+#legendTable :is(thead, tbody, tfoot, tr) {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / span 5;
+
+    &.visExpanded {
+        grid-column: 1 / span 6;
+    }
+}
+
+.legendColumnLabel {
+    cursor: pointer;
+    user-select: none;
 }
 
 .legendVisCheckboxContainer {
@@ -251,19 +366,9 @@ $timeGraphSliderThumbWidth: 12px;
     flex-direction: row;
 }
 
-#legendTable :is(thead, tbody, tfoot, tr) {
-    display: grid;
-    grid-template-columns: subgrid;
-    grid-column: 1 / span 4;
-
-    &.visExpanded {
-        grid-column: 1 / span 5;
-    }
-}
-
 #legendTable tbody tr {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 #legendTable :is(th, td) {
@@ -286,16 +391,79 @@ $timeGraphSliderThumbWidth: 12px;
     padding-right: 15px;
 }
 
+.legendColourTile {
+    cursor: pointer;
+}
+
+
+/* Settings and resample button */
+
+#settingsButtonContainer {
+    position: fixed;
+    bottom: 5px;
+    right: 15px;
+}
+
+#settingsPopoverContent {
+    position: relative;
+    margin-bottom: 20px;
+    width: 40vw;
+}
+
+#settingsPopoverGridContainer {
+    position: relative;
+    margin-top: 20px;
+}
+
+.settingsSliderBox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.settingsSlider {
+    width: 150px;
+}
+
+.settingsTextLabel {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.cacheParamsContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+
+.resamplingButtonLoading {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
 
 /* Cache layout */
 
 #cacheSetGroup {
     display: flex;
-    width: 100%;
+    width: 420px;
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    padding-top: 10px;
+    // padding-top: 10px;
+    position: absolute;
+    top: 10px;
 }
 
 #cacheHeader {
