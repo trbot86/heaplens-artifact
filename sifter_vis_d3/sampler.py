@@ -272,7 +272,7 @@ class Sampler:
                                         HITM as hitm
                                     FROM PERF""",
                                     self.con)
-            return df
+            return df.drop_duplicates(subset="cl_addr", keep="first")
         except:
             return pd.DataFrame({"cl_addr": [], "hitm": []})
 
