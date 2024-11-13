@@ -59,6 +59,12 @@ static unsigned long tmpallocs = 0;
 static volatile int initialized = 0;
 
 __attribute__((constructor)) static void init() {
+    next_free = (void (*)(void *)) dlsym(RTLD_NEXT, "free");
+    if (!next_free) {
+        fprintf(stderr, "Error in `dlsym`: %s\n", dlerror());
+        exit(1);
+    }
+
     global_fd = open(file_path,O_RDWR|O_APPEND|O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
     initialized = 1;
     fprintf(stdout, "Done memhook constructor\n");
@@ -111,13 +117,13 @@ void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, boo
         setup = true;
     }
     
-    if ((ptr >= (void*) tmpbuff && ptr <= (void*)(tmpbuff + tmppos))) { // possible off-by-one error at right endpoint...
+    if (!initialized || (ptr >= (void*) tmpbuff && ptr <= (void*)(tmpbuff + tmppos))) { // possible off-by-one error at right endpoint...
         // fprintf(stdout, "freeing temp memory\n");
         return;
     }
 
-    if (!next_free) next_free = (void (*)(void *))dlsym(RTLD_NEXT, "free");
-    if (!next_free) fprintf(stdout, "failed to find next free\n");
+    // if (!next_free) next_free = (void (*)(void *))dlsym(RTLD_NEXT, "free");
+    // if (!next_free) fprintf(stdout, "failed to find next free\n");
     next_free(ptr);
 
     unit_log.timestamp = memhook_get_server_clock();

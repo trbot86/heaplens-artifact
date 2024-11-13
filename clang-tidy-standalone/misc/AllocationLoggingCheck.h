@@ -1,4 +1,4 @@
-//===--- MalloccheckerCheck.h - clang-tidy ----------------------*- C++ -*-===//
+//===--- AllocationLoggingCheck.h - clang-tidy ------------------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -6,9 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_MALLOCCHECKERCHECK_H
-#define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_MALLOCCHECKERCHECK_H
+#ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_ALLOCATIONLOGGINGCHECK_H
+#define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_ALLOCATIONLOGGINGCHECK_H
 
+// #include "../utils/TransformerClangTidyCheck.h"
+// #include "clang/Tooling/Transformer/Stencil.h"
 #include "../ClangTidyCheck.h"
 
 namespace clang {
@@ -16,13 +18,13 @@ namespace tidy {
 namespace misc {
 
 /// FIXME: Write a short description.
-/// This check "templatizes" any allocation function with the type of memory it allocates
+///
 /// For the user-facing documentation see:
-/// http://clang.llvm.org/extra/clang-tidy/checks/misc-MallocChecker.html
-class MalloccheckerCheck : public ClangTidyCheck {
+/// http://clang.llvm.org/extra/clang-tidy/checks/misc-allocation-logging.html
+class AllocationLoggingCheck : public ClangTidyCheck {
 public:
-  MalloccheckerCheck(StringRef Name, ClangTidyContext *Context)
-      : ClangTidyCheck(Name, Context) {}
+  AllocationLoggingCheck(StringRef Name, ClangTidyContext *Context) : ClangTidyCheck(Name, Context) {}
+
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 private:
@@ -34,4 +36,4 @@ private:
 } // namespace tidy
 } // namespace clang
 
-#endif // LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_MALLOCCHECKERCHECK_H
+#endif // LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_ALLOCATIONLOGGINGCHECK_H

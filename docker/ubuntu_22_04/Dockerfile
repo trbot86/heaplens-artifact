@@ -18,16 +18,14 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
                                             zip \
                                             bear \
                                             vim \
-                                            clang-10 \
-                                            clang-tools-10 \
-                                            clang-10-doc \
-                                            libclang-common-10-dev \
-                                            libclang-10-dev \
-                                            libclang1-10 \
-                                            clang-format-10 \
-                                            python3-clang-10 \
-                                            clangd-10 \
-                                            clang-tidy-10 \
+                                            clang-14 \
+                                            libllvm-14-ocaml-dev \
+                                            libllvm14 \
+                                            llvm-14 \
+                                            llvm-14-dev \
+                                            llvm-14-doc \
+                                            llvm-14-examples \
+                                            llvm-14-runtime \
                                             zlib1g-dev \
                                             lsb-release \
                                             wget \
@@ -53,5 +51,5 @@ RUN chmod +x llvm.sh
 RUN ./llvm.sh 10
 RUN locale-gen en_US.UTF-8
 RUN pip3 install --upgrade pip
-RUN pip3 install cmake==3.14.3
+RUN pip3 install cmake==3.22.1
 RUN ln /usr/local/bin/cmake /usr/bin/cmake

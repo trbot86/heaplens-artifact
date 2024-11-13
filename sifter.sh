@@ -121,7 +121,7 @@ done
 
 add_includes () {
     echo "refactoring all c h cc hh cpp hpp files to include memhook_interface.h..."
-    cd /root/sifter/$1
+    cd ./$1
     for f in $(for t in '*.h' '*.cpp' '*.c' '*.hpp' '*.cc' '*.hh' ; do find . -name "$t" ; done) ; do
         if [[ "$f" =~ .*memhook.* ]] || grep -q '#include "memhook_interface.h"' $f; then
             echo "   skipping file $f..."

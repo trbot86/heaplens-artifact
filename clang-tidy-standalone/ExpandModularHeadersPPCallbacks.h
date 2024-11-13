@@ -9,9 +9,16 @@
 #ifndef LLVM_CLANG_TOOLING_EXPANDMODULARHEADERSPPCALLBACKS_H_
 #define LLVM_CLANG_TOOLING_EXPANDMODULARHEADERSPPCALLBACKS_H_
 
-#include <clang/Lex/PPCallbacks.h>
-#include <clang/Lex/Preprocessor.h>
-#include <llvm/ADT/DenseSet.h>
+#include "clang/Lex/PPCallbacks.h"
+#include "clang/Lex/Preprocessor.h"
+#include "llvm/ADT/DenseSet.h"
+
+namespace llvm {
+namespace vfs {
+class OverlayFileSystem;
+class InMemoryFileSystem;
+} // namespace vfs
+} // namespace llvm
 
 namespace clang {
 class CompilerInstance;
@@ -87,7 +94,8 @@ private:
                   SrcMgr::CharacteristicKind) override;
   void PragmaOpenCLExtension(SourceLocation NameLoc, const IdentifierInfo *,
                              SourceLocation StateLoc, unsigned) override;
-  void PragmaWarning(SourceLocation Loc, StringRef, ArrayRef<int>) override;
+  void PragmaWarning(SourceLocation Loc, PragmaWarningSpecifier,
+                     ArrayRef<int>) override;
   void PragmaWarningPush(SourceLocation Loc, int) override;
   void PragmaWarningPop(SourceLocation Loc) override;
   void PragmaAssumeNonNullBegin(SourceLocation Loc) override;

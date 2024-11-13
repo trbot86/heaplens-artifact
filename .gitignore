@@ -7,6 +7,7 @@ ralloc*
 gzip*
 zstd
 ASCYLIB
+leanstore
 fielddump_tester
 jemalloc
 ssmem
@@ -15,6 +16,7 @@ setbench-artifact
 synchrobench
 masstree-beta
 testing_stuff
+testing_matchers
 veb_new
 fielddump.txt
 newfielddump.txt

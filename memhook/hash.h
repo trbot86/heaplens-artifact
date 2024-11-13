@@ -13,7 +13,7 @@
 
 using namespace std;
 
-typedef char* volatile item_t;
+typedef char* volatile memhook_hash_item_t;
 
 struct entry {
     char str[MEMHOOK_MAX_STRING_SIZE];
@@ -24,7 +24,7 @@ struct entry {
 
 class memhook_hashtable {
 public:
-    typedef item_t* iterator;
+    typedef memhook_hash_item_t* iterator;
     mhRandom64 hashfunction;
     memhook_hashtable() {};
 

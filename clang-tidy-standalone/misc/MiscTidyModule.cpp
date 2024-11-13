@@ -9,7 +9,7 @@
 #include "../ClangTidy.h"
 #include "../ClangTidyModule.h"
 #include "../ClangTidyModuleRegistry.h"
-#include "MalloccheckerCheck.h"
+#include "AllocationLoggingCheck.h"
 
 namespace clang {
 namespace tidy {
@@ -18,8 +18,8 @@ namespace misc {
 class MiscModule : public ClangTidyModule {
 public:
   void addCheckFactories(ClangTidyCheckFactories &CheckFactories) override {
-    CheckFactories.registerCheck<MalloccheckerCheck>(
-    "misc-malloc-checker");
+    CheckFactories.registerCheck<AllocationLoggingCheck>(
+        "misc-allocation-logging");
   }
 };
 

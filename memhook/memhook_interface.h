@@ -194,8 +194,7 @@ inline T* operator*(const MemStamp &stamp, T* p)
 
 #if !(defined(_WIN32) && defined(_mm_malloc))
 template <typename T, int line, char... filename>
-static __inline__ void* __attribute__((__always_inline__, __nodebug__,
-                                       __malloc__))
+static __inline__ void* __attribute__((__always_inline__, __malloc__))
 _mm_malloc(size_t __size, size_t __align)
 {
     // string filestring = {filename...};
