@@ -3,6 +3,10 @@ __pycache__
 *.so
 *.o
 ASCYLIB
+leanstore
+jemalloc
+testing_matchers
+*.sqlite-journal
 fielddump_tester
 ssmem
 setbench

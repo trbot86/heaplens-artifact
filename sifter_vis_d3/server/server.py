@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from sampler import Sampler
+from logger import Logger
 from threading import Lock
 import os
 
@@ -37,3 +38,10 @@ def get_pages_and_cache_data(fname, page_size, cache_line_size, num_buckets, clu
 def get_cache_data(fname, page_size, cache_line_size, num_buckets, cache_size, assoc):
     db_sampler = Sampler(f"../{fname}", page_size, cache_line_size, num_buckets)
     return db_sampler.get_cache_data(cache_size, assoc)
+
+@app.route("/log-data/<string:fname>", methods=["POST"])
+@cross_origin(origin='http://localhost:3000')
+def log_data(fname):
+    logger = Logger(fname)
+    logger.log(request.json)
+    return "OK"

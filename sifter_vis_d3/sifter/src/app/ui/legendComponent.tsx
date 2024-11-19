@@ -6,7 +6,7 @@ import './componentStyles.scss';
 import { generateColours, getSubtypeName, TypeToColourMap } from '../vispanels/page';
 import { BarChart, Casino, KeyboardArrowLeft, KeyboardArrowRight, StackedLineChart, Window } from '@mui/icons-material';
 import { Box, styled } from '@mui/system';
-import { MaterialPicker, PhotoshopPicker } from 'react-color';
+import { MaterialPicker, PhotoshopPicker, SketchPicker } from 'react-color';
 
 export interface SubtypeEntry {
     name: string,
@@ -217,7 +217,8 @@ function VisRightClickMenu({ rightClickAnchor, setRightClickAnchor, label, typeV
 
 function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatrix,
                      fields, expandedTypes, setExpandedTypes, colourOfType,
-                     setColourOfType, setColourMenuAnchor, setSelMenuType } : 
+                     setColourOfType, setColourMenuAnchor, setSelMenuType,
+                     setCurrColourSel } : 
     {   
         typeName: string,
         colourOfType: {[tp: string]: d3.RGBColor | d3.HSLColor | null},
@@ -230,7 +231,8 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
         expandedTypes: {[tp: string]: boolean},
         setExpandedTypes: (a: {[tp: string]: boolean}) => void,
         setColourMenuAnchor: (a: HTMLDivElement | null) => void,
-        setSelMenuType: (a: string | undefined) => void
+        setSelMenuType: (a: string | undefined) => void,
+        setCurrColourSel: (a: string) => void
     }) {
     const [rightClickAnchor, setRightClickAnchor] = useState<HTMLElement | null>(null);
     const [label, setLabel] = useState<string | undefined>(undefined);
@@ -306,6 +308,7 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                             onClick={(e) => {
                                 setSelMenuType(typeName);
                                 setColourMenuAnchor(e.currentTarget);
+                                setCurrColourSel(colourOfType[typeName] == null ? '#ffffff' : colourOfType[typeName].formatHex());
                             }}
                             sx={{
                                 width: '20px',
@@ -423,6 +426,7 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, typeV
     const [currSortMode, setCurrSortMode] = useState<LegendRowSortMode>({mode: 'allocs', rev: false});
     const [colourMenuAnchor, setColourMenuAnchor] = useState<HTMLDivElement | null>(null);
     const [selMenuType, setSelMenuType] = useState<string | undefined>(undefined);
+    const [currColourSel, setCurrColourSel] = useState<string>('#ffffff');
 
     return (
         <>
@@ -430,16 +434,16 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, typeV
                 open={Boolean(colourMenuAnchor)}
                 anchorEl={colourMenuAnchor}
                 onClose={() => setColourMenuAnchor(null)} >
-                <MaterialPicker
-                    color={selMenuType ? colourOfType[selMenuType]?.toString() : '#ffffff'}
+                <PhotoshopPicker
+                    color={currColourSel}
+                    onChange={(col) => setCurrColourSel(col.hex)}
                     onChangeComplete={(col) => {
                         if (selMenuType) {
                             const newColourOfType = colourOfType;
                             newColourOfType[selMenuType] = d3.color(col.hex);
                             setColourOfType(newColourOfType);
                         }
-                    }}
-                     />
+                    }} />
             </Popover>
             <table
                 id='legendTable'
@@ -473,7 +477,8 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, typeV
                                                         setExpandedTypes={setExpandedTypes}
                                                         setColourOfType={setColourOfType}
                                                         setColourMenuAnchor={setColourMenuAnchor}
-                                                        setSelMenuType={setSelMenuType} />)
+                                                        setSelMenuType={setSelMenuType}
+                                                        setCurrColourSel={setCurrColourSel} />)
                     }
                 </tbody>
                 <LegendTableFooter

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import Legend, { SubtypeEntry } from '../ui/legendComponent';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
@@ -12,9 +12,10 @@ import CssBaseline from '@mui/material/CssBaseline';
 import CacheSets, { CacheInfoMap } from '../ui/cacheSetComponent';
 import { theme } from '../page';
 import { useSearchParams } from 'next/navigation';
-import { FormControl, IconButton, InputLabel, LinearProgress, MenuItem, Popover, Select, Slider, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { Divider, FormControl, IconButton, InputLabel, LinearProgress, MenuItem, Paper, Popover, Select, Slider, Tab, Tabs, TextareaAutosize, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { flushSync } from 'react-dom';
-import { Cached, Settings } from '@mui/icons-material';
+import { ArrowBack, Cached, Close, EditNote, Settings } from '@mui/icons-material';
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 
 export interface TypeToColourMap {
     [ tp: string ]: d3.RGBColor | d3.HSLColor | null
@@ -83,10 +84,10 @@ function getPageVis(typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: bo
     }, {});
 }
 
-function SettingsButton({ maxRunLength, setMaxRunLength, maxRunsPerCluster, setMaxRunsPerCluster,
+const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCluster, setMaxRunsPerCluster,
                          clusterAlg, setClusterAlg, numBucketsSetting, setNumBucketsSetting,
                          pageSizeSetting, setPageSizeSetting, cacheInfoSetting, setCacheInfoSetting,
-                         cacheLineSizeSetting, setCacheLineSizeSetting } : 
+                         cacheLineSizeSetting, setCacheLineSizeSetting, ...props } : 
     {
         maxRunLength: number,
         setMaxRunLength: (a: number) => void,
@@ -102,7 +103,7 @@ function SettingsButton({ maxRunLength, setMaxRunLength, maxRunsPerCluster, setM
         setCacheInfoSetting: (a: CacheInfoMap) => void,
         cacheLineSizeSetting: number,
         setCacheLineSizeSetting: (a: number) => void
-    }) {
+    }, ref) => {
     const [menuAnchor, setMenuAnchor] = useState<HTMLButtonElement | null>(null);
     const [tabValue, setTabValue] = useState<'sample' | 'pages' | 'cache'>('sample');
     const [cacheSizeUnitSetting, setCacheSizeUnitSetting] = useState(Object.keys(cacheInfoSetting).reduce((map: {[a: string]: 0 | 1 | 2}, cname: string) => {
@@ -112,6 +113,8 @@ function SettingsButton({ maxRunLength, setMaxRunLength, maxRunsPerCluster, setM
     return (
         <>
             <IconButton
+                {...props}
+                ref={ref}
                 onClick={(e) => setMenuAnchor(e.currentTarget)} >
                 <Settings />
             </IconButton>
@@ -354,7 +357,7 @@ function SettingsButton({ maxRunLength, setMaxRunLength, maxRunsPerCluster, setM
             </Popover>
         </>
     );
-}
+});
 
 export default function VisPanels() {
     const shouldInitialize = useRef(true);
@@ -393,6 +396,11 @@ export default function VisPanels() {
     const [pageSizeSetting, setPageSizeSetting] = useState(INIT_PAGE_SIZE);
     const [cacheInfoSetting, setCacheInfoSetting] = useState(INIT_CACHE_INFO);
     const [cacheLineSizeSetting, setCacheLineSizeSetting] = useState(INIT_CACHELINE_SIZE);
+
+    /*  State and refs for notes. */
+    const nodeRef = useRef(null);
+    const [notesOpen, setNotesOpen] = useState<boolean>(false);
+    const [notesPosition, setNotesPosition] = useState({x: 0, y: 0});
 
     useEffect(() => {
         if (shouldInitialize.current) {
@@ -564,11 +572,27 @@ export default function VisPanels() {
                         fieldsData={fieldsData}
                         expandedTypes={expandedTypes}
                         setExpandedTypes={setExpandedTypes} />
-                    <Stack
+                    <Box
                         id='settingsButtonContainer' >
                         <Tooltip
+                            title={'Back to selection menu'}
+                            placement='top' >
+                            <IconButton
+                                href={'/'} >
+                                <ArrowBack />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip
+                            title={notesOpen ? 'Close notes' : 'Open notes'}
+                            placement='top' >
+                            <IconButton
+                                onClick={() => setNotesOpen(!notesOpen)} >
+                                <EditNote />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip
                             title={resampling ? 'Resampling...' : 'Resample'}
-                            placement='left' >
+                            placement='top' >
                             <IconButton
                                 className={resampling ? 'resamplingButtonLoading' : ''}
                                 onClick={() => {
@@ -598,27 +622,67 @@ export default function VisPanels() {
                                                 });
                                     }
                                 }} >
-                                <Cached  />
+                                <Cached />
                             </IconButton>
                         </Tooltip>
-                        <SettingsButton
-                            maxRunLength={maxRunLength}
-                            setMaxRunLength={setMaxRunLength}
-                            maxRunsPerCluster={maxRunsPerCluster}
-                            setMaxRunsPerCluster={setMaxRunsPerCluster}
-                            clusterAlg={clusterAlg}
-                            setClusterAlg={setClusterAlg}
-                            numBucketsSetting={numBucketsSetting}
-                            setNumBucketsSetting={setNumBucketsSetting}
-                            pageSizeSetting={pageSizeSetting}
-                            setPageSizeSetting={setPageSizeSetting}
-                            cacheInfoSetting={cacheInfoSetting}
-                            setCacheInfoSetting={setCacheInfoSetting}
-                            cacheLineSizeSetting={cacheLineSizeSetting}
-                            setCacheLineSizeSetting={setCacheLineSizeSetting} />
-                        </Stack>
+                        <Tooltip
+                            title={'Settings'}
+                            placement='top' >
+                            <SettingsButton
+                                maxRunLength={maxRunLength}
+                                setMaxRunLength={setMaxRunLength}
+                                maxRunsPerCluster={maxRunsPerCluster}
+                                setMaxRunsPerCluster={setMaxRunsPerCluster}
+                                clusterAlg={clusterAlg}
+                                setClusterAlg={setClusterAlg}
+                                numBucketsSetting={numBucketsSetting}
+                                setNumBucketsSetting={setNumBucketsSetting}
+                                pageSizeSetting={pageSizeSetting}
+                                setPageSizeSetting={setPageSizeSetting}
+                                cacheInfoSetting={cacheInfoSetting}
+                                setCacheInfoSetting={setCacheInfoSetting}
+                                cacheLineSizeSetting={cacheLineSizeSetting}
+                                setCacheLineSizeSetting={setCacheLineSizeSetting} />
+                        </Tooltip>
+                    </Box>
                 </Grid>
             </Grid>
+            }
+            {
+            notesOpen &&
+            <div
+                id='notesContainer' >
+                <Draggable
+                    nodeRef={nodeRef}
+                    defaultPosition={notesPosition}
+                    onStop={(e: DraggableEvent, d: DraggableData) => setNotesPosition({x: d.lastX, y: d.lastY})} >
+                    <Paper
+                        ref={nodeRef}
+                        id='notesBackground'
+                        elevation={5} >
+                        <div
+                            id='notesHeader' >
+                            <Typography
+                                id='notesHeaderText'
+                                variant='h6' >
+                                Notepad
+                            </Typography>
+                            <div id='notesCloseButton' >
+                                <IconButton
+                                    onClick={() => setNotesOpen(false)}
+                                    size='small' >
+                                    <Close />
+                                </IconButton>
+                            </div>
+                        </div>
+                        <Divider />
+                        <TextareaAutosize
+                            id='notesTextArea'
+                            minRows={5}
+                            maxRows={12} />
+                    </Paper>
+                </Draggable>
+            </div>
             }
         </ThemeProvider>
     );

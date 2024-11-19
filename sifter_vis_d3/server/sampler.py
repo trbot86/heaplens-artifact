@@ -80,11 +80,20 @@ class Sampler:
         df.loc[:,"freeTs"] = df.groupby("addr")["freeTs"].bfill(limit=1)
 
         # Get rid of the old frees and drop the is_alloc column
-        return df.loc[df["is_alloc"] == 1,:].drop(columns=["is_alloc"]).dropna(subset=["allocTs", "type"])
+        df = df.loc[df["is_alloc"] == 1,:].drop(columns=["is_alloc"]).dropna(subset=["allocTs", "type"])
+
+        # The following is a bit of a hack to deal with placement new.
+        # For all of the remaining objects that have no free timestamp,
+        # we fill the free timestamp with the next allocation timestamp
+        # with the same address and type. (NOTE: this keeps overlapping
+        # objects with distinct types)
+        # df.loc[df["freeTs"].isnull(),"freeTs"] = df.groupby(["addr", "type"])["allocTs"].shift(periods=-1).dropna()
+        return df
     
     def get_all_records(self, page_size=4096):
         con = sqlite3.connect(self.fname)
         dfs = []
+        i = 0
         for chunk in pd.read_sql_query("""SELECT FILE as file,
                                     SIZE as size,
                                     ADDRESS as addr,
@@ -93,9 +102,11 @@ class Sampler:
                                     isNew as is_alloc,
                                     LINE as line
                                 FROM SUPERTABLE""",
-                                con = sqlite3.connect(self.fname),
+                                con,
                                 chunksize=100000):
+            chunk.index = pd.RangeIndex(start=i*100000, stop=i*100000 + len(chunk), step=1)
             dfs.append(chunk)
+            i += 1
         con.close()
         return pd.concat(dfs)
     

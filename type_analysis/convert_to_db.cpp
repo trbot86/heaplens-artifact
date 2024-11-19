@@ -9,6 +9,7 @@
 #include <sqlite3.h>
 #include <fstream>
 #include <unordered_map>
+#include <map>
 #include <sstream>
 #include <cstring>
 #include <sys/stat.h>
@@ -470,6 +471,31 @@ void get_types_in_chunk(int id, int chunk_size, int start_ind, info_t* filemap,
   }
 }
 
+void write_event_to_db(sqlite3_stmt* stmt, info_t event) {
+  const char* fname = event.file ? file_map.at((uintptr_t) event.file).c_str() : "NULL";
+  const char* tname = event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL";
+  sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
+  sqlite3_bind_int(stmt, 2, event.line);
+  sqlite3_bind_int64(stmt, 3, event.timestamp);
+  sqlite3_bind_int64(stmt, 4, event.size);
+  sqlite3_bind_int64(stmt, 5, (uint64_t) event.addr);
+  sqlite3_bind_int(stmt, 6, event.typeofop);
+  sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+
+  int rc = sqlite3_step(stmt);
+  if (rc != SQLITE_DONE) {
+    fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
+    // fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+    // fclose(input_file);
+    // sqlite3_close(db);
+    exit(-1);
+  } // TODO better error handling
+
+  // sqlite3_step(stmt);
+  sqlite3_clear_bindings(stmt);
+  sqlite3_reset(stmt);
+}
+
 
 
 int main(int argc, char* argv[]) {
@@ -747,11 +773,40 @@ int main(int argc, char* argv[]) {
     if (p.second.sampled == CTD_SAMPLED_YES) {
       node_t* n = p.second.events.head;
       unordered_map<uint64_t, size_t> last_alloc_size{};
+      map<uint64_t, uint64_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
       while (n != nullptr) {
         info_t* event = n->data;
         size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uint64_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uint64_t) event->addr) : 0;
-        if (event->typeofop)
+        if (event->typeofop) {
+          map<uint64_t, uint64_t>::iterator itlow = alloc_intervals.lower_bound((uint64_t) event->addr);
+          map<uint64_t, uint64_t>::iterator i = itlow;
+          if (i != alloc_intervals.end())
+            i++;
+
+          do {
+            if (i != alloc_intervals.begin())
+              i--;
+            if (i->first <= (uint64_t) event->addr && i->second > (uint64_t) event->addr + event->size ||   // event strictly contained inside i
+                i->first < (uint64_t) event->addr && i->second >= (uint64_t) event->addr + event->size) {
+              // remove i, add event, DON'T add free for i
+              alloc_intervals.erase(i);
+              alloc_intervals.insert(pair<uint64_t, uint64_t>{(uint64_t) event->addr, (uint64_t) event->addr + event->size});
+              break;
+            }
+            else if (i->second <= (uint64_t) event->addr) {   // event is after i
+              alloc_intervals.insert(pair<uint64_t, uint64_t>{(uint64_t) event->addr, (uint64_t) event->addr + event->size});
+              break;
+            }
+            else if (i->first < (uint64_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
+              // remove i, add event, add free for i
+              alloc_intervals.erase(i);
+              alloc_intervals.insert(pair<uint64_t, uint64_t>{(uint64_t) event->addr, (uint64_t) event->addr + event->size});
+              write_event_to_db(stmt, info_t(nullptr, nullptr, 0, event->timestamp, 0, (void*) i->first, false));
+            }
+          } while (i != alloc_intervals.begin());
+
           last_alloc_size.insert(pair<uint64_t, size_t>{(uint64_t) event->addr, event->size});
+        }
 
         uint64_t page_num = (uint64_t) event->addr / page_size;
         uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary
@@ -762,8 +817,6 @@ int main(int argc, char* argv[]) {
           int64_t rem_size = event->size - eventSize;
           do {
             uint64_t new_event_page_num = new_event_addr / page_size;
-            if (new_event_addr == 140028518490112)
-              cout << "Found the special event" << endl;
             if (boundary_crossers.find(new_event_page_num) == boundary_crossers.end())
               boundary_crossers.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
             boundary_crossers[new_event_page_num].add_event(new info_t{ event->file,
@@ -777,29 +830,31 @@ int main(int argc, char* argv[]) {
             rem_size -= page_size;
           } while (rem_size > 0);
         }
+
+        write_event_to_db(stmt, info_t(event->file, event->tindex_name, event->line, event->timestamp, eventSize, event->addr, event->typeofop));
         
-        const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
-        const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
-        sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
-        sqlite3_bind_int(stmt, 2, event->line);
-        sqlite3_bind_int64(stmt, 3, event->timestamp);
-        sqlite3_bind_int64(stmt, 4, eventSize);
-        sqlite3_bind_int64(stmt, 5, (uint64_t) event->addr);
-        sqlite3_bind_int(stmt, 6, event->typeofop);
-        sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+        // const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
+        // const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
+        // sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
+        // sqlite3_bind_int(stmt, 2, event->line);
+        // sqlite3_bind_int64(stmt, 3, event->timestamp);
+        // sqlite3_bind_int64(stmt, 4, eventSize);
+        // sqlite3_bind_int64(stmt, 5, (uint64_t) event->addr);
+        // sqlite3_bind_int(stmt, 6, event->typeofop);
+        // sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
 
-        rc = sqlite3_step(stmt);
-        if (rc != SQLITE_DONE) {
-          fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
-          fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
-          fclose(input_file);
-          sqlite3_close(db);
-          exit(-1);
-        }
+        // rc = sqlite3_step(stmt);
+        // if (rc != SQLITE_DONE) {
+        //   fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
+        //   fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+        //   fclose(input_file);
+        //   sqlite3_close(db);
+        //   exit(-1);
+        // }
 
-        // sqlite3_step(stmt);
-        sqlite3_clear_bindings(stmt);
-        sqlite3_reset(stmt);
+        // // sqlite3_step(stmt);
+        // sqlite3_clear_bindings(stmt);
+        // sqlite3_reset(stmt);
         n = n->next;
       }
     }
@@ -819,31 +874,29 @@ int main(int argc, char* argv[]) {
         while (n != nullptr) {
           info_t* event = n->data;
 
-          if ((uint64_t)event->addr == 140028518490112)
-            cout << "Found the special event in boundary pages" << endl;
+          write_event_to_db(stmt, *event);
+          // const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
+          // const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
+          // sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
+          // sqlite3_bind_int(stmt, 2, event->line);
+          // sqlite3_bind_int64(stmt, 3, event->timestamp);
+          // sqlite3_bind_int64(stmt, 4, event->size);
+          // sqlite3_bind_int64(stmt, 5, (uint64_t) event->addr);
+          // sqlite3_bind_int(stmt, 6, event->typeofop);
+          // sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
 
-          const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
-          const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
-          sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
-          sqlite3_bind_int(stmt, 2, event->line);
-          sqlite3_bind_int64(stmt, 3, event->timestamp);
-          sqlite3_bind_int64(stmt, 4, event->size);
-          sqlite3_bind_int64(stmt, 5, (uint64_t) event->addr);
-          sqlite3_bind_int(stmt, 6, event->typeofop);
-          sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+          // rc = sqlite3_step(stmt);
+          // if (rc != SQLITE_DONE) {
+          //   fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
+          //   fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+          //   fclose(input_file);
+          //   sqlite3_close(db);
+          //   exit(-1);
+          // }
 
-          rc = sqlite3_step(stmt);
-          if (rc != SQLITE_DONE) {
-            fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
-            fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
-            fclose(input_file);
-            sqlite3_close(db);
-            exit(-1);
-          }
-
-          // sqlite3_step(stmt);
-          sqlite3_clear_bindings(stmt);
-          sqlite3_reset(stmt);
+          // // sqlite3_step(stmt);
+          // sqlite3_clear_bindings(stmt);
+          // sqlite3_reset(stmt);
           n = n->next;
         }
       }

@@ -396,7 +396,7 @@ rect.selection {
 }
 
 
-/* Settings and resample button */
+/* Bottom right button panel */
 
 #settingsButtonContainer {
     position: fixed;
@@ -450,6 +450,32 @@ rect.selection {
     100% {
         transform: rotate(-360deg);
     }
+}
+
+#notesContainer {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+}
+
+#notesTextArea {
+    margin: 10px;
+    width: 300px;
+    background: $pageCardBackColour;
+    border-radius: 5px;
+    border: 1px solid $pageCardBackColourHover;
+    color: #e0e0e0;
+}
+
+#notesHeader {
+    margin-left: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#notesCloseButton {
+    margin-left: auto;
 }
 
 

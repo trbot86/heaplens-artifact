@@ -255,7 +255,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
                     clipPath='url(#timeGraphClip)' >
                     {
                         Object.keys(lines).filter((tp) => typeVisMatrix[tp].lineVis)
-                                        .map((tp) =>  <Tooltip 
+                                        .map((tp) =>   <Tooltip 
                                                             key={tp}
                                                             title={tp}
                                                             followCursor

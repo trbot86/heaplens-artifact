@@ -18,7 +18,7 @@ byte_reader: byte_rw.cpp
 	$(CC) byte_rw.cpp -g -o bin/byte_rw -lpthread -lrt
 
 convert_to_db: convert_to_db.cpp
-	g++-10 -O3 convert_to_db.cpp -g -o bin/convert_to_db -lsqlite3 -lpthread
+	g++ -O3 convert_to_db.cpp -g -o bin/convert_to_db -lsqlite3 -lpthread
 
 # NEEDED
 fieldandtypedumper: clang_parser.cpp
