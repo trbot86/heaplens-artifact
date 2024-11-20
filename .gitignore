@@ -6,6 +6,12 @@ ASCYLIB
 leanstore
 jemalloc
 testing_matchers
+gzip-1.10
+masstree-beta
+ralloc-copy
+ralloc
+setbench_verlib*
+zstd
 *.sqlite-journal
 fielddump_tester
 ssmem

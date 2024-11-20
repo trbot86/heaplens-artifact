@@ -478,9 +478,14 @@ void write_event_to_db(sqlite3_stmt* stmt, info_t event) {
   sqlite3_bind_int(stmt, 2, event.line);
   sqlite3_bind_int64(stmt, 3, event.timestamp);
   sqlite3_bind_int64(stmt, 4, event.size);
-  sqlite3_bind_int64(stmt, 5, (uint64_t) event.addr);
+  sqlite3_bind_int64(stmt, 5, (uintptr_t) event.addr);
   sqlite3_bind_int(stmt, 6, event.typeofop);
   sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+
+  if ((uintptr_t) event.addr == 140576089034810) {
+    printf("\tWRITING TO DB: HERE IS THE PROBLEM EVENT\n");
+    printf("\ttimestamp: %lu, typeofop: %d\n", event.timestamp, event.typeofop);
+  }
 
   int rc = sqlite3_step(stmt);
   if (rc != SQLITE_DONE) {
@@ -746,13 +751,10 @@ int main(int argc, char* argv[]) {
 
   unordered_map<uint64_t, memory_page_t> boundary_crossers{};
   cout << "Number of pages: " << all_pages.size() << endl;
-  int count = 0;
+  bool saw_event = false;
 
   for (auto& p: all_pages) {
-    count++;
-    if (count % 1000 == 0) {
-      // cout << "Done " << count << " pages" << endl;
-    }
+    // printf("Here is the page address: %lu\n", p.first);
     if (p.second.sampled == CTD_NOT_SAMPLED) {
       bool take_for_type = false;
       for (auto& tp: p.second.included_types) {
@@ -772,40 +774,43 @@ int main(int argc, char* argv[]) {
 
     if (p.second.sampled == CTD_SAMPLED_YES) {
       node_t* n = p.second.events.head;
-      unordered_map<uint64_t, size_t> last_alloc_size{};
-      map<uint64_t, uint64_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
+      unordered_map<uintptr_t, size_t> last_alloc_size{};
+      map<uintptr_t, uintptr_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
       while (n != nullptr) {
         info_t* event = n->data;
-        size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uint64_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uint64_t) event->addr) : 0;
+        size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uintptr_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uintptr_t) event->addr) : 0;
+
         if (event->typeofop) {
-          map<uint64_t, uint64_t>::iterator itlow = alloc_intervals.lower_bound((uint64_t) event->addr);
-          map<uint64_t, uint64_t>::iterator i = itlow;
+          // printf("About to search for address %p\n", event->addr);
+          map<uintptr_t, uintptr_t>::iterator i = alloc_intervals.lower_bound((uintptr_t) event->addr);
           if (i != alloc_intervals.end())
             i++;
 
-          do {
-            if (i != alloc_intervals.begin())
-              i--;
-            if (i->first <= (uint64_t) event->addr && i->second > (uint64_t) event->addr + event->size ||   // event strictly contained inside i
-                i->first < (uint64_t) event->addr && i->second >= (uint64_t) event->addr + event->size) {
-              // remove i, add event, DON'T add free for i
-              alloc_intervals.erase(i);
-              alloc_intervals.insert(pair<uint64_t, uint64_t>{(uint64_t) event->addr, (uint64_t) event->addr + event->size});
-              break;
-            }
-            else if (i->second <= (uint64_t) event->addr) {   // event is after i
-              alloc_intervals.insert(pair<uint64_t, uint64_t>{(uint64_t) event->addr, (uint64_t) event->addr + event->size});
-              break;
-            }
-            else if (i->first < (uint64_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
-              // remove i, add event, add free for i
-              alloc_intervals.erase(i);
-              alloc_intervals.insert(pair<uint64_t, uint64_t>{(uint64_t) event->addr, (uint64_t) event->addr + event->size});
-              write_event_to_db(stmt, info_t(nullptr, nullptr, 0, event->timestamp, 0, (void*) i->first, false));
-            }
-          } while (i != alloc_intervals.begin());
-
-          last_alloc_size.insert(pair<uint64_t, size_t>{(uint64_t) event->addr, event->size});
+          if (alloc_intervals.size() > 0) {
+            do {
+              if (i != alloc_intervals.begin())
+                i--;
+              if (i->first <= (uintptr_t) event->addr && i->second > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
+                  i->first < (uintptr_t) event->addr && i->second >= (uintptr_t) event->addr + event->size) {
+                // remove i, DON'T add free for i
+                alloc_intervals.erase(i->first);
+                i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+                break;
+              }
+              else if (i->second <= (uintptr_t) event->addr) {   // event is after i
+                break;
+              }
+              else if (i->first < (uintptr_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
+                // remove i, add free for i
+                write_event_to_db(stmt, info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
+                alloc_intervals.erase(i->first);
+                i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+              }
+            } while (i != alloc_intervals.begin());
+            // printf("FINISHED THE LOOP\n");
+          }
+          alloc_intervals.insert(pair<uintptr_t, uintptr_t>{(uintptr_t) event->addr, (uintptr_t) event->addr + event->size});         
+          last_alloc_size.insert(pair<uintptr_t, size_t>{(uintptr_t) event->addr, event->size});
         }
 
         uint64_t page_num = (uint64_t) event->addr / page_size;
@@ -861,13 +866,8 @@ int main(int argc, char* argv[]) {
   }
 
   cout << "Number of boundary crossing pages: " << boundary_crossers.size() << endl;
-  count = 0;
 
   for (auto& p: boundary_crossers) {
-    count++;
-    if (count % 1000 == 0) {
-      cout << "Done " << count << " boundary pages" << endl;
-    }
     if (all_pages.find(p.first) != all_pages.end()) {
       if (all_pages[p.first].sampled == CTD_SAMPLED_YES) {
         node_t* n = p.second.events.head;
