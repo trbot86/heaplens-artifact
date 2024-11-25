@@ -88,7 +88,8 @@ class Sampler:
         # with the same address and type. (NOTE: this keeps overlapping
         # objects with distinct types)
         # df.loc[df["freeTs"].isnull(),"freeTs"] = df.groupby(["addr", "type"])["allocTs"].shift(periods=-1).dropna()
-        return df
+        # return df.iloc[:,[]]
+        return df.iloc[:,[0, 1, 2, 3, 4, 6, 5]]
     
     def get_all_records(self, page_size=4096):
         con = sqlite3.connect(self.fname)
@@ -168,6 +169,7 @@ class Sampler:
                         coloc[tp][rec[TYPE_IND]] += 1
                 cl_current[rec[ADDR_IND]][rec[TYPE_IND]] += 1
             else:
+                print(rec)
                 cl_current[rec[ADDR_IND]][rec[TYPE_IND]] -= 1
 
         retval['coloc'] = coloc
@@ -254,7 +256,7 @@ class Sampler:
         min_ts = df['ts'].min()
         max_ts = df['ts'].max()
         bucket_size = (max_ts - min_ts) / self.num_buckets
-        df.loc[:,'bucket'] = ((df['ts'] - min_ts) // bucket_size).astype('Int64')
+        df.loc[:,'bucket'] = ((df.loc[:,'ts'] - min_ts) // bucket_size).astype('Int64')
 
         # print(df)
         pts = {}
@@ -283,7 +285,7 @@ class Sampler:
 
         return {'pts': pts,
                 'changes': change_pts,
-                'stats': {'single': self.get_stats(recs, self.cache_line_size), 'double': self.get_stats(recs, 2*self.cache_line_size)},
+                'stats': {},#{'single': self.get_stats(recs, self.cache_line_size), 'double': self.get_stats(recs, 2*self.cache_line_size)},
                 'fields': self.get_fields(s.replace(' ', '') for s in df['type'].unique()),
                 'counts': self.get_counts().set_index('type').to_dict('index'),
                 'perf': self.get_perf_data().drop_duplicates(subset=['cl_addr']).set_index('cl_addr').to_dict(orient='index'),
@@ -479,8 +481,15 @@ class Sampler:
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()}}
     
     def get_cache_data(self, size, assoc):
+        pd.options.display.float_format = '{:.0f}'.format
         num_cache_sets = size // (assoc * self.cache_line_size)
-        rows = self.get_objects(self.all_data).to_numpy()
+        all_objs = self.get_objects(self.all_data)
+        # free_ts_is_na = all_objs.loc[all_objs["freeTs"].isna()]
+        # free_ts_is_not_na = all_objs.loc[all_objs["freeTs"].notna()]
+        # print(free_ts_is_not_na.loc[free_ts_is_not_na["type"] == "leanstore::storage::btree::BTreeVI::ChainedTuple"])
+        # print(free_ts_is_na.loc[free_ts_is_na["type"] == "leanstore::storage::btree::BTreeVI::ChainedTuple"])
+        # print(all_objs.columns)
+        rows = all_objs.to_numpy()
         types = self.types()
         fields = self.get_fields([s.replace(' ', '') for s in types])
         i = 0
@@ -515,6 +524,8 @@ class Sampler:
                 rem_size = entry[SIZE_IND] - (self.cache_line_size - (entry[ADDR_IND] % self.cache_line_size))
                 alloc_time_bucket = get_bucket(self.min_ts, self.max_ts, self.num_buckets, entry[ALLOC_TS_IND])
                 free_time_bucket = -1 if math.isnan(entry[FREE_TS_IND]) else get_bucket(self.min_ts, self.max_ts, self.num_buckets, entry[FREE_TS_IND])
+                # if entry[TYPE_IND] == "leanstore::storage::btree::BTreeVI::ChainedTuple":
+                #     print("alloc bucket: {}, free bucket: {}".format(alloc_time_bucket, free_time_bucket))
                 try:
                     data[alloc_time_bucket,start_set,tp_and_st_to_idx[entry[TYPE_IND]]] += 1
                     if free_time_bucket >= 0:
@@ -549,8 +560,7 @@ class Sampler:
             "idxToTpAndSt": tp_and_st_in_order,
             "numSets": num_cache_sets
         }
-        # return .to_dict(orient="index")
-        # return df[::-1].cumsum()[::-1]
+        # return None
 
 
 if __name__ == "__main__":

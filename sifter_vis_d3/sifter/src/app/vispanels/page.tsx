@@ -1,5 +1,5 @@
 'use client';
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, forwardRef, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import Legend, { SubtypeEntry } from '../ui/legendComponent';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
@@ -19,6 +19,11 @@ import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 
 export interface TypeToColourMap {
     [ tp: string ]: d3.RGBColor | d3.HSLColor | null
+};
+
+interface LogBody {
+    'myNotes': string,
+    'colours': {'type': string, 'colour': string}[]
 };
 
 const INIT_PAGE_SIZE = 4096;
@@ -47,6 +52,18 @@ export function generateColours(types: string[]): TypeToColourMap {
         map[tp] = d3.color(`hsl(${getRand(0, 360)}, ${getRand(20, 60)}%, ${getRand(35, 55)}%)`);
         return map;
     }, {});
+}
+
+async function logData(fname: string, logBody: LogBody) {
+    const resp = await fetch(`http://localhost:5000/log-data/${fname}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(logBody)
+    });
+    return resp;
 }
 
 export async function getData(url: string, postBody: {[tp: string]: boolean} | null) {
@@ -367,7 +384,7 @@ export default function VisPanels() {
     const [pageSize, setPageSize] = useState(INIT_PAGE_SIZE);
     const [currTs, setCurrTs] = useState(0);
     const [cacheLineSize, setCacheLineSize] = useState(INIT_CACHELINE_SIZE);
-    const [colourOfType, setColourOfType] = useState({});
+    const [colourOfType, setColourOfType] = useState<TypeToColourMap>({});
     const [lineData, setLineData] = useState<{[tp: string]: SizePoint[]}>({});
     const [statsData, setStatsData] = useState({});
     const [fieldsData, setFieldsData] = useState<{[tp: string]: SubtypeEntry[]}>({});
@@ -401,6 +418,7 @@ export default function VisPanels() {
     const nodeRef = useRef(null);
     const [notesOpen, setNotesOpen] = useState<boolean>(false);
     const [notesPosition, setNotesPosition] = useState({x: 0, y: 0});
+    const [notesText, setNotesText] = useState<string>('');
 
     useEffect(() => {
         if (shouldInitialize.current) {
@@ -456,13 +474,6 @@ export default function VisPanels() {
                         setStatsData(allData['linesAndStats']['stats']);
                         setFieldsData(allData['linesAndStats']['fields']);
                         setCountsData(allData['linesAndStats']['counts']);
-                        if (fname == 'setbench_bst_chrom_n48_u0.sqlite') {
-                            allData['linesAndStats']['perf'][0x7fba06e32000] = {hitm: 0.94, stores: 394, loads: 483};
-                            allData['linesAndStats']['perf'][0x7fba06e32000 + 2688] = {hitm: 0.12, stores: 101, loads: 2450};
-                            allData['linesAndStats']['perf'][0x7fba086f4000 + 384] = {hitm: 0.02, stores: 2, loads: 3914};
-                            allData['linesAndStats']['perf'][0x7fba086f4000 + 1536] = {hitm: 0.01, stores: 2, loads: 4113};
-                            allData['linesAndStats']['perf'][0x7fba0694c000 + 2048] = {hitm: 0.01, stores: 3, loads: 2918};
-                        }
                         const retPerfData: PerfMap = Object.keys(allData['linesAndStats']['perf'])
                             .map((straddr: string) => parseInt(straddr))
                             .filter((addr) => addr >= 0)
@@ -578,7 +589,20 @@ export default function VisPanels() {
                             title={'Back to selection menu'}
                             placement='top' >
                             <IconButton
-                                href={'/'} >
+                                onClick={() => {
+                                    const logBody: LogBody = {
+                                        'myNotes': notesText,
+                                        'colours': Object.entries(colourOfType)
+                                                            .map((pair: [string, d3.RGBColor | d3.HSLColor | null]) => ({'type': pair[0], 'colour': pair[1] ? pair[1].toString() : '#ffffff'}))
+                                    };
+                                    if (fname) {
+                                        logData(fname, logBody)
+                                            .then((resp) => {
+
+                                            });
+                                    }
+                                    // window.location.href = "http://localhost:3000/"
+                                }} >
                                 <ArrowBack />
                             </IconButton>
                         </Tooltip>
@@ -678,8 +702,11 @@ export default function VisPanels() {
                         <Divider />
                         <TextareaAutosize
                             id='notesTextArea'
+                            defaultValue={notesText}
+                            placeholder='Enter notes here'
                             minRows={5}
-                            maxRows={12} />
+                            maxRows={12}
+                            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setNotesText(e.target.value)} />
                     </Paper>
                 </Draggable>
             </div>

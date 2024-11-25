@@ -1,0 +1,33 @@
+{
+    "myNotes": "",
+    "colours": [
+        {
+            "type": "int",
+            "colour": "rgb(52, 137, 66)"
+        },
+        {
+            "type": "big_type",
+            "colour": "rgb(141, 77, 37)"
+        },
+        {
+            "type": "half_type",
+            "colour": "rgb(111, 105, 73)"
+        },
+        {
+            "type": "char",
+            "colour": "rgb(91, 147, 42)"
+        },
+        {
+            "type": "huge_type",
+            "colour": "rgb(147, 161, 43)"
+        },
+        {
+            "type": "pnew_type",
+            "colour": "rgb(90, 114, 140)"
+        },
+        {
+            "type": "other_type",
+            "colour": "rgb(60, 157, 47)"
+        }
+    ]
+}

@@ -43,5 +43,15 @@ def get_cache_data(fname, page_size, cache_line_size, num_buckets, cache_size, a
 @cross_origin(origin='http://localhost:3000')
 def log_data(fname):
     logger = Logger(fname)
-    logger.log(request.json)
-    return "OK"
+    return logger.log(request.json)
+
+@app.route("/log-data/get-files", methods=["GET"])
+@cross_origin(origin='http://localhost:3000')
+def get_log_files(fname):
+    return Logger.get_log_files()
+
+@app.route("/log-data/get-notes/<string:fname>", methods=["GET"])
+@cross_origin(origin='http://localhost:3000')
+def get_notes_for_file(fname):
+    logger = Logger(fname)
+    return logger.get_notes(fname)

@@ -3,8 +3,36 @@ import { Avatar, CssBaseline, List, ListItem, ListItemAvatar, ListItemText, List
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
 import './page.scss';
 import { useEffect, useState } from 'react';
-import { Storage } from '@mui/icons-material';
+import { EditNote, Storage } from '@mui/icons-material';
 import Box from '@mui/material/Box';
+
+async function getDBFiles() {
+    const resp = await fetch('http://localhost:5000/get-fnames');
+    const files = await resp.json();
+    return files;
+}
+
+async function getLogFiles() {
+    const data = await fetch(`http://localhost:5000/log-data/get-files`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+    return data;
+}
+
+async function getNotesForFile(fname: string) {
+    const data = await fetch(`http://localhost:5000/log-data/get-notes/${fname}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+    return data;
+}
 
 export const theme: Theme = createTheme({
     palette: {
@@ -29,14 +57,15 @@ export const theme: Theme = createTheme({
 export default function FileSelect() {
     const [files, setFiles] = useState([]);
     const [filterText, setFilterText] = useState('');
+    const [logFiles, setLogFiles] = useState<Set<string>>(new Set());
 
     useEffect(() => {
-        async function getData() {
-            const resp = await fetch('http://localhost:5000/get-fnames');
-            const files = await resp.json();
-            setFiles(files);
-        }
-        getData();
+        getDBFiles()
+            .then((resp) => setFiles(resp));
+        getLogFiles()
+            .then((resp) => {
+                resp.json().then((logs) => setLogFiles(new Set(logs)))
+            });
     }, []);
 
     return (
@@ -60,13 +89,22 @@ export default function FileSelect() {
                                                         <ListItemButton
                                                             component='a'
                                                             href={`/vispanels?fname=${file}`} >
-                                                            <ListItemAvatar>
+                                                            {/* <ListItemAvatar>
                                                                 <Avatar>
                                                                     <Storage />
                                                                 </Avatar>
-                                                            </ListItemAvatar>
+                                                            </ListItemAvatar> */}
                                                             <ListItemText
                                                                 primary={file} />
+                                                            <ListItemAvatar
+                                                                className='showNotesButton'
+                                                                onClick={() => {
+
+                                                                }} >
+                                                                <Avatar>
+                                                                    <EditNote />
+                                                                </Avatar>
+                                                            </ListItemAvatar>
                                                         </ListItemButton>
                                                     </ListItem>)
                             }

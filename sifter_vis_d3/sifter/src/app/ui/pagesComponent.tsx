@@ -196,7 +196,7 @@ const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize
             }
 
             {/* Start line of object */}
-            {/* {
+            {
             (obj.actualAddr === undefined || obj.actualAddr >= viewStartAddr) &&
             <line
                 className='objDelimLine'
@@ -204,7 +204,7 @@ const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize
                 x2={xScale(obj.addr % cacheLineSize)}
                 y1={yScale(Math.floor((obj.addr - viewStartAddr) / cacheLineSize))}
                 y2={yScale(Math.floor((obj.addr - viewStartAddr) / cacheLineSize)) + yScale(1) - yScale(0)} />
-            } */}
+            }
 
             {/* End line of object */}
             {/* {

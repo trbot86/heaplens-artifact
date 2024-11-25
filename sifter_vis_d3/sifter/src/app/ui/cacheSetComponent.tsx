@@ -118,7 +118,7 @@ function CacheBox({ totalData, minOcc, maxOcc, idx, x, y, size, setHoverIdx } :
         size: number,
         setHoverIdx: (a: number | null) => void
     }) {
-    const colScale = d3.scalePow([minOcc / 2, maxOcc/1.1], ['#ffff91', '#e33a2b']).exponent(4);
+    const colScale = d3.scaleLinear([minOcc / 2, maxOcc], ['#ffff91', '#e33a2b']);
     
     return (
         <rect
@@ -126,6 +126,7 @@ function CacheBox({ totalData, minOcc, maxOcc, idx, x, y, size, setHoverIdx } :
             y={y*size}
             width={size}
             height={size}
+            data-total-max={`total: ${totalData}, max: ${maxOcc}`}
             fill={totalData > 0 ? colScale(totalData).toString() : theme.palette.primary.main}
             onMouseEnter={() => setHoverIdx(idx)}
             onMouseLeave={() => setHoverIdx(null)}
@@ -146,15 +147,6 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
         loading: boolean,
         expandedTypes: {[a: string]: boolean}
     }) {
-    const aggDataPerBucket: {min: number, max: number}[] = useMemo(() => {
-        return  cacheData.occ.map((bucket) => {
-                    return  bucket.reduce((res: {min: number, max: number}, v: number) => {
-                                    res.min = Math.min(res.min, v);
-                                    res.max = Math.max(res.max, v);
-                                    return res;
-                                }, {min: Infinity, max: 0});
-                });
-    }, [cacheData]);
     const totalData: number[][] = useMemo(() => {
         return  cacheData.occ.map((bucket) => {
                     return  bucket.reduce((res, v, i) => {
@@ -163,7 +155,21 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                                 }, new Array(cacheData.numSets).fill(0));
                 });
     }, [cacheData]);
+    const aggDataPerBucket: {min: number, max: number}[] = useMemo(() => {
+        return totalData.map((bucket: number[]) => {
+            return bucket.reduce((res: {min: number, max: number}, v: number) => {
+                res.min = Math.min(res.min, v);
+                res.max = Math.max(res.max, v);
+                return res;
+            }, {min: Infinity, max: 0});
+        });
+    }, [cacheData]);
     const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+
+    console.log('Cache data:');
+    console.log(cacheData);
+    console.log('Total data:')
+    console.log(totalData);
 
     return (
         <>
@@ -218,7 +224,7 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                             .fill(undefined)
                             .map((e, i) =>  <CacheBox
                                                 key={i}
-                                                totalData={totalData[bucketIdx][i <= 2 ? i + 8 : i]} // TODO REMOVE THIS TERNARY - THIS IS JUST FOR PRESENTATION
+                                                totalData={totalData[bucketIdx][i]}
                                                 minOcc={aggDataPerBucket[bucketIdx].min}
                                                 maxOcc={aggDataPerBucket[bucketIdx].max}
                                                 idx={i}
