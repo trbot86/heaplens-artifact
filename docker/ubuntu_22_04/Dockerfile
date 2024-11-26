@@ -48,7 +48,7 @@ COPY . /root/sifter
 WORKDIR /root/sifter
 
 RUN chmod +x llvm.sh
-RUN ./llvm.sh 10
+RUN ./llvm.sh 14
 RUN locale-gen en_US.UTF-8
 RUN pip3 install --upgrade pip
 RUN pip3 install cmake==3.22.1
