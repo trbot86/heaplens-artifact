@@ -7,7 +7,7 @@ template=false
 skipRefactor=false
 includesOnly=false
 subdirectory=""
-buildcmd="bear -- make"
+buildcmd="bear make"
 perffile=""
 fielddump=""
 pagespertype=""
@@ -230,10 +230,10 @@ else
     echo "replacing malloc with malloc_s..."
 fi
 if [ "$skipRefactor" = true ]; then
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -export-fixes=fixes.yaml
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-10 -checks=-*,misc-malloc-checker -export-fixes=fixes.yaml
     echo "skipped refactoring step - fixes written to fixes.yaml"
 else
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -fix
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-10 -checks=-*,misc-malloc-checker -fix
     echo "performed refactoring with clang-tidy"
     add_includes $outdir
 fi

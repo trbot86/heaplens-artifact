@@ -111,12 +111,14 @@ def merge_no_duplicates(tmpdir, mergefile):
   added = set()
   fixes = []
   for replacefile in glob.iglob(os.path.join(tmpdir, '*.yaml')):
-    content = yaml.safe_load(open(replacefile, 'r')).get("Diagnostics", [])
-    for fix in content:
-      info = fix["DiagnosticMessage"]
-      if re.search(".*memhook/.*", info["FilePath"]) is None and (info["FilePath"], info["FileOffset"]) not in added:
-        added.add((info["FilePath"], info["FileOffset"]))
-        fixes.append(fix)
+    filecontent = yaml.safe_load(open(replacefile, 'r'))
+    if filecontent is not None:
+      content = filecontent.get("Diagnostics", [])
+      for fix in content:
+        info = fix["DiagnosticMessage"]
+        if re.search(".*memhook/.*", info["FilePath"]) is None and (info["FilePath"], info["FileOffset"]) not in added:
+          added.add((info["FilePath"], info["FileOffset"]))
+          fixes.append(fix)
 
   if fixes:
     # MainSourceFile: The key is required by the definition inside
