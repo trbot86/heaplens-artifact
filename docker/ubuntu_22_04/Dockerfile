@@ -19,13 +19,15 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
                                             bear \
                                             vim \
                                             clang-14 \
-                                            libllvm-14-ocaml-dev \
-                                            libllvm14 \
-                                            llvm-14 \
-                                            llvm-14-dev \
-                                            llvm-14-doc \
-                                            llvm-14-examples \
-                                            llvm-14-runtime \
+                                            clang-tools-14 \
+                                            clang-14-doc \
+                                            libclang-common-14-dev \
+                                            libclang-14-dev \
+                                            libclang1-14 \
+                                            clang-format-14 \
+                                            python3-clang-14 \
+                                            clangd-14 \
+                                            clang-tidy-14 \
                                             zlib1g-dev \
                                             lsb-release \
                                             wget \
