@@ -12,6 +12,8 @@ ralloc-copy
 ralloc
 setbench_verlib*
 zstd
+sifter_vis_d3/server/saved_state/*
+*.tar.gz
 *.sqlite-journal
 fielddump_tester
 ssmem

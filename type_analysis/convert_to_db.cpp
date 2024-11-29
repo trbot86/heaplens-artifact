@@ -418,7 +418,7 @@ void create_supertable(sqlite3* db) {
   }
 }
 
-void get_types_in_chunk(int id, int chunk_size, int start_ind, info_t* filemap, 
+void sort_events_into_pages(int id, int chunk_size, int start_ind, info_t* filemap, 
                         unordered_map<uint64_t, memory_page_t>& pages, unordered_set<uintptr_t>& raw_type_set,
                         unordered_map<size_t, int>& size_class_counts, unordered_map<uintptr_t, stats_t*>& stats_per_type) {
   for (int i = 0; i < chunk_size; i++) {
@@ -447,13 +447,9 @@ void get_types_in_chunk(int id, int chunk_size, int start_ind, info_t* filemap,
       // printf("Address of new page: %p\n", &pages[page_num]);
     }
     // if (page_num_end != page_num && pages.find(page_num_end) == pages.end())
-    //   pages.insert(pair<uint64_t, memory_page_t>{page_num_end, memory_page_t{}});
+    //   pages.insert(pair<uint64_t, memory_page_t>{page_num_end, memory_page_t{}})
 
     pages[page_num].add_event(event);
-
-    if (i % 1000000 == 0) {
-      // cout << "thread " << id << " iteration " << i << " of first loop" << endl;
-    }
 
     // if (type_map.find((uintptr_t) event->tindex_name) != type_map.end()) {
       // string type_trim = type_map.at((uintptr_t) event->tindex_name);
@@ -467,6 +463,87 @@ void get_types_in_chunk(int id, int chunk_size, int start_ind, info_t* filemap,
       int ind = bin_search(size_classes, event->size, 0, num_classes);
       // cout << "Size: " << event->size << " Index: " << ind << " Size class: " << size_classes[ind] << endl;
       size_class_counts[size_classes[ind]] = size_class_counts[size_classes[ind]] + 1;
+    }
+  }
+}
+
+void split_events_across_pages( int id, int chunk_size, int start_ind, unordered_map<uint64_t, memory_page_t>& all_pages,
+                                vector<uint64_t>& page_num_list, unordered_map<uint64_t, memory_page_t>& pages) {
+  for (int i = start_ind; i < start_ind + chunk_size; i++) {
+    node_t* n = all_pages[page_num_list[i]].events.head;
+    unordered_map<uintptr_t, size_t> last_alloc_size{};
+    map<uintptr_t, uintptr_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
+    while (n != nullptr) {
+      info_t* event = n->data;
+      size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uintptr_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uintptr_t) event->addr) : 0;
+
+      if (event->typeofop) {
+        // printf("About to search for address %p\n", event->addr);
+        map<uintptr_t, uintptr_t>::iterator i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+        if (i != alloc_intervals.end())
+          i++;
+
+        if (alloc_intervals.size() > 0) {
+          do {
+            if (i != alloc_intervals.begin())
+              i--;
+            if (i->first <= (uintptr_t) event->addr && i->second > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
+                i->first < (uintptr_t) event->addr && i->second >= (uintptr_t) event->addr + event->size) {
+              // remove i, DON'T add free for i
+              alloc_intervals.erase(i->first);
+              i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+              break;
+            }
+            else if (i->second <= (uintptr_t) event->addr) {   // event is after i
+              break;
+            }
+            else if (i->first < (uintptr_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
+              // remove i, add free for i
+              write_event_to_db(stmt, info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
+              alloc_intervals.erase(i->first);
+              i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+            }
+          } while (i != alloc_intervals.begin());
+          // printf("FINISHED THE LOOP\n");
+        }
+        alloc_intervals.insert(pair<uintptr_t, uintptr_t>{(uintptr_t) event->addr, (uintptr_t) event->addr + event->size});         
+        last_alloc_size.insert(pair<uintptr_t, size_t>{(uintptr_t) event->addr, event->size});
+      }
+
+      uint64_t page_num = page_num_list[i]
+      if (pages.find(page_num) == pages.end())
+        pages.insert(pair<uint64_t, memory_page_t>{page_num, memory_page_t{}}); // DO I NEED new HERE?
+      uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary
+
+      if (page_num != page_num_end) {
+        eventSize = page_size - ((uint64_t) event->addr % page_size);
+        uint64_t new_event_addr = (uint64_t) event->addr + eventSize;
+        int64_t rem_size = event->size - eventSize;
+        do {
+          uint64_t new_event_page_num = new_event_addr / page_size;
+          if (pages.find(new_event_page_num) == pages.end())
+            pages.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
+          pages[new_event_page_num].add_event(new info_t{ event->file,
+                                                          event->tindex_name,
+                                                          event->line,
+                                                          event->timestamp,
+                                                          min((uint64_t)rem_size, page_size),
+                                                          (void*) new_event_addr,
+                                                          event->typeofop});
+          new_event_addr += page_size;
+          rem_size -= page_size;
+        } while (rem_size > 0);
+      }
+
+      pages[page_num].add_event(new info_t{event->file,
+                                event->tindex_name,
+                                event->line,
+                                event->timestamp,
+                                eventSize,
+                                event->addr,
+                                event->typeofop});
+      
+      n = n->next;
     }
   }
 }
@@ -513,7 +590,8 @@ int main(int argc, char* argv[]) {
     {"num-pages-per-type",  required_argument,  0,  't'},
     {"field-dump",          required_argument,  0,  'f'},
     {"malloc-type-c",       required_argument,  0,  'm'},
-    {"threads",             optional_argument,  0,  'j'}
+    {"threads",             optional_argument,  0,  'j'},
+    {"buckets",             required_argument,  0,  'b'}
   };
   int opt_ind = 0;
 
@@ -530,6 +608,7 @@ int main(int argc, char* argv[]) {
   unsigned int num_threads = 1;
   const char* type_c_file;
   bool is_type_c = false;
+  size_t buckets = 3000;
   while ((c = getopt_long(argc, argv, "p:c:s:t:j:", long_opts, &opt_ind)) != -1) {
     switch (c) {
       case 0:
@@ -570,6 +649,9 @@ int main(int argc, char* argv[]) {
         type_c_file = optarg;
         is_type_c = true;
         break;
+      case 'b':
+        buckets = stoi(optarg);
+        break;
       default:
         break;
     }
@@ -592,9 +674,6 @@ int main(int argc, char* argv[]) {
     cout << "Can't open database allocs.sqlite: " << sqlite3_errstr(rc) << endl;
     exit(-1);
   }
-  else {
-    cout << "Opened database allocs.sqlite successfully" << endl;
-  }
 
   unsigned long int file_byte_size = 0;
   struct stat sb;
@@ -608,6 +687,15 @@ int main(int argc, char* argv[]) {
 	fstat(fileno(input_file), &sb);
   file_byte_size = (unsigned long int) sb.st_size;
   long int num_structs = file_byte_size / sizeof(info_t);
+
+  create_supertable(db);
+  printf("Number of structs in file: %ld\n", num_structs);
+  info_t* filemap = (info_t*) mmap(NULL, file_byte_size, PROT_READ, MAP_SHARED, fileno(input_file), 0);
+
+  if (filemap == MAP_FAILED) {
+    cout << "Failed to map input file to memory" << endl;
+    exit(-1);
+  }
 
   type_map = construct_map("typeset_dump.txt", true);
   file_map = construct_map("fileset_dump.txt");
@@ -626,17 +714,6 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  create_supertable(db);
-  printf("Number of structs in file: %ld\n", num_structs);
-  info_t* filemap = (info_t*) mmap(NULL, file_byte_size, PROT_READ, MAP_SHARED, fileno(input_file), 0);
-
-  if (filemap == MAP_FAILED) {
-    cout << "Failed to map input file to memory" << endl;
-  }
-  else {
-    cout << "Successfully mapped file" << endl;
-  }
-
   int chunk_size = ceil((double)num_structs / (double)num_threads);
   vector<thread> workers{num_threads};
   unordered_map<uint64_t, memory_page_t> all_pages{};
@@ -644,12 +721,12 @@ int main(int argc, char* argv[]) {
   unordered_set<string> all_type_set{};
   unordered_map<size_t, int> all_size_class_counts{};
   unordered_map<uintptr_t, stats_t*> all_stats_per_type{};
-  
+  vector<uint64_t> page_num_list;
 
   cout << "Starting worker threads..." << endl;
 
   for (int t = 0; t < num_threads; t++) {
-    workers[t] = thread(get_types_in_chunk, t, (int) min((long) chunk_size, num_structs - (t*chunk_size)),
+    workers[t] = thread(sort_events_into_pages, t, (int) min((long) chunk_size, num_structs - (t*chunk_size)),
                         t*chunk_size, filemap, ref(pages[t]), ref(raw_type_set[t]), ref(size_class_counts[t]),
                         ref(stats_per_type[t]));
   }
@@ -658,11 +735,13 @@ int main(int argc, char* argv[]) {
     for (auto& p: pages[t]) {
       if (all_pages.find(p.first) == all_pages.end()) {
         all_pages[p.first] = p.second;
+        page_num_list.push_back(p.first);
       }
       else {
         all_pages[p.first].join(p.second);
       }
     }
+    pages[t] = unordered_map<uint64_t, memory_page_t>{};
     for (auto& tp: raw_type_set[t]) {
       all_raw_type_count.insert(pair<uintptr_t, int>{tp, 0});
     }
@@ -687,8 +766,29 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  chunk_size = ceil((double)page_num_list.size() / (double)num_threads);
+  unordered_map<uint64_t, memory_page_t> split_pages{};
+
+  for (int t = 0; t < num_threads; t++) {
+    workers[t] = thread(split_events_across_pages, t, (int) min((long) chunk_size, page_num_list.size() - (t*chunk_size)),
+                        t*chunk_size, ref(all_pages), ref(page_num_list), ref(pages[t]));
+  }
+  for (int t = 0; t < num_threads; t++) {
+    workers[t].join();
+    for (auto& p: pages[t]) {
+      if (split_pages.find(p.first) == split_pages.end()) {
+        split_pages[p.first] = p.second;
+      }
+      else {
+        split_pages[p.first].join(p.second);
+      }
+    }
+  }
+
   cout << "All worker threads joined!" << endl;
   cout << "Size of all stats per type: " << all_stats_per_type.size() << endl;
+
+
 
   // for (auto& s: all_stats_per_type) {
   //   if (type_map.find(s.first) != type_map.end()) {
@@ -749,11 +849,9 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
-  unordered_map<uint64_t, memory_page_t> boundary_crossers{};
   cout << "Number of pages: " << all_pages.size() << endl;
-  bool saw_event = false;
 
-  for (auto& p: all_pages) {
+  for (auto& p: split_pages) {
     // printf("Here is the page address: %lu\n", p.first);
     if (p.second.sampled == CTD_NOT_SAMPLED) {
       bool take_for_type = false;
@@ -774,134 +872,91 @@ int main(int argc, char* argv[]) {
 
     if (p.second.sampled == CTD_SAMPLED_YES) {
       node_t* n = p.second.events.head;
-      unordered_map<uintptr_t, size_t> last_alloc_size{};
-      map<uintptr_t, uintptr_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
+      // unordered_map<uintptr_t, size_t> last_alloc_size{};
+      // map<uintptr_t, uintptr_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
       while (n != nullptr) {
         info_t* event = n->data;
-        size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uintptr_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uintptr_t) event->addr) : 0;
+      //   size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uintptr_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uintptr_t) event->addr) : 0;
 
-        if (event->typeofop) {
-          // printf("About to search for address %p\n", event->addr);
-          map<uintptr_t, uintptr_t>::iterator i = alloc_intervals.lower_bound((uintptr_t) event->addr);
-          if (i != alloc_intervals.end())
-            i++;
+      //   if (event->typeofop) {
+      //     // printf("About to search for address %p\n", event->addr);
+      //     map<uintptr_t, uintptr_t>::iterator i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+      //     if (i != alloc_intervals.end())
+      //       i++;
 
-          if (alloc_intervals.size() > 0) {
-            do {
-              if (i != alloc_intervals.begin())
-                i--;
-              if (i->first <= (uintptr_t) event->addr && i->second > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
-                  i->first < (uintptr_t) event->addr && i->second >= (uintptr_t) event->addr + event->size) {
-                // remove i, DON'T add free for i
-                alloc_intervals.erase(i->first);
-                i = alloc_intervals.lower_bound((uintptr_t) event->addr);
-                break;
-              }
-              else if (i->second <= (uintptr_t) event->addr) {   // event is after i
-                break;
-              }
-              else if (i->first < (uintptr_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
-                // remove i, add free for i
-                write_event_to_db(stmt, info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
-                alloc_intervals.erase(i->first);
-                i = alloc_intervals.lower_bound((uintptr_t) event->addr);
-              }
-            } while (i != alloc_intervals.begin());
-            // printf("FINISHED THE LOOP\n");
-          }
-          alloc_intervals.insert(pair<uintptr_t, uintptr_t>{(uintptr_t) event->addr, (uintptr_t) event->addr + event->size});         
-          last_alloc_size.insert(pair<uintptr_t, size_t>{(uintptr_t) event->addr, event->size});
-        }
+      //     if (alloc_intervals.size() > 0) {
+      //       do {
+      //         if (i != alloc_intervals.begin())
+      //           i--;
+      //         if (i->first <= (uintptr_t) event->addr && i->second > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
+      //             i->first < (uintptr_t) event->addr && i->second >= (uintptr_t) event->addr + event->size) {
+      //           // remove i, DON'T add free for i
+      //           alloc_intervals.erase(i->first);
+      //           i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+      //           break;
+      //         }
+      //         else if (i->second <= (uintptr_t) event->addr) {   // event is after i
+      //           break;
+      //         }
+      //         else if (i->first < (uintptr_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
+      //           // remove i, add free for i
+      //           write_event_to_db(stmt, info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
+      //           alloc_intervals.erase(i->first);
+      //           i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+      //         }
+      //       } while (i != alloc_intervals.begin());
+      //       // printf("FINISHED THE LOOP\n");
+      //     }
+      //     alloc_intervals.insert(pair<uintptr_t, uintptr_t>{(uintptr_t) event->addr, (uintptr_t) event->addr + event->size});         
+      //     last_alloc_size.insert(pair<uintptr_t, size_t>{(uintptr_t) event->addr, event->size});
+      //   }
 
-        uint64_t page_num = (uint64_t) event->addr / page_size;
-        uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary
+      //   uint64_t page_num = (uint64_t) event->addr / page_size;
+      //   uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary
 
-        if (page_num != page_num_end) {
-          eventSize = page_size - ((uint64_t) event->addr % page_size);
-          uint64_t new_event_addr = (uint64_t) event->addr + eventSize;
-          int64_t rem_size = event->size - eventSize;
-          do {
-            uint64_t new_event_page_num = new_event_addr / page_size;
-            if (boundary_crossers.find(new_event_page_num) == boundary_crossers.end())
-              boundary_crossers.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
-            boundary_crossers[new_event_page_num].add_event(new info_t{ event->file,
-                                                                        event->tindex_name,
-                                                                        event->line,
-                                                                        event->timestamp,
-                                                                        min((uint64_t)rem_size, page_num),
-                                                                        (void*) new_event_addr,
-                                                                        event->typeofop});
-            new_event_addr += page_size;
-            rem_size -= page_size;
-          } while (rem_size > 0);
-        }
+      //   if (page_num != page_num_end) {
+      //     eventSize = page_size - ((uint64_t) event->addr % page_size);
+      //     uint64_t new_event_addr = (uint64_t) event->addr + eventSize;
+      //     int64_t rem_size = event->size - eventSize;
+      //     do {
+      //       uint64_t new_event_page_num = new_event_addr / page_size;
+      //       if (boundary_crossers.find(new_event_page_num) == boundary_crossers.end())
+      //         boundary_crossers.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
+      //       boundary_crossers[new_event_page_num].add_event(new info_t{ event->file,
+      //                                                                   event->tindex_name,
+      //                                                                   event->line,
+      //                                                                   event->timestamp,
+      //                                                                   min((uint64_t)rem_size, page_num),
+      //                                                                   (void*) new_event_addr,
+      //                                                                   event->typeofop});
+      //       new_event_addr += page_size;
+      //       rem_size -= page_size;
+      //     } while (rem_size > 0);
+      //   }
 
-        write_event_to_db(stmt, info_t(event->file, event->tindex_name, event->line, event->timestamp, eventSize, event->addr, event->typeofop));
+        write_event_to_db(stmt, event);
         
-        // const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
-        // const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
-        // sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
-        // sqlite3_bind_int(stmt, 2, event->line);
-        // sqlite3_bind_int64(stmt, 3, event->timestamp);
-        // sqlite3_bind_int64(stmt, 4, eventSize);
-        // sqlite3_bind_int64(stmt, 5, (uint64_t) event->addr);
-        // sqlite3_bind_int(stmt, 6, event->typeofop);
-        // sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
-
-        // rc = sqlite3_step(stmt);
-        // if (rc != SQLITE_DONE) {
-        //   fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
-        //   fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
-        //   fclose(input_file);
-        //   sqlite3_close(db);
-        //   exit(-1);
-        // }
-
-        // // sqlite3_step(stmt);
-        // sqlite3_clear_bindings(stmt);
-        // sqlite3_reset(stmt);
         n = n->next;
       }
     }
   }
 
-  cout << "Number of boundary crossing pages: " << boundary_crossers.size() << endl;
+  // cout << "Number of boundary crossing pages: " << boundary_crossers.size() << endl;
 
-  for (auto& p: boundary_crossers) {
-    if (all_pages.find(p.first) != all_pages.end()) {
-      if (all_pages[p.first].sampled == CTD_SAMPLED_YES) {
-        node_t* n = p.second.events.head;
-        while (n != nullptr) {
-          info_t* event = n->data;
+  // for (auto& p: boundary_crossers) {
+  //   if (all_pages.find(p.first) != all_pages.end()) {
+  //     if (all_pages[p.first].sampled == CTD_SAMPLED_YES) {
+  //       node_t* n = p.second.events.head;
+  //       while (n != nullptr) {
+  //         info_t* event = n->data;
 
-          write_event_to_db(stmt, *event);
-          // const char* fname = event->file ? file_map.at((uintptr_t) event->file).c_str() : "NULL";
-          // const char* tname = event->tindex_name ? type_map.at((uintptr_t) event->tindex_name).c_str() : "NULL";
-          // sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
-          // sqlite3_bind_int(stmt, 2, event->line);
-          // sqlite3_bind_int64(stmt, 3, event->timestamp);
-          // sqlite3_bind_int64(stmt, 4, event->size);
-          // sqlite3_bind_int64(stmt, 5, (uint64_t) event->addr);
-          // sqlite3_bind_int(stmt, 6, event->typeofop);
-          // sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
+  //         write_event_to_db(stmt, *event);
 
-          // rc = sqlite3_step(stmt);
-          // if (rc != SQLITE_DONE) {
-          //   fprintf(stderr, "Error in case 1: %s\n", sqlite3_errstr(rc));
-          //   fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
-          //   fclose(input_file);
-          //   sqlite3_close(db);
-          //   exit(-1);
-          // }
-
-          // // sqlite3_step(stmt);
-          // sqlite3_clear_bindings(stmt);
-          // sqlite3_reset(stmt);
-          n = n->next;
-        }
-      }
-    }
-  }
+  //         n = n->next;
+  //       }
+  //     }
+  //   }
+  // }
   rc = sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
 
   if (rc != SQLITE_OK) {

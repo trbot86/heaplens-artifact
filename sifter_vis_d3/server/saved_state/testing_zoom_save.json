@@ -1,33 +1,33 @@
 {
-    "myNotes": "",
+    "myNotes": "# Testing notes\n\ntesting 123\n\n- here is a *list*\n- blah\n- _blah_\n- blah\n\nTesting more notes\n\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes\n- long notes",
     "colours": [
         {
             "type": "int",
-            "colour": "rgb(52, 137, 66)"
+            "colour": "rgb(78, 151, 143)"
         },
         {
             "type": "big_type",
-            "colour": "rgb(141, 77, 37)"
+            "colour": "rgb(146, 58, 108)"
         },
         {
             "type": "half_type",
-            "colour": "rgb(111, 105, 73)"
+            "colour": "rgb(156, 58, 110)"
         },
         {
             "type": "char",
-            "colour": "rgb(91, 147, 42)"
+            "colour": "rgb(108, 73, 131)"
         },
         {
             "type": "huge_type",
-            "colour": "rgb(147, 161, 43)"
+            "colour": "rgb(129, 136, 83)"
         },
         {
             "type": "pnew_type",
-            "colour": "rgb(90, 114, 140)"
+            "colour": "rgb(200, 134, 76)"
         },
         {
             "type": "other_type",
-            "colour": "rgb(60, 157, 47)"
+            "colour": "rgb(72, 111, 163)"
         }
     ]
 }

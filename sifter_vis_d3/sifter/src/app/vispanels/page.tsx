@@ -10,7 +10,7 @@ import { testCacheInfo, testColourOfType, testLineData, testMaxPointsPerLine, te
 import TimeGraph, { SIZE_UNIT_SUFF, SIZE_UNITS, SizePoint } from '../ui/timeGraphComponent';
 import CssBaseline from '@mui/material/CssBaseline';
 import CacheSets, { CacheInfoMap } from '../ui/cacheSetComponent';
-import { theme } from '../page';
+import { getNotesForFile, theme } from '../page';
 import { useSearchParams } from 'next/navigation';
 import { Divider, FormControl, IconButton, InputLabel, LinearProgress, MenuItem, Paper, Popover, Select, Slider, Tab, Tabs, TextareaAutosize, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { flushSync } from 'react-dom';
@@ -416,6 +416,7 @@ export default function VisPanels() {
 
     /*  State and refs for notes. */
     const nodeRef = useRef(null);
+    const notesTextRef = useRef(null);
     const [notesOpen, setNotesOpen] = useState<boolean>(false);
     const [notesPosition, setNotesPosition] = useState({x: 0, y: 0});
     const [notesText, setNotesText] = useState<string>('');
@@ -445,7 +446,19 @@ export default function VisPanels() {
                             map[tp.replace(/\s+/g, '')] = false;
                             return map;
                         }, {}));
-                        setColourOfType(generateColours(allData['types'].concat(allFieldNames)));
+
+                        getData(`log-data/get-colours/${fname}`, null).then((resp) => resp.json())
+                            .then((json) => {
+                                if (json.length > 0) {
+                                    setColourOfType(json.reduce((map: TypeToColourMap, entry: {'type': string, 'colour': string}) => {
+                                                            map[entry['type']] = d3.color(entry['colour']);
+                                                            return map;
+                                                        }, {}));
+                                }
+                                else {
+                                    setColourOfType(generateColours(allData['types'].concat(allFieldNames)));
+                                }
+                            });
 
                         const sortedLineData = Object.keys(allData['linesAndStats']['pts']).reduce((map: {[tp: string]: SizePoint[]}, tp: string) => {
                             map[tp] = allData['linesAndStats']['pts'][tp].toSorted((a: SizePoint, b: SizePoint) => a.ts - b.ts)
@@ -495,7 +508,16 @@ export default function VisPanels() {
 
                         setCacheData(allData['cacheData']);
 
-                        setLoading(false);
+                        if (fname) {
+                            getNotesForFile(fname).then((resp) => resp.json())
+                                .then((json) => {
+                                    setNotesText(json);
+                                    setLoading(false);
+                                });
+                        }
+                        else {
+                            setLoading(false);
+                        }
                     });
         }
     }, []);
@@ -598,7 +620,7 @@ export default function VisPanels() {
                                     if (fname) {
                                         logData(fname, logBody)
                                             .then((resp) => {
-
+                                                window.location.href = "http://localhost:3000/";
                                             });
                                     }
                                     // window.location.href = "http://localhost:3000/"
@@ -693,7 +715,10 @@ export default function VisPanels() {
                             </Typography>
                             <div id='notesCloseButton' >
                                 <IconButton
-                                    onClick={() => setNotesOpen(false)}
+                                    onClick={() => {
+                                        setNotesOpen(false);
+                                        setNotesText(notesTextRef.current ? notesTextRef.current.value : '');
+                                    }}
                                     size='small' >
                                     <Close />
                                 </IconButton>
@@ -702,11 +727,11 @@ export default function VisPanels() {
                         <Divider />
                         <TextareaAutosize
                             id='notesTextArea'
+                            ref={notesTextRef}
                             defaultValue={notesText}
                             placeholder='Enter notes here'
                             minRows={5}
-                            maxRows={12}
-                            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setNotesText(e.target.value)} />
+                            maxRows={12} />
                     </Paper>
                 </Draggable>
             </div>

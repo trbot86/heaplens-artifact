@@ -18,7 +18,19 @@ class Logger:
         return "OK"
     
     def get_notes(self):
-        data = dict()
-        with open("saved_state/{}_save.json".format(self.fname.split(".")[0]), 'r') as f:
-            data= json.load(f)
-        return data["myNotes"]
+        try:
+            data = dict()
+            with open("saved_state/{}_save.json".format(self.fname.split(".")[0]), 'r') as f:
+                data= json.load(f)
+            return json.dumps(data["myNotes"])
+        except FileNotFoundError:
+            return json.dumps("")
+    
+    def get_colours(self):
+        try:
+            data = dict()
+            with open("saved_state/{}_save.json".format(self.fname.split(".")[0]), 'r') as f:
+                data= json.load(f)
+            return json.dumps(data["colours"])
+        except FileNotFoundError:
+            return json.dumps([])

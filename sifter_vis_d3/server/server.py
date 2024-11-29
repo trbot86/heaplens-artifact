@@ -47,11 +47,17 @@ def log_data(fname):
 
 @app.route("/log-data/get-files", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
-def get_log_files(fname):
+def get_log_files():
     return Logger.get_log_files()
 
 @app.route("/log-data/get-notes/<string:fname>", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
 def get_notes_for_file(fname):
     logger = Logger(fname)
-    return logger.get_notes(fname)
+    return logger.get_notes()
+
+@app.route("/log-data/get-colours/<string:fname>", methods=["GET"])
+@cross_origin(origin='http://localhost:3000')
+def get_colours_for_file(fname):
+    logger = Logger(fname)
+    return logger.get_colours()
