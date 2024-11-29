@@ -849,7 +849,7 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
-  cout << "Number of pages: " << all_pages.size() << endl;
+  cout << "Number of pages: " << split_pages.size() << endl;
 
   for (auto& p: split_pages) {
     // printf("Here is the page address: %lu\n", p.first);
