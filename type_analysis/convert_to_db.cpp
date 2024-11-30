@@ -38,7 +38,7 @@ unordered_map<uintptr_t, string> file_map;
 const int num_classes = 31;
 const size_t size_classes [num_classes] = { 8, 16, 32, 48, 64, 80, 96, 128, 192, 224, 256, 320, 384, 512, 640, 768, 1024, 1280, 
                                             1536, 2048, 3584, 8192, 28672, 40960, 81920, 163840, 655360, 917504, 10485760, 20971520, 99999999999};
-int page_size;
+size_t page_size;
 
 typedef struct stats {
   unsigned int num_allocs;
@@ -455,6 +455,9 @@ void sort_events_into_pages(int id, int chunk_size, int start_ind, info_t* filem
       // string type_trim = type_map.at((uintptr_t) event->tindex_name);
       // type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
       // type_set.insert(type_trim);
+    if (i % 100000 == 0 && event->typeofop) {
+      printf("Here is tindex: %p\n", event->tindex_name);
+    }
     if (event->typeofop)
       raw_type_set.insert((uintptr_t) event->tindex_name);
     // }
@@ -470,10 +473,21 @@ void sort_events_into_pages(int id, int chunk_size, int start_ind, info_t* filem
 void split_events_across_pages( int id, int chunk_size, int start_ind, unordered_map<uint64_t, memory_page_t>& all_pages,
                                 vector<uint64_t>& page_num_list, unordered_map<uint64_t, memory_page_t>& pages) {
   for (int i = start_ind; i < start_ind + chunk_size; i++) {
+    if (i % 10000 == 0) {
+      cout << "Thread " << id << " doing iter " << i - start_ind << endl;
+    }
+    uint64_t page_num = page_num_list[i];
+    if (pages.find(page_num) == pages.end())
+        pages.insert(pair<uint64_t, memory_page_t>{page_num, memory_page_t{}}); // DO I NEED new HERE?
     node_t* n = all_pages[page_num_list[i]].events.head;
     unordered_map<uintptr_t, size_t> last_alloc_size{};
     map<uintptr_t, uintptr_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
+    uint64_t counter1 = 1;
     while (n != nullptr) {
+      if (counter1 % 100000 == 0) {
+        cout << "   thread " << id << ", counter 1: " << counter1 << endl;
+      }
+      counter1++;
       info_t* event = n->data;
       size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uintptr_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uintptr_t) event->addr) : 0;
 
@@ -483,8 +497,13 @@ void split_events_across_pages( int id, int chunk_size, int start_ind, unordered
         if (i != alloc_intervals.end())
           i++;
 
+        uint64_t counter2 = 1;
         if (alloc_intervals.size() > 0) {
           do {
+            if (counter2 % 100000 == 0) {
+              cout << "   thread " << id << ", counter 2: " << counter2 << endl;
+            }
+            counter2++;
             if (i != alloc_intervals.begin())
               i--;
             if (i->first <= (uintptr_t) event->addr && i->second > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
@@ -499,7 +518,7 @@ void split_events_across_pages( int id, int chunk_size, int start_ind, unordered
             }
             else if (i->first < (uintptr_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
               // remove i, add free for i
-              write_event_to_db(stmt, info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
+              pages[page_num].add_event(new info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
               alloc_intervals.erase(i->first);
               i = alloc_intervals.lower_bound((uintptr_t) event->addr);
             }
@@ -510,16 +529,18 @@ void split_events_across_pages( int id, int chunk_size, int start_ind, unordered
         last_alloc_size.insert(pair<uintptr_t, size_t>{(uintptr_t) event->addr, event->size});
       }
 
-      uint64_t page_num = page_num_list[i]
-      if (pages.find(page_num) == pages.end())
-        pages.insert(pair<uint64_t, memory_page_t>{page_num, memory_page_t{}}); // DO I NEED new HERE?
       uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary
 
       if (page_num != page_num_end) {
         eventSize = page_size - ((uint64_t) event->addr % page_size);
         uint64_t new_event_addr = (uint64_t) event->addr + eventSize;
         int64_t rem_size = event->size - eventSize;
+        uint64_t counter3 = 0;
         do {
+          if (counter3 > 20) {
+            printf("Thread %d terminate event with size %lu, eventSize %lu, rem_size %ld, tindex %p\n", id, event->size, eventSize, rem_size, event->tindex_name);
+          }
+          counter3++;
           uint64_t new_event_page_num = new_event_addr / page_size;
           if (pages.find(new_event_page_num) == pages.end())
             pages.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
@@ -721,7 +742,7 @@ int main(int argc, char* argv[]) {
   unordered_set<string> all_type_set{};
   unordered_map<size_t, int> all_size_class_counts{};
   unordered_map<uintptr_t, stats_t*> all_stats_per_type{};
-  vector<uint64_t> page_num_list;
+  vector<uint64_t> page_num_list{};
 
   cout << "Starting worker threads..." << endl;
 
@@ -732,6 +753,7 @@ int main(int argc, char* argv[]) {
   }
   for (int t = 0; t < num_threads; t++) {
     workers[t].join();
+    cout << "Thread " << t << " joined in sort step" << endl;
     for (auto& p: pages[t]) {
       if (all_pages.find(p.first) == all_pages.end()) {
         all_pages[p.first] = p.second;
@@ -766,15 +788,21 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  cout << "Done sorting step" << endl;
+  cout << "Starting split step..." << endl;
+
   chunk_size = ceil((double)page_num_list.size() / (double)num_threads);
   unordered_map<uint64_t, memory_page_t> split_pages{};
 
+  cout << "Num pages: " << page_num_list.size() << " Chunk size: " << chunk_size << endl;
+
   for (int t = 0; t < num_threads; t++) {
-    workers[t] = thread(split_events_across_pages, t, (int) min((long) chunk_size, page_num_list.size() - (t*chunk_size)),
+    workers[t] = thread(split_events_across_pages, t, (int) min((long) chunk_size, (long) page_num_list.size() - (t*chunk_size)),
                         t*chunk_size, ref(all_pages), ref(page_num_list), ref(pages[t]));
   }
   for (int t = 0; t < num_threads; t++) {
     workers[t].join();
+    cout << "Thread " << t << " joined in split step" << endl;
     for (auto& p: pages[t]) {
       if (split_pages.find(p.first) == split_pages.end()) {
         split_pages[p.first] = p.second;
@@ -787,17 +815,6 @@ int main(int argc, char* argv[]) {
 
   cout << "All worker threads joined!" << endl;
   cout << "Size of all stats per type: " << all_stats_per_type.size() << endl;
-
-
-
-  // for (auto& s: all_stats_per_type) {
-  //   if (type_map.find(s.first) != type_map.end()) {
-  //     printf("%s: num allocs: %d, num frees: %d, num pages: %d\n", type_map.at(s.first).c_str(),
-  //                                                                 s.second->num_allocs,
-  //                                                                 s.second->num_frees,
-  //                                                                 s.second->resident_pages.size());
-  //   }
-  // }
 
   for (const auto& tp: all_raw_type_count) {
     if (type_map.find(tp.first) != type_map.end()) {
@@ -934,7 +951,7 @@ int main(int argc, char* argv[]) {
       //     } while (rem_size > 0);
       //   }
 
-        write_event_to_db(stmt, event);
+        write_event_to_db(stmt, *event);
         
         n = n->next;
       }
