@@ -20,6 +20,7 @@
 #include <string>
 #include <thread>
 #include <cmath>
+#include <climits>
 
 #define PADDING 64
 #ifndef STRUCTS_PER_BLOCK
@@ -96,21 +97,27 @@ typedef struct linkedlist {
 
 typedef struct memory_page {
   unordered_set<uintptr_t> included_types;
-  linkedlist_t events;
+  vector<info_t*> events;
   bool has_perf_addr;
   char sampled;
-  uint64_t size;
-  memory_page() : included_types(unordered_set<uintptr_t>{}), events(linkedlist_t{}), has_perf_addr(false), sampled(CTD_NOT_SAMPLED) {}
+  // uint64_t size;
+  memory_page() : included_types(unordered_set<uintptr_t>{}), events(vector<info_t*>()), has_perf_addr(false), sampled(CTD_NOT_SAMPLED) {}
 
   void add_event(info_t* ev) {
-    events.push(new node_t{ev});
-    size++;
+    // events.push(new node_t{ev});
+    events.push_back(ev);
+    // size++;
     if (included_types.find((uintptr_t) ev->tindex_name) == included_types.end())
       included_types.insert((uintptr_t) ev->tindex_name);
   }
   void join(struct memory_page& other) {
+    vector<info_t*> new_events = vector<info_t*>();
+    new_events.reserve(events.size() + other.events.size());
+    new_events.insert(new_events.end(), events.begin(), events.end());
+    new_events.insert(new_events.end(), other.events.begin(), other.events.end());
     included_types.insert(other.included_types.begin(), other.included_types.end());
-    events.concat(other.events);
+    events = new_events;
+    // events.concat(other.events);
   }
 } memory_page_t;
 
@@ -165,7 +172,7 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
           uint64_t cl_addr = strtoull(matches[1].str().c_str(), nullptr, 16);
           uint64_t page_num = (cl_addr * cl_size) / page_size;
           if (pages.find(page_num) == pages.end()) {
-            cout << "Perf page num not present in data: " << page_num << endl;
+            std::cout << "Perf page num not present in data: " << page_num << std::endl;
           }
           else {
             pages[page_num].has_perf_addr = true;
@@ -185,12 +192,12 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
                         "HITM       FLOAT NOT NULL);", nullptr, 0, &zErrMsg);
 
     if (rc != SQLITE_OK) {
-      cout << "SQL error creating perf table: " << zErrMsg << endl;
+      std::cout << "SQL error creating perf table: " << zErrMsg << std::endl;
       sqlite3_free(zErrMsg);
       exit(-1);
     }
     else {
-      cout << "Perf table created successfully" << endl;
+      std::cout << "Perf table created successfully" << std::endl;
     }
 
     vector<struct perf_data>::iterator iter;
@@ -203,25 +210,25 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
                                                 iter->hitm);
     }
 
-    cout << "Done copying perf data to mem" << endl;
+    std::cout << "Done copying perf data to mem" << std::endl;
     sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
     rc = sqlite3_exec(db, charmap, nullptr, 0, &zErrMsg);
     sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
 
     if (rc != SQLITE_OK) {
-      cout << "SQL error: " << zErrMsg << endl;
+      std::cout << "SQL error: " << zErrMsg << std::endl;
       sqlite3_free(zErrMsg);
       free(charmap);
       sqlite3_close(db);
       exit(-1);
     }
 
-    cout << "Done writing perf table to file" << endl;
+    std::cout << "Done writing perf table to file" << std::endl;
 
     free(charmap);
   }
   else {
-    cout << "Failed to open perf output file " << fname << endl;
+    std::cout << "Failed to open perf output file " << fname << std::endl;
   }
 }
 
@@ -234,7 +241,7 @@ struct field_data {
 void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db) {
   unordered_set<string>::iterator seeniter;
   for (seeniter = seen_types.begin(); seeniter != seen_types.end(); seeniter++)
-    cout << *seeniter << endl;
+    std::cout << *seeniter << std::endl;
 
   ifstream pfile;
   pfile.open(fname);
@@ -278,12 +285,12 @@ void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db
                         "OFFSET     INT NOT NULL);", nullptr, 0, &zErrMsg);
 
     if (rc != SQLITE_OK) {
-      cout << "SQL error creating fields table: " << zErrMsg << endl;
+      std::cout << "SQL error creating fields table: " << zErrMsg << std::endl;
       sqlite3_free(zErrMsg);
       exit(-1);
     }
     else {
-      cout << "Fields table created successfully" << endl;
+      std::cout << "Fields table created successfully" << std::endl;
     }
 
     // cout << "Size of map: " << entries.size() << endl;
@@ -309,13 +316,13 @@ void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db
       typeiter++;
 
       if (typeiter == entries.end() || bytes_copied > 900000) {
-        cout << "Copied fields data to mem" << endl;
+        std::cout << "Copied fields data to mem" << std::endl;
         sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
         rc = sqlite3_exec(db, charmap, nullptr, 0, &zErrMsg);
         sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
 
         if (rc != SQLITE_OK) {
-          cout << "SQL error: " << zErrMsg << endl;
+          std::cout << "SQL error: " << zErrMsg << std::endl;
           sqlite3_free(zErrMsg);
           free(charmap);
           sqlite3_close(db);
@@ -327,12 +334,12 @@ void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db
       }
     }
 
-    cout << "Done writing fields table to file" << endl;
+    std::cout << "Done writing fields table to file" << std::endl;
 
     free(charmap);
   }
   else {
-    cout << "Failed to open fields output file " << fname << endl;
+    std::cout << "Failed to open fields output file " << fname << std::endl;
   }
 }
 
@@ -345,11 +352,11 @@ void get_stats(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr
                       "PAGES      INT NOT NULL);", nullptr, 0, &zErrMsg);
 
   if (rc != SQLITE_OK) {
-    cout << "SQL error creating stats table: " << zErrMsg << endl;
+    std::cout << "SQL error creating stats table: " << zErrMsg << std::endl;
     sqlite3_free(zErrMsg);
   }
   else {
-    cout << "Stats table created successfully" << endl;
+    std::cout << "Stats table created successfully" << std::endl;
   }
 
   sqlite3_stmt* stmt = 0;
@@ -391,9 +398,75 @@ void get_stats(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr
   rc = sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
 
   if (rc != SQLITE_OK) {
-    cout << "SQL error creating stats table: " << sqlite3_errstr(rc) << endl;
+    std::cout << "SQL error creating stats table: " << sqlite3_errstr(rc) << std::endl;
     // free(charmap);
   }
+}
+
+void get_lines(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr_t, vector<uint64_t>>& all_buckets, size_t buckets, sqlite3* db) {
+  char* zErrMsg = 0;
+  int rc = sqlite3_exec(db, "DROP TABLE IF EXISTS LINES;" \
+                      "CREATE TABLE LINES(" \
+                      "TYPE       CHAR(500) NOT NULL," \
+                      "BUCKET     INT NOT NULL," \
+                      "SIZE       INT NOT NULL);", nullptr, 0, &zErrMsg);
+
+  if (rc != SQLITE_OK) {
+    std::cout << "SQL error creating stats table: " << zErrMsg << std::endl;
+    sqlite3_free(zErrMsg);
+  }
+  else {
+    std::cout << "Lines table created successfully" << std::endl;
+  }
+
+  sqlite3_stmt* stmt = 0;
+  rc = sqlite3_prepare_v2(db, "INSERT INTO LINES (TYPE,BUCKET,SIZE) " \
+                              "VALUES (?, ?, ?);", -1, &stmt, 0);
+
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "Error after sqlite prepare: %s\n", sqlite3_errstr(rc));
+    fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+  }
+
+  rc = sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
+
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "Error after begin transaction: %s\n", sqlite3_errstr(rc));
+    fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+  }
+
+  for (auto& it: all_buckets) {
+    if (type_map.find((uintptr_t) it.first) == type_map.end())
+      continue;
+    const char* tname = type_map[it.first].c_str();
+    // printf("Adding %s to table\n", tname);
+    for (int i = 0; i < buckets + 2; i++) {
+      sqlite3_bind_text(stmt, 1, tname, strlen(tname), NULL);
+      sqlite3_bind_int(stmt, 2, i);
+      sqlite3_bind_int(stmt, 3, it.second[i]);
+
+      rc = sqlite3_step(stmt);
+      if (rc != SQLITE_DONE) {
+        fprintf(stderr, "Error creating lines table: %s\n", sqlite3_errstr(rc));
+        fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+      }
+
+      // sqlite3_step(stmt);
+      sqlite3_clear_bindings(stmt);
+      sqlite3_reset(stmt);
+    }
+  }
+
+  rc = sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
+
+  if (rc != SQLITE_OK) {
+    std::cout << "SQL error creating lines table: " << sqlite3_errstr(rc) << std::endl;
+  }
+}
+
+uint64_t get_bucket(uint64_t ts, size_t num_buckets, uint64_t min_ts, uint64_t max_ts) {
+  uint64_t size_of_bucket = std::max((max_ts - min_ts) / num_buckets, (uint64_t) 1);
+  return std::ceil(((double) ts - (double) min_ts) / (double) size_of_bucket);
 }
 
 void create_supertable(sqlite3* db) {
@@ -418,11 +491,18 @@ void create_supertable(sqlite3* db) {
   }
 }
 
-void sort_events_into_pages(int id, int chunk_size, int start_ind, info_t* filemap, 
-                        unordered_map<uint64_t, memory_page_t>& pages, unordered_set<uintptr_t>& raw_type_set,
+void sort_events_into_pages(int id, int chunk_size, int start_ind, info_t* filemap, vector<uint64_t>& min_ts,
+                        vector<uint64_t>& max_ts, unordered_map<uint64_t, memory_page_t>& pages, unordered_set<uintptr_t>& raw_type_set,
                         unordered_map<size_t, int>& size_class_counts, unordered_map<uintptr_t, stats_t*>& stats_per_type) {
   for (int i = 0; i < chunk_size; i++) {
     info_t* event = filemap + start_ind + i;
+    
+    if (event->timestamp < min_ts[id]) {
+      min_ts[id] = event->timestamp;
+    }
+    if (event->timestamp > max_ts[id]) {
+      max_ts[id] = event->timestamp;
+    }
 
     if (stats_per_type.find((uintptr_t) event->tindex_name) == stats_per_type.end()) {
       // cout << "Adding for type: " << (uintptr_t) event->tindex_name << endl;
@@ -455,55 +535,58 @@ void sort_events_into_pages(int id, int chunk_size, int start_ind, info_t* filem
       // string type_trim = type_map.at((uintptr_t) event->tindex_name);
       // type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
       // type_set.insert(type_trim);
-    if (i % 100000 == 0 && event->typeofop) {
-      printf("Here is tindex: %p\n", event->tindex_name);
-    }
-    if (event->typeofop)
+    if (event->typeofop) {
       raw_type_set.insert((uintptr_t) event->tindex_name);
+    }
     // }
 
     if (event->size > 0) {
       int ind = bin_search(size_classes, event->size, 0, num_classes);
-      // cout << "Size: " << event->size << " Index: " << ind << " Size class: " << size_classes[ind] << endl;
+      // if (i % 1000000 == 0)
+      //   cout << "Size: " << event->size << " Index: " << ind << " Size class: " << size_classes[ind] << endl;
       size_class_counts[size_classes[ind]] = size_class_counts[size_classes[ind]] + 1;
     }
   }
 }
 
+struct size_and_type {
+  size_t size;
+  uintptr_t type;
+};
+
+// TODO: is everything guaranteed to be sorted by timestamp at this point?
+// this is important for the use of last_alloc_size and alloc_intervals
 void split_events_across_pages( int id, int chunk_size, int start_ind, unordered_map<uint64_t, memory_page_t>& all_pages,
-                                vector<uint64_t>& page_num_list, unordered_map<uint64_t, memory_page_t>& pages) {
+                                vector<uint64_t>& page_num_list, unordered_map<uint64_t, memory_page_t>& pages,
+                                uint64_t min_ts, uint64_t max_ts, size_t buckets, unordered_map<uintptr_t, vector<uint64_t>>& thread_buckets,
+                                unordered_map<uintptr_t, stats_t*>& stats_per_type) {
   for (int i = start_ind; i < start_ind + chunk_size; i++) {
-    if (i % 10000 == 0) {
-      cout << "Thread " << id << " doing iter " << i - start_ind << endl;
-    }
     uint64_t page_num = page_num_list[i];
     if (pages.find(page_num) == pages.end())
-        pages.insert(pair<uint64_t, memory_page_t>{page_num, memory_page_t{}}); // DO I NEED new HERE?
-    node_t* n = all_pages[page_num_list[i]].events.head;
-    unordered_map<uintptr_t, size_t> last_alloc_size{};
+        pages.insert(pair<uint64_t, memory_page_t>{page_num, memory_page_t{}});
+    // node_t* n = all_pages[page_num_list[i]].events.head;
+    unordered_map<uintptr_t, struct size_and_type> last_alloc_info{};
     map<uintptr_t, uintptr_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
-    uint64_t counter1 = 1;
-    while (n != nullptr) {
-      if (counter1 % 100000 == 0) {
-        cout << "   thread " << id << ", counter 1: " << counter1 << endl;
-      }
-      counter1++;
-      info_t* event = n->data;
-      size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uintptr_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uintptr_t) event->addr) : 0;
+    std::sort(all_pages[page_num_list[i]].events.begin(), all_pages[page_num_list[i]].events.end(),
+              [](info_t* a, info_t* b){ return a->timestamp < b->timestamp; });
+    for (const info_t* event : all_pages[page_num_list[i]].events) {
+    // while (n != nullptr) {
+      // info_t* event = n->data;
+      size_t eventSize = event->typeofop ? event->size : last_alloc_info.find((uintptr_t) event->addr) != last_alloc_info.end() ? last_alloc_info[(uintptr_t) event->addr].size : 0;
 
       if (event->typeofop) {
+        // printf("Here is event addr: %p, eventSize: %lu\n", event->addr, event->size);
+        // printf("(alloc) Here is tindex name: %p, here is bucket: %lu\n", event->tindex_name, get_bucket(event->timestamp, buckets, min_ts, max_ts));
+        // printf("is tindex_name NULL? %d, typeofop: %d\n", event->tindex_name == NULL, event->typeofop);
+        // printf("here is size of vector: %lu\n", thread_buckets[(uintptr_t) event->tindex_name].size());
+        thread_buckets[(uintptr_t) event->tindex_name][get_bucket(event->timestamp, buckets, min_ts, max_ts)] += eventSize;
         // printf("About to search for address %p\n", event->addr);
         map<uintptr_t, uintptr_t>::iterator i = alloc_intervals.lower_bound((uintptr_t) event->addr);
         if (i != alloc_intervals.end())
           i++;
 
-        uint64_t counter2 = 1;
         if (alloc_intervals.size() > 0) {
           do {
-            if (counter2 % 100000 == 0) {
-              cout << "   thread " << id << ", counter 2: " << counter2 << endl;
-            }
-            counter2++;
             if (i != alloc_intervals.begin())
               i--;
             if (i->first <= (uintptr_t) event->addr && i->second > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
@@ -526,21 +609,23 @@ void split_events_across_pages( int id, int chunk_size, int start_ind, unordered
           // printf("FINISHED THE LOOP\n");
         }
         alloc_intervals.insert(pair<uintptr_t, uintptr_t>{(uintptr_t) event->addr, (uintptr_t) event->addr + event->size});         
-        last_alloc_size.insert(pair<uintptr_t, size_t>{(uintptr_t) event->addr, event->size});
+        last_alloc_info.insert(pair<uintptr_t, struct size_and_type>{(uintptr_t) event->addr, size_and_type{event->size, (uintptr_t)event->tindex_name}});
+      }
+      else if (last_alloc_info.find((uintptr_t) event->addr) != last_alloc_info.end()) {
+        // printf("(free) Here is tindex name: %lX, here is bucket: %lu\n", last_alloc_info[(uintptr_t) event->addr].type, get_bucket(event->timestamp, buckets, min_ts, max_ts));
+        thread_buckets[last_alloc_info[(uintptr_t) event->addr].type][get_bucket(event->timestamp, buckets, min_ts, max_ts)] -= eventSize;
+        alloc_intervals.erase((uintptr_t) event->addr);
       }
 
+      if (stats_per_type.find((uintptr_t)event->tindex_name) != stats_per_type.end())
+        stats_per_type[(uintptr_t)event->tindex_name]->resident_pages.insert(page_num);
       uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary
 
       if (page_num != page_num_end) {
         eventSize = page_size - ((uint64_t) event->addr % page_size);
         uint64_t new_event_addr = (uint64_t) event->addr + eventSize;
         int64_t rem_size = event->size - eventSize;
-        uint64_t counter3 = 0;
         do {
-          if (counter3 > 20) {
-            printf("Thread %d terminate event with size %lu, eventSize %lu, rem_size %ld, tindex %p\n", id, event->size, eventSize, rem_size, event->tindex_name);
-          }
-          counter3++;
           uint64_t new_event_page_num = new_event_addr / page_size;
           if (pages.find(new_event_page_num) == pages.end())
             pages.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
@@ -564,7 +649,13 @@ void split_events_across_pages( int id, int chunk_size, int start_ind, unordered
                                 event->addr,
                                 event->typeofop});
       
-      n = n->next;
+      // n = n->next;
+    }
+  }
+
+  for (auto& it: thread_buckets) {
+    for (int i = 1; i < buckets+2; i++) {
+      it.second[i] += it.second[i-1];
     }
   }
 }
@@ -723,11 +814,13 @@ int main(int argc, char* argv[]) {
   // vector<unordered_map<uintptr_t, unordered_set<uint64_t>>> include_addrs{num_threads, unordered_map};
   // unordered_set<uint64_t> skip_addrs{};
   // vector<unordered_map<uintptr_t, int>> seen_types{num_threads, unordered_map<uintptr_t, int>{}};
-  vector<unordered_map<uint64_t, memory_page_t>> pages{num_threads, unordered_map<uint64_t, memory_page_t>{}};
-  vector<unordered_set<uintptr_t>> raw_type_set{num_threads, unordered_set<uintptr_t>{}};
-  vector<unordered_set<string>> type_set{num_threads, unordered_set<string>{}};
-  vector<unordered_map<size_t, int>> size_class_counts{num_threads, unordered_map<size_t, int>{}};
-  vector<unordered_map<uintptr_t, stats_t*>> stats_per_type{num_threads, unordered_map<uintptr_t, stats_t*>{}};
+  vector<unordered_map<uint64_t, memory_page_t>> pages(num_threads, unordered_map<uint64_t, memory_page_t>{});
+  vector<unordered_set<uintptr_t>> raw_type_set(num_threads, unordered_set<uintptr_t>{});
+  vector<unordered_set<string>> type_set(num_threads, unordered_set<string>{});
+  vector<unordered_map<size_t, int>> size_class_counts(num_threads, unordered_map<size_t, int>{});
+  vector<unordered_map<uintptr_t, stats_t*>> stats_per_type(num_threads, unordered_map<uintptr_t, stats_t*>{});
+  vector<uint64_t> min_vals(num_threads, ULLONG_MAX);
+  vector<uint64_t> max_vals(num_threads, 0);
 
   for (int t = 0; t < num_threads; t++) {
     for (int i = 0; i < num_classes; i++) {
@@ -743,13 +836,15 @@ int main(int argc, char* argv[]) {
   unordered_map<size_t, int> all_size_class_counts{};
   unordered_map<uintptr_t, stats_t*> all_stats_per_type{};
   vector<uint64_t> page_num_list{};
+  uint64_t min_all_vals;
+  uint64_t max_all_vals;
 
   cout << "Starting worker threads..." << endl;
 
   for (int t = 0; t < num_threads; t++) {
     workers[t] = thread(sort_events_into_pages, t, (int) min((long) chunk_size, num_structs - (t*chunk_size)),
-                        t*chunk_size, filemap, ref(pages[t]), ref(raw_type_set[t]), ref(size_class_counts[t]),
-                        ref(stats_per_type[t]));
+                        t*chunk_size, filemap, ref(min_vals), ref(max_vals), ref(pages[t]), ref(raw_type_set[t]),
+                        ref(size_class_counts[t]), ref(stats_per_type[t]));
   }
   for (int t = 0; t < num_threads; t++) {
     workers[t].join();
@@ -776,15 +871,13 @@ int main(int argc, char* argv[]) {
       }
     }
     // cout << "Size of stats per type " << t << " : " << stats_per_type[t].size() << endl;
-    for (auto& s: stats_per_type[t]) {
-      if (all_stats_per_type.find(s.first) == all_stats_per_type.end()) {
-        all_stats_per_type[s.first] = s.second;
-      }
-      else {
-        all_stats_per_type[s.first]->num_allocs += s.second->num_allocs;
-        all_stats_per_type[s.first]->num_frees += s.second->num_frees;
-        all_stats_per_type[s.first]->resident_pages.insert(s.second->resident_pages.begin(), s.second->resident_pages.end());
-      }
+    if (t == 0) {
+      min_all_vals = min_vals[t];
+      max_all_vals = max_vals[t];
+    }
+    else {
+      min_all_vals = std::min(min_vals[t], min_all_vals);
+      max_all_vals = std::max(max_vals[t], max_all_vals);
     }
   }
 
@@ -793,12 +886,21 @@ int main(int argc, char* argv[]) {
 
   chunk_size = ceil((double)page_num_list.size() / (double)num_threads);
   unordered_map<uint64_t, memory_page_t> split_pages{};
+  vector<unordered_map<uintptr_t, vector<uint64_t>>> thread_buckets{num_threads, unordered_map<uintptr_t, vector<uint64_t>>{}};
+  unordered_map<uintptr_t, vector<uint64_t>> all_buckets{};
+  for (auto& it: all_raw_type_count) {
+    all_buckets.insert(pair<uintptr_t, vector<uint64_t>>{it.first, vector<uint64_t>(buckets+2, 0)});
+    for (int t = 0; t < num_threads; t++) {
+      thread_buckets[t].insert(pair<uintptr_t, vector<uint64_t>>{it.first, vector<uint64_t>(buckets+2, 0)});
+    }
+  }
 
   cout << "Num pages: " << page_num_list.size() << " Chunk size: " << chunk_size << endl;
 
   for (int t = 0; t < num_threads; t++) {
     workers[t] = thread(split_events_across_pages, t, (int) min((long) chunk_size, (long) page_num_list.size() - (t*chunk_size)),
-                        t*chunk_size, ref(all_pages), ref(page_num_list), ref(pages[t]));
+                        t*chunk_size, ref(all_pages), ref(page_num_list), ref(pages[t]), min_all_vals, max_all_vals,
+                        buckets, ref(thread_buckets[t]), ref(stats_per_type[t]));
   }
   for (int t = 0; t < num_threads; t++) {
     workers[t].join();
@@ -809,6 +911,21 @@ int main(int argc, char* argv[]) {
       }
       else {
         split_pages[p.first].join(p.second);
+      }
+    }
+    for (auto& it: all_raw_type_count) {
+      for (int i = 0; i < buckets + 2; i++) {
+        all_buckets[it.first][i] += thread_buckets[t][it.first][i];
+      }
+    }
+    for (auto& s: stats_per_type[t]) {
+      if (all_stats_per_type.find(s.first) == all_stats_per_type.end()) {
+        all_stats_per_type[s.first] = s.second;
+      }
+      else {
+        all_stats_per_type[s.first]->num_allocs += s.second->num_allocs;
+        all_stats_per_type[s.first]->num_frees += s.second->num_frees;
+        all_stats_per_type[s.first]->resident_pages.insert(s.second->resident_pages.begin(), s.second->resident_pages.end());
       }
     }
   }
@@ -841,6 +958,7 @@ int main(int argc, char* argv[]) {
   }
 
   get_stats(type_map, all_stats_per_type, db);
+  get_lines(type_map, all_buckets, buckets, db);
 
   cout << "Beginning to copy records to database..." << endl;
 
@@ -888,11 +1006,12 @@ int main(int argc, char* argv[]) {
         p.second.sampled = rand() < sample_portion*RAND_MAX ? CTD_SAMPLED_YES : CTD_SAMPLED_NO;
 
     if (p.second.sampled == CTD_SAMPLED_YES) {
-      node_t* n = p.second.events.head;
+      // node_t* n = p.second.events.head;
       // unordered_map<uintptr_t, size_t> last_alloc_size{};
       // map<uintptr_t, uintptr_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
-      while (n != nullptr) {
-        info_t* event = n->data;
+      for (const info_t* event : p.second.events) {
+      // while (n != nullptr) {
+      // info_t* event = n->data;
       //   size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uintptr_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uintptr_t) event->addr) : 0;
 
       //   if (event->typeofop) {
@@ -953,7 +1072,7 @@ int main(int argc, char* argv[]) {
 
         write_event_to_db(stmt, *event);
         
-        n = n->next;
+      // n = n->next;
       }
     }
   }
