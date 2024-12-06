@@ -67,34 +67,6 @@ typedef struct info {
                 typeofop(tp) {}
 } info_t;
 
-typedef struct node {
-  info_t* data;
-  struct node* next;
-  node(info_t* d) : data(d), next(nullptr) {}
-} node_t;
-
-typedef struct linkedlist {
-  node_t* head;
-  node_t* tail;
-  linkedlist() : head(nullptr), tail(nullptr) {}
-
-  void push(node_t* n) {
-    if (tail == nullptr)
-      head = tail = n;
-    else {
-      tail->next = n;
-      tail = n;
-    }
-  }
-  void concat(struct linkedlist& other) {
-    if (tail == nullptr)
-      head = other.head;
-    else
-      tail->next = other.head;
-    tail = other.tail;
-  }
-} linkedlist_t;
-
 typedef struct memory_page {
   unordered_set<uintptr_t> included_types;
   vector<info_t*> events;
