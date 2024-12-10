@@ -9,7 +9,7 @@ while [ $# -gt 0 ]; do
             echo "HELP"
         ;;
         -p | --huge-page)
-            hugepage="-v /dev/hugepages:/dev/hugepages"
+            hugepage="-v/dev/hugepages:/dev/hugepages"
         ;;
         -n | --name)
             if [[ -z "$2" || "$2" == -* ]]; then

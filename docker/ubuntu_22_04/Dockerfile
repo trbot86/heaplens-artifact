@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
                                             build-essential \
@@ -41,9 +41,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
                                             flex \
                                             bison \
                                             libelf-dev \
-                                            linux-tools-common \
-                                            linux-tools-generic \
-                                            linux-tools-`uname -r` \
+                                            # linux-tools-common \
+                                            # linux-tools-generic \
+                                            # linux-tools-`uname -r` \
                                             autoconf
 
 COPY . /root/sifter
