@@ -414,8 +414,8 @@ void get_lines(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr
     // printf("Adding %s to table\n", tname);
     for (int i = 0; i < buckets + 2; i++) {
       sqlite3_bind_text(stmt, 1, tname, strlen(tname), NULL);
-      sqlite3_bind_int(stmt, 2, i);
-      sqlite3_bind_int(stmt, 3, it.second[i]);
+      sqlite3_bind_int64(stmt, 2, i);
+      sqlite3_bind_int64(stmt, 3, it.second[i]);
 
       rc = sqlite3_step(stmt);
       if (rc != SQLITE_DONE) {
