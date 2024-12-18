@@ -9,6 +9,7 @@ while [ $# -gt 0 ]; do
             echo "HELP"
         ;;
         -p | --huge-page)
+            echo "Launching image with hugepages mounted at /dev/hugepages"
             hugepage="-v/dev/hugepages:/dev/hugepages"
         ;;
         -n | --name)
