@@ -2,6 +2,10 @@ __pycache__
 -1
 *.so
 *.o
+setbench_verlib*
+ralloc*
+gzip*
+zstd
 ASCYLIB
 leanstore
 jemalloc
@@ -16,11 +20,14 @@ sifter_vis_d3/server/saved_state/*
 *.tar.gz
 *.sqlite-journal
 fielddump_tester
+jemalloc
 ssmem
 setbench
 setbench-artifact
 synchrobench
+masstree-beta
 testing_stuff
+testing_matchers
 veb_new
 fielddump.txt
 newfielddump.txt

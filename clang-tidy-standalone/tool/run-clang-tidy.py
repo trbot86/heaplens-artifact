@@ -105,6 +105,32 @@ def get_tidy_invocation(f, clang_tidy_binary, checks, tmpdir, build_path,
   start.append(f)
   return start
 
+def merge_no_duplicates(tmpdir, mergefile):
+  """Merge all replacement files in directory into a single file
+  and remove all duplicate fixes"""
+  added = set()
+  fixes = []
+  for replacefile in glob.iglob(os.path.join(tmpdir, '*.yaml')):
+    filecontent = yaml.safe_load(open(replacefile, 'r'))
+    if filecontent is not None:
+      content = filecontent.get("Diagnostics", [])
+      for fix in content:
+        info = fix["DiagnosticMessage"]
+        if re.search(".*memhook/.*", info["FilePath"]) is None and (info["FilePath"], info["FileOffset"]) not in added:
+          added.add((info["FilePath"], info["FileOffset"]))
+          fixes.append(fix)
+
+  if fixes:
+    # MainSourceFile: The key is required by the definition inside
+    # include/clang/Tooling/ReplacementsYaml.h, but the value
+    # is actually never used inside clang-apply-replacements,
+    # so we set it to '' here.
+    output = { 'MainSourceFile': '', "Diagnostics": fixes }
+    with open(mergefile, 'w') as out:
+      yaml.safe_dump(output, out)
+  else:
+    # Empty the file:
+    open(mergefile, 'w').close()
 
 def merge_replacement_files(tmpdir, mergefile):
   """Merge all replacement files in a directory into a single file"""
@@ -142,14 +168,14 @@ def check_clang_apply_replacements_binary(args):
     sys.exit(1)
 
 
-def apply_fixes(args, tmpdir):
+def apply_fixes(args, fixes_path):
   """Calls clang-apply-fixes on a given directory."""
   invocation = [args.clang_apply_replacements_binary]
   if args.format:
     invocation.append('-format')
   if args.style:
     invocation.append('-style=' + args.style)
-  invocation.append(tmpdir)
+  invocation.append(fixes_path)
   subprocess.call(invocation)
 
 
@@ -300,10 +326,14 @@ def main():
       shutil.rmtree(tmpdir)
     os.kill(0, 9)
 
+  tmp_merged_path = "/tmp/merged-replacements.yaml"
+  merge_no_duplicates(tmpdir, tmp_merged_path)
+
   if yaml and args.export_fixes:
     print('Writing fixes to ' + args.export_fixes + ' ...')
     try:
-      merge_replacement_files(tmpdir, args.export_fixes)
+      # merge_replacement_files(tmpdir, args.export_fixes)
+      shutil.copy(tmp_merged_path, args.export_fixes)
     except:
       print('Error exporting fixes.\n', file=sys.stderr)
       traceback.print_exc()
@@ -312,12 +342,14 @@ def main():
   if args.fix:
     print('Applying fixes ...')
     try:
-      apply_fixes(args, tmpdir)
+      apply_fixes(args, tmp_merged_path)
     except:
       print('Error applying fixes.\n', file=sys.stderr)
       traceback.print_exc()
       return_code=1
 
+  # print("Here is tmpdir: {}".format(tmpdir))
+  os.remove(tmp_merged_path)
   if tmpdir:
     shutil.rmtree(tmpdir)
   sys.exit(return_code)

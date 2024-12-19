@@ -5,6 +5,18 @@ Libs=
 OBJ= memhook.o hash.o
 DEPS=hash.h memhook.h memhook_interface.h memstamp.h memhook_xoshiro256p.h
 
+ifdef MEMHOOK_ASCYLIB
+	CFLAGS += -DMEMHOOK_ASCYLIB
+endif
+
+ifdef MEMHOOK_C_LOG
+	CFLAGS += -DMEMHOOK_C_LOG
+endif
+
+ifdef USE_RALLOC
+	CFLAGS += -DUSE_RALLOC
+endif
+
 libmemhook.so: $(OBJ)
 	$(CC) -o $@ $^ -lrt -shared $(CFLAGS)
 
@@ -40,4 +52,4 @@ install:
 	cp memhook.h ../prac/setbench-master/microbench
 
 clean:
-	rm libmemhook.so info_t_dump.txt hash.o memhook.o
+	rm libmemhook.so *.o

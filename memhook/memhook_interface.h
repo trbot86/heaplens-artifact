@@ -34,6 +34,7 @@ extern "C" {
 #include "memstamp.h"
 #include "hash.h"
 
+
 // #include "/root/teststatic/a.h"
 // #include "mem_alloc.h"
 //#include <execinfo.h>
@@ -73,6 +74,34 @@ using namespace std;
 
 #define MACRO_GET_STR(str) MACRO_GET_128(str, 0), 0
 
+#if defined(__cplusplus) && ! defined(MEMHOOK_C_LOG)
+#define MEMHOOK_LOG_ALLOC(ptr, sz, fname, ln, tname) \
+        unit_log.timestamp = memhook_get_server_clock(); \
+        unit_log.size = sz; \
+        unit_log.addr = ptr; \
+        unit_log.typeofop = true; \
+        unit_log.file = filetable.insert<fname>(); \
+        unit_log.tindex_name = typetable.insert(tname); \
+        unit_log.line = ln; \
+        collector.copy(unit_log);
+#else
+#define MEMHOOK_LOG_ALLOC(ptr, sz, fname, ln, tname) \
+        unit_log.timestamp = memhook_get_server_clock(); \
+        unit_log.size = sz; \
+        unit_log.addr = ptr; \
+        unit_log.typeofop = true; \
+        unit_log.file = filetable.insert(fname); \
+        unit_log.tindex_name = typetable.insert(tname); \
+        unit_log.line = ln; \
+        collector.copy(unit_log);
+#endif // __cplusplus
+
+#define MEMHOOK_LOG_FREE(ptr) \
+        unit_log.timestamp = memhook_get_server_clock(); \
+        unit_log.addr = ptr; \
+        unit_log.typeofop = false; \
+        collector.copy(unit_log);
+
 struct slot;
 struct memhook_info_t;
 
@@ -94,8 +123,9 @@ extern "C"
 {
 #endif
 
-    void* malloc_s(size_t, int, const char*, const char*);
+    void* malloc_s(size_t, int, const char*, const char*, bool, void*);
     // void free_s(void *, int, const char*);
+    void free_log(void*);
     #if defined(MEMHOOK_ASCYLIB)
     void* ssalloc_s(size_t, int, const char*, const char*);
     void* ssalloc_aligned_s(size_t, size_t, int, const char*, const char*);
@@ -104,6 +134,10 @@ extern "C"
     int posix_memalign_s(void**, size_t, size_t, int, const char*, const char*);
     void* memalign_s(size_t, size_t, int, const char*, const char*);
     void* calloc_s(size_t, size_t, int, const char*, const char*);
+    #if defined(MEMHOOK_GZIP)
+    void* xmalloc_s(size_t, int, const char*, const char*);
+    void* xcalloc_s(size_t, size_t, int, const char*, const char*);
+    #endif
     // void ssmem_free_s(ssmem_allocator_t*, void*, int, const char*);
     // void free(void* ptr);
 
@@ -112,7 +146,7 @@ extern "C"
     // void ssfree_alloc_s(unsigned int allocator, void* ptr, const char* filepath, int line);
 
 // #define SIFTER_NEW
-#define new MemStamp((__FILE__), (__LINE__)) * new
+// #define new MemStamp((__FILE__), (__LINE__)) * new
 // #define delete MemStamp((__FILE__), (__LINE__)) * delete
 
 #ifdef __cplusplus
@@ -134,8 +168,9 @@ extern void memhook_free(void *ptr, const char* file, int line, bool log);
 // T malloc(size_t size, bool fakearg=true);
 
 template <class T>
-inline T *operator*(const MemStamp &stamp, T *p)
+inline T* operator*(const MemStamp &stamp, T* p)
 {
+    //cout << "CALLED operator *" << endl;
     /************************************************/
     /* Rationale: placement new cannot be           */
     /* overloaded for now, hence timestamp is 0.    */
@@ -143,6 +178,12 @@ inline T *operator*(const MemStamp &stamp, T *p)
     /************************************************/
     if (unit_log.timestamp == 0)
         unit_log.timestamp = memhook_get_server_clock();
+    // Following is a hack for placement new
+    if (!unit_log.typeofop) {
+        unit_log.size = sizeof(T);
+        unit_log.addr = (void*) p;
+        unit_log.typeofop = true;
+    }
     unit_log.file = filetable.insert(stamp.filename);
     unit_log.line = stamp.lineNum;
     unit_log.tindex_name = typetable.insert(typeid(T).name());
@@ -153,8 +194,7 @@ inline T *operator*(const MemStamp &stamp, T *p)
 
 #if !(defined(_WIN32) && defined(_mm_malloc))
 template <typename T, int line, char... filename>
-static __inline__ void* __attribute__((__always_inline__, __nodebug__,
-                                       __malloc__))
+static __inline__ void* __attribute__((__always_inline__, __malloc__))
 _mm_malloc(size_t __size, size_t __align)
 {
     // string filestring = {filename...};
@@ -193,7 +233,24 @@ _mm_malloc(size_t __size, size_t __align)
 #endif
 
 template <typename T, int line, char... filename>
-void* malloc(size_t size, bool fakearg=true)
+int posix_memalign(void** ptr, size_t align, size_t size) {
+    unit_log.file = filetable.insert<filename...>();
+    unit_log.tindex_name = typetable.insert(typeid(T).name());
+    unit_log.timestamp = memhook_get_server_clock();
+    unit_log.size = memhook_roundUp(size, align);
+    unit_log.line = line;
+    unit_log.typeofop = true;
+
+    int r = posix_memalign<int, 210, MACRO_GET_STR("/home/s2ovens/sifter/memhook/memhook_interface.h")>(ptr, align, size);
+    unit_log.addr = *ptr;
+
+    collector.copy(unit_log);
+
+    return r;
+}
+
+template <typename T, int line, char... filename>
+void* malloc(size_t size)
 {
     unit_log.file = filetable.insert<filename...>();
     unit_log.tindex_name = typetable.insert(typeid(T).name());
@@ -204,16 +261,5 @@ void* malloc(size_t size, bool fakearg=true)
     return ptr;
 }
 
-#endif
-
-// #define ssalloc_alloc(a, s) ssalloc_alloc_s(a, s, __FILE__, __LINE__)
-// #define ssalloc_aligned_alloc(a, l, s) ssalloc_aligned_alloc_s(a, l, s, __FILE__, __LINE__)
-// #define ssfree_alloc(a, s) ssfree_alloc_s(a, s, __FILE__, __LINE__)
-
-// #define ssalloc_alloc(a, s) ssalloc_alloc_s((a), (s), (__FILE__), (__LINE__))
-// #define ssalloc_aligned_alloc(a, l, s) ssalloc_aligned_alloc_s((a), (l), (s), (__FILE__), (__LINE__))
-// #define ssfree_alloc(a, s) ssfree_alloc_s((a), (s), (__FILE__), (__LINE__))
-
-// #define malloc(s) malloc_s((s), (__FILE__), (__LINE__))
-// #define free(s) free_s((s), (__FILE__), (__LINE__))
+#endif // __cplusplus
 #endif //__MEMHOOK_INTERFACE_H

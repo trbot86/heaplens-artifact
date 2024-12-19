@@ -15,6 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "ClangTidyMain.h"
+#include "../ClangTidyForceLinker.h"
 
 int main(int argc, const char **argv) {
   return clang::tidy::clangTidyMain(argc, argv);

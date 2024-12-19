@@ -7,13 +7,14 @@ template=false
 skipRefactor=false
 includesOnly=false
 subdirectory=""
-buildcmd="bear make"
+buildcmd="bear -- make"
 perffile=""
 fielddump=""
 pagespertype=""
 sample=""
 cutoff=""
 threads=1
+pageSize="--page-size 4096"
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -43,7 +44,6 @@ while [ $# -gt 0 ]; do
             shift
         ;;
         -j | --threads)
-            echo "THREADS"
             if [[ -z "$2" || "$2" == -* ]]; then
                 echo "Must specify number of threads with option -j/--threads." >&2
                 exit 1
@@ -97,6 +97,14 @@ while [ $# -gt 0 ]; do
         --includes-only)
             includesOnly=true
         ;;
+        --page-size)
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Must specify a page size with option --page-size." >&2
+                exit 1
+            fi
+            pageSize="--page-size $2"
+            shift
+        ;;
         *)
             if [ -z "$indir" ]; then
                 indir=$1
@@ -113,7 +121,7 @@ done
 
 add_includes () {
     echo "refactoring all c h cc hh cpp hpp files to include memhook_interface.h..."
-    cd /root/sifter/$1
+    cd ./$1
     for f in $(for t in '*.h' '*.cpp' '*.c' '*.hpp' '*.cc' '*.hh' ; do find . -name "$t" ; done) ; do
         if [[ "$f" =~ .*memhook.* ]] || grep -q '#include "memhook_interface.h"' $f; then
             echo "   skipping file $f..."
@@ -146,18 +154,19 @@ elif [ "$database" = true ]; then
     fi
     mv $indir/binary_dump.txt type_analysis ; mv $indir/fileset_dump.txt type_analysis ; mv $indir/typeset_dump.txt type_analysis
     if ! [[ -z "$perffile" ]]; then
-        mv "$indir"/"$perffile" type_analysis
+        cp "$indir"/"$perffile" type_analysis
         perffile="--perf-file $perffile"
     fi
     if ! [[ -z "$fielddump" ]]; then
-        mv $indir/"$fielddump" type_analysis
+        cp $indir/"$fielddump" type_analysis
         fielddump="--field-dump $fielddump"
     fi
 
     cd type_analysis
+    rm allocs.sqlite
     make convert_to_db
-    echo "./bin/convert_to_db -j $threads $perffile $fielddump $pagespertype $sample $cutoff"
-    ./bin/convert_to_db -j $threads $perffile $fielddump $pagespertype $sample $cutoff
+    echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff"
+    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff
     exit 0
 elif [ "$includesOnly" = true ]; then
     add_includes $indir
@@ -221,10 +230,10 @@ else
     echo "replacing malloc with malloc_s..."
 fi
 if [ "$skipRefactor" = true ]; then
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-10 -checks=misc-malloc-checker -export-fixes=fixes.yaml
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -export-fixes=fixes.yaml
     echo "skipped refactoring step - fixes written to fixes.yaml"
 else
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-10 -checks=misc-malloc-checker -fix
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -fix
     echo "performed refactoring with clang-tidy"
     add_includes $outdir
 fi

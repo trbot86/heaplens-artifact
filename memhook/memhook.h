@@ -31,7 +31,7 @@
 #define MEMHOOK_MAX_TRACK 1000000
 #define MEMHOOK_MAX_TYPE_LENGTH 1000
 #define MEMHOOK_MAX_RETRY 10
-#define MEMHOOK_MAX_BUFFER_SIZE 10000
+#define MEMHOOK_MAX_BUFFER_SIZE 100000
 #define PADDING 64
 
 using namespace std;
@@ -257,6 +257,9 @@ void   (*next_free)(void *ptr);
 void   (*next_ssmem_free)(ssmem_allocator_t* a, void* ptr);
 // void * (*ssmem_alloc)(ssmem_allocator_t* a, size_t size);
 void   (*next_ssfree)(void* ptr);
+#endif
+#if defined(USE_RALLOC)
+void (*next_RP_free)(void* ptr);
 #endif
 // void * (*ssalloc)(size_t size);
 // void * (*ssalloc_aligned)(size_t alignment, size_t size);
