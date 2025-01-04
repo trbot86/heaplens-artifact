@@ -26,6 +26,12 @@ interface LogBody {
     'colours': {'type': string, 'colour': string}[]
 };
 
+interface LinePoint {
+    'type': number,
+    'bucket': number,
+    'size': number
+};
+
 const INIT_PAGE_SIZE = 4096;
 const INIT_CACHELINE_SIZE = 64;
 const INIT_NUM_BUCKETS = 2000;
@@ -92,13 +98,6 @@ function a11yProps(value: string) {
         id: `simple-tab-${value}`,
         'aria-controls': `simple-tabpanel-${value}`
     };
-}
-
-function getPageVis(typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}) {
-    return Object.keys(typeVisMatrix).reduce((map: {[a: string]: boolean}, tp: string) => {
-        map[tp] = typeVisMatrix[tp].pageVis;
-        return map;
-    }, {});
 }
 
 const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCluster, setMaxRunsPerCluster,
@@ -391,6 +390,8 @@ export default function VisPanels() {
     const [countsData, setCountsData] = useState({});
     const [pageData, setPageData] = useState({});
     const [clustersData, setClustersData] = useState({});
+    const [sumClusterSizes, setSumClusterSizes] = useState<number>(0);
+    const [numClusters, setNumClusters] = useState<number>(0);
     const [featuresData, setFeaturesData] = useState({});
     const [perfData, setPerfData] = useState({});
     const [cacheInfo, setCacheInfo] = useState(INIT_CACHE_INFO);
@@ -399,7 +400,12 @@ export default function VisPanels() {
     const [timeRange, setTimeRange] = useState(INIT_TIME_RANGE);
     const [getBucketIdx, setGetBucketTs] = useState(() => (ts: number) => 0);
     const [typesToSample, setTypesToSample] = useState({});
-    const [typeVisMatrix, setTypeVisMatrix] = useState<{[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}>({});
+
+    const [lineVis, setLineVis] = useState<{[tp: string]: boolean}>({});
+    const [pageVis, setPageVis] = useState<{[tp: string]: boolean}>({});
+    const [cacheVis, setCacheVis] = useState<{[tp: string]: boolean}>({});
+    // const [typeVisMatrix, setTypeVisMatrix] = useState<{[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}>({});
+
     const [selCacheName, setSelCacheName] = useState<string>(Object.keys(cacheInfo)[0]);
     const [resampling, setResampling] = useState<boolean>(false);
     const [expandedTypes, setExpandedTypes] = useState<{[tp: string]: boolean}>({});
@@ -435,13 +441,21 @@ export default function VisPanels() {
                         Object.keys(allData['linesAndStats']['fields']).forEach((tp: string) => {
                             allData['linesAndStats']['fields'][tp].forEach((field: SubtypeEntry) => allFieldNames.push(getSubtypeName(tp, field.subtype)));
                         });
-                        console.log('ALL FIELD NAMES:');
-                        console.log(allFieldNames.sort());
-                        setTypeVisMatrix(allData['types'].concat(allFieldNames)
-                            .reduce((map: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}, tp: string) => {
-                                map[tp] = {lineVis: true, pageVis: true, cacheVis: true};
+                        // console.log('ALL FIELD NAMES:');
+                        // console.log(allFieldNames.sort());
+                        const allMaps = allData['types'].concat(allFieldNames)
+                            .reduce((map: {[tp: string]: boolean}, tp: string) => {
+                                map[tp] = true;
                                 return map;
-                        }, {}));
+                            }, {});
+                        // setTypeVisMatrix(allTypeNames
+                        //     .reduce((map: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}, tp: string) => {
+                        //         map[tp] = {lineVis: true, pageVis: true, cacheVis: true};
+                        //         return map;
+                        // }, {}));
+                        setLineVis(allMaps);
+                        setPageVis(allMaps);
+                        setCacheVis(allMaps);
                         setExpandedTypes(allData['types'].reduce((map: {[tp: string]: boolean}, tp: string) => {
                             map[tp.replace(/\s+/g, '')] = false;
                             return map;
@@ -460,11 +474,17 @@ export default function VisPanels() {
                                 }
                             });
 
-                        const sortedLineData = Object.keys(allData['linesAndStats']['pts']).reduce((map: {[tp: string]: SizePoint[]}, tp: string) => {
-                            map[tp] = allData['linesAndStats']['pts'][tp].toSorted((a: SizePoint, b: SizePoint) => a.ts - b.ts)
-                                        .filter((sp: SizePoint, i: number) => i == allData['linesAndStats']['pts'][tp].length - 1 || sp.ts < allData['linesAndStats']['pts'][tp][i+1].ts);
-                            return map;
-                        }, {});
+                        // const numLinePts = allData['linesAndStats']['pts'].reduce((maxBucket: number, curr: LinePoint) => Math.max(curr['bucket'], maxBucket), 0);
+                        // const sortedLineData = allData['linesAndStats']['pts'].reduce((lineMap: {[tp: string]: {bucket: number, size: number}[]}, curr: LinePoint) => {
+                        //     if (!lineMap[curr['type']])
+                        //         lineMap[curr['type']] = new Array(numLinePts);
+                        //     lineMap[curr['type']][curr['bucket']] = {bucket: curr['bucket'], size: curr['size']};
+                        // }, {});
+                        // const sortedLineData = Object.keys(allData['linesAndStats']['pts']).reduce((map: {[tp: string]: SizePoint[]}, tp: string) => {
+                        //     map[tp] = allData['linesAndStats']['pts'][tp].toSorted((a: SizePoint, b: SizePoint) => a.ts - b.ts)
+                        //                 .filter((sp: SizePoint, i: number) => i == allData['linesAndStats']['pts'][tp].length - 1 || sp.ts < allData['linesAndStats']['pts'][tp][i+1].ts);
+                        //     return map;
+                        // }, {});
 
                         const minTs: number = allData['linesAndStats']['minTs'];
                         const maxTs: number = allData['linesAndStats']['maxTs'];
@@ -483,7 +503,7 @@ export default function VisPanels() {
                             }
                         });
                         setCurrTs(minTs);
-                        setLineData(sortedLineData);
+                        setLineData(allData['linesAndStats']['pts']);
                         setStatsData(allData['linesAndStats']['stats']);
                         setFieldsData(allData['linesAndStats']['fields']);
                         setCountsData(allData['linesAndStats']['counts']);
@@ -504,7 +524,14 @@ export default function VisPanels() {
 
                         setPageData(allData['pagesData']['page_num_events']);
                         setClustersData(allData['pagesData']['clusters']);
+                        setSumClusterSizes(allData['pagesData']['sum_cluster_sizes']);
+                        setNumClusters(allData['pagesData']['num_clusters']);
                         setFeaturesData(allData['pagesData']['features']);
+
+                        console.log('HERE IS CLUSTERS');
+                        console.log(allData['pagesData']['clusters']);
+                        console.log('HERE IS FEATURES');
+                        console.log(allData['pagesData']['features']);
 
                         setCacheData(allData['cacheData']);
 
@@ -543,7 +570,9 @@ export default function VisPanels() {
                     size={8.5} >
                     <Pages
                         pages={pageData}
-                        // clustersData={clustersData}
+                        clustersData={clustersData}
+                        sumClusterSizes={sumClusterSizes}
+                        numClusters={numClusters}
                         features={featuresData}
                         pageSize={pageSize}
                         perf={perfData}
@@ -554,7 +583,7 @@ export default function VisPanels() {
                         maxRunLength={maxRunLength}
                         maxRunsPerCluster={maxRunsPerCluster}
                         typesToSample={typesToSample}
-                        typeVisMatrix={typeVisMatrix}
+                        pageVis={pageVis}
                         fieldsData={fieldsData}
                         expandedTypes={expandedTypes}
                         setExpandedTypes={setExpandedTypes}
@@ -569,7 +598,7 @@ export default function VisPanels() {
                         cacheData={cacheData}
                         cacheInfo={cacheInfo}
                         bucketIdx={getBucketIdx(currTs)}
-                        typeVisMatrix={typeVisMatrix}
+                        cacheVis={cacheVis}
                         selCacheName={selCacheName}
                         setSelCacheName={setSelCacheName}
                         fname={fname}
@@ -585,13 +614,12 @@ export default function VisPanels() {
                     size={6} >
                     <TimeGraph
                         lines={lineData}
-                        maxPointsPerLine={MAX_POINTS_PER_LINE}
                         colourOfType={colourOfType}
                         currTs={currTs}
                         setCurrTs={setCurrTs}
                         timeRange={timeRange}
                         numBuckets={numBuckets}
-                        typeVisMatrix={typeVisMatrix} />
+                        lineVis={lineVis} />
                 </Grid>
                 <Grid 
                     className='visPanel'
@@ -600,8 +628,12 @@ export default function VisPanels() {
                         colourOfType={colourOfType}
                         setColourOfType={setColourOfType}
                         typeStats={countsData}
-                        typeVisMatrix={typeVisMatrix}
-                        setTypeVisMatrix={setTypeVisMatrix}
+                        lineVis={lineVis}
+                        pageVis={pageVis}
+                        cacheVis={cacheVis}
+                        setLineVis={setLineVis}
+                        setPageVis={setPageVis}
+                        setCacheVis={setCacheVis}
                         fieldsData={fieldsData}
                         expandedTypes={expandedTypes}
                         setExpandedTypes={setExpandedTypes} />
@@ -645,7 +677,7 @@ export default function VisPanels() {
                                     if (!resampling) {
                                         const fname = searchParams.get('fname');
                                         setResampling(true);
-                                        getData(`get-pages-and-cache-data/${fname}-${pageSizeSetting}-${cacheLineSizeSetting}-${numBucketsSetting}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${cacheInfoSetting[selCacheName].size}-${cacheInfoSetting[selCacheName].assoc}`, getPageVis(typeVisMatrix))
+                                        getData(`get-pages-and-cache-data/${fname}-${pageSizeSetting}-${cacheLineSizeSetting}-${numBucketsSetting}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${cacheInfoSetting[selCacheName].size}-${cacheInfoSetting[selCacheName].assoc}`, pageVis)
                                                 .then((resp) => resp.json())
                                                 .then((allData) => {
                                                     setNumBuckets(numBucketsSetting);
@@ -659,6 +691,8 @@ export default function VisPanels() {
                                                     setCacheLineSize(cacheLineSizeSetting);
                                                     setPageData(allData['pagesData']['page_num_events']);
                                                     setClustersData(allData['pagesData']['clusters']);
+                                                    setSumClusterSizes(allData['pagesData']['sum_cluster_sizes']);
+                                                    setNumClusters(allData['pagesData']['num_clusters']);
                                                     setFeaturesData(allData['pagesData']['features']);
 
                                                     setCacheInfo(cacheInfoSetting);

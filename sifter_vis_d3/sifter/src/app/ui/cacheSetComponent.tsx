@@ -136,14 +136,14 @@ function CacheBox({ totalData, minOcc, maxOcc, idx, x, y, size, setHoverIdx } :
 }
 
 function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
-                         setCacheWidth, typeVisMatrix, loading, expandedTypes } : 
+                         setCacheWidth, cacheVis, loading, expandedTypes } : 
     {
         selCacheName: string,
         cacheData: CacheData,
         bucketIdx: number,
         cacheWidth: CacheWidthData,
         setCacheWidth: (a: CacheWidthData) => void,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
+        cacheVis: {[tp: string]: boolean},
         loading: boolean,
         expandedTypes: {[a: string]: boolean}
     }) {
@@ -165,11 +165,6 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
         });
     }, [cacheData]);
     const [hoverIdx, setHoverIdx] = useState<number | null>(null);
-
-    console.log('Cache data:');
-    console.log(cacheData);
-    console.log('Total data:')
-    console.log(totalData);
 
     return (
         <>
@@ -257,7 +252,7 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
     );
 }
 
-export default function CacheSets({ cacheData, cacheInfo, bucketIdx, typeVisMatrix,
+export default function CacheSets({ cacheData, cacheInfo, bucketIdx, cacheVis,
                                     selCacheName, setSelCacheName, fname, pageSize,
                                     cacheLineSize, numBuckets, expandedTypes,
                                     setCacheData } : 
@@ -265,7 +260,7 @@ export default function CacheSets({ cacheData, cacheInfo, bucketIdx, typeVisMatr
         cacheData: {occ: number[][], idxToTpAndSt: string[], numSets: number}
         cacheInfo: CacheInfoMap,
         bucketIdx: number,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
+        cacheVis: {[tp: string]: boolean},
         selCacheName: string,
         setSelCacheName: (a: string) => void,
         fname: string | null,
@@ -301,13 +296,13 @@ export default function CacheSets({ cacheData, cacheInfo, bucketIdx, typeVisMatr
         //     v : 0)));
         return {
             occ: cacheData.occ.map((row) => row.map((v, i) => 
-                                                        (!isSubType(cacheData, i) && typeVisMatrix[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]].cacheVis && !expandedTypes[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length].replace(/\s+/g, '')]) ||
-                                                        (isSubType(cacheData, i) && typeVisMatrix[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]].cacheVis && expandedTypes[getTypeName(cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length])]) ?
+                                                        (!isSubType(cacheData, i) && cacheVis[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]] && !expandedTypes[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length].replace(/\s+/g, '')]) ||
+                                                        (isSubType(cacheData, i) && cacheVis[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]] && expandedTypes[getTypeName(cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length])]) ?
                                                         v : 0)),
             idxToTpAndSt: cacheData.idxToTpAndSt,
             numSets: cacheData.numSets
         }
-    }, [cacheData, typeVisMatrix, expandedTypes]);
+    }, [cacheData, cacheVis, expandedTypes]);
 
     // useEffect(() => {
     //     getCacheData(cacheInfo[selCacheName])
@@ -341,7 +336,7 @@ export default function CacheSets({ cacheData, cacheInfo, bucketIdx, typeVisMatr
                 bucketIdx={bucketIdx}
                 cacheWidth={cacheWidth}
                 setCacheWidth={setCacheWidth}
-                typeVisMatrix={typeVisMatrix}
+                cacheVis={cacheVis}
                 loading={loading}
                 expandedTypes={expandedTypes} />
         </div>

@@ -24,7 +24,8 @@
     "react-color": "^2.19.3",
     "react-dom": "^18",
     "react-draggable": "^4.4.6",
-    "react-markdown": "^9.0.1"
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",

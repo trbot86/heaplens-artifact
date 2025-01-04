@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import * as d3 from 'd3';
-import { Checkbox, IconButton, Menu, MenuItem, Paper, Popover, TextField, Tooltip } from '@mui/material';
+import { Checkbox, IconButton, Menu, MenuItem, Paper, Popover, TextField, Tooltip, Typography } from '@mui/material';
 import './componentStyles.scss';
 import { generateColours, getSubtypeName, TypeToColourMap } from '../vispanels/page';
 import { BarChart, Casino, KeyboardArrowLeft, KeyboardArrowRight, StackedLineChart, Window } from '@mui/icons-material';
@@ -158,14 +158,14 @@ function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded 
     );
 }
 
-function VisRightClickMenu({ rightClickAnchor, setRightClickAnchor, label, typeVisMatrix,
-                             typeName, setTypeVisMatrix } : 
+function VisRightClickMenu({ rightClickAnchor, setRightClickAnchor, label, visMatrix,
+                             typeName, setVisMatrix } : 
     {
         rightClickAnchor: HTMLElement | null,
         setRightClickAnchor: (a: HTMLElement | null) => void,
         label: string | undefined,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
-        setTypeVisMatrix: (a: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}) => void,
+        visMatrix: {[tp: string]: boolean},
+        setVisMatrix: (a: {[tp: string]: boolean}) => void,
         typeName: string
     }) {
     return (
@@ -179,34 +179,18 @@ function VisRightClickMenu({ rightClickAnchor, setRightClickAnchor, label, typeV
             }} >
             <MenuItem
                 onClick={() => {
-                    const newTypeVisMatrix = structuredClone(typeVisMatrix);
-                    if (label?.startsWith('line')) {
-                        Object.keys(newTypeVisMatrix).forEach((tp) => newTypeVisMatrix[tp].lineVis = tp == typeName);
-                    }
-                    else if (label?.startsWith('page')) {
-                        Object.keys(newTypeVisMatrix).forEach((tp) => newTypeVisMatrix[tp].pageVis = tp == typeName);
-                    }
-                    else {
-                        Object.keys(newTypeVisMatrix).forEach((tp) => newTypeVisMatrix[tp].cacheVis = tp == typeName);
-                    }
-                    setTypeVisMatrix(newTypeVisMatrix);
+                    const newVisMatrix = structuredClone(visMatrix);
+                    Object.keys(newVisMatrix).forEach((tp) => newVisMatrix[tp] = tp == typeName);
+                    setVisMatrix(newVisMatrix);
                     setRightClickAnchor(null);
                 }} >
                 Only this type
             </MenuItem>
             <MenuItem
                 onClick={() => {
-                    const newTypeVisMatrix = structuredClone(typeVisMatrix);
-                    if (label?.startsWith('line')) {
-                        Object.keys(newTypeVisMatrix).forEach((tp) => newTypeVisMatrix[tp].lineVis = tp != typeName);
-                    }
-                    else if (label?.startsWith('page')) {
-                        Object.keys(newTypeVisMatrix).forEach((tp) => newTypeVisMatrix[tp].pageVis = tp != typeName);
-                    }
-                    else {
-                        Object.keys(newTypeVisMatrix).forEach((tp) => newTypeVisMatrix[tp].cacheVis = tp != typeName);
-                    }
-                    setTypeVisMatrix(newTypeVisMatrix);
+                    const newVisMatrix = structuredClone(visMatrix);
+                    Object.keys(newVisMatrix).forEach((tp) => newVisMatrix[tp] = tp != typeName);
+                    setVisMatrix(newVisMatrix);
                     setRightClickAnchor(null);
                 }}  >
                 Everything but this type
@@ -215,18 +199,22 @@ function VisRightClickMenu({ rightClickAnchor, setRightClickAnchor, label, typeV
     );
 }
 
-function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatrix,
-                     fields, expandedTypes, setExpandedTypes, colourOfType,
-                     setColourOfType, setColourMenuAnchor, setSelMenuType,
-                     setCurrColourSel } : 
+function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
+                     setLineVis, setPageVis, setCacheVis, fields, expandedTypes,
+                     setExpandedTypes, colourOfType, setColourOfType,
+                     setColourMenuAnchor, setSelMenuType, setCurrColourSel } : 
     {   
         typeName: string,
         colourOfType: {[tp: string]: d3.RGBColor | d3.HSLColor | null},
         setColourOfType: (a: TypeToColourMap) => void,
         visExpanded: boolean,
         stats: TypeStat,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
-        setTypeVisMatrix: (a: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}) => void,
+        lineVis: {[tp: string]: boolean},
+        pageVis: {[tp: string]: boolean},
+        cacheVis: {[tp: string]: boolean},
+        setLineVis: (a: {[tp: string]: boolean}) => void,
+        setPageVis: (a: {[tp: string]: boolean}) => void,
+        setCacheVis: (a: {[tp: string]: boolean}) => void,
         fields: SubtypeEntry[] | null,
         expandedTypes: {[tp: string]: boolean},
         setExpandedTypes: (a: {[tp: string]: boolean}) => void,
@@ -244,8 +232,12 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                 rightClickAnchor={rightClickAnchor}
                 setRightClickAnchor={setRightClickAnchor}
                 label={label}
-                typeVisMatrix={typeVisMatrix}
-                setTypeVisMatrix={setTypeVisMatrix}
+                visMatrix={label?.startsWith('line') ? lineVis :
+                            label?.startsWith('page') ? pageVis :
+                            cacheVis}
+                setVisMatrix={label?.startsWith('line') ? setLineVis :
+                            label?.startsWith('page') ? setPageVis :
+                            setCacheVis}
                 typeName={rightClickedType}
                 />
             <tr className={visExpanded ? 'visExpanded' : ''} >
@@ -255,7 +247,7 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                     <div className='legendVisCheckboxContainer' >
                         <VisCheckbox
                             id={`line-vis-${typeName}`}
-                            checked={typeVisMatrix[typeName].lineVis}
+                            checked={lineVis[typeName]}
                             size='small'
                             onContextMenu={(e) => {
                                 e.preventDefault();
@@ -264,13 +256,13 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                                 setRightClickedType(typeName);
                             }}
                             onChange={() => {
-                                const newTypeVisMatrix = structuredClone(typeVisMatrix);
-                                newTypeVisMatrix[typeName].lineVis = !typeVisMatrix[typeName].lineVis;
-                                setTypeVisMatrix(newTypeVisMatrix);
+                                const newLineVis = structuredClone(lineVis);
+                                newLineVis[typeName] = !lineVis[typeName];
+                                setLineVis(newLineVis);
                             }} />
                         <VisCheckbox
                             id={`page-vis-${typeName}`}
-                            checked={typeVisMatrix[typeName].pageVis}
+                            checked={pageVis[typeName]}
                             size='small'
                             onContextMenu={(e) => {
                                 e.preventDefault();
@@ -279,13 +271,13 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                                 setRightClickedType(typeName);
                             }}
                             onChange={() => {
-                                const newTypeVisMatrix = structuredClone(typeVisMatrix);
-                                newTypeVisMatrix[typeName].pageVis = !typeVisMatrix[typeName].pageVis;
-                                setTypeVisMatrix(newTypeVisMatrix);
+                                const newPageVis = structuredClone(pageVis);
+                                newPageVis[typeName] = !pageVis[typeName];
+                                setPageVis(newPageVis);
                             }} />
                         <VisCheckbox
                             id={`cache-vis-${typeName}`}
-                            checked={typeVisMatrix[typeName].cacheVis}
+                            checked={cacheVis[typeName]}
                             size='small'
                             onContextMenu={(e) => {
                                 e.preventDefault();
@@ -294,9 +286,9 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                                 setRightClickedType(typeName);
                             }}
                             onChange={() => {
-                                const newTypeVisMatrix = structuredClone(typeVisMatrix);
-                                newTypeVisMatrix[typeName].cacheVis = !typeVisMatrix[typeName].cacheVis;
-                                setTypeVisMatrix(newTypeVisMatrix);
+                                const newCacheVis = structuredClone(cacheVis);
+                                newCacheVis[typeName] = !cacheVis[typeName];
+                                setCacheVis(newCacheVis);
                             }} />
                     </div>
                 </td>
@@ -331,8 +323,24 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                     </div>
                 </td>
                 <td>{typeName}</td>
-                <td>{stats.numAllocs}</td>
-                <td>{stats.numPages}</td>
+                <td>
+                    <Typography
+                        sx={{
+                            fontFamily: 'monospace',
+                            fontSize: '12px'
+                        }} >
+                        {stats.numAllocs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </Typography>
+                </td>
+                <td>
+                    <Typography
+                        sx={{
+                            fontFamily: 'monospace',
+                            fontSize: '12px'
+                        }} >
+                        {stats.numPages.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </Typography>
+                </td>
             </tr>
             {
             (fields && expandedTypes[typeName.replace(/\s+/g, '')]) &&
@@ -351,7 +359,7 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                                     disabled />
                                 <VisCheckbox
                                     id={`page-vis-${getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)}`}
-                                    checked={typeVisMatrix[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)].pageVis}
+                                    checked={pageVis[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)]}
                                     size='small'
                                     onContextMenu={(e) => {
                                         e.preventDefault();
@@ -360,13 +368,13 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                                         setRightClickedType(getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype));
                                     }}
                                     onChange={() => {
-                                        const newTypeVisMatrix = structuredClone(typeVisMatrix);
-                                        newTypeVisMatrix[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)].pageVis = !typeVisMatrix[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)].pageVis;
-                                        setTypeVisMatrix(newTypeVisMatrix);
+                                        const newPageVis = structuredClone(pageVis);
+                                        newPageVis[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)] = !pageVis[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)];
+                                        setPageVis(newPageVis);
                                     }} />
                                 <VisCheckbox
                                     id={`cache-vis-${getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)}`}
-                                    checked={typeVisMatrix[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)].cacheVis}
+                                    checked={cacheVis[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)]}
                                     size='small'
                                     onContextMenu={(e) => {
                                         e.preventDefault();
@@ -375,9 +383,9 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
                                         setRightClickedType(getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype));
                                     }}
                                     onChange={() => {
-                                        const newTypeVisMatrix = structuredClone(typeVisMatrix);
-                                        newTypeVisMatrix[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)].cacheVis = !typeVisMatrix[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)].cacheVis;
-                                        setTypeVisMatrix(newTypeVisMatrix);
+                                        const newCacheVis = structuredClone(cacheVis);
+                                        newCacheVis[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)] = !cacheVis[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)];
+                                        setCacheVis(newCacheVis);
                                     }} />
                             </div>
                         </td>
@@ -409,14 +417,19 @@ function LegendRow({ typeName, visExpanded, stats, typeVisMatrix, setTypeVisMatr
     );
 }
 
-export default function Legend({ colourOfType, setColourOfType, typeStats, typeVisMatrix, setTypeVisMatrix,
+export default function Legend({ colourOfType, setColourOfType, typeStats, lineVis,
+                                 pageVis, cacheVis, setLineVis, setPageVis, setCacheVis,
                                  fieldsData, expandedTypes, setExpandedTypes } : 
     {   
         colourOfType: TypeToColourMap,
         setColourOfType: (a: TypeToColourMap) => void,
         typeStats: TypeToStatsMap,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
-        setTypeVisMatrix: (a: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}) => void,
+        lineVis: {[tp: string]: boolean},
+        pageVis: {[tp: string]: boolean},
+        cacheVis: {[tp: string]: boolean},
+        setLineVis: (a: {[tp: string]: boolean}) => void,
+        setPageVis: (a: {[tp: string]: boolean}) => void,
+        setCacheVis: (a: {[tp: string]: boolean}) => void,
         fieldsData: {[tp: string]: SubtypeEntry[]},
         expandedTypes: {[tp: string]: boolean},
         setExpandedTypes: (a: {[tp: string]: boolean}) => void
@@ -470,8 +483,12 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, typeV
                                                         colourOfType={colourOfType}
                                                         visExpanded={visExpanded}
                                                         stats={typeStats[tp]}
-                                                        typeVisMatrix={typeVisMatrix}
-                                                        setTypeVisMatrix={setTypeVisMatrix}
+                                                        lineVis={lineVis}
+                                                        pageVis={pageVis}
+                                                        cacheVis={cacheVis}
+                                                        setLineVis={setLineVis}
+                                                        setPageVis={setPageVis}
+                                                        setCacheVis={setCacheVis}
                                                         fields={fieldsData[tp.replace(/\s+/g, '')] ? fieldsData[tp.replace(/\s+/g, '')] : null}
                                                         expandedTypes={expandedTypes}
                                                         setExpandedTypes={setExpandedTypes}

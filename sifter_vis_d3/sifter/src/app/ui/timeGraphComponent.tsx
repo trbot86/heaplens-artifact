@@ -6,7 +6,7 @@ import { TypeToColourMap } from "../vispanels/page";
 import { Slider, styled, Tooltip } from "@mui/material";
 
 export interface SizePoint {
-    ts: number,
+    bucket: number,
     size: number
 }
 
@@ -35,27 +35,27 @@ export const SIZE_UNIT_SUFF = [
     'GiB'
 ];
 
-function getSampledLine(sortedLine: SizePoint[], maxPointsPerLine: number): SizePoint[] {
-    // const sortedLine = line.toSorted((a, b) => a.ts - b.ts);
-    const retLine: SizePoint[] = [];
-    const minTs = sortedLine[0].ts;
-    const maxTs = sortedLine[sortedLine.length - 1].ts;
-    const quantum: number = (maxTs - minTs) / maxPointsPerLine;
+// function getSampledLine(sortedLine: SizePoint[], maxPointsPerLine: number): SizePoint[] {
+//     // const sortedLine = line.toSorted((a, b) => a.ts - b.ts);
+//     const retLine: SizePoint[] = [];
+//     const minTs = sortedLine[0].ts;
+//     const maxTs = sortedLine[sortedLine.length - 1].ts;
+//     const quantum: number = (maxTs - minTs) / maxPointsPerLine;
     
-    let prevDiv = 0,
-        prevSize = 0;
-    sortedLine.forEach((pt) => {
-        const currDiv = Math.ceil(pt.ts / quantum);
-        if (currDiv > prevDiv || sortedLine.length <= maxPointsPerLine) {
-            retLine.push({ts: pt.ts, size: prevSize});
-            retLine.push(pt);
-            prevDiv = currDiv;
-            prevSize = pt.size;
-        }
-    });
+//     let prevDiv = 0,
+//         prevSize = 0;
+//     sortedLine.forEach((pt) => {
+//         const currDiv = Math.ceil(pt.ts / quantum);
+//         if (currDiv > prevDiv || sortedLine.length <= maxPointsPerLine) {
+//             retLine.push({ts: pt.ts, size: prevSize});
+//             retLine.push(pt);
+//             prevDiv = currDiv;
+//             prevSize = pt.size;
+//         }
+//     });
 
-    return retLine;
-}
+//     return retLine;
+// }
 
 function getTsTickValues(minTs: number, maxTs: number, maxValues: number): number[] {
     const ret = [];
@@ -78,6 +78,11 @@ function getSizeTickValues(maxSize: number, maxValues: number): number[] {
     return ret;
 }
 
+function convertLinePtXToTs(linePtX: number, minTs: number, maxTs: number, numLinePtsX: number) {
+    const sizeOfLinePtX = Math.max((maxTs - minTs) / numLinePtsX, 1);
+    return (linePtX * sizeOfLinePtX) + minTs;
+}
+
 const CustomSlider = styled(Slider)({
     '& .MuiSlider-thumb': {
         height: SLIDER_THUMB_HEIGHT,
@@ -89,25 +94,25 @@ const CustomSlider = styled(Slider)({
     },
 });
 
-function TimeSlider({ xScale, currTs, setCurrTs, timeRange, numBuckets } :
+function TimeSlider({ xScale, currTs, numLinePtsX, setCurrTs, timeRange, numBuckets } :
     {
         xScale: d3.ScaleLinear<number, number, never>,
         currTs: number,
+        numLinePtsX: number,
         setCurrTs: (a: number) => void,
         timeRange: {min: number, max: number},
         numBuckets: number
     }) {
-    // TODO change step below to bucket size
     return(
         <div id='sliderGroup' >
             <CustomSlider
                 value={currTs}
                 track={false}
-                min={xScale.invert(0)}
-                max={xScale.invert(LINE_GRAPH_WIDTH)}
+                min={convertLinePtXToTs(xScale.invert(0), timeRange.min, timeRange.max, numLinePtsX)}
+                max={convertLinePtXToTs(xScale.invert(LINE_GRAPH_WIDTH), timeRange.min, timeRange.max, numLinePtsX)}
                 step={Math.max(Math.floor(timeRange.max - timeRange.min) / numBuckets, 1)}
                 onChange={(e, val) => {
-                    console.log(`Timestamp: ${val - timeRange.min}`);
+                    console.log(`Timestamp: ${val}`);
                     setCurrTs(val);
                 }} />
         </div>
@@ -158,7 +163,7 @@ const LinePath = forwardRef(({ lineData, colour, lineGenerator, ...props } :
 });
 
 function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
-                             numBuckets, typeVisMatrix } :
+                             numBuckets, lineVis } :
     {
         lines: LineData,
         colourOfType: TypeToColourMap,
@@ -166,38 +171,42 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
         setCurrTs: (a: number) => void,
         timeRange: {min: number, max: number},
         numBuckets: number,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
+        lineVis: {[tp: string]: boolean},
     }) {
     const SVGref = useRef(null);
     // const xScale = useRef<d3.ScaleLinear<number, number, never> | null>(null);
     const lineGenerator = useRef<d3.Line<SizePoint> | null>(null);
     const [xScale, setXScale] = useState<d3.ScaleLinear<number, number, never> | null>(null);
 
-    const xScaleOrig    = d3.scaleLinear().domain([timeRange.min, timeRange.max])
+    // const xScaleOrig = d3.scaleLinear().domain([timeRange.min, timeRange.max])
+    //                                 .range([0, LINE_GRAPH_WIDTH]);
+    const numLinePtsX = Object.values(lines)[0].length
+    const xScaleOrig = d3.scaleLinear().domain([0, numLinePtsX])
                                     .range([0, LINE_GRAPH_WIDTH]);
     
     // if (!xScale.current)
     //     xScale.current = xScaleOrig;
-    const maxSize       = d3.max(Object.keys(lines), (tp: string) => {
-                            return d3.max(lines[tp], (pt: SizePoint) => pt.size);
-                        });
-    const yScale        = d3.scaleLinear().domain([maxSize ? maxSize*1.05 : 1, 0])
-                                    .range([0, LINE_GRAPH_HEIGHT-5]);
+    const maxSize = useMemo(() => d3.max(Object.keys(lines).filter((tp) => lineVis[tp]), (tp: string) => {
+                                    return d3.max(lines[tp], (pt: SizePoint) => pt.size);
+                                    }), [lineVis]);
+    const yScale = useMemo(() => d3.scaleLinear().domain([maxSize ? maxSize*1.05 : 1, 0])
+                                    .range([0, LINE_GRAPH_HEIGHT-5]), [maxSize]);
 
     let xAxis: d3.Axis<d3.NumberValue>;
     if (!xScale) {
-        lineGenerator.current = d3.line((pt: SizePoint) => xScaleOrig(pt.ts), (pt: SizePoint) => yScale(pt.size));
+        lineGenerator.current = d3.line((pt: SizePoint) => xScaleOrig(pt.bucket), (pt: SizePoint) => yScale(pt.size));
         xAxis = d3.axisBottom(xScaleOrig).tickSize(9).tickValues(getTsTickValues(timeRange.min, timeRange.max, 10))
-            .tickFormat((d) => `${((parseInt(d) - timeRange.min) / 1000000000).toFixed(2)} s`);
+            .tickFormat((d) => `${((parseInt(convertLinePtXToTs(d)) - timeRange.min) / 1000000000).toFixed(2)} s`);
     }
     else {
-        lineGenerator.current = d3.line((pt: SizePoint) => xScale(pt.ts), (pt: SizePoint) => yScale(pt.size));
+        lineGenerator.current = d3.line((pt: SizePoint) => xScale(pt.bucket), (pt: SizePoint) => yScale(pt.size));
         xAxis = d3.axisBottom(xScale).tickSize(9).tickValues(getTsTickValues(timeRange.min, timeRange.max, 10))
-            .tickFormat((d) => `${((parseInt(d) - timeRange.min) / 1000000000).toFixed(2)} s`);
+            .tickFormat((d) => `${((parseInt(convertLinePtXToTs(d)) - timeRange.min) / 1000000000).toFixed(2)} s`);
     }
     
-    const yAxis = d3.axisLeft(yScale).tickSize(3).tickValues(getSizeTickValues(maxSize ? maxSize : 1, 6))
-        .tickFormat((d: number) => `${d / SIZE_UNITS[getUnitIndex(maxSize ? maxSize : 1)]} ${SIZE_UNIT_SUFF[getUnitIndex(maxSize ? maxSize : 1)]}`);
+    const yAxis = useMemo(() => d3.axisLeft(yScale).tickSize(3).tickValues(getSizeTickValues(maxSize ? maxSize : 1, 6))
+        .tickFormat((d: number) => `${d / SIZE_UNITS[getUnitIndex(maxSize ? maxSize : 1)]} ${SIZE_UNIT_SUFF[getUnitIndex(maxSize ? maxSize : 1)]}`)
+    , [yScale]);
 
     useEffect(() => {
         d3.select('#xAxisGroup').call(xAxis);
@@ -233,7 +242,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
         
         d3.select(SVGref.current)
             .call(zoom);
-    }, [lines, xScale]);
+    }, [lines, xScale, yAxis]);
     
     return (
         <div>
@@ -254,7 +263,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
                     id='linesGroup'
                     clipPath='url(#timeGraphClip)' >
                     {
-                        Object.keys(lines).filter((tp) => typeVisMatrix[tp].lineVis)
+                        Object.keys(lines).filter((tp) => lineVis[tp])
                                         .map((tp) =>   <Tooltip 
                                                             key={tp}
                                                             title={tp}
@@ -279,6 +288,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
             <TimeSlider 
                 xScale={xScale ? xScale : xScaleOrig}
                 currTs={currTs}
+                numLinePtsX={numLinePtsX}
                 setCurrTs={setCurrTs}
                 timeRange={timeRange}
                 numBuckets={numBuckets} />
@@ -286,42 +296,41 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
     );
 }
 
-export default function TimeGraph({ lines, maxPointsPerLine, colourOfType, currTs, setCurrTs,
-                                    timeRange, numBuckets, typeVisMatrix } :
+export default function TimeGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
+                                    numBuckets, lineVis } :
     {
         lines: LineData,
-        maxPointsPerLine: number,
         colourOfType: TypeToColourMap,
         currTs: number,
         setCurrTs: (a: number) => void,
         timeRange: {min: number, max: number},
         numBuckets: number,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}
+        lineVis: {[tp: string]: boolean}
     }) {
-    const sampledAndSortedLines = Object.keys(lines).reduce((retLines: LineData, tp: string) => {
-        retLines[tp] = getSampledLine(lines[tp], maxPointsPerLine);
-        return retLines;
-    }, {});
+    // const sampledAndSortedLines = Object.keys(lines).reduce((retLines: LineData, tp: string) => {
+    //     retLines[tp] = getSampledLine(lines[tp], maxPointsPerLine);
+    //     return retLines;
+    // }, {});
 
-    Object.keys(sampledAndSortedLines).forEach((tp) => {
-        if (sampledAndSortedLines[tp][0].ts > timeRange.min) {
-            sampledAndSortedLines[tp].unshift({ts: timeRange.min, size: 0});
-        }
-        if (sampledAndSortedLines[tp][sampledAndSortedLines[tp].length - 1].ts < timeRange.max) {
-            sampledAndSortedLines[tp].push({ts: timeRange.max, size: sampledAndSortedLines[tp][sampledAndSortedLines[tp].length - 1].size});
-        }
-    });
+    // Object.keys(sampledAndSortedLines).forEach((tp) => {
+    //     if (sampledAndSortedLines[tp][0].ts > timeRange.min) {
+    //         sampledAndSortedLines[tp].unshift({ts: timeRange.min, size: 0});
+    //     }
+    //     if (sampledAndSortedLines[tp][sampledAndSortedLines[tp].length - 1].ts < timeRange.max) {
+    //         sampledAndSortedLines[tp].push({ts: timeRange.max, size: sampledAndSortedLines[tp][sampledAndSortedLines[tp].length - 1].size});
+    //     }
+    // });
 
     return (
         <div>
             <ZoomableLineGraph
-                lines={sampledAndSortedLines}
+                lines={lines}
                 colourOfType={colourOfType}
                 currTs={currTs}
                 setCurrTs={setCurrTs}
                 timeRange={timeRange}
                 numBuckets={numBuckets}
-                typeVisMatrix={typeVisMatrix} />
+                lineVis={lineVis} />
         </div>
     );
 }

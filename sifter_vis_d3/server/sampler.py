@@ -91,6 +91,15 @@ class Sampler:
         # return df.iloc[:,[]]
         return df.iloc[:,[0, 1, 2, 3, 4, 6, 5]]
     
+    def get_all_lines(self):
+        con = sqlite3.connect(self.fname)
+        df = pd.read_sql_query("""SELECT TYPE as type,
+                                    BUCKET as bucket,
+                                    SIZE as size
+                                FROM LINES""",
+                                con)
+        return df
+
     def get_all_records(self, page_size=4096):
         con = sqlite3.connect(self.fname)
         dfs = []
@@ -251,42 +260,49 @@ class Sampler:
         return last_allocs
     
     def get_all_lines_and_stats(self):
-        recs = self.all_data
-        df = self.add_free_types(recs).dropna(subset=['file','size','type'])
-        min_ts = df['ts'].min()
-        max_ts = df['ts'].max()
-        bucket_size = (max_ts - min_ts) / self.num_buckets
-        df.loc[:,'bucket'] = ((df.loc[:,'ts'] - min_ts) // bucket_size).astype('Int64')
+        # recs = self.all_data
+        # df = self.add_free_types(recs).dropna(subset=['file','size','type'])
 
-        # print(df)
-        pts = {}
-        change_pts = {}
-        for tp in df.loc[:, 'type'].unique():
-            type_df_alloc = df[(df['type'] == tp) & (df['is_alloc'] == 1)][['ts', 'addr', 'size', 'bucket']]
-            type_df_free = df[(df['type'] == tp) & (df['is_alloc'] == 0)][['ts', 'addr', 'size', 'bucket']]
-            type_df_free['size'] = type_df_free['size'] * -1
-            # type_df_alloc.rename(columns={'allocTs': 'ts'}, inplace=True)
-            # type_df_free.rename(columns={'freeTs': 'ts'}, inplace=True)
-            merged = type_df_alloc.merge(type_df_free, how='outer', sort=True)
-            sum_allocs = merged.groupby(['addr', 'bucket']).agg({'size': 'sum', 'ts': 'last'}).sort_values('ts')
+        # bucket_size = (max_ts - min_ts) / self.num_buckets
+        # df.loc[:,'bucket'] = ((df.loc[:,'ts'] - min_ts) // bucket_size).astype('Int64')
 
-            df_pts = sum_allocs.set_index('ts').cumsum()
-            pts[tp] = [{'ts': int(rec[0]), 'size': int(rec[1])} for rec in zip(df_pts.index.to_list(), df_pts['size'])]
-            # if len(df[df['type'] == tp]) >= CHANGE_POINT_THRESHOLD:
-            #     change_point_alg = rpt.Window(width=150, model='l2', min_size=CHANGE_POINT_THRESHOLD).fit(df_pts)
-            #     change_pts[tp] = list(map(int, change_point_alg.predict(pen=20)))
+        # # print(df)
+        # pts = {}
+        # change_pts = {}
+        # for tp in df.loc[:, 'type'].unique():
+        #     type_df_alloc = df[(df['type'] == tp) & (df['is_alloc'] == 1)][['ts', 'addr', 'size', 'bucket']]
+        #     type_df_free = df[(df['type'] == tp) & (df['is_alloc'] == 0)][['ts', 'addr', 'size', 'bucket']]
+        #     type_df_free['size'] = type_df_free['size'] * -1
+        #     # type_df_alloc.rename(columns={'allocTs': 'ts'}, inplace=True)
+        #     # type_df_free.rename(columns={'freeTs': 'ts'}, inplace=True)
+        #     merged = type_df_alloc.merge(type_df_free, how='outer', sort=True)
+        #     sum_allocs = merged.groupby(['addr', 'bucket']).agg({'size': 'sum', 'ts': 'last'}).sort_values('ts')
 
-        # objects = self.get_objects(recs) if len(recs.index) < 2000000 else self.get_last_object_per_bucket(self.get_objects(recs), self.num_buckets).drop(columns=['bucket'])
+        #     df_pts = sum_allocs.set_index('ts').cumsum()
+        #     pts[tp] = [{'ts': int(rec[0]), 'size': int(rec[1])} for rec in zip(df_pts.index.to_list(), df_pts['size'])]
+        #     # if len(df[df['type'] == tp]) >= CHANGE_POINT_THRESHOLD:
+        #     #     change_point_alg = rpt.Window(width=150, model='l2', min_size=CHANGE_POINT_THRESHOLD).fit(df_pts)
+        #     #     change_pts[tp] = list(map(int, change_point_alg.predict(pen=20)))
 
-        # print(f"cols in objects: {self.get_objects(recs).columns}")
-        # print(f"cols in objects: {objects.columns}")
+        # # objects = self.get_objects(recs) if len(recs.index) < 2000000 else self.get_last_object_per_bucket(self.get_objects(recs), self.num_buckets).drop(columns=['bucket'])
+
+        # # print(f"cols in objects: {self.get_objects(recs).columns}")
+        # # print(f"cols in objects: {objects.columns}")
+
+        lines_df = self.get_all_lines()
+        num_line_pts_x = lines_df["bucket"].max()
+        line_pts = dict()
+        for entry in self.get_all_lines().values.tolist():
+            if not entry[0] in line_pts:
+                line_pts[entry[0]] = [0]*(num_line_pts_x+1)
+            line_pts[entry[0]][entry[1]] = {"bucket": entry[1], "size": entry[2]}
 
         print("Returning from get_all_lines_and_stats")
 
-        return {'pts': pts,
-                'changes': change_pts,
+        return {'pts': line_pts,
+                'changes': {},
                 'stats': {},#{'single': self.get_stats(recs, self.cache_line_size), 'double': self.get_stats(recs, 2*self.cache_line_size)},
-                'fields': self.get_fields(s.replace(' ', '') for s in df['type'].unique()),
+                'fields': self.get_fields(s.replace(' ', '') for s in lines_df['type'].unique()),
                 'counts': self.get_counts().set_index('type').to_dict('index'),
                 'perf': self.get_perf_data().drop_duplicates(subset=['cl_addr']).set_index('cl_addr').to_dict(orient='index'),
                 'minTs': self.min_ts,
@@ -449,6 +465,7 @@ class Sampler:
         # max_pages = 1 # DEBUGGING
         sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
         # sampled_pages.add(34278619365)
+        # sampled_pages.add(0x7f028df4e000 // 4096)
         
         taken = 0
         cluster_keys = list(clusters.keys())
@@ -473,11 +490,26 @@ class Sampler:
         features = sampled_pages_df.merge(features, how='left', on='page_num')
         merged = sampled_pages_df.merge(labeled_data, how='left', on='page_num')
         
-        dict_merged = merged.set_index('page_num').set_axis(['events', 'cluster'], axis='columns').to_dict(orient='index')
+        all_merged = merged.set_index('page_num').set_axis(['events', 'cluster'], axis='columns')
+        dict_merged = all_merged.to_dict(orient='index')
         fts = event_labels.index("freeTs")
 
+        # print("BLAH BLAH BLAH")
+        # print(all_merged)
+
+        # for pn, v in dict_merged.items():
+        #     print("HERE ARE THE EVENTS FOR PAGE {}:".format(pn))
+        #     print(v['events'])
+        #     for event in v['events']:
+        #         print("\t{}".format(dict(zip(event_labels, replace_nan(event, fts)))))
+
+        cluster_pages = features.reset_index().loc[:,['cluster','page_num']].groupby('cluster').agg(lambda x: x.tolist()).to_dict(orient='index')
+        cluster_sizes = {c: len(clusters[c]) for c in cluster_pages.keys()}
+
         return {'page_num_events': {f"{pn*self.page_size}": {'events': [dict(zip(event_labels, replace_nan(event, fts))) for event in v['events']], 'cluster': v['cluster']} for pn, v in dict_merged.items()},
-                'clusters': features.reset_index().loc[:,['cluster','page_num']].groupby('cluster').agg(lambda x: x.tolist()).to_dict(orient='index'),
+                'clusters': {c: {'pages': cluster_pages[c], 'size': cluster_sizes[c]} for c in cluster_pages.keys()},
+                'sum_cluster_sizes': sum([len(clusters[c]) for c in clusters.keys()]),
+                'num_clusters': len(clusters.keys()),
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()}}
     
     def get_cache_data(self, size, assoc):

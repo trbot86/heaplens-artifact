@@ -5,7 +5,8 @@ import './page.scss';
 import { useEffect, useState } from 'react';
 import { EditNote, KeyboardArrowRight, Storage } from '@mui/icons-material';
 import Box from '@mui/material/Box';
-import Markdown from 'react-markdown';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 async function getDBFiles() {
     const resp = await fetch('http://localhost:5000/get-fnames');
@@ -146,7 +147,10 @@ export default function FileSelect() {
                 <Paper
                     id='notesDisplayedContainer'
                     elevation={3} >
-                    <Markdown>{notesDisplayed}</Markdown>
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm]} >
+                        {notesDisplayed}
+                    </ReactMarkdown>
                 </Paper>
                 }
             </Box>

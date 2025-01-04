@@ -7,6 +7,7 @@ import { Check, Dangerous, DangerousOutlined, LocalFireDepartment, LocalFireDepa
 import { Box, Checkbox, Icon, IconButton, Stack, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { SubtypeEntry } from './legendComponent';
 import { HtmlTooltip } from './cacheSetComponent';
+import Grid from '@mui/material/Grid2';
 
 interface MemoryObject {
     file: string | null,
@@ -34,6 +35,10 @@ interface PerfEntry {
     loads: number
 }
 
+interface ClustersInfo {
+    [c: number]: {'pages': number[], 'size': number}
+}
+
 export interface PerfMap {
     addrs: {[ addr: number ]: PerfEntry},
     avgAccesses: number
@@ -53,11 +58,11 @@ const MAX_HOT_ADDRS = 20;
     should be fine to give an approximate overview in most cases. */
 function getSlotDataPerBucket(  events: MemoryObject[], pageAddr: number, pageSize: number, numSlots: number,
                                 numBuckets: number, getBucketIdx: (ts: number) => number,
-                                typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}) {
+                                pageVis: {[tp: string]: boolean}) {
     const ret: number[][] = Array(numBuckets + 2).fill(undefined).map(() => Array(numSlots).fill(0));
     const slotSize = Math.floor(pageSize / numSlots);
 
-    events.filter((event) => event.type && typeVisMatrix[event.type].pageVis)
+    events.filter((event) => event.type && pageVis[event.type])
         .forEach((event) => {
         const eventAddr = event.actualAddr ? event.actualAddr : event.addr;
         if (Math.floor(eventAddr / pageSize) == Math.floor(pageAddr / pageSize)) {
@@ -542,6 +547,36 @@ function PageHeader({ sortMode, setSortMode, pageSize, selSize, setSelSize,
     );
 }
 
+const SizeIndicator = forwardRef(({ clusterSize, sumClusterSizes, maxClusterSize, ...props } :
+    {
+        clusterSize: number,
+        sumClusterSizes: number,
+        maxClusterSize: number
+    }, ref) => {
+
+    const   maxWidth = 36,
+            minWidth = 6,
+            colScale = d3.scaleLinear([1, sumClusterSizes], ['#abc9b3', '#c9b5b8']),
+            widthScale = d3.scaleLinear([1, maxClusterSize], [minWidth, maxWidth]);
+
+    return (
+        <div
+            className='sizeIndicatorDiv'
+            ref={ref}
+            {...props} >
+            <svg className='sizeIndicatorSvg' >
+                <rect
+                    className='sizeIndicatorRect'
+                    data-clustersize={clusterSize}
+                    data-sumclustersizes={sumClusterSizes}
+                    data-maxclustersize={maxClusterSize}
+                    width={`${widthScale(clusterSize)}px`}
+                    fill={colScale(clusterSize)} />
+            </svg>
+        </div>
+    );
+});
+
 function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourOfType,
                     showHot, showHitm, perf } :
     {
@@ -741,9 +776,12 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
 }
 
 function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType, 
-                    setSelPageAddr, setFocusData, typeVisMatrix, showHot,
-                    showHitm, perf } : 
+                    setSelPageAddr, setFocusData, pageVis, showHot,
+                    showHitm, perf, clusterSize, sumClusterSizes, maxClusterSize } : 
     {
+        clusterSize: number,
+        sumClusterSizes: number,
+        maxClusterSize: number,
         pageSize: number,
         addr: number,
         data: PageContents,
@@ -752,7 +790,7 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
         colourOfType: TypeToColourMap,
         setSelPageAddr: (a: number) => void,
         setFocusData: (a: PageContents) => void,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
+        pageVis: {[tp: string]: boolean},
         showHot: boolean,
         showHitm: boolean,
         perf: PerfMap
@@ -764,14 +802,14 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
             events: data.events.filter((obj) => obj.allocTs <= currTs && 
                                                 (obj.freeTs == null || obj.freeTs >= currTs)
                                                 && obj.type
-                                                && typeVisMatrix[obj.type].pageVis),
+                                                && pageVis[obj.type]),
             cluster: data.cluster
         };
         setCurrData(filtered);
         if (selAddr == addr) {
             setFocusData(filtered);
         }
-    }, [currTs, selAddr, data, typeVisMatrix]);
+    }, [currTs, selAddr, data, pageVis]);
 
     return (
         <div className='pageRow' >
@@ -785,10 +823,29 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
                 showHot={showHot}
                 showHitm={showHitm}
                 perf={perf} />
-            <div className='pageRowLabel'>
-                <div>{`0x${addr.toString(16)}`}</div>
-                <div>{`cluster: ${currData.cluster}`}</div>
-            </div>
+            <Grid
+                container
+                rowSpacing={0.3}
+                columnSpacing={0.8}
+                className='pageRowLabel' >
+                <Grid size={12} >
+                    <div className='pageLabelDiv' >{`0x${addr.toString(16)}`}</div>
+                </Grid>
+                
+                <Grid size={5} >
+                    <div className='clusterLabelDiv' >{`cluster: ${currData.cluster}`}</div>
+                </Grid>
+                <Grid size={4} >
+                    <Tooltip
+                        placement='right'
+                        title={`${clusterSize} of ${sumClusterSizes} pages`} >
+                        <SizeIndicator
+                            clusterSize={clusterSize}
+                            sumClusterSizes={sumClusterSizes}
+                            maxClusterSize={maxClusterSize} />
+                    </Tooltip>
+                </Grid>
+            </Grid>
             {
             (addr == selAddr) &&
             <div id='selPageIcon' >
@@ -801,7 +858,7 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
 
 function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setSelPageAddr,
                        numBuckets, setFocusData, setZoomedSize, getBucketIdx, selSize,
-                       setSelSize, typeVisMatrix, zoomedSize, zoomedAddr, setZoomedAddr } : 
+                       setSelSize, pageVis, zoomedSize, zoomedAddr, setZoomedAddr } : 
     {
         pageSize: number,
         addr: number,
@@ -817,14 +874,14 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
         getBucketIdx: (a: number) => number,
         selSize: number,
         setSelSize: (a: number) => void,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
+        pageVis: {[tp: string]: boolean},
         zoomedAddr: number,
         setZoomedAddr: (a: number) => void
     }) {
     const [currData, setCurrData] = useState(data);
     const dataPerBucket = useMemo(() => {
-        return getSlotDataPerBucket(data.events, addr, pageSize, NUM_SLOTS_HUGEPAGE, numBuckets, getBucketIdx, typeVisMatrix);
-    }, [data, typeVisMatrix]);
+        return getSlotDataPerBucket(data.events, addr, pageSize, NUM_SLOTS_HUGEPAGE, numBuckets, getBucketIdx, pageVis);
+    }, [data, pageVis]);
 
     useEffect(() => {
         const filtered = {
@@ -833,7 +890,7 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
                                                 obj.allocTs <= currTs && 
                                                 (obj.freeTs == null || obj.freeTs >= currTs) &&
                                                 obj.type &&
-                                                typeVisMatrix[obj.type].pageVis),
+                                                pageVis[obj.type]),
             cluster: data.cluster
         };
         setCurrData(filtered);
@@ -849,7 +906,7 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
                 cluster: filtered.cluster
             });
         }
-    }, [currTs, selAddr, data, typeVisMatrix, zoomedSize]);
+    }, [currTs, selAddr, data, pageVis, zoomedSize]);
 
     return (
         <div className={`pageRow${zoomedSize > 0 ? ' pageRowZoomed' : ''}`} >
@@ -881,11 +938,15 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
     );
 }
 
-export default function Pages({ pages, features, pageSize, cacheLineSize, perf, colourOfType, currTs,
-                                clusterAlg, maxRunLength, maxRunsPerCluster, numBuckets, typeVisMatrix,
-                                fieldsData, expandedTypes, setExpandedTypes, getBucketIdx, timeRange } :
+export default function Pages({ pages, clustersData, sumClusterSizes, numClusters, features, pageSize,
+                                cacheLineSize, perf, colourOfType, currTs, clusterAlg, maxRunLength,
+                                maxRunsPerCluster, numBuckets, pageVis, fieldsData, expandedTypes,
+                                setExpandedTypes, getBucketIdx, timeRange } :
     {
         pages: PageMap,
+        clustersData: ClustersInfo,
+        sumClusterSizes: number,
+        numClusters: number,
         features: any,
         pageSize: number,
         cacheLineSize: number,
@@ -895,7 +956,7 @@ export default function Pages({ pages, features, pageSize, cacheLineSize, perf, 
         clusterAlg: string,
         maxRunLength: number,
         maxRunsPerCluster: number,
-        typeVisMatrix: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}},
+        pageVis: {[tp: string]: boolean},
         fieldsData: {[tp: string]: SubtypeEntry[]},
         expandedTypes: {[tp: string]: boolean},
         setExpandedTypes: (a: {[tp: string]: boolean}) => void,
@@ -916,19 +977,7 @@ export default function Pages({ pages, features, pageSize, cacheLineSize, perf, 
     const [showHot, setShowHot] = useState<boolean>(false);
     const [showHitm, setShowHitm] = useState<boolean>(false);
 
-    // useEffect(() => {
-    //     getData(`get-pages/${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}`, typesToSample)
-    //             .then((resp) => resp.json())
-    //             .then((data) => {
-    //                 setPages(data['page_num_events']);
-    //                 setClusters(data['clusters']);
-    //                 setFeatures(data['features']);
-    //                 setFocusData({
-    //                     events: Object.values(data['page_num_events'])[0].events.filter((obj: MemoryObject) => obj.allocTs <= currTs && (!obj.freeTs || obj.freeTs >= currTs)),
-    //                     cluster: Object.values(data['page_num_events'])[0].cluster
-    //                 });
-    //             });
-    // }, []);
+    const maxClusterSize = Object.values(clustersData).reduce((size: number, curr: {'pages': number[], 'size': number}) => Math.max(size, curr['size']), 0);
 
     return (
         <div id='pageAndObjectVis'>
@@ -957,6 +1006,9 @@ export default function Pages({ pages, features, pageSize, cacheLineSize, perf, 
                                                 sortMode == 'cluster' ? pages[parseInt(ad1)].cluster - pages[parseInt(ad2)].cluster : 0)
                         .map((addr: string) =>  <PageRow
                                                     key={addr}
+                                                    clusterSize={clustersData[pages[parseInt(addr)].cluster]['size']}
+                                                    sumClusterSizes={sumClusterSizes}
+                                                    maxClusterSize={maxClusterSize}
                                                     pageSize={pageSize}
                                                     addr={parseInt(addr)}
                                                     data={pages[parseInt(addr)]}
@@ -965,7 +1017,7 @@ export default function Pages({ pages, features, pageSize, cacheLineSize, perf, 
                                                     colourOfType={colourOfType}
                                                     setSelPageAddr={setSelPageAddr}
                                                     setFocusData={setFocusData}
-                                                    typeVisMatrix={typeVisMatrix}
+                                                    pageVis={pageVis}
                                                     showHot={showHot}
                                                     showHitm={showHitm}
                                                     perf={perf} />)
@@ -996,7 +1048,7 @@ export default function Pages({ pages, features, pageSize, cacheLineSize, perf, 
                                                     numBuckets={numBuckets}
                                                     selSize={selSize}
                                                     setSelSize={setSelSize}
-                                                    typeVisMatrix={typeVisMatrix} />)
+                                                    pageVis={pageVis} />)
                     }
                     </>
                     }

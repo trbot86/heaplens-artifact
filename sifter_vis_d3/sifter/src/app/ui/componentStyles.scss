@@ -78,7 +78,7 @@ $timeGraphSliderThumbWidth: 12px;
     overflow-y: scroll;
 }
 
-#pageRowContainer, .pageRowLabel {
+#pageRowContainer {
     display: flex;
     flex-direction: column;
 }
@@ -234,8 +234,29 @@ rect.selection {
 }
 
 #selPageIcon {
-    position: relative;
-    left: 7px;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.pageLabelDiv {
+    width: 100px;
+    font-family: monospace;
+}
+
+.clusterLabelDiv {
+    width: 63px;
+}
+
+.sizeIndicatorSvg, .sizeIndicatorDiv {
+    width: 40px;
+    height: 8px;
+}
+
+.sizeIndicatorRect {
+    height: 8px;
+    rx: 2px;
 }
 
 #objectLayoutDiv {
