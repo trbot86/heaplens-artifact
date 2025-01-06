@@ -164,7 +164,7 @@ extern "C" {
         if (initialized) {
             unit_log.tindex_name = typetable.insert(name_of_type);
             // cout << "CALLED CUSTOM MALLOC, TYPE: " << (void*) unit_log.tindex_name << endl;
-            collector.copy(unit_log);
+            memhookCollector.copy(unit_log);
         }
         return ptr;
     }
@@ -178,7 +178,7 @@ extern "C" {
         memhook_free(ptr, NULL, 0, false);
         if (initialized) {
             // cout << "CALLED CUSTOM FREE" << endl;
-            collector.copy(unit_log);
+            memhookCollector.copy(unit_log);
         }
     }
 
@@ -197,7 +197,7 @@ extern "C" {
     //     memhook_free(ptr, filename, line, false);
     //     if (initialized) {
     //         // cout << "CALLED CUSTOM FREE" << endl;
-    //         collector.copy(unit_log);
+    //         memhookCollector.copy(unit_log);
     //     }
     // }
 
@@ -350,12 +350,12 @@ void *operator new[] (size_t size) {
 
 void operator delete(void * mem) _GLIBCXX_USE_NOEXCEPT {
     memhook_free(mem, NULL, 0, false);
-    collector.copy(unit_log);
+    memhookCollector.copy(unit_log);
     return;
 }
 
 void operator delete[](void *mem)  _GLIBCXX_USE_NOEXCEPT {
     memhook_free(mem, NULL, 0, false);
-    collector.copy(unit_log);
+    memhookCollector.copy(unit_log);
     return;
 }

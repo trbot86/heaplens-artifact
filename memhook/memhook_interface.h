@@ -83,7 +83,7 @@ using namespace std;
         unit_log.file = filetable.insert<fname>(); \
         unit_log.tindex_name = typetable.insert(tname); \
         unit_log.line = ln; \
-        collector.copy(unit_log);
+        memhookCollector.copy(unit_log);
 #else
 #define MEMHOOK_LOG_ALLOC(ptr, sz, fname, ln, tname) \
         unit_log.timestamp = memhook_get_server_clock(); \
@@ -93,14 +93,14 @@ using namespace std;
         unit_log.file = filetable.insert(fname); \
         unit_log.tindex_name = typetable.insert(tname); \
         unit_log.line = ln; \
-        collector.copy(unit_log);
+        memhookCollector.copy(unit_log);
 #endif // __cplusplus
 
 #define MEMHOOK_LOG_FREE(ptr) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.addr = ptr; \
         unit_log.typeofop = false; \
-        collector.copy(unit_log);
+        memhookCollector.copy(unit_log);
 
 struct slot;
 struct memhook_info_t;
@@ -155,7 +155,7 @@ extern "C"
 
 #ifdef __cplusplus
 
-extern MemStampCollector collector;
+extern MemStampCollector memhookCollector;
 extern thread_local memhook_info_t unit_log;
 // extern thread_local unordered_set<const char*> threadFiles;
 // extern thread_local unordered_set<const char*> typeFiles;
@@ -188,7 +188,7 @@ inline T* operator*(const MemStamp &stamp, T* p)
     unit_log.line = stamp.lineNum;
     unit_log.tindex_name = typetable.insert(typeid(T).name());
 
-    collector.copy(unit_log);
+    memhookCollector.copy(unit_log);
     return p;
 }
 
@@ -204,7 +204,7 @@ _mm_malloc(size_t __size, size_t __align)
     if (__align == 1)
     {
         void* ptr = memhook_malloc(__size, unit_log.file, line, true);
-        collector.copy(unit_log);
+        memhookCollector.copy(unit_log);
         return ptr;
     }
 
@@ -226,7 +226,7 @@ _mm_malloc(size_t __size, size_t __align)
     unit_log.line = line;
     unit_log.typeofop = true;
 
-    collector.copy(unit_log);
+    memhookCollector.copy(unit_log);
 
     return __mallocedMemory;
 }
@@ -244,7 +244,7 @@ int posix_memalign(void** ptr, size_t align, size_t size) {
     int r = posix_memalign<int, 210, MACRO_GET_STR("/home/s2ovens/sifter/memhook/memhook_interface.h")>(ptr, align, size);
     unit_log.addr = *ptr;
 
-    collector.copy(unit_log);
+    memhookCollector.copy(unit_log);
 
     return r;
 }
@@ -257,7 +257,7 @@ void* malloc(size_t size)
 
     void* ptr = memhook_malloc(size, unit_log.file, line, true);
 
-    collector.copy(unit_log);
+    memhookCollector.copy(unit_log);
     return ptr;
 }
 

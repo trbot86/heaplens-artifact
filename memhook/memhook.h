@@ -340,7 +340,7 @@ void MemStampCollector::copy(memhook_info_t &unit_log){
   }
 }
 
-MemStampCollector collector;
+MemStampCollector memhookCollector;
 
 //Keeps the total number of concurrent threads
 int arrayCount = 0;
