@@ -6,6 +6,7 @@ database=false
 template=false
 skipRefactor=false
 includesOnly=false
+placementNew=true
 subdirectory=""
 buildcmd="bear -- make"
 perffile=""
@@ -42,6 +43,9 @@ while [ $# -gt 0 ]; do
             fi
             buildcmd=$2
             shift
+        ;;
+        --no-pnew)
+            placementNew=false
         ;;
         -j | --threads)
             if [[ -z "$2" || "$2" == -* ]]; then
@@ -177,13 +181,24 @@ cd clang-tidy-standalone
 rm -rf build
 mkdir build
 cd build
+
+cmakeOptions=""
 if [ "$template" = true ]; then
     echo "About to build clang-tidy with templating ON"
-    cmake -DCPP_TEMPLATE=ON ..
+    cmakeOptions="-DCPP_TEMPLATE=ON"
 else
     echo "About to build clang-tidy with templating OFF"
-    cmake -DCPP_TEMPLATE=OFF ..
+    cmakeOptions="-DCPP_TEMPLATE=OFF"
 fi
+if [ "$placementNew" = true ]; then
+    echo "About to build clang-tidy with placement new logging ON"
+    cmakeOptions="$cmakeOptions -DCPP_PLACEMENT_NEW=ON"
+else
+    echo "About to build clang-tidy with placement new logging OFF"
+    cmakeOptions="$cmakeOptions -DCPP_PLACEMENT_NEW=OFF"
+fi
+
+cmake "$cmakeOptions" ..
 cmake --build .
 cd ../..
 echo "Done building clang-tidy"

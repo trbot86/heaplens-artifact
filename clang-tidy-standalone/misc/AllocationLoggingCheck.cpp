@@ -22,7 +22,8 @@
                                     hasName("posix_memalign"), \
                                     hasName("calloc"), \
                                     hasName("xmalloc"), \
-                                    hasName("xcalloc")), unless(isTemplateInstantiation()))
+                                    hasName("xcalloc"), \
+                                    hasName("AllocateAligned")), unless(isTemplateInstantiation()))
 
 using namespace clang::ast_matchers;
 
@@ -198,9 +199,11 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
                         node->getExprLoc(),
                         "MemStamp((__FILE__), (__LINE__)) * ");
         }
+#ifdef ALLOCLOGGING_PLACEMENT_NEW
         // TODO: if dereference on same line, need to put parentheses around like *(MemStamp() * (T*) new () T())
         else if (node->getNumPlacementArgs() > 0) {
-            std::string type = node->getAllocatedType().getUnqualifiedType().getAsString();
+            // std::string type = node->getAllocatedType().getUnqualifiedType().getAsString();
+            std::string type = node->getAllocatedType().getTypePtr()->getAs<clang::RecordType>()->getDecl()->getNameAsString();
             std::string out = "MemStamp((__FILE__), (__LINE__)) * (" + type + "*) ";
             diag(node->getExprLoc(), "insert MemStamp (placement new)",
                 DiagnosticIDs::Error)
@@ -208,6 +211,7 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
                         node->getExprLoc(),
                         out);
         }
+#endif
     }
 }
 

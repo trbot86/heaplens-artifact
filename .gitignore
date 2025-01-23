@@ -10,6 +10,9 @@ ASCYLIB
 leanstore
 rocksdb
 jemalloc
+mimalloc
+test_align
+perfout.txt
 testing_matchers
 gzip-1.10
 masstree-beta

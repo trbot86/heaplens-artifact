@@ -8,7 +8,6 @@
 #include <unistd.h>
 #include <sqlite3.h>
 #include <fstream>
-#include <map>
 #include <unordered_map>
 #include <map>
 #include <sstream>
@@ -97,8 +96,6 @@ typedef struct memory_page {
 struct perf_data {
   uint64_t addr;
   float hitm;
-  uint64_t stores;
-  uint64_t loads;
 };
 
 size_t bin_search(const size_t* arr, size_t x, int begin, int end) {
@@ -132,23 +129,20 @@ unordered_map<uintptr_t, string> construct_map(const char* filename, bool remove
   return retmap;
 }
 
-void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size, map<uint64_t, memory_page_t>& pages, sqlite3* db) {
+void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size, unordered_map<uint64_t, memory_page_t>& pages, sqlite3* db) {
   ifstream pfile;
   pfile.open(fname);
   string line;
   vector<struct perf_data> entries{};
   cmatch matches;
-  regex rgx("[0-9]+\\s+(0x[a-f0-9]+)\\s+\\S+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+\\.[0-9]+)%\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+)\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+)");
+  regex rgx("[0-9]+\\s+(0x[a-f0-9]+)\\s+\\S+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+\\.[0-9]+)%");
   if (pfile.good()) {
     while(getline(pfile, line)) {
       if (regex_search(line.c_str(), matches, rgx)) {
         float hitm = stof(matches[2].str());
         if (hitm >= cutoff) {
           uint64_t cl_addr = strtoull(matches[1].str().c_str(), nullptr, 16);
-          uint64_t page_num = cl_addr / page_size;
-          uint64_t stores = stoul(matches[3].str());
-          uint64_t loads = stoul(matches[4].str());
-          
+          uint64_t page_num = (cl_addr * cl_size) / page_size;
           if (pages.find(page_num) == pages.end()) {
             std::cout << "Perf page num not present in data: " << page_num << std::endl;
           }
@@ -156,10 +150,8 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
             pages[page_num].has_perf_addr = true;
           }
           // cout << "PERF ACTUAL PAGE ADDRESS: " << cl_addr / cl_size << endl;
-          if (cl_addr < 18446462598732840960) {
-            struct perf_data new_entry{cl_addr, hitm, stores, loads};
-            entries.push_back(new_entry);
-          }
+          struct perf_data new_entry{cl_addr, hitm};
+          entries.push_back(new_entry);
         }
         else
           break;
@@ -242,7 +234,6 @@ void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db
         string name = matches[3].str();
         size_t size = strtoull(matches[4].str().c_str(), nullptr, 10);
         size_t offset = strtoull(matches[5].str().c_str(), nullptr, 10);
-        string type_trim_t = type_trim + "_t";
 
         // if (seen_types.find(type) != seen_types.end())
         //   cout << "Seen types contains type " << type << endl;
@@ -253,11 +244,6 @@ void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db
             (entries.find(type_trim) == entries.end() || entries[type_trim].find(name) == entries[type_trim].end())) {
           struct field_data new_entry{subtype, size, offset};
           entries[type_trim][name] = new_entry;
-        }
-        else if (seen_types.find(type_trim_t.c_str()) != seen_types.end() &&
-            (entries.find(type_trim_t) == entries.end() || entries[type_trim_t].find(name) == entries[type_trim_t].end())) {
-          struct field_data new_entry{subtype, size, offset};
-          entries[type_trim_t][name] = new_entry;
         }
       }
     }
@@ -428,8 +414,8 @@ void get_lines(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr
     // printf("Adding %s to table\n", tname);
     for (int i = 0; i < buckets + 2; i++) {
       sqlite3_bind_text(stmt, 1, tname, strlen(tname), NULL);
-      sqlite3_bind_int64(stmt, 2, i);
-      sqlite3_bind_int64(stmt, 3, it.second[i]);
+      sqlite3_bind_int(stmt, 2, i);
+      sqlite3_bind_int(stmt, 3, it.second[i]);
 
       rc = sqlite3_step(stmt);
       if (rc != SQLITE_DONE) {
@@ -647,6 +633,7 @@ void split_events_across_pages( int id, int chunk_size, int start_ind, unordered
 }
 
 void write_event_to_db(sqlite3_stmt* stmt, info_t event) {
+  printf("Here is the file ptr: %p\n", event.file);
   const char* fname = event.file ? file_map.at((uintptr_t) event.file).c_str() : "NULL";
   const char* tname = event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL";
   sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
@@ -694,8 +681,8 @@ int main(int argc, char* argv[]) {
   int opt_ind = 0;
 
   int c;
-  float sample_portion = 1.0;
-  float cutoff = 0.0001;
+  float sample_portion = -1.0;
+  float cutoff = 5.0;
   const char* perf_file;
   bool is_perf_file = false;
   const char* field_file;
@@ -816,7 +803,7 @@ int main(int argc, char* argv[]) {
 
   int chunk_size = ceil((double)num_structs / (double)num_threads);
   vector<thread> workers{num_threads};
-  map<uint64_t, memory_page_t> all_pages{};
+  unordered_map<uint64_t, memory_page_t> all_pages{};
   unordered_map<uintptr_t, int> all_raw_type_count{};
   unordered_set<string> all_type_set{};
   unordered_map<size_t, int> all_size_class_counts{};
@@ -976,20 +963,20 @@ int main(int argc, char* argv[]) {
     // printf("Here is the page address: %lu\n", p.first);
     if (p.second.sampled == CTD_NOT_SAMPLED) {
       bool take_for_type = false;
-      for (auto& tp: p->second.included_types) {
+      for (auto& tp: p.second.included_types) {
         if (all_raw_type_count[tp] < num_pages_per_type) {
-          p->second.sampled = CTD_SAMPLED_YES;
+          p.second.sampled = CTD_SAMPLED_YES;
           take_for_type = true;
           break;
         }
       }
       if (take_for_type) {
-        for (auto& tp: p->second.included_types)
+        for (auto& tp: p.second.included_types)
           all_raw_type_count[tp]++;
       }
     }
-    if (p->second.sampled == CTD_NOT_SAMPLED)
-        p->second.sampled = (p->second.has_perf_addr || rand() < sample_portion*RAND_MAX) ? CTD_SAMPLED_YES : CTD_SAMPLED_NO;
+    if (p.second.sampled == CTD_NOT_SAMPLED)
+        p.second.sampled = rand() < sample_portion*RAND_MAX ? CTD_SAMPLED_YES : CTD_SAMPLED_NO;
 
     if (p.second.sampled == CTD_SAMPLED_YES) {
       // node_t* n = p.second.events.head;

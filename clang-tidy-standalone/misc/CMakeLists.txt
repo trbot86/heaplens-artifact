@@ -31,7 +31,12 @@ clang_target_link_libraries(clangTidyMiscModule
   )
 
 option(CPP_TEMPLATE "Specify whether the target application supports templating." OFF)
+option(CPP_PLACEMENT_NEW "Specify whether placement new should be logged." ON)
 
 if(CPP_TEMPLATE)
   add_definitions(-DALLOCLOGGING_TEMPLATE)
 endif(CPP_TEMPLATE)
+
+if(CPP_PLACEMENT_NEW)
+  add_definitions(-DALLOCLOGGING_PLACEMENT_NEW)
+endif(CPP_PLACEMENT_NEW)
