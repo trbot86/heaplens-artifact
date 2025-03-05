@@ -8,3 +8,11 @@ rocksdb
 ralloc*
 mimalloc
 zstd
+setbench_verlib*
+setbench-artifact
+test_align
+sychrobench
+testing_stuff
+masstree*
+gzip*
+jemalloc

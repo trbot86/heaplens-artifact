@@ -6,7 +6,12 @@ name="sifter"
 while [ $# -gt 0 ]; do
     case $1 in
         -h | --help)
-            echo "HELP"
+            echo "Usage: ./build_image_and_launch.sh [options]"
+            echo "options:"
+            echo "-h/--help         Print this message"
+            echo "-p/--huge-page    Mount huge pages at /dev/hugepages"
+            echo "-n/--name [name]  Specify Docker container name"
+            exit 0
         ;;
         -p | --huge-page)
             hugepage="--huge-page"
