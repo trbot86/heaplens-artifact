@@ -4,3 +4,7 @@ docker
 ssmem
 ASCYLIB/exp*
 fielddump_tester
+rocksdb
+ralloc*
+mimalloc
+zstd

@@ -23,6 +23,7 @@
                                     hasName("calloc"), \
                                     hasName("xmalloc"), \
                                     hasName("xcalloc"), \
+                                    hasName("Allocate"), \
                                     hasName("AllocateAligned")), unless(isTemplateInstantiation()))
 
 using namespace clang::ast_matchers;
@@ -58,6 +59,10 @@ DeclarationMatcher declMallocMatcher = varDecl(
     hasDescendant(
         callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fdeclmalloc"))).bind("declmalloc")),
     hasType(type().bind("decltype")));
+
+StatementMatcher returnMallocMatcher = returnStmt(
+    hasDescendant(callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fretmalloc"))).bind("retmalloc")), 
+    hasReturnValue(hasType(type().bind("rettype"))));
 
 // // Matches declaration with placement new allocation
 // DeclarationMatcher placementNewDeclMatcher = varDecl(hasDescendant(
@@ -123,6 +128,7 @@ void AllocationLoggingCheck::registerMatchers(MatchFinder *Finder) {
     Finder->addMatcher(sizeofMallocMatcher, this);
     Finder->addMatcher(lhsofMallocMatcher, this);
     Finder->addMatcher(declMallocMatcher, this);
+    //Finder->addMatcher(returnMallocMatcher, this);
 #ifdef ALLOCLOGGING_TEMPLATE
     Finder->addMatcher(newMatcher, this);
 #endif
@@ -202,8 +208,8 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
 #ifdef ALLOCLOGGING_PLACEMENT_NEW
         // TODO: if dereference on same line, need to put parentheses around like *(MemStamp() * (T*) new () T())
         else if (node->getNumPlacementArgs() > 0) {
-            // std::string type = node->getAllocatedType().getUnqualifiedType().getAsString();
-            std::string type = node->getAllocatedType().getTypePtr()->getAs<clang::RecordType>()->getDecl()->getNameAsString();
+            std::string type = node->getAllocatedType().getUnqualifiedType().getAsString();
+            // std::string type = node->getAllocatedType().getTypePtr()->getAs<clang::RecordType>()->getDecl()->getNameAsString();
             std::string out = "MemStamp((__FILE__), (__LINE__)) * (" + type + "*) ";
             diag(node->getExprLoc(), "insert MemStamp (placement new)",
                 DiagnosticIDs::Error)
@@ -222,6 +228,7 @@ void AllocationLoggingCheck::check(const MatchFinder::MatchResult &Result) {
     AllocationLoggingCheck::emitDiagnosticsMalloc(Result, "sizeofmalloc", "sizeof-arg-type", "fdeclsizeofmalloc");
     AllocationLoggingCheck::emitDiagnosticsMalloc(Result, "lhsmalloc", "lhs-type", "fdecllhsmalloc");
     AllocationLoggingCheck::emitDiagnosticsMalloc(Result, "declmalloc", "decltype", "fdeclmalloc");
+    //AllocationLoggingCheck::emitDiagnosticsMalloc(Result, "retmalloc", "rettype", "fretmalloc");
 
 #ifdef ALLOCLOGGING_TEMPLATE
     AllocationLoggingCheck::emitDiagnosticsNew(Result, "new-expr");

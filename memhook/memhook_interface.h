@@ -241,7 +241,7 @@ int posix_memalign(void** ptr, size_t align, size_t size) {
     unit_log.line = line;
     unit_log.typeofop = true;
 
-    int r = posix_memalign<int, 210, MACRO_GET_STR("/home/s2ovens/sifter/memhook/memhook_interface.h")>(ptr, align, size);
+    int r = posix_memalign(ptr, align, size);
     unit_log.addr = *ptr;
 
     memhookCollector.copy(unit_log);
