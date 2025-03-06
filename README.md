@@ -24,7 +24,7 @@ This step uses clang-tidy to add logging instructions to the target application.
 
 2. Write templated versions of any custom allocation functions (see templated malloc function in memhook/memhook_interface.h)
 
-3. Run script to add logging information to memory allocations. If the target application is written in C++ (rather than C), use the -t flag.
+3. Compute logging information for memory allocations. If the target application is written in C++ (rather than C), use the -t flag.
 
 		./sifter.sh [target-application-dir] [new-dir-name] -t --skip-refactor --build 'bear -- [make-command]'
 
@@ -34,16 +34,21 @@ If the target application is compiled by simply calling 'make', then you do not 
 
 Note: currently, you must use the --skip-refactor flag. Hypothetically, excluding the flag does the remaining refactoring in a single step, but this isn't working right now...
 
-4. Add memhook directory to the include, library, and linker paths in your makefile. For example:
+4. Add the logging information.
+
+		cd [new-dir-name]
+		clang-apply-replacements-14 ./
+
+5. Add memhook directory to the include, library, and linker paths in your makefile. For example:
 
 		CXXFLAGS += -I/root/sifter/memhook/
 		LDFLAGS += -L/root/sifter/memhook/ -Wl,-rpath=/root/sifter/memhook/ -lmemhook -ldl
 
-5. Include memhook_interface.h in all source files. To do this, run the following:
+6. Include memhook_interface.h in all source files. To do this, run the following:
 
 		./sifter.sh [new-dir-name] --includes-only
 
-6. Run your target application. This will produce a few files: binary_dump.txt, fileset_dump.txt, and typeset_dump.txt.
+7. Run your target application. This will produce a few files: binary_dump.txt, fileset_dump.txt, and typeset_dump.txt.
 ## Step 2: Sample output logs
 
 This step samples a set of memory pages from binary_dump.txt.

@@ -161,34 +161,37 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
             }
 
             FullSourceLoc fsrcloc = Result.Context->getFullLoc(mnode->getExprLoc());
-            std::string FileName = fsrcloc.getFileEntry()->getName().str();
-            int line = fsrcloc.getLineNumber();
+            /* TODO: get the following to work will allocations performed in macro defs */
+            if (!fsrcloc.isMacroID()) {
+                std::string FileName = fsrcloc.getFileEntry()->getName().str();
+                int line = fsrcloc.getLineNumber();
 
-            // SmallString<200> pathVector;
-            //   std::cout << "FILENAME: "
-            //             << pathVector.c_str() + fsrcloc.getFileEntry()->getName().str()
-            //             << ": " << line << endl;
+                // SmallString<200> pathVector;
+                //   std::cout << "FILENAME: "
+                //             << pathVector.c_str() + fsrcloc.getFileEntry()->getName().str()
+                //             << ": " << line << endl;
 
-            // std::cout << "DeclName: " << declnode->getNameAsString() << endl;
-            int offset = declnode->getNameAsString().size();
+                // std::cout << "DeclName: " << declnode->getNameAsString() << endl;
+                int offset = declnode->getNameAsString().size();
 
-#ifdef ALLOCLOGGING_TEMPLATE
-            diag(mnode->getExprLoc().getLocWithOffset(offset), "insert type here",
-                DiagnosticIDs::Error)
-                << FixItHint::CreateInsertion(
-                    mnode->getExprLoc().getLocWithOffset(offset),
-                    "<" + type + ", " + std::to_string(line) + ", MACRO_GET_STR(\"" + FileName + "\")" + ">");
-#else    
-            diag(mnode->getExprLoc().getLocWithOffset(offset), "insert _s here",
-                DiagnosticIDs::Error)
-                << FixItHint::CreateInsertion(
-                    mnode->getExprLoc().getLocWithOffset(offset), "_s");
-            diag(mnode->getEndLoc(), "insert file name, line number, and type",
-                DiagnosticIDs::Error)
-                << FixItHint::CreateInsertion(
-                    mnode->getEndLoc(),
-                    ", " + std::to_string(line) + ", \"" + FileName + "\", \"" + type + "\"");
-#endif // TEMPLATE
+    #ifdef ALLOCLOGGING_TEMPLATE
+                diag(mnode->getExprLoc().getLocWithOffset(offset), "insert type here",
+                    DiagnosticIDs::Error)
+                    << FixItHint::CreateInsertion(
+                        mnode->getExprLoc().getLocWithOffset(offset),
+                        "<" + type + ", " + std::to_string(line) + ", MACRO_GET_STR(\"" + FileName + "\")" + ">");
+    #else    
+                diag(mnode->getExprLoc().getLocWithOffset(offset), "insert _s here",
+                    DiagnosticIDs::Error)
+                    << FixItHint::CreateInsertion(
+                        mnode->getExprLoc().getLocWithOffset(offset), "_s");
+                diag(mnode->getEndLoc(), "insert file name, line number, and type",
+                    DiagnosticIDs::Error)
+                    << FixItHint::CreateInsertion(
+                        mnode->getEndLoc(),
+                        ", " + std::to_string(line) + ", \"" + FileName + "\", \"" + type + "\"");
+    #endif // TEMPLATE
+            }
         }
     }
 }
