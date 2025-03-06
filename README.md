@@ -28,11 +28,19 @@ This step uses clang-tidy to add logging instructions to the target application.
 
 		./sifter.sh [target-application-dir] [new-dir-name] -t --skip-refactor --build 'bear -- [make-command]'
 
-This will generate a list of modifications in the file 'fixes.yaml'. If 'fixes.yaml' is empty following this step, then either the target application contains no dynamic memory allocations or something went wrong. This step should also produce a file called 'fielddump.txt' containing information about the fields of user-defined classes and structs.
+	This will generate a list of modifications in the file 'fixes.yaml'. If 'fixes.yaml' is empty following this step, then either the target application contains no dynamic memory allocations or something went wrong. This step should also produce a file called 'fielddump.txt' containing information about the fields of user-defined classes and structs.
 
-If the target application is compiled by simply calling 'make', then you do not need to specify the build command.
+	If the target application is compiled by simply calling 'make', then you do not need to specify the build command.
 
-Note: currently, you must use the --skip-refactor flag. Hypothetically, excluding the flag does the remaining refactoring in a single step, but this isn't working right now...
+	Note: currently, you must use the --skip-refactor flag. Hypothetically, excluding the flag does the remaining refactoring in a single step, but this isn't working right now...
+
+	To add custom logging, use the ```MEMHOOK_LOG_ALLOC``` and ```MEMHOOK_LOG_FREE``` macros in memhook_interface.h as follows:
+
+		int* my_ints = (int*) malloc(10 * sizeof(int));
+		MEMHOOK_LOG_ALLOC(my_ints, 10 * sizeof(int), typeid(int).name())
+		...
+		MEMHOOK_LOG_FREE(my_ints)
+		custom_free_func(my_ints);
 
 4. Add the logging information.
 
@@ -57,11 +65,11 @@ This step samples a set of memory pages from binary_dump.txt.
 
 		./sifter.sh [new-dir-name] -d --sample [proportion-sampled] --pages-per-type [num-pages] --field-dump fielddump.txt
 
-The argument provided to --sample is a real number between 0 and 1 that largely determines the size of the resulting database. A good rule of thumb is to aim for a database size of around 500MB or less (depending on the power of your machine). For example, if the size of binary_dump.txt is 5GB, then the proportion of events sampled should be around 0.1 or less.
+	The argument provided to --sample is a real number between 0 and 1 that largely determines the size of the resulting database. A good rule of thumb is to aim for a database size of around 500MB or less (depending on the power of your machine). For example, if the size of binary_dump.txt is 5GB, then the proportion of events sampled should be around 0.1 or less.
 
-With --pages-per-type you are specifying, for each type T, how many memory pages the sampler should pick containing at least one allocation of type T. By default this is 1, but you may want to increase this number if you are interested in seeing more pages containing underrepresented types. Note that picking a large number here will also increase the size of the resulting database.
+	With --pages-per-type you are specifying, for each type T, how many memory pages the sampler should pick containing at least one allocation of type T. By default this is 1, but you may want to increase this number if you are interested in seeing more pages containing underrepresented types. Note that picking a large number here will also increase the size of the resulting database.
 
-This step should produce a file called 'allocs.sqlite' in the 'type_analysis' directory.
+	This step should produce a file called 'allocs.sqlite' in the 'type_analysis' directory.
 
 ## Step 3: Visualization
 

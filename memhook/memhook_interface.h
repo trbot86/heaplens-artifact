@@ -75,24 +75,24 @@ using namespace std;
 #define MACRO_GET_STR(str) MACRO_GET_128(str, 0), 0
 
 #if defined(__cplusplus) && ! defined(MEMHOOK_C_LOG)
-#define MEMHOOK_LOG_ALLOC(ptr, sz, fname, ln, tname) \
+#define MEMHOOK_LOG_ALLOC(ptr, sz, tname) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.file = filetable.insert<fname>(); \
+        unit_log.file = filetable.insert<MACRO_GET_STR(__FILE__)>(); \
         unit_log.tindex_name = typetable.insert(tname); \
-        unit_log.line = ln; \
+        unit_log.line = __LINE__; \
         memhookCollector.copy(unit_log);
 #else
-#define MEMHOOK_LOG_ALLOC(ptr, sz, fname, ln, tname) \
+#define MEMHOOK_LOG_ALLOC(ptr, sz, tname) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.file = filetable.insert(fname); \
+        unit_log.file = filetable.insert(MACRO_GET_STR(__FILE__)); \
         unit_log.tindex_name = typetable.insert(tname); \
-        unit_log.line = ln; \
+        unit_log.line = __LINE__; \
         memhookCollector.copy(unit_log);
 #endif // __cplusplus
 
