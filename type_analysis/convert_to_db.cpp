@@ -43,6 +43,7 @@ size_t page_size;
 
 typedef struct stats {
   unsigned int num_allocs;
+  unordered_map<size_t, uint64_t> num_alignment;
   unsigned int num_frees;
   unordered_set<uint64_t> resident_pages;
 } stats_t;
@@ -67,36 +68,60 @@ typedef struct info {
                 typeofop(tp) {}
 } info_t;
 
+typedef struct event {
+  info_t i;
+  void* actualAddr;
+} event_t;
+
 typedef struct memory_page {
   unordered_set<uintptr_t> included_types;
-  vector<info_t*> events;
+  // vector<info_t*> events;
   bool has_perf_addr;
   char sampled;
   // uint64_t size;
-  memory_page() : included_types(unordered_set<uintptr_t>{}), events(vector<info_t*>()), has_perf_addr(false), sampled(CTD_NOT_SAMPLED) {}
+  bool all_types_taken;
+  memory_page() : included_types(unordered_set<uintptr_t>{}), has_perf_addr(false), sampled(CTD_NOT_SAMPLED), all_types_taken(false) {}
 
-  void add_event(info_t* ev) {
+  void add_event_type(info_t* ev) {
     // events.push(new node_t{ev});
-    events.push_back(ev);
+    // events.push_back(ev);
     // size++;
     if (included_types.find((uintptr_t) ev->tindex_name) == included_types.end())
       included_types.insert((uintptr_t) ev->tindex_name);
   }
-  void join(struct memory_page& other) {
-    vector<info_t*> new_events = vector<info_t*>();
-    new_events.reserve(events.size() + other.events.size());
-    new_events.insert(new_events.end(), events.begin(), events.end());
-    new_events.insert(new_events.end(), other.events.begin(), other.events.end());
-    included_types.insert(other.included_types.begin(), other.included_types.end());
-    events = new_events;
-    // events.concat(other.events);
-  }
+  // void join(struct memory_page& other) {
+  //   vector<info_t*> new_events = vector<info_t*>();
+  //   new_events.reserve(events.size() + other.events.size());
+  //   new_events.insert(new_events.end(), events.begin(), events.end());
+  //   new_events.insert(new_events.end(), other.events.begin(), other.events.end());
+  //   included_types.insert(other.included_types.begin(), other.included_types.end());
+  //   events = new_events;
+  //   // events.concat(other.events);
+  // }
 } memory_page_t;
 
 struct perf_data {
   uint64_t addr;
   float hitm;
 };
+
+struct field_data {
+  string subtype;
+  size_t size;
+  size_t offset;
+};
+
+struct size_and_type {
+  size_t size;
+  uintptr_t type;
+};
+
+typedef struct mem_interval {
+  uintptr_t start;
+  uintptr_t end;
+  bool contained;
+  info_t* alloc_info;
+} mem_interval_t;
 
 size_t bin_search(const size_t* arr, size_t x, int begin, int end) {
   if (begin == end)
@@ -204,16 +229,10 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
   }
 }
 
-struct field_data {
-  string subtype;
-  size_t size;
-  size_t offset;
-};
-
 void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db) {
   unordered_set<string>::iterator seeniter;
-  for (seeniter = seen_types.begin(); seeniter != seen_types.end(); seeniter++)
-    std::cout << *seeniter << std::endl;
+  // for (seeniter = seen_types.begin(); seeniter != seen_types.end(); seeniter++)
+  //   std::cout << *seeniter << std::endl;
 
   ifstream pfile;
   pfile.open(fname);
@@ -414,8 +433,8 @@ void get_lines(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr
     // printf("Adding %s to table\n", tname);
     for (int i = 0; i < buckets + 2; i++) {
       sqlite3_bind_text(stmt, 1, tname, strlen(tname), NULL);
-      sqlite3_bind_int(stmt, 2, i);
-      sqlite3_bind_int(stmt, 3, it.second[i]);
+      sqlite3_bind_int64(stmt, 2, i);
+      sqlite3_bind_int64(stmt, 3, it.second[i]);
 
       rc = sqlite3_step(stmt);
       if (rc != SQLITE_DONE) {
@@ -449,6 +468,7 @@ void create_supertable(sqlite3* db) {
                         "LINE       INT NOT NULL," \
                         "TIMESTAMP  INT NOT NULL," \
                         "SIZE       INT," \
+                        "ACTUALADDR INT," \
                         "ADDRESS    INT NOT NULL," \
                         "isNew      INT," \
                         "TYPE       CHAR(500));", nullptr, 0, &zErrMsg);
@@ -463,191 +483,17 @@ void create_supertable(sqlite3* db) {
   }
 }
 
-void sort_events_into_pages(int id, int chunk_size, int start_ind, info_t* filemap, vector<uint64_t>& min_ts,
-                        vector<uint64_t>& max_ts, unordered_map<uint64_t, memory_page_t>& pages, unordered_set<uintptr_t>& raw_type_set,
-                        unordered_map<size_t, int>& size_class_counts, unordered_map<uintptr_t, stats_t*>& stats_per_type) {
-  for (int i = 0; i < chunk_size; i++) {
-    info_t* event = filemap + start_ind + i;
-    
-    if (event->timestamp < min_ts[id]) {
-      min_ts[id] = event->timestamp;
-    }
-    if (event->timestamp > max_ts[id]) {
-      max_ts[id] = event->timestamp;
-    }
-
-    if (stats_per_type.find((uintptr_t) event->tindex_name) == stats_per_type.end()) {
-      // cout << "Adding for type: " << (uintptr_t) event->tindex_name << endl;
-      stats_per_type.insert(pair<uintptr_t, stats_t*>{(uintptr_t) event->tindex_name, new stats_t{
-                                                                                event->typeofop ? 1u : 0u, // num_allocs
-                                                                                event->typeofop ? 0u : 1u, // num_frees
-                                                                                unordered_set<uint64_t>{}
-                                                                              }});
-    }
-    else {
-      stats_per_type[(uintptr_t) event->tindex_name]->num_allocs++;
-      stats_per_type[(uintptr_t) event->tindex_name]->num_frees++;
-    }
-
-    uint64_t page_num = (uint64_t)event->addr / page_size;
-    if (event->typeofop)
-      stats_per_type[(uintptr_t) event->tindex_name]->resident_pages.insert(page_num);
-    
-    // uint64_t page_num_end = ((uint64_t)event->addr + event->size) / page_size;
-    if (pages.find(page_num) == pages.end()) {
-      pages.insert(pair<uint64_t, memory_page_t>{page_num, memory_page_t{}});
-      // printf("Address of new page: %p\n", &pages[page_num]);
-    }
-    // if (page_num_end != page_num && pages.find(page_num_end) == pages.end())
-    //   pages.insert(pair<uint64_t, memory_page_t>{page_num_end, memory_page_t{}})
-
-    pages[page_num].add_event(event);
-
-    // if (type_map.find((uintptr_t) event->tindex_name) != type_map.end()) {
-      // string type_trim = type_map.at((uintptr_t) event->tindex_name);
-      // type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
-      // type_set.insert(type_trim);
-    if (event->typeofop) {
-      raw_type_set.insert((uintptr_t) event->tindex_name);
-    }
-    // }
-
-    if (event->size > 0) {
-      int ind = bin_search(size_classes, event->size, 0, num_classes);
-      // if (i % 1000000 == 0)
-      //   cout << "Size: " << event->size << " Index: " << ind << " Size class: " << size_classes[ind] << endl;
-      size_class_counts[size_classes[ind]] = size_class_counts[size_classes[ind]] + 1;
-    }
-  }
-}
-
-struct size_and_type {
-  size_t size;
-  uintptr_t type;
-};
-
-// TODO: is everything guaranteed to be sorted by timestamp at this point?
-// this is important for the use of last_alloc_size and alloc_intervals
-void split_events_across_pages( int id, int chunk_size, int start_ind, unordered_map<uint64_t, memory_page_t>& all_pages,
-                                vector<uint64_t>& page_num_list, unordered_map<uint64_t, memory_page_t>& pages,
-                                uint64_t min_ts, uint64_t max_ts, size_t buckets, unordered_map<uintptr_t, vector<uint64_t>>& thread_buckets,
-                                unordered_map<uintptr_t, stats_t*>& stats_per_type) {
-  for (int i = start_ind; i < start_ind + chunk_size; i++) {
-    uint64_t page_num = page_num_list[i];
-    if (pages.find(page_num) == pages.end())
-        pages.insert(pair<uint64_t, memory_page_t>{page_num, memory_page_t{}});
-    // node_t* n = all_pages[page_num_list[i]].events.head;
-    unordered_map<uintptr_t, struct size_and_type> last_alloc_info{};
-    map<uintptr_t, uintptr_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
-    std::sort(all_pages[page_num_list[i]].events.begin(), all_pages[page_num_list[i]].events.end(),
-              [](info_t* a, info_t* b){ return a->timestamp < b->timestamp; });
-    for (const info_t* event : all_pages[page_num_list[i]].events) {
-    // while (n != nullptr) {
-      // info_t* event = n->data;
-      size_t eventSize = event->typeofop ? event->size : last_alloc_info.find((uintptr_t) event->addr) != last_alloc_info.end() ? last_alloc_info[(uintptr_t) event->addr].size : 0;
-
-      if (event->typeofop) {
-        // printf("Here is event addr: %p, eventSize: %lu\n", event->addr, event->size);
-        // printf("(alloc) Here is tindex name: %p, here is bucket: %lu\n", event->tindex_name, get_bucket(event->timestamp, buckets, min_ts, max_ts));
-        // printf("is tindex_name NULL? %d, typeofop: %d\n", event->tindex_name == NULL, event->typeofop);
-        // printf("here is size of vector: %lu\n", thread_buckets[(uintptr_t) event->tindex_name].size());
-        thread_buckets[(uintptr_t) event->tindex_name][get_bucket(event->timestamp, buckets, min_ts, max_ts)] += eventSize;
-        // printf("About to search for address %p\n", event->addr);
-        map<uintptr_t, uintptr_t>::iterator i = alloc_intervals.lower_bound((uintptr_t) event->addr);
-        if (i != alloc_intervals.end())
-          i++;
-
-        if (alloc_intervals.size() > 0) {
-          do {
-            if (i != alloc_intervals.begin())
-              i--;
-            if (i->first <= (uintptr_t) event->addr && i->second > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
-                i->first < (uintptr_t) event->addr && i->second >= (uintptr_t) event->addr + event->size) {
-              // remove i, DON'T add free for i
-              alloc_intervals.erase(i->first);
-              i = alloc_intervals.lower_bound((uintptr_t) event->addr);
-              break;
-            }
-            else if (i->second <= (uintptr_t) event->addr) {   // event is after i
-              break;
-            }
-            else if (i->first < (uintptr_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
-              // remove i, add free for i
-              pages[page_num].add_event(new info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
-              alloc_intervals.erase(i->first);
-              i = alloc_intervals.lower_bound((uintptr_t) event->addr);
-            }
-          } while (i != alloc_intervals.begin());
-          // printf("FINISHED THE LOOP\n");
-        }
-        alloc_intervals.insert(pair<uintptr_t, uintptr_t>{(uintptr_t) event->addr, (uintptr_t) event->addr + event->size});         
-        last_alloc_info.insert(pair<uintptr_t, struct size_and_type>{(uintptr_t) event->addr, size_and_type{event->size, (uintptr_t)event->tindex_name}});
-      }
-      else if (last_alloc_info.find((uintptr_t) event->addr) != last_alloc_info.end()) {
-        // printf("(free) Here is tindex name: %lX, here is bucket: %lu\n", last_alloc_info[(uintptr_t) event->addr].type, get_bucket(event->timestamp, buckets, min_ts, max_ts));
-        thread_buckets[last_alloc_info[(uintptr_t) event->addr].type][get_bucket(event->timestamp, buckets, min_ts, max_ts)] -= eventSize;
-        alloc_intervals.erase((uintptr_t) event->addr);
-      }
-
-      if (stats_per_type.find((uintptr_t)event->tindex_name) != stats_per_type.end())
-        stats_per_type[(uintptr_t)event->tindex_name]->resident_pages.insert(page_num);
-      uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary
-
-      if (page_num != page_num_end) {
-        eventSize = page_size - ((uint64_t) event->addr % page_size);
-        uint64_t new_event_addr = (uint64_t) event->addr + eventSize;
-        int64_t rem_size = event->size - eventSize;
-        do {
-          uint64_t new_event_page_num = new_event_addr / page_size;
-          if (pages.find(new_event_page_num) == pages.end())
-            pages.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
-          pages[new_event_page_num].add_event(new info_t{ event->file,
-                                                          event->tindex_name,
-                                                          event->line,
-                                                          event->timestamp,
-                                                          min((uint64_t)rem_size, page_size),
-                                                          (void*) new_event_addr,
-                                                          event->typeofop});
-          new_event_addr += page_size;
-          rem_size -= page_size;
-        } while (rem_size > 0);
-      }
-
-      pages[page_num].add_event(new info_t{event->file,
-                                event->tindex_name,
-                                event->line,
-                                event->timestamp,
-                                eventSize,
-                                event->addr,
-                                event->typeofop});
-      
-      // n = n->next;
-    }
-  }
-
-  for (auto& it: thread_buckets) {
-    for (int i = 1; i < buckets+2; i++) {
-      it.second[i] += it.second[i-1];
-    }
-  }
-}
-
-void write_event_to_db(sqlite3_stmt* stmt, info_t event) {
-  printf("Here is the file ptr: %p\n", event.file);
-  const char* fname = event.file ? file_map.at((uintptr_t) event.file).c_str() : "NULL";
-  const char* tname = event.tindex_name ? type_map.at((uintptr_t) event.tindex_name).c_str() : "NULL";
+void write_event_to_db(sqlite3_stmt* stmt, event_t const& event) {
+  const char* fname = event.i.file ? file_map.at((uintptr_t) event.i.file).c_str() : "NULL";
+  const char* tname = event.i.tindex_name ? type_map.at((uintptr_t) event.i.tindex_name).c_str() : "NULL";
   sqlite3_bind_text(stmt, 1, fname, strlen(fname), NULL);
-  sqlite3_bind_int(stmt, 2, event.line);
-  sqlite3_bind_int64(stmt, 3, event.timestamp);
-  sqlite3_bind_int64(stmt, 4, event.size);
-  sqlite3_bind_int64(stmt, 5, (uintptr_t) event.addr);
-  sqlite3_bind_int(stmt, 6, event.typeofop);
-  sqlite3_bind_text(stmt, 7, tname, strlen(tname), NULL);
-
-  if ((uintptr_t) event.addr == 140576089034810) {
-    printf("\tWRITING TO DB: HERE IS THE PROBLEM EVENT\n");
-    printf("\ttimestamp: %lu, typeofop: %d\n", event.timestamp, event.typeofop);
-  }
+  sqlite3_bind_int(stmt, 2, event.i.line);
+  sqlite3_bind_int64(stmt, 3, event.i.timestamp);
+  sqlite3_bind_int64(stmt, 4, event.i.size);
+  sqlite3_bind_int64(stmt, 5, (uintptr_t) event.actualAddr);
+  sqlite3_bind_int64(stmt, 6, (uintptr_t) event.i.addr);
+  sqlite3_bind_int(stmt, 7, event.i.typeofop);
+  sqlite3_bind_text(stmt, 8, tname, strlen(tname), NULL);
 
   int rc = sqlite3_step(stmt);
   if (rc != SQLITE_DONE) {
@@ -661,6 +507,92 @@ void write_event_to_db(sqlite3_stmt* stmt, info_t event) {
   // sqlite3_step(stmt);
   sqlite3_clear_bindings(stmt);
   sqlite3_reset(stmt);
+}
+
+void add_event( info_t const& event, int num_pages_per_type, size_t page_size,
+                unordered_map<uint64_t, memory_page_t>& page_info,
+                unordered_map<uintptr_t, int>& type_counts,
+                sqlite3_stmt* stmt,
+                double sample_portion) {
+  uint64_t page_num = (uint64_t) event.addr / page_size;
+  uint64_t page_num_end = ((uint64_t)event.addr + event.size) / page_size;
+
+  uintptr_t event_addr = (uintptr_t) event.addr;
+  size_t event_size = std::min(page_size - ((uint64_t) event.addr % page_size), (uint64_t)event.size);
+  int64_t rem_size = event.size;
+  while (rem_size > 0) {
+    uint64_t event_page_num = event_addr / page_size;
+    if (page_info[event_page_num].sampled == CTD_NOT_SAMPLED) {
+      if (page_info[event_page_num].has_perf_addr || type_counts[(uintptr_t)event.tindex_name] < num_pages_per_type) {
+        page_info[event_page_num].sampled = CTD_SAMPLED_YES;
+        for (auto& tp: page_info[event_page_num].included_types)
+          type_counts[tp]++;
+      }
+      else if (!page_info[event_page_num].all_types_taken &&
+              (event_page_num == page_num || event_page_num == page_num_end)) {
+        bool all_types_taken = true;
+        for (auto& tp: page_info[event_page_num].included_types) {
+          if (type_counts[tp] < num_pages_per_type) {
+            all_types_taken = false;
+            page_info[event_page_num].sampled = CTD_SAMPLED_YES;
+            for (auto& tp: page_info[event_page_num].included_types)
+              type_counts[tp]++;
+            break;
+          }
+        }
+        page_info[event_page_num].all_types_taken = all_types_taken;
+      }
+      
+      if (page_info[event_page_num].sampled == CTD_NOT_SAMPLED && rand() < sample_portion*RAND_MAX) {
+        page_info[event_page_num].sampled = CTD_SAMPLED_YES;
+        for (auto& tp: page_info[event_page_num].included_types)
+          type_counts[tp]++;
+      }
+      else if (page_info[event_page_num].sampled == CTD_NOT_SAMPLED) {
+        page_info[event_page_num].sampled = CTD_SAMPLED_NO;
+      }
+    }
+
+    if (page_info[event_page_num].sampled == CTD_SAMPLED_YES) {
+      write_event_to_db(stmt, event_t{info_t{ event.file,
+                                              event.tindex_name,
+                                              event.line,
+                                              event.timestamp,
+                                              event_size,
+                                              (void*)event_addr,
+                                              event.typeofop}, event.addr});
+    }
+
+    event_addr += event_size;
+    rem_size -= event_size;
+    event_size = std::min((int64_t)page_size, rem_size);
+  }
+}
+
+void record_stats(unordered_map<uintptr_t, stats_t*>& stats_per_type, info_t* event, size_t cacheline_size) {
+  if (stats_per_type.find((uintptr_t) event->tindex_name) == stats_per_type.end()) {
+    stats_per_type.insert(pair<uintptr_t, stats_t*>{(uintptr_t) event->tindex_name, new stats_t{
+                                                                              event->typeofop ? 1u : 0u, // num_allocs
+                                                                              unordered_map<size_t, uint64_t>{},
+                                                                              event->typeofop ? 0u : 1u, // num_frees
+                                                                              unordered_set<uint64_t>{}
+                                                                            }});
+  }
+  else {
+    stats_per_type[(uintptr_t) event->tindex_name]->num_allocs++;
+    stats_per_type[(uintptr_t) event->tindex_name]->num_frees++;
+  }
+  if (!event->typeofop)
+    return;
+
+  size_t alignment = ((uintptr_t) event->addr) % cacheline_size;
+
+  if (stats_per_type[(uintptr_t) event->tindex_name]->num_alignment.find(alignment) == stats_per_type[(uintptr_t) event->tindex_name]->num_alignment.end()) {
+    stats_per_type[(uintptr_t) event->tindex_name]->num_alignment.insert(pair<size_t, uint64_t>{alignment, 1});
+  }
+  else {
+    stats_per_type[(uintptr_t) event->tindex_name]->num_alignment[alignment]++;
+  }
 }
 
 
@@ -688,12 +620,11 @@ int main(int argc, char* argv[]) {
   const char* field_file;
   bool is_field_file = false;
   page_size = 4096;
-  int cacheline_size = 64;
-  int num_pages_per_type = 1;
-  unsigned int num_threads = 1;
+  size_t cacheline_size = 64;
+  size_t num_pages_per_type = 1;
   const char* type_c_file;
   bool is_type_c = false;
-  size_t buckets = 3000;
+  size_t num_buckets = 3000;
   while ((c = getopt_long(argc, argv, "p:c:s:t:j:", long_opts, &opt_ind)) != -1) {
     switch (c) {
       case 0:
@@ -725,17 +656,12 @@ int main(int argc, char* argv[]) {
         field_file = optarg;
         is_field_file = true;
         break;
-      case 'j':
-        if (optarg != NULL)
-          num_threads = stoi(optarg);
-        else
-          num_threads = thread::hardware_concurrency();
       case 'm':
         type_c_file = optarg;
         is_type_c = true;
         break;
       case 'b':
-        buckets = stoi(optarg);
+        num_buckets = stoi(optarg);
         break;
       default:
         break;
@@ -744,24 +670,14 @@ int main(int argc, char* argv[]) {
 
   cout << "Sample percent: " << sample_portion << endl;
   cout << "Number of pages per type: " << num_pages_per_type << endl;
-  cout << "Number of threads: " << num_threads << endl;
-
-  int rc = sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
-  if (rc) {
-    cout << "Cannot configure sqlite3: " << sqlite3_errstr(rc) << endl;
-    exit(-1);
-  }
 
   sqlite3* db;
-  rc = sqlite3_open("allocs.sqlite", &db);
+  int rc = sqlite3_open("allocs.sqlite", &db);
 
   if (rc) {
     cout << "Can't open database allocs.sqlite: " << sqlite3_errstr(rc) << endl;
     exit(-1);
   }
-
-  unsigned long int file_byte_size = 0;
-  struct stat sb;
 
   FILE* input_file = fopen("binary_dump.txt", "r");
   if (input_file ==  NULL) {
@@ -769,12 +685,14 @@ int main(int argc, char* argv[]) {
     exit(-1);
 	}
 	
+  unsigned long int file_byte_size = 0;
+  struct stat sb;
 	fstat(fileno(input_file), &sb);
   file_byte_size = (unsigned long int) sb.st_size;
   long int num_structs = file_byte_size / sizeof(info_t);
 
   create_supertable(db);
-  printf("Number of structs in file: %ld\n", num_structs);
+  printf("Number of records in file: %ld\n", num_structs);
   info_t* filemap = (info_t*) mmap(NULL, file_byte_size, PROT_READ, MAP_SHARED, fileno(input_file), 0);
 
   if (filemap == MAP_FAILED) {
@@ -784,160 +702,85 @@ int main(int argc, char* argv[]) {
 
   type_map = construct_map("typeset_dump.txt", true);
   file_map = construct_map("fileset_dump.txt");
-  // vector<unordered_map<uintptr_t, unordered_set<uint64_t>>> include_addrs{num_threads, unordered_map};
-  // unordered_set<uint64_t> skip_addrs{};
-  // vector<unordered_map<uintptr_t, int>> seen_types{num_threads, unordered_map<uintptr_t, int>{}};
-  vector<unordered_map<uint64_t, memory_page_t>> pages(num_threads, unordered_map<uint64_t, memory_page_t>{});
-  vector<unordered_set<uintptr_t>> raw_type_set(num_threads, unordered_set<uintptr_t>{});
-  vector<unordered_set<string>> type_set(num_threads, unordered_set<string>{});
-  vector<unordered_map<size_t, int>> size_class_counts(num_threads, unordered_map<size_t, int>{});
-  vector<unordered_map<uintptr_t, stats_t*>> stats_per_type(num_threads, unordered_map<uintptr_t, stats_t*>{});
-  vector<uint64_t> min_vals(num_threads, ULLONG_MAX);
-  vector<uint64_t> max_vals(num_threads, 0);
 
-  for (int t = 0; t < num_threads; t++) {
-    for (int i = 0; i < num_classes; i++) {
-      size_class_counts[t].insert(pair<size_t, int>{size_classes[i], 0});
-    }
-  }
-
-  int chunk_size = ceil((double)num_structs / (double)num_threads);
-  vector<thread> workers{num_threads};
-  unordered_map<uint64_t, memory_page_t> all_pages{};
-  unordered_map<uintptr_t, int> all_raw_type_count{};
-  unordered_set<string> all_type_set{};
-  unordered_map<size_t, int> all_size_class_counts{};
-  unordered_map<uintptr_t, stats_t*> all_stats_per_type{};
+  unordered_map<uint64_t, memory_page_t> page_info;
+  unordered_map<uintptr_t, int> type_counts{};
+  unordered_set<string> type_set{};
+  unordered_map<size_t, int> size_class_counts{};
+  unordered_map<uintptr_t, stats_t*> stats_per_type{};
   vector<uint64_t> page_num_list{};
-  uint64_t min_all_vals;
-  uint64_t max_all_vals;
+  uint64_t min_ts = ULLONG_MAX;
+  uint64_t max_ts = 0;
 
-  cout << "Starting worker threads..." << endl;
+  std::cout << "Starting stats pass..." << std::endl;
 
-  for (int t = 0; t < num_threads; t++) {
-    workers[t] = thread(sort_events_into_pages, t, (int) min((long) chunk_size, num_structs - (t*chunk_size)),
-                        t*chunk_size, filemap, ref(min_vals), ref(max_vals), ref(pages[t]), ref(raw_type_set[t]),
-                        ref(size_class_counts[t]), ref(stats_per_type[t]));
+  for (int i = 0; i < num_structs; i++) {
+    info_t* event = filemap + i;
+    min_ts = std::min(min_ts, event->timestamp);
+    max_ts = std::max(max_ts, event->timestamp);
+
+
+
+    record_stats(stats_per_type, event, cacheline_size);
+
+
+
+
+    uint64_t page_num = (uint64_t)event->addr / page_size;
+    if (event->typeofop) {
+      stats_per_type[(uintptr_t) event->tindex_name]->resident_pages.insert(page_num);
+      type_counts.insert(pair<uintptr_t, int>{(uintptr_t) event->tindex_name, 0});
+
+      if (page_info.find(page_num) == page_info.end())
+        page_info.insert(pair<uint64_t, memory_page_t>{page_num, memory_page_t{}});
+      page_info[page_num].add_event_type(event);
+    }
+
+    if (event->size > 0) {
+      int ind = bin_search(size_classes, event->size, 0, num_classes);
+      size_class_counts[size_classes[ind]] = size_class_counts[size_classes[ind]] + 1;
+    }
   }
-  for (int t = 0; t < num_threads; t++) {
-    workers[t].join();
-    cout << "Thread " << t << " joined in sort step" << endl;
-    for (auto& p: pages[t]) {
-      if (all_pages.find(p.first) == all_pages.end()) {
-        all_pages[p.first] = p.second;
-        page_num_list.push_back(p.first);
-      }
-      else {
-        all_pages[p.first].join(p.second);
-      }
-    }
-    pages[t] = unordered_map<uint64_t, memory_page_t>{};
-    for (auto& tp: raw_type_set[t]) {
-      all_raw_type_count.insert(pair<uintptr_t, int>{tp, 0});
-    }
-    for (auto& s: size_class_counts[t]) {
-      if (all_size_class_counts.find(s.first) == all_size_class_counts.end()) {
-        all_size_class_counts[s.first] = s.second;
-      }
-      else {
-        all_size_class_counts[s.first] += s.second;
-      }
-    }
-    // cout << "Size of stats per type " << t << " : " << stats_per_type[t].size() << endl;
-    if (t == 0) {
-      min_all_vals = min_vals[t];
-      max_all_vals = max_vals[t];
+
+  std::cout << "Finished stats pass. Starting sampling pass..." << std::endl;
+
+  unordered_map<uintptr_t, vector<uint64_t>> buckets{};
+  for (auto& it: type_counts) {
+    if (type_map.find(it.first) != type_map.end()) {
+      printf("FOUND type: %p\n", (void*)it.first);
+      string type_trim = type_map.at(it.first);
+      type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
+      type_set.insert(type_trim);
     }
     else {
-      min_all_vals = std::min(min_vals[t], min_all_vals);
-      max_all_vals = std::max(max_vals[t], max_all_vals);
+      printf("FAILED to find type: %p\n", (void*)it.first);
     }
-  }
-
-  cout << "Done sorting step" << endl;
-  cout << "Starting split step..." << endl;
-
-  chunk_size = ceil((double)page_num_list.size() / (double)num_threads);
-  unordered_map<uint64_t, memory_page_t> split_pages{};
-  vector<unordered_map<uintptr_t, vector<uint64_t>>> thread_buckets{num_threads, unordered_map<uintptr_t, vector<uint64_t>>{}};
-  unordered_map<uintptr_t, vector<uint64_t>> all_buckets{};
-  for (auto& it: all_raw_type_count) {
-    all_buckets.insert(pair<uintptr_t, vector<uint64_t>>{it.first, vector<uint64_t>(buckets+2, 0)});
-    for (int t = 0; t < num_threads; t++) {
-      thread_buckets[t].insert(pair<uintptr_t, vector<uint64_t>>{it.first, vector<uint64_t>(buckets+2, 0)});
-    }
-  }
-
-  cout << "Num pages: " << page_num_list.size() << " Chunk size: " << chunk_size << endl;
-
-  for (int t = 0; t < num_threads; t++) {
-    workers[t] = thread(split_events_across_pages, t, (int) min((long) chunk_size, (long) page_num_list.size() - (t*chunk_size)),
-                        t*chunk_size, ref(all_pages), ref(page_num_list), ref(pages[t]), min_all_vals, max_all_vals,
-                        buckets, ref(thread_buckets[t]), ref(stats_per_type[t]));
-  }
-  for (int t = 0; t < num_threads; t++) {
-    workers[t].join();
-    cout << "Thread " << t << " joined in split step" << endl;
-    for (auto& p: pages[t]) {
-      if (split_pages.find(p.first) == split_pages.end()) {
-        split_pages[p.first] = p.second;
-      }
-      else {
-        split_pages[p.first].join(p.second);
-      }
-    }
-    for (auto& it: all_raw_type_count) {
-      for (int i = 0; i < buckets + 2; i++) {
-        all_buckets[it.first][i] += thread_buckets[t][it.first][i];
-      }
-    }
-    for (auto& s: stats_per_type[t]) {
-      if (all_stats_per_type.find(s.first) == all_stats_per_type.end()) {
-        all_stats_per_type[s.first] = s.second;
-      }
-      else {
-        all_stats_per_type[s.first]->num_allocs += s.second->num_allocs;
-        all_stats_per_type[s.first]->num_frees += s.second->num_frees;
-        all_stats_per_type[s.first]->resident_pages.insert(s.second->resident_pages.begin(), s.second->resident_pages.end());
-      }
-    }
-  }
-
-  cout << "All worker threads joined!" << endl;
-  cout << "Size of all stats per type: " << all_stats_per_type.size() << endl;
-
-  for (const auto& tp: all_raw_type_count) {
-    if (type_map.find(tp.first) != type_map.end()) {
-      string type_trim = type_map.at(tp.first);
-      type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
-      all_type_set.insert(type_trim);
-    }
+    buckets.insert(pair<uintptr_t, vector<uint64_t>>{it.first, vector<uint64_t>(num_buckets+2, 0)});
   }
 
   if (is_perf_file)
-    get_perf_addrs(perf_file, cutoff, page_size, cacheline_size, all_pages, db);
+    get_perf_addrs(perf_file, cutoff, page_size, cacheline_size, page_info, db);
 
   cout << "----- SIZE CLASS TABLE -----" << endl;
   for (int i = 0; i < num_classes; i++) {
-    cout << size_classes[i] << ":\t" << all_size_class_counts[size_classes[i]] << endl;
+    cout << size_classes[i] << ":\t" << size_class_counts[size_classes[i]] << endl;
   }
   cout << "----- END SIZE CLASS TABLE -----" << endl;
 
-  cout << "Number of unique types found: " << all_type_set.size() << endl;
+  cout << "Number of unique types found: " << type_set.size() << endl;
 
   if (is_field_file) {
     cout << "Field file name: " << field_file << endl;
-    get_fields(field_file, all_type_set, db);
+    get_fields(field_file, type_set, db);
   }
 
-  get_stats(type_map, all_stats_per_type, db);
-  get_lines(type_map, all_buckets, buckets, db);
+  get_stats(type_map, stats_per_type, db);
 
   cout << "Beginning to copy records to database..." << endl;
 
   sqlite3_stmt* stmt = 0;
-  rc = sqlite3_prepare_v2(db, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ADDRESS,isNew,TYPE) " \
-                              "VALUES (?, ?, ?, ?, ?, ?, ?);", -1, &stmt, 0);
+  rc = sqlite3_prepare_v2(db, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ACTUALADDR,ADDRESS,isNew,TYPE) " \
+                              "VALUES (?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, 0);
 
   if (rc != SQLITE_OK) {
     fprintf(stderr, "Error after sqlite prepare: %s\n", sqlite3_errstr(rc));
@@ -957,115 +800,74 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
-  cout << "Number of pages: " << split_pages.size() << endl;
+  unordered_map<uintptr_t, struct size_and_type> last_alloc_info{};
+  map<uintptr_t, mem_interval_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
+  // TODO: I don't think records are guaranteed to be ordered by timestamp
 
-  for (auto& p: split_pages) {
-    // printf("Here is the page address: %lu\n", p.first);
-    if (p.second.sampled == CTD_NOT_SAMPLED) {
-      bool take_for_type = false;
-      for (auto& tp: p.second.included_types) {
-        if (all_raw_type_count[tp] < num_pages_per_type) {
-          p.second.sampled = CTD_SAMPLED_YES;
-          take_for_type = true;
-          break;
-        }
+  for (int i = 0; i < num_structs; i++) {
+    info_t* event = filemap + i;
+    uint64_t page_num = (uint64_t)event->addr / page_size;
+    size_t eventSize = event->typeofop ? event->size : last_alloc_info.find((uintptr_t) event->addr) != last_alloc_info.end() ? last_alloc_info[(uintptr_t) event->addr].size : 0;
+
+    if (event->typeofop) {
+      buckets[(uintptr_t) event->tindex_name][get_bucket(event->timestamp, num_buckets, min_ts, max_ts)] += eventSize;
+      map<uintptr_t, mem_interval_t>::iterator i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+      if (i != alloc_intervals.end())
+          i++;
+
+      bool contained = false;
+      if (alloc_intervals.size() > 0) {
+        do {
+          if (i != alloc_intervals.begin())
+            i--;
+
+          mem_interval_t other = i->second;
+          if (!other.contained &&
+              (other.start <= (uintptr_t) event->addr && other.end > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
+              other.start < (uintptr_t) event->addr && other.end >= (uintptr_t) event->addr + event->size)) {
+            // remove i, DON'T add free for i
+            alloc_intervals.erase(i->first);
+            contained = true;
+            break;
+          }
+          else if (other.end <= (uintptr_t) event->addr) {   // event is after i
+            break;
+          }
+          else if (other.start < (uintptr_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
+            // remove i, add free for i
+            // pages[page_num].add_event(new info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
+            add_event(info_t{other.alloc_info->file, other.alloc_info->tindex_name, 0, event->timestamp-1, other.alloc_info->size, (void*)other.start, false},
+                      num_pages_per_type,
+                      page_size,
+                      page_info,
+                      type_counts,
+                      stmt,
+                      sample_portion);
+            alloc_intervals.erase(i->first);
+            i = alloc_intervals.lower_bound((uintptr_t) event->addr);
+          }
+        } while (i != alloc_intervals.begin());
+        // printf("FINISHED THE LOOP\n");
       }
-      if (take_for_type) {
-        for (auto& tp: p.second.included_types)
-          all_raw_type_count[tp]++;
-      }
+      alloc_intervals.insert(pair<uintptr_t, mem_interval_t>{(uintptr_t) event->addr,
+                                                        mem_interval_t{(uintptr_t) event->addr, (uintptr_t) event->addr + event->size, contained, event}});         
+      last_alloc_info.insert(pair<uintptr_t, struct size_and_type>{(uintptr_t) event->addr, size_and_type{event->size, (uintptr_t)event->tindex_name}});
     }
-    if (p.second.sampled == CTD_NOT_SAMPLED)
-        p.second.sampled = rand() < sample_portion*RAND_MAX ? CTD_SAMPLED_YES : CTD_SAMPLED_NO;
-
-    if (p.second.sampled == CTD_SAMPLED_YES) {
-      // node_t* n = p.second.events.head;
-      // unordered_map<uintptr_t, size_t> last_alloc_size{};
-      // map<uintptr_t, uintptr_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
-      for (const info_t* event : p.second.events) {
-      // while (n != nullptr) {
-      // info_t* event = n->data;
-      //   size_t eventSize = event->typeofop ? event->size : last_alloc_size.find((uintptr_t) event->addr) != last_alloc_size.end() ? last_alloc_size.at((uintptr_t) event->addr) : 0;
-
-      //   if (event->typeofop) {
-      //     // printf("About to search for address %p\n", event->addr);
-      //     map<uintptr_t, uintptr_t>::iterator i = alloc_intervals.lower_bound((uintptr_t) event->addr);
-      //     if (i != alloc_intervals.end())
-      //       i++;
-
-      //     if (alloc_intervals.size() > 0) {
-      //       do {
-      //         if (i != alloc_intervals.begin())
-      //           i--;
-      //         if (i->first <= (uintptr_t) event->addr && i->second > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
-      //             i->first < (uintptr_t) event->addr && i->second >= (uintptr_t) event->addr + event->size) {
-      //           // remove i, DON'T add free for i
-      //           alloc_intervals.erase(i->first);
-      //           i = alloc_intervals.lower_bound((uintptr_t) event->addr);
-      //           break;
-      //         }
-      //         else if (i->second <= (uintptr_t) event->addr) {   // event is after i
-      //           break;
-      //         }
-      //         else if (i->first < (uintptr_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
-      //           // remove i, add free for i
-      //           write_event_to_db(stmt, info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
-      //           alloc_intervals.erase(i->first);
-      //           i = alloc_intervals.lower_bound((uintptr_t) event->addr);
-      //         }
-      //       } while (i != alloc_intervals.begin());
-      //       // printf("FINISHED THE LOOP\n");
-      //     }
-      //     alloc_intervals.insert(pair<uintptr_t, uintptr_t>{(uintptr_t) event->addr, (uintptr_t) event->addr + event->size});         
-      //     last_alloc_size.insert(pair<uintptr_t, size_t>{(uintptr_t) event->addr, event->size});
-      //   }
-
-      //   uint64_t page_num = (uint64_t) event->addr / page_size;
-      //   uint64_t page_num_end = ((uint64_t) event->addr + eventSize - 1) / page_size; // Need to -1 for objects that end on page boundary
-
-      //   if (page_num != page_num_end) {
-      //     eventSize = page_size - ((uint64_t) event->addr % page_size);
-      //     uint64_t new_event_addr = (uint64_t) event->addr + eventSize;
-      //     int64_t rem_size = event->size - eventSize;
-      //     do {
-      //       uint64_t new_event_page_num = new_event_addr / page_size;
-      //       if (boundary_crossers.find(new_event_page_num) == boundary_crossers.end())
-      //         boundary_crossers.insert(pair<uint64_t, memory_page_t>{new_event_page_num, memory_page_t{}});
-      //       boundary_crossers[new_event_page_num].add_event(new info_t{ event->file,
-      //                                                                   event->tindex_name,
-      //                                                                   event->line,
-      //                                                                   event->timestamp,
-      //                                                                   min((uint64_t)rem_size, page_num),
-      //                                                                   (void*) new_event_addr,
-      //                                                                   event->typeofop});
-      //       new_event_addr += page_size;
-      //       rem_size -= page_size;
-      //     } while (rem_size > 0);
-      //   }
-
-        write_event_to_db(stmt, *event);
-        
-      // n = n->next;
-      }
+    else if (last_alloc_info.find((uintptr_t) event->addr) != last_alloc_info.end()) {
+      // printf("(free) Here is tindex name: %lX, here is bucket: %lu\n", last_alloc_info[(uintptr_t) event->addr].type, get_bucket(event->timestamp, buckets, min_ts, max_ts));
+      buckets[last_alloc_info[(uintptr_t) event->addr].type][get_bucket(event->timestamp, num_buckets, min_ts, max_ts)] -= eventSize;
+      alloc_intervals.erase((uintptr_t) event->addr);
     }
+
+    add_event(info_t{event->file, event->tindex_name, event->line, event->timestamp, eventSize, event->addr, event->typeofop},
+              num_pages_per_type,
+              page_size,
+              page_info,
+              type_counts,
+              stmt,
+              sample_portion);
   }
 
-  // cout << "Number of boundary crossing pages: " << boundary_crossers.size() << endl;
-
-  // for (auto& p: boundary_crossers) {
-  //   if (all_pages.find(p.first) != all_pages.end()) {
-  //     if (all_pages[p.first].sampled == CTD_SAMPLED_YES) {
-  //       node_t* n = p.second.events.head;
-  //       while (n != nullptr) {
-  //         info_t* event = n->data;
-
-  //         write_event_to_db(stmt, *event);
-
-  //         n = n->next;
-  //       }
-  //     }
-  //   }
-  // }
   rc = sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
 
   if (rc != SQLITE_OK) {
@@ -1075,6 +877,29 @@ int main(int argc, char* argv[]) {
     sqlite3_close(db);
     exit(-1);
   }
+
+  int num_unknown = 0;
+  int num_yes = 0;
+  int num_no = 0;
+  for (auto& page: page_info) {
+    if (page.second.sampled == CTD_NOT_SAMPLED)
+      num_unknown++;
+    else if (page.second.sampled == CTD_SAMPLED_YES)
+      num_yes++;
+    else
+      num_no++;
+  }
+  printf("Num unknown: %d\n", num_unknown);
+  printf("Num yes: %d\n", num_yes);
+  printf("Num no: %d\n", num_no);
+
+  for (auto& it: buckets) {
+    for (int i = 1; i < num_buckets+2; i++) {
+      it.second[i] += it.second[i-1];
+    }
+  }
+
+  get_lines(type_map, buckets, num_buckets, db);
 
   fclose(input_file);
   sqlite3_close(db);

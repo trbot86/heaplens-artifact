@@ -10,7 +10,7 @@ while [ $# -gt 0 ]; do
         ;;
         -p | --huge-page)
             echo "Launching image with hugepages mounted at /dev/hugepages"
-            hugepage="-v/dev/hugepages:/dev/hugepages"
+            hugepage=" -v/dev/hugepages:/dev/hugepages"
         ;;
         -n | --name)
             if [[ -z "$2" || "$2" == -* ]]; then
@@ -35,4 +35,4 @@ fi
 #echo y | docker container rm "$name" 2>/dev/null
 
 ## launch built docker image in a container
-docker run "$hugepage" -it --privileged --name "$name" sifter
+docker run"$hugepage" -it --privileged --name "$name" sifter

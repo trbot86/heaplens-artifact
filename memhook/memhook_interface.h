@@ -75,24 +75,24 @@ using namespace std;
 #define MACRO_GET_STR(str) MACRO_GET_128(str, 0), 0
 
 #if defined(__cplusplus) && ! defined(MEMHOOK_C_LOG)
-#define MEMHOOK_LOG_ALLOC(ptr, sz, fname, ln, tname) \
+#define MEMHOOK_LOG_ALLOC(ptr, sz, tname) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.file = filetable.insert<fname>(); \
+        unit_log.file = filetable.insert<MACRO_GET_STR(__FILE__)>(); \
         unit_log.tindex_name = typetable.insert(tname); \
-        unit_log.line = ln; \
+        unit_log.line = __LINE__; \
         memhookCollector.copy(unit_log);
 #else
-#define MEMHOOK_LOG_ALLOC(ptr, sz, fname, ln, tname) \
+#define MEMHOOK_LOG_ALLOC(ptr, sz, tname) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.file = filetable.insert(fname); \
+        unit_log.file = filetable.insert(MACRO_GET_STR(__FILE__)); \
         unit_log.tindex_name = typetable.insert(tname); \
-        unit_log.line = ln; \
+        unit_log.line = __LINE__; \
         memhookCollector.copy(unit_log);
 #endif // __cplusplus
 
@@ -192,7 +192,7 @@ inline T* operator*(const MemStamp &stamp, T* p)
     return p;
 }
 
-#if defined(_mm_malloc))
+#if defined(_mm_malloc)
 template <typename T, int line, char... filename>
 static __inline__ void* __attribute__((__always_inline__, __malloc__))
 _mm_malloc(size_t __size, size_t __align)
@@ -241,7 +241,7 @@ int posix_memalign(void** ptr, size_t align, size_t size) {
     unit_log.line = line;
     unit_log.typeofop = true;
 
-    int r = posix_memalign<int, 210, MACRO_GET_STR("/home/s2ovens/sifter/memhook/memhook_interface.h")>(ptr, align, size);
+    int r = posix_memalign(ptr, align, size);
     unit_log.addr = *ptr;
 
     memhookCollector.copy(unit_log);
