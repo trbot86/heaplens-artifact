@@ -230,8 +230,108 @@ const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize
     );
 });
 
+function HoverableSplitBlock({  event, colourOfType, viewStartAddr, viewSize,
+                                cacheLineSize, xScale, yScale, expandedTypes,
+                                fieldsData, pageVis, currTs } : 
+    {
+        event: MemoryObject,
+        colourOfType: TypeToColourMap,
+        viewSize: number,
+        viewStartAddr: number,
+        cacheLineSize: number,
+        fieldsData: {[tp: string]: SubtypeEntry[]},
+        expandedTypes: {[tp: string]: boolean},
+        pageVis: {[tp: string]: boolean},
+        xScale: d3.ScaleLinear<number, number, never>,
+        yScale: d3.ScaleLinear<number, number, never>,
+        currTs: number
+    }) {
+    return (
+        <>
+        {
+        event.allocTs <= currTs && (event.freeTs == null || event.freeTs >= currTs) && (event.type && pageVis[event.type]) &&
+        <>
+            <HtmlTooltip
+                title={
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>type:</td>
+                            <td>{event.type}</td>
+                        </tr>
+                        <tr>
+                            <td>file:</td>
+                            <td>{event.file}</td>
+                        </tr>
+                        <tr>
+                            <td>line:</td>
+                            <td>{event.line}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                }
+                placement='left' >
+                <SplitBlock
+                    obj={event}
+                    colourOfType={colourOfType}
+                    viewStartAddr={viewStartAddr}
+                    viewSize={viewSize}
+                    cacheLineSize={cacheLineSize}
+                    xScale={xScale}
+                    yScale={yScale}
+                    expanded={event.type ? expandedTypes[event.type.replace(/\s+/g, '')] : false} />
+            </HtmlTooltip>
+            {
+            (event.type && fieldsData[event.type.replace(/\s+/g, '')] && expandedTypes[event.type.replace(/\s+/g, '')]) &&
+            <>
+            {
+                fieldsData[event.type.replace(/\s+/g, '')].map((field) =>   
+                                                        <HtmlTooltip 
+                                                            title={
+                                                            <table>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>type:</td>
+                                                                        <td>{field.subtype}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>name:</td>
+                                                                        <td>{field.name}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            }
+                                                            key={`${event.addr}-${event.allocTs}-${field.name}`}
+                                                            placement='left' >
+                                                            <SplitBlock
+                                                                obj={{
+                                                                    file: event.file,
+                                                                    line: event.line,
+                                                                    size: field.size,
+                                                                    addr: (event.actualAddr ? event.actualAddr : event.addr) + field.offset,
+                                                                    allocTs: event.allocTs,
+                                                                    freeTs: event.freeTs,
+                                                                    type: event.type ? getSubtypeName(event.type.replace(/\s+/g, ''), field.subtype) : field.subtype
+                                                                }}
+                                                                colourOfType={colourOfType}
+                                                                viewStartAddr={viewStartAddr}
+                                                                viewSize={viewSize}
+                                                                cacheLineSize={cacheLineSize}
+                                                                xScale={xScale}
+                                                                yScale={yScale}
+                                                                expanded={false} />
+                                                        </HtmlTooltip>)
+            }
+            </>
+            }
+        </>
+        }
+        </>
+    );
+}
+
 function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData, expandedTypes,
-                        setExpandedTypes, viewStartAddr, showHot, showHitm, perf } :
+                        setExpandedTypes, viewStartAddr, showHot, showHitm, pageVis, perf, currTs } :
     {
         data: MemoryObject[],
         colourOfType: TypeToColourMap,
@@ -243,10 +343,12 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
         viewStartAddr: number,
         showHot: boolean,
         showHitm: boolean,
-        perf: PerfMap
+        pageVis: {[tp: string]: boolean},
+        perf: PerfMap,
+        currTs: number
     }) {
     const objSVG = useRef(null);
-    const [hoveredType, setHoveredType] = useState<string | null>(null);
+    // const [hoveredType, setHoveredType] = useState<string | null>(null);
 
     // console.log(`Here is data in object layout:`);
     // console.log(data);
@@ -317,84 +419,20 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
                         id='objectGroup'
                         clipPath='url(#objectLayoutClip)' >
                         {
-                            data.map((event: MemoryObject) => 
-                                                                <Fragment key={`${event.addr}-${event.allocTs}`} >
-                                                                <HtmlTooltip
-                                                                    title={
-                                                                    <table>
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <td>type:</td>
-                                                                                <td>{event.type}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td>file:</td>
-                                                                                <td>{event.file}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td>line:</td>
-                                                                                <td>{event.line}</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                    }
-                                                                    placement='left' >
-                                                                    <SplitBlock
-                                                                        obj={event}
-                                                                        colourOfType={colourOfType}
-                                                                        viewStartAddr={viewStartAddr}
-                                                                        viewSize={viewSize}
-                                                                        cacheLineSize={cacheLineSize}
-                                                                        xScale={xScale}
-                                                                        yScale={yScale}
-                                                                        expanded={event.type ? expandedTypes[event.type.replace(/\s+/g, '')] : false} />
-                                                                        {/* hoveredType={hoveredType}
-                                                                        setHoveredType={setHoveredType} /> */}
-                                                                </HtmlTooltip>
-                                                                {
-                                                                (event.type && fieldsData[event.type.replace(/\s+/g, '')] && expandedTypes[event.type.replace(/\s+/g, '')]) &&
-                                                                <>
-                                                                {
-                                                                    fieldsData[event.type.replace(/\s+/g, '')].map((field) =>   
-                                                                                                            <HtmlTooltip 
-                                                                                                                title={
-                                                                                                                <table>
-                                                                                                                    <tbody>
-                                                                                                                        <tr>
-                                                                                                                            <td>type:</td>
-                                                                                                                            <td>{field.subtype}</td>
-                                                                                                                        </tr>
-                                                                                                                        <tr>
-                                                                                                                            <td>name:</td>
-                                                                                                                            <td>{field.name}</td>
-                                                                                                                        </tr>
-                                                                                                                    </tbody>
-                                                                                                                </table>
-                                                                                                                }
-                                                                                                                key={`${event.addr}-${event.allocTs}-${field.name}`}
-                                                                                                                placement='left' >
-                                                                                                                <SplitBlock
-                                                                                                                    obj={{
-                                                                                                                        file: event.file,
-                                                                                                                        line: event.line,
-                                                                                                                        size: field.size,
-                                                                                                                        addr: (event.actualAddr ? event.actualAddr : event.addr) + field.offset,
-                                                                                                                        allocTs: event.allocTs,
-                                                                                                                        freeTs: event.freeTs,
-                                                                                                                        type: event.type ? getSubtypeName(event.type.replace(/\s+/g, ''), field.subtype) : field.subtype
-                                                                                                                    }}
-                                                                                                                    colourOfType={colourOfType}
-                                                                                                                    viewStartAddr={viewStartAddr}
-                                                                                                                    viewSize={viewSize}
-                                                                                                                    cacheLineSize={cacheLineSize}
-                                                                                                                    xScale={xScale}
-                                                                                                                    yScale={yScale}
-                                                                                                                    expanded={false} />
-                                                                                                            </HtmlTooltip>)
-                                                                }
-                                                                </>
-                                                                }
-                                                                </Fragment>)
+                            data.map((event: MemoryObject) =>   <HoverableSplitBlock
+                                                                    key={`${event.addr}-${event.allocTs}`}
+                                                                    event={event}
+                                                                    colourOfType={colourOfType}
+                                                                    viewStartAddr={viewStartAddr}
+                                                                    viewSize={viewSize}
+                                                                    cacheLineSize={cacheLineSize}
+                                                                    xScale={xScale}
+                                                                    yScale={yScale}
+                                                                    expandedTypes={expandedTypes}
+                                                                    fieldsData={fieldsData}
+                                                                    pageVis={pageVis}
+                                                                    currTs={currTs}
+                                                                     />)
                         }
                         <g id='objectYAxisGridGroup' />
                     </g>
@@ -577,8 +615,34 @@ const SizeIndicator = forwardRef(({ clusterSize, sumClusterSizes, maxClusterSize
     );
 });
 
+function PageObject({ x, y, width, fill, currTs, allocTs, freeTs, isVis } : 
+    {
+        x: number,
+        y: number,
+        width: number,
+        fill: string,
+        currTs: number,
+        allocTs: number,
+        freeTs: number | null,
+        isVis: boolean
+    }) {
+    return (
+        <>
+        {
+            allocTs <= currTs && (freeTs == null || freeTs >= currTs) && isVis &&
+            <rect
+                className='pageCardObject'
+                x={x}
+                y={y}
+                width={width}
+                fill={fill} />
+        }
+        </>
+    );
+}
+
 function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourOfType,
-                    showHot, showHitm, perf } :
+                    showHot, pageVis, showHitm, perf, currTs } :
     {
         addr: number,
         selAddr: number,
@@ -588,7 +652,9 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
         colourOfType: TypeToColourMap,
         showHot: boolean,
         showHitm: boolean,
-        perf: PerfMap
+        perf: PerfMap,
+        pageVis: {[tp: string]: boolean},
+        currTs: number
     }) {
     // const ref = useRef(null);
     const pageScale = useMemo(() => d3.scaleLinear().domain([0, pageSize]).range([0, PAGE_CARD_BORDER_WIDTH]), [pageSize]);
@@ -605,13 +671,17 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                 <g
                     className='pageCardClipGroup' >
                     {
-                        objectData.events.map((ev) =>   <rect
+                        objectData.events.map((ev) =>   <PageObject
                                                             key={`${ev.addr}-${ev.allocTs}`}
-                                                            className='pageCardObject'
+                                                            // className='pageCardObject'
                                                             x={pageScale(ev.addr % pageSize)}
                                                             y={0}
                                                             width={pageScale(ev.size)}
-                                                            fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'} />)
+                                                            fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'}
+                                                            isVis={(ev.type && pageVis[ev.type]) == true}
+                                                            currTs={currTs}
+                                                            allocTs={ev.allocTs}
+                                                            freeTs={ev.freeTs} />)
                     }
                 </g>
             </svg>
@@ -776,8 +846,8 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
 }
 
 function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType, 
-                    setSelPageAddr, setFocusData, pageVis, showHot,
-                    showHitm, perf, clusterSize, sumClusterSizes, maxClusterSize } : 
+                    setSelPageAddr, pageVis, showHot, showHitm, perf,
+                    clusterSize, sumClusterSizes, maxClusterSize } : 
     {
         clusterSize: number,
         sumClusterSizes: number,
@@ -795,21 +865,21 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
         showHitm: boolean,
         perf: PerfMap
     }) {
-    const [currData, setCurrData] = useState(data);
+    // const [currData, setCurrData] = useState(data);
 
-    useEffect(() => {
-        const filtered = {
-            events: data.events.filter((obj) => obj.allocTs <= currTs && 
-                                                (obj.freeTs == null || obj.freeTs >= currTs)
-                                                && obj.type
-                                                && pageVis[obj.type]),
-            cluster: data.cluster
-        };
-        setCurrData(filtered);
-        if (selAddr == addr) {
-            setFocusData(filtered);
-        }
-    }, [currTs, selAddr, data, pageVis]);
+    // useEffect(() => {
+    //     const filtered = {
+    //         events: data.events.filter((obj) => obj.allocTs <= currTs && 
+    //                                             (obj.freeTs == null || obj.freeTs >= currTs)
+    //                                             && obj.type
+    //                                             && pageVis[obj.type]),
+    //         cluster: data.cluster
+    //     };
+    //     setCurrData(filtered);
+    //     if (selAddr == addr) {
+    //         setFocusData(filtered);
+    //     }
+    // }, [currTs, selAddr, data, pageVis]);
 
     return (
         <div className='pageRow' >
@@ -817,12 +887,14 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
                 addr={addr}
                 selAddr={selAddr}
                 pageSize={pageSize}
-                objectData={currData}
+                objectData={data}
                 setSelPageAddr={setSelPageAddr}
                 colourOfType={colourOfType}
                 showHot={showHot}
                 showHitm={showHitm}
-                perf={perf} />
+                perf={perf}
+                pageVis={pageVis}
+                currTs={currTs} />
             <Grid
                 container
                 rowSpacing={0.3}
@@ -833,7 +905,7 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
                 </Grid>
                 
                 <Grid size={5} >
-                    <div className='clusterLabelDiv' >{`cluster: ${currData.cluster}`}</div>
+                    <div className='clusterLabelDiv' >{`cluster: ${data.cluster}`}</div>
                 </Grid>
                 <Grid size={4} >
                     <Tooltip
@@ -966,10 +1038,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
     }) {
     // const [clusters, setClusters] = useState({});
     const [selPageAddr, setSelPageAddr] = useState(parseInt(Object.keys(pages)[0]));
-    const [focusData, setFocusData] = useState({
-        events: Object.values(pages)[0].events.filter((obj: MemoryObject) => obj.allocTs <= currTs && (!obj.freeTs || obj.freeTs >= currTs)),
-        cluster: Object.values(pages)[0].cluster
-    });
+    // const [focusData, setFocusData] = useState<PageContents>(Object.values(pages)[0]);
     const [sortMode, setSortMode] = useState<'addr' | 'cluster'>('addr');
     const [selSize, setSelSize] = useState<number>(0);
     const [zoomedAddr, setZoomedAddr] = useState<number>(0);
@@ -978,6 +1047,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
     const [showHitm, setShowHitm] = useState<boolean>(false);
 
     const maxClusterSize = Object.values(clustersData).reduce((size: number, curr: {'pages': number[], 'size': number}) => Math.max(size, curr['size']), 0);
+    const focusData = useMemo(() => pages[selPageAddr], [selPageAddr]);
 
     return (
         <div id='pageAndObjectVis'>
@@ -1016,7 +1086,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                                                     selAddr={selPageAddr}
                                                     colourOfType={colourOfType}
                                                     setSelPageAddr={setSelPageAddr}
-                                                    setFocusData={setFocusData}
+                                                    // setFocusData={setFocusData}
                                                     pageVis={pageVis}
                                                     showHot={showHot}
                                                     showHitm={showHitm}
@@ -1038,7 +1108,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                                                     selAddr={selPageAddr}
                                                     colourOfType={colourOfType}
                                                     setSelPageAddr={setSelPageAddr}
-                                                    setFocusData={setFocusData}
+                                                    // setFocusData={setFocusData}
                                                     zoomedAddr={zoomedAddr}
                                                     setZoomedAddr={setZoomedAddr}
                                                     zoomedSize={zoomedSize}
@@ -1066,7 +1136,9 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                     viewStartAddr={selPageAddr}
                     showHot={showHot}
                     showHitm={showHitm}
-                    perf={perf} />
+                    perf={perf}
+                    pageVis={pageVis}
+                    currTs={currTs} />
             </div>
         </div>
     );

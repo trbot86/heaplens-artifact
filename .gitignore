@@ -2,6 +2,7 @@ __pycache__
 -1
 *.so
 *.o
+*.svg
 setbench_verlib*
 ralloc*
 gzip*
