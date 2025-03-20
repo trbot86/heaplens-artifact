@@ -14,8 +14,8 @@ interface LineData {
     [tp: string]: SizePoint[]
 };
 
-const LINE_GRAPH_WIDTH = 640;
-const LINE_GRAPH_HEIGHT = 330;
+const LINE_GRAPH_WIDTH = 700;
+const LINE_GRAPH_HEIGHT = 300;
 const LINE_GRAPH_Y_AXIS_WIDTH = 50;
 const LINE_GRAPH_X_AXIS_HEIGHT = 30;
 const LINE_GRAPH_LINE_STROKE_WIDTH = 2;
@@ -81,6 +81,10 @@ function getSizeTickValues(maxSize: number, maxValues: number): number[] {
 function convertLinePtXToTs(linePtX: number, minTs: number, maxTs: number, numLinePtsX: number) {
     const sizeOfLinePtX = Math.max((maxTs - minTs) / numLinePtsX, 1);
     return (linePtX * sizeOfLinePtX) + minTs;
+}
+
+function convertTsToLinePtX(currTs: number, ) {
+
 }
 
 const CustomSlider = styled(Slider)({
@@ -174,6 +178,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
         lineVis: {[tp: string]: boolean},
     }) {
     const SVGref = useRef(null);
+    const [thumbX, setThumbX] = useState<number>(LINE_GRAPH_Y_AXIS_WIDTH);
     // const xScale = useRef<d3.ScaleLinear<number, number, never> | null>(null);
     const lineGenerator = useRef<d3.Line<SizePoint> | null>(null);
     const [xScale, setXScale] = useState<d3.ScaleLinear<number, number, never> | null>(null);
@@ -183,6 +188,9 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
     const numLinePtsX = Object.values(lines)[0].length
     const xScaleOrig = d3.scaleLinear().domain([0, numLinePtsX])
                                     .range([0, LINE_GRAPH_WIDTH]);
+
+    const xPtToTsScale = d3.scaleLinear().domain([0, numLinePtsX])
+                                    .range([timeRange.min, timeRange.max]);
     
     // if (!xScale.current)
     //     xScale.current = xScaleOrig;
@@ -195,13 +203,14 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
     let xAxis: d3.Axis<d3.NumberValue>;
     if (!xScale) {
         lineGenerator.current = d3.line((pt: SizePoint) => xScaleOrig(pt.bucket), (pt: SizePoint) => yScale(pt.size));
-        xAxis = d3.axisBottom(xScaleOrig).tickSize(9).tickValues(getTsTickValues(timeRange.min, timeRange.max, 10))
-            .tickFormat((d) => `${((parseInt(convertLinePtXToTs(d)) - timeRange.min) / 1000000000).toFixed(2)} s`);
+        xAxis = d3.axisBottom(xScaleOrig).tickSize(9).tickValues(new Array(10).fill(0).map((d, i) => i*Math.floor(numLinePtsX / 10)))
+            .tickFormat((d) => `${((xPtToTsScale(d) - timeRange.min) / 1000000000).toFixed(2)} s`);
     }
     else {
+        console.log('TEST XSCALE IS NOT NULL');
         lineGenerator.current = d3.line((pt: SizePoint) => xScale(pt.bucket), (pt: SizePoint) => yScale(pt.size));
-        xAxis = d3.axisBottom(xScale).tickSize(9).tickValues(getTsTickValues(timeRange.min, timeRange.max, 10))
-            .tickFormat((d) => `${((parseInt(convertLinePtXToTs(d)) - timeRange.min) / 1000000000).toFixed(2)} s`);
+        xAxis = d3.axisBottom(xScale).tickSize(9).tickValues(new Array(10).fill(0).map((d, i) => i*Math.floor(numLinePtsX / 10)))
+            .tickFormat((d) => `${((xPtToTsScale(d) - timeRange.min) / 1000000000).toFixed(2)} s`);
     }
     
     const yAxis = useMemo(() => d3.axisLeft(yScale).tickSize(3).tickValues(getSizeTickValues(maxSize ? maxSize : 1, 6))
@@ -221,36 +230,46 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
                 // .attr('d', d3.line((pt: SizePoint) => xScale.current(pt.ts), (pt: SizePoint) => yScale(pt.size)));
         }
 
-        // d3.select(SVGref.current)
-        //     .select('#linesGroup')
-        //     .selectAll('.timeGraphLine')
-        //     .data(Object.keys(lines))
-        //     .enter()
-        //     .append('path')
-        //     .attr('class', 'timeGraphLine')
-        //     .attr('stroke', (tp: string) => colourOfType[tp] ? colourOfType[tp].toString() : 'gray')
-        //     .datum((tp: string) => lines[tp])
-        //     .attr('d', lineGenerator);
-
         const zoom = d3.zoom()
             .scaleExtent([1, 10]) // TODO: get rid of constants
             .translateExtent([[0, 0], [LINE_GRAPH_WIDTH + LINE_GRAPH_RIGHT_PAD + LINE_GRAPH_Y_AXIS_WIDTH + (LINE_GRAPH_LINE_STROKE_WIDTH / 2), LINE_GRAPH_HEIGHT + 31]])
             .on('zoom', (event) => {
-                setXScale(() => event.transform.rescaleX(xScaleOrig));
+                const newXScale = event.transform.rescaleX(xScaleOrig);
+                setXScale(() => newXScale);
+                setThumbX(Math.max(LINE_GRAPH_Y_AXIS_WIDTH, Math.min(newXScale(xPtToTsScale.invert(currTs)), LINE_GRAPH_WIDTH + LINE_GRAPH_Y_AXIS_WIDTH)));
                 // xScale.current = event.transform.rescaleX(xScaleOrig);
             });
         
         d3.select(SVGref.current)
             .call(zoom);
+
+        const thumbDrag = d3.drag()
+            .on("start", (event) => event.sourceEvent.stopPropagation()) // Prevent zooming when dragging
+            .on("drag", (event) => {
+                const newX = Math.max(LINE_GRAPH_Y_AXIS_WIDTH, Math.min(event.x, LINE_GRAPH_WIDTH + LINE_GRAPH_Y_AXIS_WIDTH));
+                let newTs = 0;
+                if (xScale) {
+                    newTs = xPtToTsScale(xScale.invert(newX - LINE_GRAPH_Y_AXIS_WIDTH));
+                }
+                else {
+                    newTs = xPtToTsScale(xScaleOrig.invert(newX - LINE_GRAPH_Y_AXIS_WIDTH));
+                }
+                setCurrTs(newTs);
+                console.log(`New timestamp: ${newX}`);
+                setThumbX(newX);
+            });
+
+        d3.select('#timeThumb')
+            .call(thumbDrag);
     }, [lines, xScale, yAxis]);
     
     return (
-        <div>
+        <div
+            id='timeGraphContainer' >
             <svg
                 id='timeGraphSVG'
                 ref={SVGref}
-                width={LINE_GRAPH_WIDTH + LINE_GRAPH_Y_AXIS_WIDTH + (LINE_GRAPH_LINE_STROKE_WIDTH / 2) + LINE_GRAPH_RIGHT_PAD}
-                height={LINE_GRAPH_HEIGHT + LINE_GRAPH_X_AXIS_HEIGHT + (LINE_GRAPH_LINE_STROKE_WIDTH / 2)} >
+                viewBox={`0 0 ${LINE_GRAPH_WIDTH + LINE_GRAPH_Y_AXIS_WIDTH + (LINE_GRAPH_LINE_STROKE_WIDTH / 2) + LINE_GRAPH_RIGHT_PAD} ${LINE_GRAPH_HEIGHT + LINE_GRAPH_X_AXIS_HEIGHT + (LINE_GRAPH_LINE_STROKE_WIDTH / 2)}`} >
                 <defs>
                     <clipPath id='timeGraphClip'>
                         <rect
@@ -278,20 +297,13 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
                 </g>
                 <g id='xAxisGroup' />
                 <g id='yAxisGroup' />
-                {/* <TimeSlider 
-                    minTs={minTs ? minTs : 0}
-                    maxTs={maxTs ? maxTs : 1}
-                    xScale={xScale ? xScale : xScaleOrig}
-                    currTs={currTs}
-                    setCurrTs={setCurrTs} /> */}
+                <circle
+                    id='timeThumb'
+                    cx={thumbX}
+                    cy='0'
+                    r='8'
+                    fill='white' />
             </svg>
-            <TimeSlider 
-                xScale={xScale ? xScale : xScaleOrig}
-                currTs={currTs}
-                numLinePtsX={numLinePtsX}
-                setCurrTs={setCurrTs}
-                timeRange={timeRange}
-                numBuckets={numBuckets} />
         </div>
     );
 }
@@ -322,15 +334,13 @@ export default function TimeGraph({ lines, colourOfType, currTs, setCurrTs, time
     // });
 
     return (
-        <div>
-            <ZoomableLineGraph
-                lines={lines}
-                colourOfType={colourOfType}
-                currTs={currTs}
-                setCurrTs={setCurrTs}
-                timeRange={timeRange}
-                numBuckets={numBuckets}
-                lineVis={lineVis} />
-        </div>
+        <ZoomableLineGraph
+            lines={lines}
+            colourOfType={colourOfType}
+            currTs={currTs}
+            setCurrTs={setCurrTs}
+            timeRange={timeRange}
+            numBuckets={numBuckets}
+            lineVis={lineVis} />
     );
 }

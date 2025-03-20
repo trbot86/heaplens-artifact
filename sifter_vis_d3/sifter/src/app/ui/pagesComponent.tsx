@@ -45,6 +45,7 @@ export interface PerfMap {
 }
 
 const PAGE_CARD_SVG_WIDTH = 540;
+const PAGE_CARD_SVG_HEIGHT = 50;
 const PAGE_CARD_BORDER_WIDTH = PAGE_CARD_SVG_WIDTH - 10;
 const OBJECT_LAYOUT_WIDTH = 300;
 const OBJECT_LAYOUT_HEIGHT = 300;
@@ -391,8 +392,7 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
         <div id='objectLayoutDiv' >
             <svg
                 id='objectSVG'
-                width={OBJECT_LAYOUT_WIDTH + OBJECT_LAYOUT_MARGIN + 5}
-                height={OBJECT_LAYOUT_HEIGHT + OBJECT_LAYOUT_MARGIN + 5}
+                viewBox={`0 0 ${OBJECT_LAYOUT_WIDTH + OBJECT_LAYOUT_MARGIN + 5} ${OBJECT_LAYOUT_HEIGHT + OBJECT_LAYOUT_MARGIN + 5}`}
                 ref={objSVG} >
                 <defs>
                     <clipPath id='objectLayoutClip' >
@@ -662,7 +662,8 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
     return (
         <div className='pageCardDiv' >
             <svg 
-                className='pageCard' >
+                className='pageCard'
+                viewBox={`0 0 ${PAGE_CARD_SVG_WIDTH} ${PAGE_CARD_SVG_HEIGHT}`} >
                 {/* // ref={ref} > */}
                 <rect className='pageCardBorder pageCardShadow' />
                 <rect

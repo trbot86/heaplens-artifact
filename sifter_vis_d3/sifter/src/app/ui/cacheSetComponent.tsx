@@ -212,8 +212,7 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                 } >
                 <svg 
                     id='cacheBoxesSVG'
-                    width={MAX_CACHE_BOX_ARRAY_WIDTH}
-                    height={MAX_CACHE_BOX_ARRAY_WIDTH} >
+                    viewBox={`0 0 ${MAX_CACHE_BOX_ARRAY_WIDTH} ${MAX_CACHE_BOX_ARRAY_WIDTH}`} >
                     {   
                         new Array(cacheData.numSets)
                             .fill(undefined)

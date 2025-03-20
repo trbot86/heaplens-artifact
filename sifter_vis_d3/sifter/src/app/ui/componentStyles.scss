@@ -14,8 +14,8 @@ $pageCardBackColourHover: rgb(88, 88, 88);
 
 /* Time graph vars */
 
-$timeGraphWidth: 640px;
-$timeGraphHeight: 330px;
+$timeGraphWidth: 700px;
+$timeGraphHeight: 300px;
 $timeGraphYAxisWidth: 50px;
 $timeGraphXAxisHeight: 30px;
 $timeGraphLineStrokeWidth: 2.5px;
@@ -43,7 +43,7 @@ $timeGraphSliderThumbWidth: 12px;
     flex-direction: row;
     gap: 7px;
     align-items: center;
-    width: $pageCardBorderWidth;
+    width: 100%;
 }
 
 #pageSortButtons {
@@ -91,15 +91,22 @@ $timeGraphSliderThumbWidth: 12px;
     }
 }
 
+.pageRow {
+    width: 100%;
+    height: $pageCardSVGHeight;
+}
+
 .pageCardDiv {
     display: inline;
     overflow: visible;
+    width: inherit;
+    height: inherit;
 }
 
 .pageCard {
     vertical-align: middle;
-    height: $pageCardSVGHeight;
-    width: $pageCardSVGWidth;
+    width: inherit;
+    height: inherit;
 }
 
 .pageCardShadow {
@@ -259,9 +266,20 @@ rect.selection {
     rx: 2px;
 }
 
+#objectVis {
+    width: 35%;
+    height: 100%;
+}
+
 #objectLayoutDiv {
     position: relative;
-    top: 30px;
+    width: 100%;
+    height: inherit;
+}
+
+#objectSVG {
+    width: inherit;
+    height: inherit;
 }
 
 #objectGroup rect, #objectGroup .objDelimLine, #objectXAxisGroup, #objectYAxisGroup, #objectYAxisGridGroup {
@@ -316,6 +334,16 @@ rect.selection {
 
 /* Time line graph */
 
+#timeGraphContainer {
+    width: 100%;
+    height: 100%;
+}
+
+#timeGraphSVG {
+    width: inherit;
+    height: inherit;
+}
+
 #linesGroup {
     transform: translate(calc($timeGraphYAxisWidth + ($timeGraphLineStrokeWidth / 2)), -($timeGraphLineStrokeWidth / 2));
 }
@@ -334,9 +362,14 @@ rect.selection {
     clip-path: view-box inset(0)
 }
 
+#timeThumb {
+    cursor: pointer;
+    transform: translateY($timeGraphHeight);
+}
+
 #sliderGroup {
-    width: $timeGraphWidth;
-    height: $timeGraphXAxisHeight;
+    width: 90%;
+    height: 5%;
     transform: translate($timeGraphYAxisWidth, - calc($timeGraphXAxisHeight + 20px));
 }
 
@@ -355,15 +388,26 @@ rect.selection {
 
 /* Legend */
 
+.legendText {
+    font-size: 10pt;
+    &.numberText {
+        font-size: 9pt;
+        font-family: monospace;
+    }
+}
+
 #legendTable {
+    width: 100%;
+    height: 100%;
     position: relative;
-    top: -18px;
+    // top: -26px;
     display: grid;
-    grid-template-columns: 55px 20px 449px 100px 100px;
-    grid-template-rows: 1fr fit-content(240px) 2fr;
+
+    grid-template-columns: 10% 5% 59% 13% 13%;
+    grid-template-rows: 15% fit-content(30vh) 15%;
 
     &.visExpanded {
-        grid-template-columns: 79px 55px 20px 370px 100px 100px;
+        grid-template-columns: 11% 10% 5% 48% 13% 13%;
     }
 }
 
@@ -505,25 +549,29 @@ rect.selection {
 
 #cacheSetGroup {
     display: flex;
-    width: 420px;
+    width: inherit;
+    height: inherit;
     flex-direction: column;
     align-items: center;
     gap: 8px;
     // padding-top: 10px;
     position: absolute;
-    top: 10px;
+    // top: 10px;
 }
 
 #cacheHeader {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    width: inherit;
+    height: 15%;
 }
 
 #cacheBoxesContainer {
     display: flex;
     align-items: center;
     justify-items: center;
+    width: 85%;
+    height: 85%;
 }
 

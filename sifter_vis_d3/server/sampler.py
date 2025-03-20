@@ -484,6 +484,7 @@ class Sampler:
                     while start + num_s < len(clusters[c]) and clusters[c][start + num_s] == clusters[c][start + num_s - 1] + 1 and num_s < max_run_length:
                         sampled_pages.add(clusters[c][start + num_s])
                         num_s += 1
+                    taken += num_s
         # print(sampled_pages)
         
         sampled_pages_df = pd.DataFrame({'page_num': sorted(sampled_pages)})

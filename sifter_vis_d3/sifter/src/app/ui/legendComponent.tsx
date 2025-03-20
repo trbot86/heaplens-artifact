@@ -322,22 +322,18 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
                     }
                     </div>
                 </td>
-                <td>{typeName}</td>
                 <td>
-                    <Typography
-                        sx={{
-                            fontFamily: 'monospace',
-                            fontSize: '12px'
-                        }} >
+                    <Typography className='legendText' >
+                        {typeName}
+                    </Typography>
+                </td>
+                <td>
+                    <Typography className='legendText numberText' >
                         {stats.numAllocs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                     </Typography>
                 </td>
                 <td>
-                    <Typography
-                        sx={{
-                            fontFamily: 'monospace',
-                            fontSize: '12px'
-                        }} >
+                    <Typography className='legendText numberText' >
                         {stats.numPages.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                     </Typography>
                 </td>
@@ -447,6 +443,7 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, lineV
                 open={Boolean(colourMenuAnchor)}
                 anchorEl={colourMenuAnchor}
                 onClose={() => setColourMenuAnchor(null)} >
+                    {/* TODO: Get the following "OK" and "Cancel" buttons to work */}
                 <PhotoshopPicker
                     color={currColourSel}
                     onChange={(col) => setCurrColourSel(col.hex)}
