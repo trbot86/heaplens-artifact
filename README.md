@@ -56,7 +56,9 @@ This step uses clang-tidy to add logging instructions to the target application.
 
 		./sifter.sh [new-dir-name] --includes-only
 
-7. Run your target application. This will produce a few files: binary_dump.txt, fileset_dump.txt, and typeset_dump.txt.
+7. Compile your target application.
+
+8. Run your target application. This will produce a few files: binary_dump.txt, fileset_dump.txt, and typeset_dump.txt.
 ## Step 2: Sample output logs
 
 This step samples a set of memory pages from binary_dump.txt.
