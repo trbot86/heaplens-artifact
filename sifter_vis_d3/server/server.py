@@ -2,7 +2,6 @@ from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from sampler import Sampler
 from logger import Logger
-from threading import Lock
 import os
 
 app = Flask(__name__)

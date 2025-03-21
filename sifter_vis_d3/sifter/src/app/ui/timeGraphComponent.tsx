@@ -223,11 +223,9 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
         if (xScale) {
             d3.select('#xAxisGroup')
                 .call(xAxis.scale(xScale));
-                // .call(xAxis.scale(xScale.current));
-            d3.selectAll('.timeGraphLine')
-                .attr('d', lineGenerator.current);
-                // .attr('d', d3.line((pt: SizePoint) => xScale.current(pt.ts), (pt: SizePoint) => yScale(pt.size)));
         }
+        d3.selectAll('.timeGraphLine')
+                .attr('d', lineGenerator.current);
 
         const zoom = d3.zoom()
             .scaleExtent([1, 10]) // TODO: get rid of constants

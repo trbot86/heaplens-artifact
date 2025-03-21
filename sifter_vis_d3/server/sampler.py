@@ -7,10 +7,8 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import MeanShift
 import pandas as pd
 import numpy as np
-import ruptures as rpt
 import matplotlib.pyplot as plt
 import sys
-import simplejson as json
 import math
 import os
 from random import randint, shuffle
