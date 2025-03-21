@@ -12,7 +12,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import CacheSets, { CacheInfoMap } from '../ui/cacheSetComponent';
 import { getNotesForFile, theme } from '../page';
 import { useSearchParams } from 'next/navigation';
-import { Divider, FormControl, IconButton, InputLabel, LinearProgress, MenuItem, Paper, Popover, Select, Slider, Tab, Tabs, TextareaAutosize, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { Badge, Divider, FormControl, IconButton, InputLabel, LinearProgress, MenuItem, Paper, Popover, Select, Slider, Tab, Tabs, TextareaAutosize, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { flushSync } from 'react-dom';
 import { ArrowBack, Cached, Close, EditNote, Settings } from '@mui/icons-material';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
@@ -441,8 +441,6 @@ export default function VisPanels() {
                         Object.keys(allData['linesAndStats']['fields']).forEach((tp: string) => {
                             allData['linesAndStats']['fields'][tp].forEach((field: SubtypeEntry) => allFieldNames.push(getSubtypeName(tp, field.subtype)));
                         });
-                        // console.log('ALL FIELD NAMES:');
-                        // console.log(allFieldNames.sort());
                         const allMaps = allData['types'].concat(allFieldNames)
                             .reduce((map: {[tp: string]: boolean}, tp: string) => {
                                 map[tp] = true;
@@ -528,12 +526,9 @@ export default function VisPanels() {
                         setNumClusters(allData['pagesData']['num_clusters']);
                         setFeaturesData(allData['pagesData']['features']);
 
-                        console.log('HERE IS CLUSTERS');
-                        console.log(allData['pagesData']['clusters']);
-                        console.log('HERE IS FEATURES');
-                        console.log(allData['pagesData']['features']);
-
                         setCacheData(allData['cacheData']);
+                        console.log(`cache sets in settings: ${Math.floor(cacheInfoSetting[selCacheName].size / cacheLineSizeSetting)}, cache sets in data: ${allData['cacheData'].numSets}`);
+                        console.log(`cache info size: ${cacheInfoSetting[selCacheName].size}, cachelinesize setting: ${cacheLineSizeSetting}`);
 
                         if (fname) {
                             getNotesForFile(fname).then((resp) => resp.json())
@@ -697,12 +692,21 @@ export default function VisPanels() {
 
                                                     setCacheInfo(cacheInfoSetting);
                                                     setCacheData(allData['cacheData']);
+                                                    console.log(`cache sets in settings: ${Math.floor(cacheInfoSetting[selCacheName].size / cacheLineSizeSetting)}, cache sets in data: ${allData['cacheData'].numSets}`);
 
                                                     setResampling(false);
                                                 });
                                     }
                                 }} >
+                                {Math.floor(cacheInfoSetting[selCacheName].size / (cacheLineSizeSetting*cacheInfoSetting[selCacheName].assoc)) == cacheData.numSets && !resampling ?
                                 <Cached />
+                                :
+                                <Badge
+                                    color='secondary'
+                                    variant='dot' >
+                                    <Cached />
+                                </Badge>
+                                }
                             </IconButton>
                         </Tooltip>
                         <Tooltip

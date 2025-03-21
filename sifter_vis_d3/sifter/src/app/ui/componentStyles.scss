@@ -389,6 +389,7 @@ rect.selection {
 /* Legend */
 
 .legendText {
+    word-wrap: break-word;
     font-size: 10pt;
     &.numberText {
         font-size: 9pt;
@@ -573,5 +574,16 @@ rect.selection {
     justify-items: center;
     width: 85%;
     height: 85%;
+}
+
+.cacheOccTable {
+    table-layout: fixed;
+    margin: 0 auto;
+    width: 400px;
+}
+
+.cacheTableTypeText {
+    word-wrap: break-word;
+    font-size: 10pt;
 }
 
