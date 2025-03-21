@@ -75,19 +75,46 @@ This step samples a set of memory pages from binary_dump.txt.
 
 ## Step 3: Visualization
 
-This step allows you to visualize the database produced in the previous step. You will need node.js, Flask, and scikit-learn.
+This step allows you to visualize the database produced in the previous step. You can either run the backend (with Flask) and frontend (with node.js) servers directly on your local machine, or you may build a virtual environment in Python using the included requirements.txt. This section will cover the latter approach.
 
-1. Start the Flask server in a separate terminal. This allows the web app to communicate with the python sampling script.
+You will need Python 3 along with the venv module (which you should already have if you have Python >= 3.3).
 
-		cd sifter_vis_d3
+1. Create a new Python virtual environment.
+
+		python -m venv /path/to/venv
+
+2. Activate the virtual environment.
+
+	Using bash/zsh on POSIX systems:
+
+		source /path/to/venv/bin/activate
+
+	On Windows systems:
+
+		path\to\venv\Scripts\activate.bat
+
+	Note: to deactivate the virtual environment on POSIX, type `deactivate`. On Windows, run the script `path\to\venv\Scripts\deactivate.bat`.
+
+3. In your virtual environment, install the modules in `requirements.txt`.
+
+		cd sifter_vis_d3/server
+		pip install -r requirements.txt
+
+4. In the `server` directory, start the backend server.
+
 		flask --app server run
 
-2. Navigate to the visualization application directory, install node dependencies, and run the server.
+5. In another terminal window, activate the Python virtual environment again (see step 2). Set up a node.js virtual environment using the `nodeenv` module.
+
+		nodeenv --python-virtualenv --node 18.18.2
+
+
+6. Navigate to the visualization application directory, install node dependencies, and run the server.
 
 		cd sifter_vis_d3/sifter
 		npm install
 		npm run dev
 
-3. Copy 'allocs.sqlite' from the previous step into the 'sifter_vis_d3' directory.
+7. Copy 'allocs.sqlite' from the previous step into the 'sifter_vis_d3' directory.
 
-4. Open 'localhost:3000' in your web browser. Note that it can take a few minutes to load a database in the visualization app. If it takes too long, you may want to choose a lower sampling proportion value in the sampling step.
+8. Open 'localhost:3000' in your web browser. Note that it can take a few minutes to load a database in the visualization app. If it takes too long, you may want to choose a lower sampling proportion value in the sampling step.
