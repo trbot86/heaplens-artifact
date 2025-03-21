@@ -1,7 +1,7 @@
 'use client';
 
 import { Add, Remove } from "@mui/icons-material";
-import { CircularProgress, IconButton, styled, Theme, ToggleButton, ToggleButtonGroup, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
+import { CircularProgress, IconButton, styled, Theme, ToggleButton, ToggleButtonGroup, Tooltip, tooltipClasses, TooltipProps, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import * as d3 from 'd3';
 import { testCacheDataPerBucket, testMinAndMaxOccPerBucket } from "./testdata";
@@ -194,7 +194,11 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                 placement='left'
                 title={
                     hoverIdx != null ?
-                    <table>
+                    <table className='cacheOccTable' >
+                        <colgroup>
+                            <col style={{'width': '330px'}} />
+                            <col style={{'width': '70px'}} />
+                        </colgroup>
                         <tbody>
                         {
                             cacheData.occ[bucketIdx].slice(hoverIdx*cacheData.idxToTpAndSt.length, (hoverIdx+1)*cacheData.idxToTpAndSt.length)
@@ -202,7 +206,11 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                                 .filter((v) => v.val > 0)
                                 .sort((a, b) => b.val - a.val)
                                 .map((v: {val: number, tidx: number}) =>    <tr key={`cb-${v.tidx}`} >
-                                                                                <td>{cacheData.idxToTpAndSt[v.tidx]}</td>
+                                                                                <td className='cacheTableTypeTextContainer' >
+                                                                                    <Typography className='cacheTableTypeText' >
+                                                                                        {cacheData.idxToTpAndSt[v.tidx]}
+                                                                                    </Typography>
+                                                                                </td>
                                                                                 <td>{`${v.val} (${(v.val*100 / totalData[bucketIdx][hoverIdx]).toFixed(2)}%)`}</td>
                                                                             </tr>)
                         }
@@ -303,17 +311,13 @@ export default function CacheSets({ cacheData, cacheInfo, bucketIdx, cacheVis,
         }
     }, [cacheData, cacheVis, expandedTypes]);
 
-    // useEffect(() => {
-    //     getCacheData(cacheInfo[selCacheName])
-    //         .then((data) => {
-    //             setCacheData(data)
-    //             setCacheWidth({
-    //                 min: Math.floor(Math.sqrt(data['numSets'])),
-    //                 max: data['numSets'],
-    //                 curr: Math.floor(Math.sqrt(data['numSets']))
-    //             });
-    //     });
-    // }, []);
+    useEffect(() => {
+        setCacheWidth({
+            min: Math.floor(Math.sqrt(cacheData.numSets)),
+            max: cacheData.numSets,
+            curr: Math.floor(Math.sqrt(cacheData.numSets))
+        });
+    }, [cacheData]);
 
     return (
         <div id='cacheSetGroup' >

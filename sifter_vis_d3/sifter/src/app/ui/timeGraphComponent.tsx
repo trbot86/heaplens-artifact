@@ -207,7 +207,6 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
             .tickFormat((d) => `${((xPtToTsScale(d) - timeRange.min) / 1000000000).toFixed(2)} s`);
     }
     else {
-        console.log('TEST XSCALE IS NOT NULL');
         lineGenerator.current = d3.line((pt: SizePoint) => xScale(pt.bucket), (pt: SizePoint) => yScale(pt.size));
         xAxis = d3.axisBottom(xScale).tickSize(9).tickValues(new Array(10).fill(0).map((d, i) => i*Math.floor(numLinePtsX / 10)))
             .tickFormat((d) => `${((xPtToTsScale(d) - timeRange.min) / 1000000000).toFixed(2)} s`);
@@ -224,11 +223,9 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
         if (xScale) {
             d3.select('#xAxisGroup')
                 .call(xAxis.scale(xScale));
-                // .call(xAxis.scale(xScale.current));
-            d3.selectAll('.timeGraphLine')
-                .attr('d', lineGenerator.current);
-                // .attr('d', d3.line((pt: SizePoint) => xScale.current(pt.ts), (pt: SizePoint) => yScale(pt.size)));
         }
+        d3.selectAll('.timeGraphLine')
+                .attr('d', lineGenerator.current);
 
         const zoom = d3.zoom()
             .scaleExtent([1, 10]) // TODO: get rid of constants
@@ -255,7 +252,6 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
                     newTs = xPtToTsScale(xScaleOrig.invert(newX - LINE_GRAPH_Y_AXIS_WIDTH));
                 }
                 setCurrTs(newTs);
-                console.log(`New timestamp: ${newX}`);
                 setThumbX(newX);
             });
 
