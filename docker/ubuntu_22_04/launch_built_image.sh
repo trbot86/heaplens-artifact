@@ -1,7 +1,6 @@
 #!/bin/bash
 
-hugepage=""
-name="sifter"
+args=(-it --privileged)
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -10,14 +9,14 @@ while [ $# -gt 0 ]; do
         ;;
         -p | --huge-page)
             echo "Launching image with hugepages mounted at /dev/hugepages"
-            hugepage=" -v/dev/hugepages:/dev/hugepages"
+            args=("-v/dev/hugepages:/dev/hugepages" "${args[@]}")
         ;;
         -n | --name)
             if [[ -z "$2" || "$2" == -* ]]; then
                 echo "Must specify a container name with option -n/--name." >&2
                 exit 1
             fi
-            name=$2
+            args=("${args[@]}" --name "$2")
             shift
         ;;
     esac
@@ -35,4 +34,5 @@ fi
 #echo y | docker container rm "$name" 2>/dev/null
 
 ## launch built docker image in a container
-docker run"$hugepage" -it --privileged --name "$name" sifter
+echo "docker run ${args[@]} sifter"
+docker run "${args[@]}" sifter

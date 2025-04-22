@@ -16,6 +16,7 @@ sample=""
 cutoff=""
 threads=1
 pageSize="--page-size 4096"
+fragGran=""
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -109,6 +110,14 @@ while [ $# -gt 0 ]; do
             pageSize="--page-size $2"
             shift
         ;;
+        -r | --fragmentation)
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Must specify a fragmentation granularity with option -r/--fragmentation." >&2
+                exit 1
+            fi
+            fragGran="-r $2"
+            shift
+        ;;
         *)
             if [ -z "$indir" ]; then
                 indir=$1
@@ -169,8 +178,8 @@ elif [ "$database" = true ]; then
     cd type_analysis
     rm allocs.sqlite
     make convert_to_db
-    echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff"
-    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff
+    echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran"
+    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran
     exit 0
 elif [ "$includesOnly" = true ]; then
     add_includes $indir

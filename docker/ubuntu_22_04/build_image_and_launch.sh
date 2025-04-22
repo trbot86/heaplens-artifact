@@ -1,7 +1,6 @@
 #!/bin/bash
 
-hugepage=""
-name="sifter"
+args=()
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -14,14 +13,14 @@ while [ $# -gt 0 ]; do
             exit 0
         ;;
         -p | --huge-page)
-            hugepage="--huge-page"
+            args=(--huge-page "${args[@]}")
         ;;
         -n | --name)
             if [[ -z "$2" || "$2" == -* ]]; then
                 echo "Must specify a container name with option -n/--name." >&2
                 exit 1
             fi
-            name=$2
+            args=(--name "$2" "${args[@]}")
             shift
         ;;
     esac
@@ -29,4 +28,4 @@ while [ $# -gt 0 ]; do
 done
 
 ./build_image.sh
-./launch_built_image.sh --name "$name" "$hugepage"
+./launch_built_image.sh "${args[@]}"
