@@ -21,6 +21,8 @@
 #include <thread>
 #include <cmath>
 #include <climits>
+#include <future>
+#include <cassert>
 
 #define PADDING 64
 #ifndef STRUCTS_PER_BLOCK
@@ -43,7 +45,7 @@ size_t page_size;
 
 typedef struct stats {
   unsigned int num_allocs;
-  unordered_map<size_t, uint64_t> num_alignment;
+  unordered_map<size_t, unordered_map<size_t, uint64_t>> count_align_and_size;
   unsigned int num_frees;
   unordered_set<uint64_t> resident_pages;
 } stats_t;
@@ -154,7 +156,7 @@ unordered_map<uintptr_t, string> construct_map(const char* filename, bool remove
   return retmap;
 }
 
-void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size, unordered_map<uint64_t, memory_page_t>& pages, sqlite3* db) {
+void write_perf_addrs_to_db(const char* fname, float cutoff, int page_size, int cl_size, unordered_map<uint64_t, memory_page_t>& pages, sqlite3* db) {
   ifstream pfile;
   pfile.open(fname);
   string line;
@@ -229,7 +231,7 @@ void get_perf_addrs(const char* fname, float cutoff, int page_size, int cl_size,
   }
 }
 
-void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db) {
+void write_fields_to_db(const char* fname, unordered_set<string> seen_types, sqlite3* db) {
   unordered_set<string>::iterator seeniter;
   // for (seeniter = seen_types.begin(); seeniter != seen_types.end(); seeniter++)
   //   std::cout << *seeniter << std::endl;
@@ -334,7 +336,7 @@ void get_fields(const char* fname, unordered_set<string> seen_types, sqlite3* db
   }
 }
 
-void get_stats(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr_t, stats_t*>& stats_per_type, sqlite3* db) {
+void write_stats_to_db(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr_t, stats_t*>& stats_per_type, sqlite3* db) {
   char* zErrMsg = 0;
   int rc = sqlite3_exec(db, "DROP TABLE IF EXISTS STATS;" \
                       "CREATE TABLE STATS(" \
@@ -350,9 +352,33 @@ void get_stats(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr
     std::cout << "Stats table created successfully" << std::endl;
   }
 
+  rc = sqlite3_exec(db, "DROP TABLE IF EXISTS ALIGNMENT;" \
+      "CREATE TABLE ALIGNMENT(" \
+      "TYPE       CHAR(500) NOT NULL," \
+      "ALIGN      INT NOT NULL," \
+      "SIZE       INT NOT NULL," \
+      "COUNT      INT NOT NULL);", nullptr, 0, &zErrMsg);
+
+  if (rc != SQLITE_OK) {
+    std::cout << "SQL error creating alignment table: " << zErrMsg << std::endl;
+    sqlite3_free(zErrMsg);
+  }
+  else {
+    std::cout << "Alignment table created successfully" << std::endl;
+  }
+
   sqlite3_stmt* stmt = 0;
+  sqlite3_stmt* align_stmt = 0;
   rc = sqlite3_prepare_v2(db, "INSERT INTO STATS (TYPE,ALLOCS,PAGES) " \
                               "VALUES (?, ?, ?);", -1, &stmt, 0);
+
+  if (rc != SQLITE_OK) {
+    fprintf(stderr, "Error after sqlite prepare: %s\n", sqlite3_errstr(rc));
+    fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+  }
+
+  rc = sqlite3_prepare_v2(db, "INSERT INTO ALIGNMENT (TYPE,ALIGN,SIZE,COUNT) " \
+                              "VALUES (?, ?, ?, ?);", -1, &align_stmt, 0);
 
   if (rc != SQLITE_OK) {
     fprintf(stderr, "Error after sqlite prepare: %s\n", sqlite3_errstr(rc));
@@ -377,13 +403,30 @@ void get_stats(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr
 
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-      fprintf(stderr, "Error creating stats table: %s\n", sqlite3_errstr(rc));
+      fprintf(stderr, "Error adding entry to stats table: %s\n", sqlite3_errstr(rc));
       fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
     }
 
-    // sqlite3_step(stmt);
     sqlite3_clear_bindings(stmt);
     sqlite3_reset(stmt);
+
+    for (auto& a: s.second->count_align_and_size) {
+      for (auto& b: a.second) {
+        sqlite3_bind_text(align_stmt, 1, tname, strlen(tname), NULL);
+        sqlite3_bind_int(align_stmt, 2, a.first);   // a.first = align
+        sqlite3_bind_int(align_stmt, 3, b.first);   // b.first = size
+        sqlite3_bind_int(align_stmt, 4, b.second);  // b.second = count
+
+        rc = sqlite3_step(align_stmt);
+        if (rc != SQLITE_DONE) {
+          fprintf(stderr, "Error adding entry to alignment table: %s\n", sqlite3_errstr(rc));
+          fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
+        }
+
+        sqlite3_clear_bindings(align_stmt);
+        sqlite3_reset(align_stmt);
+      }
+    }
   }
 
   rc = sqlite3_exec(db, "END TRANSACTION;", nullptr, nullptr, nullptr);
@@ -394,7 +437,7 @@ void get_stats(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr
   }
 }
 
-void get_lines(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr_t, vector<uint64_t>>& all_buckets, size_t buckets, sqlite3* db) {
+void write_lines_to_db(unordered_map<uintptr_t, string>& type_map, unordered_map<uintptr_t, vector<uint64_t>>& all_buckets, size_t buckets, sqlite3* db) {
   char* zErrMsg = 0;
   int rc = sqlite3_exec(db, "DROP TABLE IF EXISTS LINES;" \
                       "CREATE TABLE LINES(" \
@@ -573,7 +616,7 @@ void record_stats(unordered_map<uintptr_t, stats_t*>& stats_per_type, info_t* ev
   if (stats_per_type.find((uintptr_t) event->tindex_name) == stats_per_type.end()) {
     stats_per_type.insert(pair<uintptr_t, stats_t*>{(uintptr_t) event->tindex_name, new stats_t{
                                                                               event->typeofop ? 1u : 0u, // num_allocs
-                                                                              unordered_map<size_t, uint64_t>{},
+                                                                              unordered_map<size_t, unordered_map<size_t, uint64_t>>{},
                                                                               event->typeofop ? 0u : 1u, // num_frees
                                                                               unordered_set<uint64_t>{}
                                                                             }});
@@ -585,14 +628,172 @@ void record_stats(unordered_map<uintptr_t, stats_t*>& stats_per_type, info_t* ev
   if (!event->typeofop)
     return;
 
-  size_t alignment = ((uintptr_t) event->addr) % cacheline_size;
+  size_t align = ((uintptr_t) event->addr) % cacheline_size;
+  size_t size = event->size;
 
-  if (stats_per_type[(uintptr_t) event->tindex_name]->num_alignment.find(alignment) == stats_per_type[(uintptr_t) event->tindex_name]->num_alignment.end()) {
-    stats_per_type[(uintptr_t) event->tindex_name]->num_alignment.insert(pair<size_t, uint64_t>{alignment, 1});
+  if (stats_per_type[(uintptr_t) event->tindex_name]->count_align_and_size.find(align) == stats_per_type[(uintptr_t) event->tindex_name]->count_align_and_size.end()) {
+    stats_per_type[(uintptr_t) event->tindex_name]->count_align_and_size.insert(pair<size_t, unordered_map<size_t, uint64_t>>{align, unordered_map<size_t, uint64_t>{}});
   }
-  else {
-    stats_per_type[(uintptr_t) event->tindex_name]->num_alignment[alignment]++;
+  if (stats_per_type[(uintptr_t) event->tindex_name]->count_align_and_size[align].find(size) == stats_per_type[(uintptr_t) event->tindex_name]->count_align_and_size[align].end()) {
+    stats_per_type[(uintptr_t) event->tindex_name]->count_align_and_size[align].insert(pair<size_t, uint64_t>{size, 0});
   }
+  stats_per_type[(uintptr_t) event->tindex_name]->count_align_and_size[align][size]++;
+}
+
+typedef struct event_list {
+  size_t size{0};
+  vector<info_t*> events{};
+} event_list_t;
+
+void calc_external_frag(map<uint64_t, info_t*>& sorted_events,
+                          unordered_map<info_t*, bool>& is_container,
+                          map<uint64_t, info_t*> free_overlap, size_t frag_gran) {
+  unordered_map<uint64_t, map<uint64_t, int>> chunk_map{};
+  unordered_map<uint64_t, event_list_t> chunk_size{};
+  auto next_free = free_overlap.begin();
+  unordered_map<uintptr_t, size_t> last_alloc{};
+  uint64_t min_ts = sorted_events.begin()->first;
+  uint64_t max_ts = sorted_events.rbegin()->first;
+  uint64_t quarter_ts = (max_ts - min_ts) / 4;
+  char quarter_num = 1;
+  for (auto it = sorted_events.begin(); it != sorted_events.end(); it++) {
+    info_t* event;
+    if (next_free != free_overlap.end() && next_free->second->timestamp <= it->first) {
+      // if ((uint64_t) next_free->second->addr / frag_gran == 0x7f2ef8300f00 / frag_gran) {
+      //   printf("CHOSE EVENT FRMO free_overlap  the event is at addr %p and timestamp %lu | vs. next_free->first %lu\n", it->second->addr, it->second->timestamp, next_free->first);
+      //   printf("Here is next_free timestamp: %lu\n", next_free->second->timestamp);
+      // }
+      it--;
+      event = next_free->second;
+      next_free++;
+    }
+    else {
+      event = it->second;
+    }
+
+    if (event->timestamp >= min_ts + (quarter_num*quarter_ts) || (quarter_num <= 4 && event->timestamp == max_ts)) {
+      double numerator = 0.0;
+      double denominator = 0.0;
+      for (auto& chunk: chunk_map) {
+        size_t curr_occ = 0;
+        for (auto& ev: chunk.second)
+          curr_occ += ev.second;
+        if (curr_occ > 0) {
+          numerator += curr_occ;
+          denominator += 1.0;
+        }
+      }
+      numerator /= (double)frag_gran;
+      printf("Space usage after Q%d: %f%%\n", quarter_num, 100*(numerator / denominator));
+      quarter_num++;
+    }
+
+    if ((is_container.find(event) != is_container.end() && !is_container[event]) || 0x7f2efa475d03 == (uintptr_t)event->tindex_name || event->size > 6000) {
+      continue;
+    }
+    
+    uint64_t chunk_num = (uint64_t) event->addr / frag_gran;
+    uintptr_t event_addr = (uintptr_t) event->addr;
+    int64_t rem_size;
+    if (event->typeofop)
+      rem_size = event->size;
+    else {
+      rem_size = last_alloc.find((uintptr_t) event->addr) != last_alloc.end() ? last_alloc[(uintptr_t) event->addr] : 0;
+      last_alloc.erase((uintptr_t) event->addr);
+    }
+    size_t event_size = std::min((int64_t)(frag_gran - ((uint64_t) event->addr % frag_gran)), rem_size);
+    while (rem_size > 0) {
+      // std::cout << "CHUNK NUM: " << chunk_num << std::endl;
+      if (chunk_map.find(chunk_num) == chunk_map.end()) {
+        chunk_map.insert(pair<uint64_t, map<uint64_t, int>>{chunk_num, map<uint64_t, int>{}});
+        chunk_size.insert(pair<uint64_t, event_list_t>{chunk_num, event_list_t{}});
+      }
+
+      if (event->typeofop) {
+        chunk_map[chunk_num].insert(pair<uint64_t, int>{event->timestamp, event_size});
+        // if (chunk_num == 0x7f2ef8300f00 / frag_gran) {
+        //   printf("Adding the problem event to last_alloc with addr = %p and ts = %lu and event_size = %lu\n", event->addr, event->timestamp, event_size);
+        //   printf("next_free->first: %lu\n", next_free->first);
+        //   if (next_free == free_overlap.end())
+        //     printf("next_free is end\n");
+        // }
+        last_alloc.insert(pair<uintptr_t, size_t>{(uintptr_t) event->addr, event->size});
+
+        chunk_size[chunk_num].size += event_size;
+      }
+      else {
+        chunk_map[chunk_num].insert(pair<uint64_t, int>{event->timestamp, -event_size});
+        chunk_size[chunk_num].size -= event_size;
+        // if (chunk_num == 0x7f2ef8300f00 / frag_gran)
+        //   printf("removing the problem event to last_alloc with addr = %p and event_size = %lu\n", event->addr, last_alloc[(uintptr_t) event->addr]);
+      }
+
+      chunk_size[chunk_num].events.push_back(event);
+
+      // if (chunk_num == 34140554054) {
+      //   printf("size %ld to chunk size from event with adjusted addr %p, isNew? %d\n", event_size, (void*)event_addr, event->typeofop);
+      //   std::cout << "New chunk size of problem chunk: " << chunk_size[chunk_num].size << std::endl;
+      // }
+
+      if (chunk_size[chunk_num].size > frag_gran) {
+        std::cout << "BAD CHUNK num = " << chunk_num << std::endl;
+        std::cout << "total size: " << chunk_size[chunk_num].size << std::endl;
+        for (auto& ev: chunk_size[chunk_num].events) {
+          printf("Event - tindex_name: %p, ts: %lu, size: %lu, addr: %p, typeofop: %d\n", ev->tindex_name, ev->timestamp, ev->size, ev->addr, ev->typeofop);
+        }
+        exit(1);
+      }
+
+      event_addr += event_size;
+      chunk_num = event_addr / frag_gran;
+      rem_size -= event_size;
+      event_size = std::min((int64_t)frag_gran, rem_size);
+    }
+  }
+
+  double numerator = 0.0;
+  double denominator = 0.0;
+  for (auto& chunk: chunk_map) {
+    uint64_t curr_time = 0;
+    uint64_t occ_time = 0;
+    unordered_map<size_t, uint64_t> occ_to_time{};
+    size_t curr_occ = 0;
+
+    for (auto& ev: chunk.second) { // ev.first = timestamp, ev.second = change in size
+      if (curr_occ > 0) {
+        if (occ_to_time.find(curr_occ) == occ_to_time.end())
+          occ_to_time.insert(pair<size_t, uint64_t>{curr_occ, 0});
+        occ_to_time[curr_occ] += ev.first - curr_time;
+        occ_time += ev.first - curr_time;
+      }
+      curr_occ += ev.second;
+      // if (curr_occ > frag_gran) {
+      //   std::cout << "Here is curr occ: " << curr_occ << std::endl;
+      //   std::cout << ev.first << std::endl;
+      // }
+      assert(curr_occ <= frag_gran);
+      curr_time = ev.first;
+    }
+
+    // printf("For chunk %lu:\n", chunk.first);
+    double chunk_eff = 0.0;
+    for (auto& occ: occ_to_time) {
+      double prop_full = (double) occ.first / (double) frag_gran;
+      double prop_time = (double) occ.second / 1000000.0;
+      chunk_eff += prop_full * prop_time;
+      // printf("  prop_full: %f, prop_time: %f\n", prop_full, prop_time);
+    }
+
+    // assert(chunk_eff >= 0.0 && chunk_eff <= 1.0);
+
+    double occ_sec = ((double) occ_time / 1000000.0);     // convert ns to s
+    numerator += chunk_eff;
+    denominator += occ_sec;
+
+    // printf("Eff level of chunk: %f, sec occ: %f\n", chunk_eff / occ_sec, occ_sec);
+  }
+
+  printf("Average space usage: %f%%\n", 100*(numerator / denominator));
 }
 
 
@@ -608,7 +809,8 @@ int main(int argc, char* argv[]) {
     {"field-dump",          required_argument,  0,  'f'},
     {"malloc-type-c",       required_argument,  0,  'm'},
     {"threads",             optional_argument,  0,  'j'},
-    {"buckets",             required_argument,  0,  'b'}
+    {"buckets",             required_argument,  0,  'b'},
+    {"fragmentation",       required_argument,  0,  'r'}
   };
   int opt_ind = 0;
 
@@ -624,8 +826,9 @@ int main(int argc, char* argv[]) {
   size_t num_pages_per_type = 1;
   const char* type_c_file;
   bool is_type_c = false;
+  size_t frag_gran = 0;
   size_t num_buckets = 3000;
-  while ((c = getopt_long(argc, argv, "p:c:s:t:j:", long_opts, &opt_ind)) != -1) {
+  while ((c = getopt_long(argc, argv, "p:c:s:t:f:m:b:r:", long_opts, &opt_ind)) != -1) {
     switch (c) {
       case 0:
         switch (opt_ind) {
@@ -662,6 +865,9 @@ int main(int argc, char* argv[]) {
         break;
       case 'b':
         num_buckets = stoi(optarg);
+        break;
+      case 'r':
+        frag_gran = stoi(optarg);
         break;
       default:
         break;
@@ -703,6 +909,7 @@ int main(int argc, char* argv[]) {
   type_map = construct_map("typeset_dump.txt", true);
   file_map = construct_map("fileset_dump.txt");
 
+  map<uint64_t, info_t*> sorted_events{};
   unordered_map<uint64_t, memory_page_t> page_info;
   unordered_map<uintptr_t, int> type_counts{};
   unordered_set<string> type_set{};
@@ -716,15 +923,11 @@ int main(int argc, char* argv[]) {
 
   for (int i = 0; i < num_structs; i++) {
     info_t* event = filemap + i;
+    sorted_events.insert(pair<uint64_t, info_t*>{event->timestamp, event});
     min_ts = std::min(min_ts, event->timestamp);
     max_ts = std::max(max_ts, event->timestamp);
 
-
-
     record_stats(stats_per_type, event, cacheline_size);
-
-
-
 
     uint64_t page_num = (uint64_t)event->addr / page_size;
     if (event->typeofop) {
@@ -742,24 +945,22 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  std::cout << "Finished stats pass. Starting sampling pass..." << std::endl;
-
   unordered_map<uintptr_t, vector<uint64_t>> buckets{};
   for (auto& it: type_counts) {
     if (type_map.find(it.first) != type_map.end()) {
-      printf("FOUND type: %p\n", (void*)it.first);
+      // printf("FOUND type: %p\n", (void*)it.first);
       string type_trim = type_map.at(it.first);
       type_trim.erase(std::remove_if(type_trim.begin(), type_trim.end(), ::isspace), type_trim.end());
       type_set.insert(type_trim);
     }
-    else {
-      printf("FAILED to find type: %p\n", (void*)it.first);
-    }
+    // else {
+    //   printf("FAILED to find type: %p\n", (void*)it.first);
+    // }
     buckets.insert(pair<uintptr_t, vector<uint64_t>>{it.first, vector<uint64_t>(num_buckets+2, 0)});
   }
 
   if (is_perf_file)
-    get_perf_addrs(perf_file, cutoff, page_size, cacheline_size, page_info, db);
+    write_perf_addrs_to_db(perf_file, cutoff, page_size, cacheline_size, page_info, db);
 
   cout << "----- SIZE CLASS TABLE -----" << endl;
   for (int i = 0; i < num_classes; i++) {
@@ -770,11 +971,11 @@ int main(int argc, char* argv[]) {
   cout << "Number of unique types found: " << type_set.size() << endl;
 
   if (is_field_file) {
-    cout << "Field file name: " << field_file << endl;
-    get_fields(field_file, type_set, db);
+    // cout << "Field file name: " << field_file << endl;
+    write_fields_to_db(field_file, type_set, db);
   }
 
-  get_stats(type_map, stats_per_type, db);
+  write_stats_to_db(type_map, stats_per_type, db);
 
   cout << "Beginning to copy records to database..." << endl;
 
@@ -802,40 +1003,64 @@ int main(int argc, char* argv[]) {
 
   unordered_map<uintptr_t, struct size_and_type> last_alloc_info{};
   map<uintptr_t, mem_interval_t> alloc_intervals{};  // all NON-OVERLAPPING intervals currently allocated
-  // TODO: I don't think records are guaranteed to be ordered by timestamp
+  unordered_map<info_t*, bool> is_container{};
+  map<uint64_t, info_t*> free_overlap{};
+  unordered_map<uint64_t, map<uint64_t, int>> chunk_map{};
+  unordered_map<uint64_t, event_list_t> chunk_size{};
 
-  for (int i = 0; i < num_structs; i++) {
-    info_t* event = filemap + i;
+  for (auto& ev : sorted_events) {
+    info_t* event = ev.second;
     uint64_t page_num = (uint64_t)event->addr / page_size;
-    size_t eventSize = event->typeofop ? event->size : last_alloc_info.find((uintptr_t) event->addr) != last_alloc_info.end() ? last_alloc_info[(uintptr_t) event->addr].size : 0;
+    size_t event_size = event->typeofop ? event->size : last_alloc_info.find((uintptr_t) event->addr) != last_alloc_info.end() ? last_alloc_info[(uintptr_t) event->addr].size : 0;
 
     if (event->typeofop) {
-      buckets[(uintptr_t) event->tindex_name][get_bucket(event->timestamp, num_buckets, min_ts, max_ts)] += eventSize;
+      buckets[(uintptr_t) event->tindex_name][get_bucket(event->timestamp, num_buckets, min_ts, max_ts)] += event_size;
       map<uintptr_t, mem_interval_t>::iterator i = alloc_intervals.lower_bound((uintptr_t) event->addr);
       if (i != alloc_intervals.end())
-          i++;
+        i++;
 
       bool contained = false;
       if (alloc_intervals.size() > 0) {
+        // if ((uintptr_t)event->addr == 0x7f2ef8346080) {
+        //   std::cout << "About to check bad event!" << std::endl;
+        // }
         do {
           if (i != alloc_intervals.begin())
             i--;
 
           mem_interval_t other = i->second;
+          if ((uintptr_t)other.start == 0x7f2cfcda47f0)
+            printf("About to check what should be container event while looking at addr %p, ts %lu\n", event->addr, event->timestamp);
+          
           if (!other.contained &&
-              (other.start <= (uintptr_t) event->addr && other.end > (uintptr_t) event->addr + event->size ||   // event strictly contained inside i
-              other.start < (uintptr_t) event->addr && other.end >= (uintptr_t) event->addr + event->size)) {
+              ((other.start <= (uintptr_t) event->addr && other.end > (uintptr_t) event->addr + event->size) ||   // event strictly contained inside i
+              (other.start < (uintptr_t) event->addr && other.end >= (uintptr_t) event->addr + event->size))) {
             // remove i, DON'T add free for i
-            alloc_intervals.erase(i->first);
+            is_container.insert(pair<info_t*, bool>{other.alloc_info, true});
+            is_container.insert(pair<info_t*, bool>{event, false});
+            if ((uintptr_t)event->addr == 0x7f2cfcda47f0) {
+              printf("setting container char to contained = true.\n");
+              printf("filename of container: %p, line num of container: %d address of container: %p\n", other.alloc_info->file, other.alloc_info->line, (void*)other.start);
+            }
+            // alloc_intervals.erase(i->first);
             contained = true;
+            // if ((uintptr_t)event->addr == 0x7f2ef8346080)
+            //   std::cout << "ADDED TO IS_CONTAINER" << std::endl;
             break;
           }
-          else if (other.end <= (uintptr_t) event->addr) {   // event is after i
+          else if (other.end <= (uintptr_t) event->addr && !other.contained) {   // event is after i
+            // if ((uintptr_t)event->addr == 0x7f2ef8346080)
+            //   printf("Broke at addr %p\n", (void*)other.end);
             break;
           }
-          else if (other.start < (uintptr_t) event->addr + event->size) {   // event overlaps with i but is not contained within i
+          else if ((other.start < (uintptr_t) event->addr + event->size && other.end > (uintptr_t) event->addr) || 
+                   (other.start == (uintptr_t) event->addr && other.end == (uintptr_t) event->addr + event->size)) {   // event overlaps with i but is not contained within i
+            // if ((uintptr_t)event->addr == 0x7f2ef8300f00)
+            //   printf("FOUND THE BAD EVENT. insert free at addr %p with timestamp: %lu\n", (void*)other.start, event->timestamp-1);
             // remove i, add free for i
             // pages[page_num].add_event(new info_t(event->file, event->tindex_name, 0, event->timestamp-1, 0, (void*) i->first, false));
+            if ((uintptr_t)other.start == 0x7f2cfcda47f0)
+              printf("LAST CASE IS TRUE - REMOVING\n");
             add_event(info_t{other.alloc_info->file, other.alloc_info->tindex_name, 0, event->timestamp-1, other.alloc_info->size, (void*)other.start, false},
                       num_pages_per_type,
                       page_size,
@@ -843,23 +1068,42 @@ int main(int argc, char* argv[]) {
                       type_counts,
                       stmt,
                       sample_portion);
+            
+            // if ((uintptr_t)event->addr == 0x7f2ef8346080)
+            //   printf("Added free for event at addr %p\n", (void*)other.start);
+            free_overlap.insert(pair<uint64_t, info_t*>{event->timestamp-1, new info_t{other.alloc_info->file,
+                                                                                      other.alloc_info->tindex_name,
+                                                                                      other.alloc_info->line,
+                                                                                      event->timestamp-1,
+                                                                                      other.alloc_info->size,
+                                                                                      (void*)other.start,
+                                                                                      false}});
+            // if (0x7f2ef8345fc0 == i->first)
+            //   printf("REMOVING container event from alloc_intervals due to OVERLAP.\n");
             alloc_intervals.erase(i->first);
             i = alloc_intervals.lower_bound((uintptr_t) event->addr);
           }
+          // else if ((uintptr_t)event->addr == 0x7f2ef8346080) {
+          //   printf("DID NOTHING\n");
+          // }
         } while (i != alloc_intervals.begin());
         // printf("FINISHED THE LOOP\n");
       }
+      // if (0x7f2ef8345fc0 == (uintptr_t)event->addr)
+      //   printf("ADDING container event to alloc_intervals. contained = %d\n", contained);
       alloc_intervals.insert(pair<uintptr_t, mem_interval_t>{(uintptr_t) event->addr,
                                                         mem_interval_t{(uintptr_t) event->addr, (uintptr_t) event->addr + event->size, contained, event}});         
       last_alloc_info.insert(pair<uintptr_t, struct size_and_type>{(uintptr_t) event->addr, size_and_type{event->size, (uintptr_t)event->tindex_name}});
     }
     else if (last_alloc_info.find((uintptr_t) event->addr) != last_alloc_info.end()) {
       // printf("(free) Here is tindex name: %lX, here is bucket: %lu\n", last_alloc_info[(uintptr_t) event->addr].type, get_bucket(event->timestamp, buckets, min_ts, max_ts));
-      buckets[last_alloc_info[(uintptr_t) event->addr].type][get_bucket(event->timestamp, num_buckets, min_ts, max_ts)] -= eventSize;
+      buckets[last_alloc_info[(uintptr_t) event->addr].type][get_bucket(event->timestamp, num_buckets, min_ts, max_ts)] -= event_size;
+      // if (0x7f2ef8345fc0 == (uintptr_t)event->addr)
+      //   printf("REMOVING container event from alloc_intervals due to FREE.\n");
       alloc_intervals.erase((uintptr_t) event->addr);
     }
 
-    add_event(info_t{event->file, event->tindex_name, event->line, event->timestamp, eventSize, event->addr, event->typeofop},
+    add_event(info_t{event->file, event->tindex_name, event->line, event->timestamp, event_size, event->addr, event->typeofop},
               num_pages_per_type,
               page_size,
               page_info,
@@ -878,6 +1122,13 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
 
+  printf("Size of free_overlap: %lu\n", free_overlap.size());
+
+  if (frag_gran > 0) {
+    std::cout << "Starting to calculate external fragmentation..." << std::endl;
+    calc_external_frag(sorted_events, is_container, free_overlap, frag_gran);
+  }
+
   int num_unknown = 0;
   int num_yes = 0;
   int num_no = 0;
@@ -889,9 +1140,9 @@ int main(int argc, char* argv[]) {
     else
       num_no++;
   }
-  printf("Num unknown: %d\n", num_unknown);
-  printf("Num yes: %d\n", num_yes);
-  printf("Num no: %d\n", num_no);
+  printf("Num unknown pages: %d\n", num_unknown);
+  printf("Num pages taken: %d\n", num_yes);
+  printf("Num pages NOT taken: %d\n", num_no);
 
   for (auto& it: buckets) {
     for (int i = 1; i < num_buckets+2; i++) {
@@ -899,7 +1150,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  get_lines(type_map, buckets, num_buckets, db);
+  write_lines_to_db(type_map, buckets, num_buckets, db);
 
   fclose(input_file);
   sqlite3_close(db);
