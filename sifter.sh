@@ -177,7 +177,7 @@ elif [ "$database" = true ]; then
 
     cd type_analysis
     rm allocs.sqlite
-    make convert_to_db
+    make bin/convert_to_db
     echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran"
     ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran
     exit 0
