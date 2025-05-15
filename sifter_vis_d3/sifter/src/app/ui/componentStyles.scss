@@ -404,27 +404,81 @@ rect.selection {
     // top: -26px;
     display: grid;
 
-    grid-template-columns: 10% 5% 59% 13% 13%;
+    grid-template-columns: 7% 3.5% 4.5% 59% 13% 13%;
     grid-template-rows: 15% fit-content(30vh) 15%;
 
     &.visExpanded {
-        grid-template-columns: 11% 10% 5% 48% 13% 13%;
+        grid-template-columns: 11% 7% 3.5% 4.5% 48% 13% 13%;
     }
 }
 
 #legendTable :is(thead, tbody, tfoot, tr) {
     display: grid;
     grid-template-columns: subgrid;
-    grid-column: 1 / span 5;
+    grid-column: 1 / span 6;
 
     &.visExpanded {
-        grid-column: 1 / span 6;
+        grid-column: 1 / span 7;
     }
+}
+
+#alignAndSizeContainer {
+    top: -20px;
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+    height: 80%;
+    position: relative;
+}
+
+#alignSVGTitleContainer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#alignSVG {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.alignDataButton, .sizeListItemCheckbox {
+    &:hover {
+        background-color: transparent;
+    }
+    padding: 1px;
+    margin: 0px;
+}
+
+#alignCloseButton {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+#sizesTitleContainer {
+    width: 25%;
+    height: 100%;
+    position: relative;
+}
+
+#sizesContainer {
+    max-height: 100%;
+    overflow: scroll;
+}
+
+.sizeListItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .legendColumnLabel {
     cursor: pointer;
     user-select: none;
+    text-align: center;
+    margin-left: 4px;
 }
 
 .legendVisCheckboxContainer {

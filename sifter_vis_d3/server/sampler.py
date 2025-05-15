@@ -27,13 +27,16 @@ FREE_TS_IND = 5
 TYPE_KIND_IND = 6
 LINE_IND = 7
 
+
 def replace_nan(event, key):
     if math.isnan(event[key]):
         event[key] = None
     return event
 
+
 def get_sub_tname(t, st):
     return ">" + t.replace(' ', '') + "|" + st
+
 
 def get_bucket(min_ts, max_ts, num_buckets, ts):
     size_of_bucket = max(math.floor(max_ts - min_ts) / num_buckets, 1)
@@ -133,7 +136,20 @@ class Sampler:
             return df
         except:
             return pd.DataFrame(columns=['type', 'numAllocs', 'numPages'])
-    
+        
+    def get_align_and_size(self):
+        try:
+            con = sqlite3.connect(self.fname)
+            df = pd.read_sql_query("""SELECT TYPE as type,
+                                        ALIGN as align,
+                                        SIZE as size,
+                                        COUNT as count
+                                   FROM ALIGNMENT""", con)
+            con.close()
+            return df
+        except:
+            return pd.DataFrame(columns=['type', 'align', 'size', 'count'])
+
     def get_stats(self, recs, cls=64):
         objs = self.get_objects(recs)
 
@@ -302,6 +318,7 @@ class Sampler:
                 'stats': {},#{'single': self.get_stats(recs, self.cache_line_size), 'double': self.get_stats(recs, 2*self.cache_line_size)},
                 'fields': self.get_fields(s.replace(' ', '') for s in lines_df['type'].unique()),
                 'counts': self.get_counts().set_index('type').to_dict('index'),
+                'align': self.get_align_and_size().to_dict('records'),
                 'perf': self.get_perf_data().drop_duplicates(subset=['cl_addr']).set_index('cl_addr').to_dict(orient='index'),
                 'minTs': self.min_ts,
                 'maxTs': self.max_ts}
@@ -441,20 +458,29 @@ class Sampler:
             clusters = MeanShift(min_bin_freq=1, cluster_all=False).fit_predict(page_pattern)
         merged['cluster'] = clusters
 
-        print("Done clustering pages")
-        
-        pages = pd.DataFrame.from_dict({page: [group[event_labels].values.tolist()]
-                    for page, group in last_allocs.groupby('page_num')}, orient='index')
+        print("Starting page grouping")
+        last_allocs = last_allocs.sort_values('page_num')
+        gps = last_allocs.groupby('page_num')[event_labels] \
+            .apply(lambda df: df.values.tolist())
+        pages = gps.to_frame(name=0)
+        # pages = pd.DataFrame.from_dict({page: [group[event_labels].values.tolist()]
+        #             for page, group in last_allocs.groupby('page_num')}, orient='index')
+        print("Done page grouping")
         pages.index.name = 'page_num'
         labeled = pages.merge(merged.loc[:,'cluster'], on='page_num')
+        print("Done merging")
         # labeled = pages
         # merged['cluster'] = 0
         # labeled['cluster'] = 0
+
+        print("Done clustering pages")
 
         return labeled, merged, perf_df
 
     def get_sample_of_pages(self, start_ts, end_ts, type_data, cluster_alg='dbscan', 
                             max_run_length=3, max_runs_from_cluster=2, include_all_noise=True):
+        print("starting to sample pages")
+        sys.stdout.flush()
         labeled_data, features, perf_df = self.get_clusters_of_pages(start_ts, end_ts, type_data, alg=cluster_alg)
         # .reset_index().set_index('cluster')
         clusters = labeled_data.groupby('cluster', sort=False).groups
@@ -464,6 +490,9 @@ class Sampler:
         sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
         # sampled_pages.add(34127647253)
         # sampled_pages.add(0x7f028df4e000 // 4096)
+
+        print("about to start sampling loop")
+        sys.stdout.flush()
         
         taken = 0
         cluster_keys = list(clusters.keys())
@@ -484,6 +513,8 @@ class Sampler:
                         num_s += 1
                     taken += num_s
         # print(sampled_pages)
+        print("Done sampling loop")
+        sys.stdout.flush()
         
         sampled_pages_df = pd.DataFrame({'page_num': sorted(sampled_pages)})
         features = sampled_pages_df.merge(features, how='left', on='page_num')
@@ -492,6 +523,9 @@ class Sampler:
         all_merged = merged.set_index('page_num').set_axis(['events', 'cluster'], axis='columns')
         dict_merged = all_merged.to_dict(orient='index')
         fts = event_labels.index("freeTs")
+
+        print("Done merging stuff")
+        sys.stdout.flush()
 
         # print("BLAH BLAH BLAH")
         # print(all_merged)
@@ -505,6 +539,9 @@ class Sampler:
         cluster_pages = features.reset_index().loc[:,['cluster','page_num']].groupby('cluster').agg(lambda x: x.tolist()).to_dict(orient='index')
         cluster_sizes = {c: len(clusters[c]) for c in cluster_pages.keys()}
 
+        print("done sampling pages")
+        sys.stdout.flush()
+
         return {'page_num_events': {f"{pn*self.page_size}": {'events': [dict(zip(event_labels, replace_nan(event, fts))) for event in v['events']], 'cluster': v['cluster']} for pn, v in dict_merged.items()},
                 'clusters': {c: {'pages': cluster_pages[c], 'size': cluster_sizes[c]} for c in cluster_pages.keys()},
                 'sum_cluster_sizes': sum([len(clusters[c]) for c in clusters.keys()]),
@@ -512,6 +549,8 @@ class Sampler:
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()}}
     
     def get_cache_data(self, size, assoc):
+        print("start of get_cache_data")
+        sys.stdout.flush()
         pd.options.display.float_format = '{:.0f}'.format
         num_cache_sets = size // (assoc * self.cache_line_size)
         all_objs = self.get_objects(self.all_data)
@@ -526,6 +565,8 @@ class Sampler:
         i = 0
         tp_and_st_in_order = []
         tp_and_st_to_idx = dict()
+        print("About to process types")
+        sys.stdout.flush()
         for tp in types:
             tp_and_st_in_order.append(tp)
             tp_and_st_to_idx[tp] = i
@@ -540,9 +581,12 @@ class Sampler:
         data = np.empty(shape=(self.num_buckets + 2, num_cache_sets, len(tp_and_st_in_order)))
         data.fill(0)
 
+        print("Initialized empty data")
+        sys.stdout.flush()
+
         for obj in rows:
             entries = [obj]
-            if obj[TYPE_IND].replace(' ', '') in fields: #and (obj[TYPE_IND] == "block<Node<long long, void*> >" or tp == "node_t"):
+            if obj[TYPE_IND].replace(' ', '') in fields:
                 for field_ent in fields[obj[TYPE_IND].replace(' ', '')]:
                     entries.append([obj[FILE_IND],
                                     field_ent["size"],
@@ -558,14 +602,14 @@ class Sampler:
                 # if entry[TYPE_IND] == "leanstore::storage::btree::BTreeVI::ChainedTuple":
                 #     print("alloc bucket: {}, free bucket: {}".format(alloc_time_bucket, free_time_bucket))
                 try:
-                    data[alloc_time_bucket,start_set,tp_and_st_to_idx[entry[TYPE_IND]]] += 1
+                    data[alloc_time_bucket, start_set, tp_and_st_to_idx[entry[TYPE_IND]]] += 1
                     if free_time_bucket >= 0:
-                        data[free_time_bucket,start_set,tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
+                        data[free_time_bucket, start_set, tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
                     i = 1
                     while rem_size > 0 and i <= num_cache_sets:
-                        data[alloc_time_bucket,(start_set + i) % num_cache_sets,tp_and_st_to_idx[entry[TYPE_IND]]] += 1
+                        data[alloc_time_bucket, (start_set + i) % num_cache_sets, tp_and_st_to_idx[entry[TYPE_IND]]] += 1
                         if free_time_bucket >= 0:
-                            data[free_time_bucket,(start_set + i) % num_cache_sets,tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
+                            data[free_time_bucket, (start_set + i) % num_cache_sets, tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
                         rem_size -= self.cache_line_size
                         i += 1
                 except KeyError:
@@ -575,16 +619,23 @@ class Sampler:
 
         # flatten the data matrix to 2d
         flat = np.array(data).reshape(len(data), -1)
+        print("Flattened data array")
+        sys.stdout.flush()
         row_idx = pd.Index(range(len(data)), name="time_bucket")
+        print("Done calculating row_idx")
+        sys.stdout.flush()
         col_idx = pd.MultiIndex.from_product(
             [range(len(data[0])), range(len(data[0][0]))],
             names=["cache_set", "type_idx"]
         )
+        print("Done calculating col_idx")
+        sys.stdout.flush()
 
         df = pd.DataFrame(flat, index=row_idx, columns=col_idx)
         df = df.cumsum()
 
         print("Returning from get_cache_data")
+        sys.stdout.flush()
 
         return {
             "occ": df.values.astype(int).tolist(),
