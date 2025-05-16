@@ -471,7 +471,13 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
             .style('transform', `translateY(${ALIGN_SIZE_HEIGHT}px)`)
             .call(xAxis);
 
-        const maxCount = data.reduce((acc: number, curr: {size: number, align: number, count: number}) => Math.max(acc, curr.count), 0);
+        const maxCount = Object.values(data.reduce((map: {[align: number]: number}, curr: {size: number, align: number, count: number}) => {
+                                        if (!(curr.align in map))
+                                            map[curr.align] = 0;
+                                        map[curr.align] += curr.count;
+                                        return map;
+                                    }, {}))
+                                    .reduce((acc: number, curr: number) => Math.max(acc, curr), 0);
         const yScale = d3.scaleLinear()
                         .domain([maxCount, 0])
                         .range([ALIGN_SIZE_MARGIN+10, ALIGN_SIZE_HEIGHT]);

@@ -336,7 +336,7 @@ rect.selection {
 
 #timeGraphContainer {
     width: 100%;
-    height: 100%;
+    height: 50vh;
 }
 
 #timeGraphSVG {
@@ -423,21 +423,44 @@ rect.selection {
 }
 
 #alignAndSizeContainer {
-    top: -20px;
     display: flex;
     flex-direction: row;
-    width: 80%;
-    height: 80%;
+    width: 90%;
+    height: 50vh;
     position: relative;
+}
+
+#sizesTitleContainer {
+    display: flex;
+    flex-direction: column;
+    width: 12%;
+    // height: 100%;
+    // position: relative;
+}
+
+#sizesContainer {
+    top: 5px;
+    height: 58%;
+    // max-height: 58%;
+    overflow: scroll;
+}
+
+.sizeListItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 #alignSVGTitleContainer {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    height: 100%;
-    position: relative;
+    max-height: 85%;
+    // position: relative;
 }
 
 #alignSVG {
+    top: 5px;
     width: 100%;
     height: 100%;
     position: relative;
@@ -455,23 +478,6 @@ rect.selection {
     position: absolute;
     top: 0px;
     right: 0px;
-}
-
-#sizesTitleContainer {
-    width: 25%;
-    height: 100%;
-    position: relative;
-}
-
-#sizesContainer {
-    max-height: 100%;
-    overflow: scroll;
-}
-
-.sizeListItem {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
 }
 
 .legendColumnLabel {
