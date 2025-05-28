@@ -7,10 +7,12 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route("/get-fnames", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
 def get_fnames():
     return [fname for fname in os.listdir(os.path.dirname(os.getcwd())) if fname.endswith(".sqlite")]
+
 
 @app.route("/init-app/<string:fname>-<int:page_size>-<int:cache_line_size>-<int:num_buckets>-<string:cluster_alg>-<int:max_run_length>-<int:max_runs_from_cluster>-<int:cache_size>-<int:assoc>", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
@@ -23,6 +25,7 @@ def init_app(fname, page_size, cache_line_size, num_buckets, cluster_alg, max_ru
         'cacheData': db_sampler.get_cache_data(cache_size, assoc)
     }
 
+
 @app.route("/get-pages-and-cache-data/<string:fname>-<int:page_size>-<int:cache_line_size>-<int:num_buckets>-<string:cluster_alg>-<int:max_run_length>-<int:max_runs_from_cluster>-<int:cache_size>-<int:assoc>", methods=["POST"])
 @cross_origin(origin='http://localhost:3000')
 def get_pages_and_cache_data(fname, page_size, cache_line_size, num_buckets, cluster_alg, max_run_length, max_runs_from_cluster, cache_size, assoc):
@@ -32,11 +35,13 @@ def get_pages_and_cache_data(fname, page_size, cache_line_size, num_buckets, clu
         'cacheData': db_sampler.get_cache_data(cache_size, assoc)
     }
 
+
 @app.route("/get-cache-data/<string:fname>-<int:page_size>-<int:cache_line_size>-<int:num_buckets>-<int:cache_size>-<int:assoc>", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
 def get_cache_data(fname, page_size, cache_line_size, num_buckets, cache_size, assoc):
     db_sampler = Sampler(f"../{fname}", page_size, cache_line_size, num_buckets)
     return db_sampler.get_cache_data(cache_size, assoc)
+
 
 @app.route("/log-data/<string:fname>", methods=["POST"])
 @cross_origin(origin='http://localhost:3000')
@@ -44,16 +49,19 @@ def log_data(fname):
     logger = Logger(fname)
     return logger.log(request.json)
 
+
 @app.route("/log-data/get-files", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
 def get_log_files():
     return Logger.get_log_files()
+
 
 @app.route("/log-data/get-notes/<string:fname>", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
 def get_notes_for_file(fname):
     logger = Logger(fname)
     return logger.get_notes()
+
 
 @app.route("/log-data/get-colours/<string:fname>", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')

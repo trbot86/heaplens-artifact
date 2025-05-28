@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { Checkbox, IconButton, Menu, MenuItem, Paper, Popover, TextField, Tooltip, Typography } from '@mui/material';
 import './componentStyles.scss';
 import { generateColours, getSubtypeName, TypeToColourMap } from '../vispanels/page';
-import { BarChart, Casino, KeyboardArrowLeft, KeyboardArrowRight, StackedLineChart, Window } from '@mui/icons-material';
+import { BarChart, Casino, Close, InsertChart, KeyboardArrowLeft, KeyboardArrowRight, StackedLineChart, Window } from '@mui/icons-material';
 import { Box, styled } from '@mui/system';
 import { MaterialPicker, PhotoshopPicker, SketchPicker } from 'react-color';
 
@@ -29,6 +29,10 @@ interface LegendRowSortMode {
     rev: boolean
 }
 
+const ALIGN_SIZE_WIDTH = 500;
+const ALIGN_SIZE_HEIGHT = 300;
+const ALIGN_SIZE_MARGIN = 40;
+const ALIGN_SIZE_BANDSPACE = 8;
 const VisCheckbox = styled(Checkbox)({
     padding: '2.5px',
 });
@@ -83,6 +87,7 @@ function LegendTableHeader({ visExpanded, setVisExpanded, currSortMode, setCurrS
                     </IconButton>
                 </th>
                 <th />
+                <th />
                 <th>
                     <div
                         className='legendColumnLabel'
@@ -127,6 +132,7 @@ function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded 
                 visExpanded &&
                 <td />
                 }
+                <td />
                 <td>
                     <div className='centerTableCell' >
                         <Tooltip 
@@ -202,7 +208,8 @@ function VisRightClickMenu({ rightClickAnchor, setRightClickAnchor, label, visMa
 function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
                      setLineVis, setPageVis, setCacheVis, fields, expandedTypes,
                      setExpandedTypes, colourOfType, setColourOfType,
-                     setColourMenuAnchor, setSelMenuType, setCurrColourSel } : 
+                     setColourMenuAnchor, setSelMenuType, setCurrColourSel,
+                     hasAlignData, setAlignTypeDisplay } : 
     {   
         typeName: string,
         colourOfType: {[tp: string]: d3.RGBColor | d3.HSLColor | null},
@@ -220,7 +227,9 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
         setExpandedTypes: (a: {[tp: string]: boolean}) => void,
         setColourMenuAnchor: (a: HTMLDivElement | null) => void,
         setSelMenuType: (a: string | undefined) => void,
-        setCurrColourSel: (a: string) => void
+        setCurrColourSel: (a: string) => void,
+        hasAlignData: boolean,
+        setAlignTypeDisplay: (a: string) => void
     }) {
     const [rightClickAnchor, setRightClickAnchor] = useState<HTMLElement | null>(null);
     const [label, setLabel] = useState<string | undefined>(undefined);
@@ -308,6 +317,17 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
                                 backgroundColor: colourOfType[typeName] == null ? 'white' : colourOfType[typeName].formatHex()
                             }} />
                     </div>
+                </td>
+                <td>
+                    {
+                    hasAlignData &&
+                    <IconButton
+                        className='alignDataButton'
+                        size='small'
+                        onClick={() => setAlignTypeDisplay(typeName)} >
+                        <InsertChart/>
+                    </IconButton>
+                    }
                 </td>
                 <td>
                     <div
@@ -413,9 +433,137 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
     );
 }
 
+function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } : 
+    {   
+        data: {size: number, align: number, count: number}[],
+        setAlignTypeDisplay: (a: string | null) => void,
+        cacheLineSize: number,
+        colour: d3.Color
+    }) {
+    const barGroupRef = useRef(null);
+    const [sizesToShow, setSizesToShow] = useState<Set<number>>(
+        data.reduce((acc, curr) => {
+            acc.add(curr.size);
+            return acc;
+        }, new Set<number>())
+    );
+
+    useEffect(() => {
+        const gcd: (a: number, b: number) => number =
+            (a, b) => (b == 0 ? a : gcd(a, a % b));
+        const gran = data.reduce((acc: number, curr: {size: number, align: number, count: number}) => gcd(acc, curr.align), 8);
+        const barData: {[align: string]: number} = new Array(cacheLineSize / gran).fill(0)
+                            .reduce((map, curr, i) => {
+                                map[`${i*gran}`] = 0;
+                                return map;
+                            }, {});
+        data.forEach((entry: {size: number, align: number, count: number}) => {
+            if (sizesToShow.has(entry.size))
+                barData[`${entry.align}`] += entry.count;
+        });
+        const xScale = d3.scaleBand()
+                        .domain(new Array(cacheLineSize / gran).fill(0)
+                                    .map((d, i) => `${i*gran}`))
+                        .range([0, ALIGN_SIZE_WIDTH]);
+        const xAxis = d3.axisBottom(xScale)
+                        .tickSize(0);
+        d3.select('#alignXAxisGroup')
+            .style('transform', `translateY(${ALIGN_SIZE_HEIGHT}px)`)
+            .call(xAxis);
+
+        const maxCount = Object.values(data.reduce((map: {[align: number]: number}, curr: {size: number, align: number, count: number}) => {
+                                        if (!(curr.align in map))
+                                            map[curr.align] = 0;
+                                        map[curr.align] += curr.count;
+                                        return map;
+                                    }, {}))
+                                    .reduce((acc: number, curr: number) => Math.max(acc, curr), 0);
+        const yScale = d3.scaleLinear()
+                        .domain([maxCount, 0])
+                        .range([ALIGN_SIZE_MARGIN+10, ALIGN_SIZE_HEIGHT]);
+        const yAxis = d3.axisLeft(yScale)
+                        .tickFormat((d: number) =>  d >= 1000000000 ? `${(d / 1000000000).toFixed(1)}B` :
+                                                    d >= 1000000 ? `${(d / 1000000).toFixed(1)}M` :
+                                                    d >= 1000 ? `${(d / 1000).toFixed(1)}K` :
+                                                    `${d}`);
+        d3.select('#alignYAxisGroup')
+            .call(yAxis);
+
+        d3.select(barGroupRef.current)
+            .selectAll('.alignBar')
+            .data(Object.entries(barData))
+            .enter()
+            .append('rect')
+            .attr('class', 'alignBar')
+            .attr('x', (d) => xScale(d[0]) + (ALIGN_SIZE_BANDSPACE / 2))
+            .attr('y', (d) => yScale(0))
+            .attr('width', xScale.bandwidth() - ALIGN_SIZE_BANDSPACE)
+            .attr('height', 0)
+            .attr('fill', colour.toString());
+
+        d3.selectAll('.alignBar')
+            .transition()
+            .duration(600)
+            .attr('y', (d) => yScale(d[1]))
+            .attr('height', (d) => ALIGN_SIZE_HEIGHT - yScale(d[1]))
+            .delay((d, i) => i*70);
+    }, [data, sizesToShow]);
+
+    return (
+        <div
+            id='alignAndSizeContainer' >
+            <div
+                id='sizesTitleContainer' >
+                <Typography textAlign='center' >Sizes</Typography>
+                <div
+                    id='sizesContainer' >
+                    {
+                        data.map((d) => d.size)
+                            .filter((val, ind, arr) => arr.indexOf(val) === ind)
+                            .sort((a, b) => a - b)
+                            .map((d) => <div
+                                            className='sizeListItem' >
+                                            <Checkbox
+                                                className='sizeListItemCheckbox'
+                                                defaultChecked
+                                                size='small'
+                                                onChange={() => {
+                                                    const newSizesToShow = structuredClone(sizesToShow);
+                                                    if (!newSizesToShow.delete(d))
+                                                        newSizesToShow.add(d);
+                                                    setSizesToShow(newSizesToShow);
+                                                }} />
+                                            <Typography fontSize='10pt' >{d}</Typography>
+                                        </div>)
+                    }
+                </div>
+            </div>
+            <div
+                id='alignSVGTitleContainer' >
+                <Typography textAlign='center' >Alignments</Typography>
+                <svg
+                    id='alignSVG'
+                    viewBox={`${-ALIGN_SIZE_MARGIN} ${ALIGN_SIZE_MARGIN} ${ALIGN_SIZE_WIDTH} ${ALIGN_SIZE_HEIGHT}`} >
+                    <g 
+                        id='barGroup'
+                        ref={barGroupRef} />
+                    <g id='alignXAxisGroup' />
+                    <g id='alignYAxisGroup' />
+                </svg>
+            </div>
+            <IconButton
+                id='alignCloseButton'
+                onClick={() => setAlignTypeDisplay(null)} >
+                <Close />
+            </IconButton>
+        </div>
+    );
+}
+
 export default function Legend({ colourOfType, setColourOfType, typeStats, lineVis,
                                  pageVis, cacheVis, setLineVis, setPageVis, setCacheVis,
-                                 fieldsData, expandedTypes, setExpandedTypes } : 
+                                 fieldsData, expandedTypes, setExpandedTypes, alignData,
+                                 cacheLineSize } : 
     {   
         colourOfType: TypeToColourMap,
         setColourOfType: (a: TypeToColourMap) => void,
@@ -428,7 +576,9 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, lineV
         setCacheVis: (a: {[tp: string]: boolean}) => void,
         fieldsData: {[tp: string]: SubtypeEntry[]},
         expandedTypes: {[tp: string]: boolean},
-        setExpandedTypes: (a: {[tp: string]: boolean}) => void
+        setExpandedTypes: (a: {[tp: string]: boolean}) => void,
+        alignData: {[tp: string]: [{size: number, align: number, count: number}]},
+        cacheLineSize: number
     }) {
     const [filterText, setFilterText] = useState('');
     const [visExpanded, setVisExpanded] = useState(false);
@@ -436,6 +586,7 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, lineV
     const [colourMenuAnchor, setColourMenuAnchor] = useState<HTMLDivElement | null>(null);
     const [selMenuType, setSelMenuType] = useState<string | undefined>(undefined);
     const [currColourSel, setCurrColourSel] = useState<string>('#ffffff');
+    const [alignTypeDisplay, setAlignTypeDisplay] = useState<string | null>(null);
 
     return (
         <>
@@ -455,6 +606,7 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, lineV
                         }
                     }} />
             </Popover>
+            {alignTypeDisplay == null ?
             <table
                 id='legendTable'
                 className={visExpanded ? 'visExpanded' : ''} >
@@ -492,7 +644,9 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, lineV
                                                         setColourOfType={setColourOfType}
                                                         setColourMenuAnchor={setColourMenuAnchor}
                                                         setSelMenuType={setSelMenuType}
-                                                        setCurrColourSel={setCurrColourSel} />)
+                                                        setCurrColourSel={setCurrColourSel}
+                                                        hasAlignData={tp in alignData}
+                                                        setAlignTypeDisplay={setAlignTypeDisplay} />)
                     }
                 </tbody>
                 <LegendTableFooter
@@ -500,7 +654,13 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, lineV
                     setFilterText={setFilterText}
                     setColourOfType={setColourOfType}
                     visExpanded={visExpanded} />
-            </table>
+            </table> :
+            <AlignAndSize
+                data={alignData[alignTypeDisplay]}
+                setAlignTypeDisplay={setAlignTypeDisplay}
+                cacheLineSize={cacheLineSize}
+                colour={colourOfType[alignTypeDisplay] ? colourOfType[alignTypeDisplay] : d3.color('white')} />
+            }
         </>
     );
 }

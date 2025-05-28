@@ -400,6 +400,7 @@ export default function VisPanels() {
     const [timeRange, setTimeRange] = useState(INIT_TIME_RANGE);
     const [getBucketIdx, setGetBucketTs] = useState(() => (ts: number) => 0);
     const [typesToSample, setTypesToSample] = useState({});
+    const [alignData, setAlignData] = useState({});
 
     const [lineVis, setLineVis] = useState<{[tp: string]: boolean}>({});
     const [pageVis, setPageVis] = useState<{[tp: string]: boolean}>({});
@@ -505,6 +506,16 @@ export default function VisPanels() {
                         setStatsData(allData['linesAndStats']['stats']);
                         setFieldsData(allData['linesAndStats']['fields']);
                         setCountsData(allData['linesAndStats']['counts']);
+
+                        const allAlignData = allData['linesAndStats']['align'].reduce(
+                            (map: {[tp: string]: {size: number, align: number, count: number}[]}, 
+                            entry: {'type': string, 'size': number, 'align': number, 'count': number}) => {
+                                if (!(entry['type'] in map))
+                                    map[entry['type']] = [];
+                                map[entry['type']].push({size: entry['size'], align: entry['align'], count: entry['count']});
+                                return map;
+                            }, {});
+                        setAlignData(allAlignData);
                         const retPerfData: PerfMap = Object.keys(allData['linesAndStats']['perf'])
                             .map((straddr: string) => parseInt(straddr))
                             .filter((addr) => addr >= 0)
@@ -631,7 +642,9 @@ export default function VisPanels() {
                         setCacheVis={setCacheVis}
                         fieldsData={fieldsData}
                         expandedTypes={expandedTypes}
-                        setExpandedTypes={setExpandedTypes} />
+                        setExpandedTypes={setExpandedTypes}
+                        alignData={alignData}
+                        cacheLineSize={cacheLineSize} />
                     <Box
                         id='settingsButtonContainer' >
                         <Tooltip
@@ -698,7 +711,8 @@ export default function VisPanels() {
                                                 });
                                     }
                                 }} >
-                                {Math.floor(cacheInfoSetting[selCacheName].size / (cacheLineSizeSetting*cacheInfoSetting[selCacheName].assoc)) == cacheData.numSets && !resampling ?
+                                {
+                                (Math.floor(cacheInfoSetting[selCacheName].size / (cacheLineSizeSetting*cacheInfoSetting[selCacheName].assoc)) == cacheData.numSets || resampling) ?
                                 <Cached />
                                 :
                                 <Badge

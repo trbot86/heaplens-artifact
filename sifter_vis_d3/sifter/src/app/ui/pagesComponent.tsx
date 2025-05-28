@@ -419,7 +419,8 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
                         id='objectGroup'
                         clipPath='url(#objectLayoutClip)' >
                         {
-                            data.map((event: MemoryObject) =>   <HoverableSplitBlock
+                            data.sort((a: MemoryObject, b: MemoryObject) => a.allocTs - b.allocTs)
+                                .map((event: MemoryObject) =>   <HoverableSplitBlock
                                                                     key={`${event.addr}-${event.allocTs}`}
                                                                     event={event}
                                                                     colourOfType={colourOfType}
@@ -672,17 +673,18 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                 <g
                     className='pageCardClipGroup' >
                     {
-                        objectData.events.map((ev) =>   <PageObject
-                                                            key={`${ev.addr}-${ev.allocTs}`}
-                                                            // className='pageCardObject'
-                                                            x={pageScale(ev.addr % pageSize)}
-                                                            y={0}
-                                                            width={pageScale(ev.size)}
-                                                            fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'}
-                                                            isVis={(ev.type && pageVis[ev.type]) == true}
-                                                            currTs={currTs}
-                                                            allocTs={ev.allocTs}
-                                                            freeTs={ev.freeTs} />)
+                        objectData.events.sort((a: MemoryObject, b: MemoryObject) => a.allocTs - b.allocTs)
+                            .map((ev) =>   <PageObject
+                                                key={`${ev.addr}-${ev.allocTs}`}
+                                                // className='pageCardObject'
+                                                x={pageScale(ev.addr % pageSize)}
+                                                y={0}
+                                                width={pageScale(ev.size)}
+                                                fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'}
+                                                isVis={(ev.type && pageVis[ev.type]) == true}
+                                                currTs={currTs}
+                                                allocTs={ev.allocTs}
+                                                freeTs={ev.freeTs} />)
                     }
                 </g>
             </svg>
