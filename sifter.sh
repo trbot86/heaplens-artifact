@@ -207,7 +207,7 @@ else
     cmakeOptions="$cmakeOptions -DCPP_PLACEMENT_NEW=OFF"
 fi
 
-cmake "$cmakeOptions" ..
+cmake $cmakeOptions ..
 cmake --build .
 cd ../..
 echo "Done building clang-tidy"

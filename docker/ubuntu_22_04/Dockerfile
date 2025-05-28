@@ -49,6 +49,13 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 COPY . /root/sifter
 WORKDIR /root/sifter
 
+RUN git clone --depth 1 https://git.kernel.org/pub//scm/linux/kernel/git/torvalds/linux.git
+WORKDIR /root/sifter/linux/tools/perf
+RUN make NO_LIBTRACEEVENT=1
+RUN cp perf /usr/bin
+WORKDIR /root/sifter
+RUN rm -rf linux
+
 RUN chmod +x llvm.sh
 RUN ./llvm.sh 14
 RUN locale-gen en_US.UTF-8

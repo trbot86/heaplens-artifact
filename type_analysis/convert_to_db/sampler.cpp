@@ -21,27 +21,27 @@ std::vector<addr_and_size> Sampler::split_event(memory_event_t& ev, size_t gran)
 }
 
 void Sampler::sample_page_and_add_event(std::unordered_map<uintptr_t, page_info_t>& pages,
-                        event_and_actual_addr* new_event, uintptr_t page_addr, 
+                        event_and_actual_addr* new_event, uintptr_t page_num, 
                         double sample_prop) {
-    if (pages.find(page_addr) == pages.end())
-        pages.insert(std::pair<uintptr_t, page_info_t>{page_addr, page_info_t{}});
+    if (pages.find(page_num) == pages.end())
+        pages.insert(std::pair<uintptr_t, page_info_t>{page_num, page_info_t{}});
     
-    pages[page_addr].add_event(new_event);
-    if (pages[page_addr].sampled == PageSample::Unknown) {
-        if (perf_pages.find(page_addr) != perf_pages.end()) {
-            seen_perf_pages.insert(page_addr);
-            pages[page_addr].sampled = PageSample::Yes;
+    pages[page_num].add_event(new_event);
+    if (pages[page_num].sampled == PageSample::Unknown) {
+        if (perf_pages.find(page_num) != perf_pages.end()) {
+            seen_perf_pages.insert(page_num);
+            pages[page_num].sampled = PageSample::Yes;
         }
         else if (rand() < sample_prop*RAND_MAX) {
-            pages[page_addr].sampled = PageSample::Yes;
+            pages[page_num].sampled = PageSample::Yes;
         }
         else {
-            pages[page_addr].sampled = PageSample::No;
+            pages[page_num].sampled = PageSample::No;
         }
     }
 
-    assert(pages[page_addr].sampled == PageSample::Yes 
-            || pages[page_addr].sampled == PageSample::No);
+    assert(pages[page_num].sampled == PageSample::Yes 
+            || pages[page_num].sampled == PageSample::No);
 }
 
 size_t Sampler::get_bucket(uint64_t ts, size_t num_buckets, uint64_t min_ts,
@@ -141,7 +141,7 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
                                                     event.timestamp, addr_sz.second,
                                                     reinterpret_cast<void*>(addr_sz.first),
                                                     event.typeofop};
-            uintptr_t page_addr = reinterpret_cast<uintptr_t>(sp_ev->addr) / page_size;
+            uintptr_t page_num = reinterpret_cast<uintptr_t>(sp_ev->addr) / page_size;
 
             if (event.typeofop) {
                 tp_stats[event_tindex].resident_pages
@@ -149,7 +149,7 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
             }
 
             event_and_actual_addr* new_event = new event_and_actual_addr{sp_ev, event_addr};
-            sample_page_and_add_event(pages, new_event, page_addr, sample_prop);
+            sample_page_and_add_event(pages, new_event, page_num, sample_prop);
             if (tp_to_num_pages_taken.find(event_tindex)
                 == tp_to_num_pages_taken.end()) {
                 tp_to_num_pages_taken.insert(
@@ -159,12 +159,12 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
                                                 std::unordered_set<uintptr_t>{}});
             }
 
-            if (pages[page_addr].sampled == PageSample::Yes) {
+            if (pages[page_num].sampled == PageSample::Yes) {
                 io.write_event_to_db(stmt, *sp_ev, event_addr);
                 tp_to_num_pages_taken[event_tindex]++;
             }
             else {
-                tp_to_untaken_containing_pages[event_tindex].insert(page_addr);
+                tp_to_untaken_containing_pages[event_tindex].insert(page_num);
             }
         }
     }

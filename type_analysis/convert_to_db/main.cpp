@@ -2,7 +2,6 @@
 #include "sampler.hpp"
 
 int main(int argc, char* argv[]) {
-    std::cout << "TEST TEST TEST" << std::endl;
     CLI::App app{"Samples a set of pages from the memory events " \
                 "produced by the instrumented application."};
     argv = app.ensure_utf8(argv);
@@ -48,12 +47,9 @@ int main(int argc, char* argv[]) {
 
     CLI11_PARSE(app, argc, argv);
 
-    printf("Before construct sampler\n");
     Sampler s{};
-    printf("after construct sampler\n");
     if (!perf_filename.empty())
         s.note_perf_addrs(perf_filename, page_size, cache_line_size, hitm_cutoff);
-    printf("Starting to sample pages\n");
     s.sample_pages_and_record_stats(page_size, num_pages_per_type, 
                                     cache_line_size, num_buckets, sample_portion);
     if (!field_filename.empty())

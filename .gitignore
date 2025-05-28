@@ -10,6 +10,7 @@ zstd
 ASCYLIB
 leanstore
 rocksdb
+rocksdb-copy
 jemalloc
 mimalloc
 test_align

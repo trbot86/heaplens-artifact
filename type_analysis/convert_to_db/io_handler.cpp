@@ -284,22 +284,27 @@ std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, double>>
     std::string line;
     std::vector<struct perf_data> entries{};
     std::cmatch matches;
-    std::regex rgx("[0-9]+\\s+(0x[a-f0-9]+)\\s+\\S+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+\\.[0-9]+)%");
+    std::regex rgx("\\s*[0-9]+\\s+(0x[a-f0-9]+)\\s+\\S+\\s+[0-9]+\\s+([0-9]+\\.[0-9]+)%");
     if (pfile.good()) {
         while(getline(pfile, line)) {
             if (regex_search(line.c_str(), matches, rgx)) {
-            double hitm = stof(matches[2].str());
-            if (hitm >= cutoff) {
-                uintptr_t cl_addr = strtoull(matches[1].str().c_str(), nullptr, 16);
-                uintptr_t page_num = (cl_addr * cl_size) / page_size;
-                if (perf_pages.find(page_num) == perf_pages.end()) {
-                    perf_pages.insert(std::pair<uintptr_t, std::unordered_map<uintptr_t, double>>
-                        {page_num, std::unordered_map<uintptr_t, double>{}});
+                // printf("Here is the matching perf line: %s\n", line.c_str());
+                double hitm = stof(matches[2].str());
+                if (hitm >= cutoff) {
+                    uintptr_t cl_addr = strtoull(matches[1].str().c_str(), nullptr, 16);
+                    // uintptr_t page_addr = cl_addr - (cl_addr % page_size);
+                    uintptr_t page_num = cl_addr / page_size; // TODO make sure you don't need to mult by CLS here
+                    if (perf_pages.find(page_num) == perf_pages.end()) {
+                        perf_pages.insert(std::pair<uintptr_t, std::unordered_map<uintptr_t, double>>
+                            {page_num, std::unordered_map<uintptr_t, double>{}});
+                    }
+                    perf_pages[page_num][cl_addr] = hitm;
                 }
-                perf_pages[page_num][cl_addr * cl_size] = hitm;
+                else
+                    break;
             }
-            else
-                break;
+            else {
+                // printf("Perf line did NOT match: %s\n", line.c_str());
             }
         }
     }
