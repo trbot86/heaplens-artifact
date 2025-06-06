@@ -269,7 +269,7 @@ echo "-I/root/sifter/memhook/ -L/root/sifter/memhook/ -Wl,-rpath=/root/sifter/me
 echo ""
 echo "Then compile (again) and run your application."
 echo "  Note: if you want to include perf c2c data, run your application using"
-echo "      perf c2c record <your_application>"
+echo "      perf c2c record --all-user <your_application>"
 echo "  Then, run the following command:"
 echo "      perf c2c report --stdio > perfout.txt"
 echo "Afterwards, return to this directory and run sifter.sh --database $outdir/$subdir"

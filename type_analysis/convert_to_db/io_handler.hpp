@@ -13,11 +13,6 @@
 
 class IOHandler {
 private:
-    typedef struct perf_data {
-        uintptr_t addr;
-        double hitm;
-    } perf_data_t;
-
     typedef struct field_data {
         std::string subtype;
         size_t size;
@@ -71,7 +66,7 @@ public:
 
     std::unordered_map<memory_event_t, mem_interval_t> get_event_interval_info();
 
-    std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, double>> get_perf_addrs(
+    std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>> get_perf_addrs(
         std::string perf_filename, size_t page_size, size_t cl_size, double cutoff);
 
     std::unordered_set<file_and_line_num_t> include_frag_allocs();
@@ -96,7 +91,7 @@ public:
 
     void write_lines_to_db(std::unordered_map<uintptr_t, std::vector<int64_t>>&);
 
-    void write_perf_to_db(sqlite3_stmt*, uintptr_t, double);
+    void write_perf_to_db(sqlite3_stmt*, uintptr_t, double, size_t, size_t);
 
     void write_fields_to_db(std::string);
 

@@ -1,7 +1,7 @@
 #include "sampler.hpp"
 
 Sampler::Sampler() : io{}, all_events{io.get_all_events()}, 
-            perf_pages{std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, double>>{}},
+            perf_pages{std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>>{}},
             seen_perf_pages{std::unordered_set<uintptr_t>{}} {}
 
 Sampler::~Sampler() {}
@@ -65,9 +65,8 @@ void Sampler::record_perf_addrs() {
     io.prepare_write_to_perf(&stmt);
     for (auto& page_addr : seen_perf_pages) {
         for (auto& entry : perf_pages[page_addr]) {
-            uintptr_t addr = entry.first;
-            double hitm = entry.second;
-            io.write_perf_to_db(stmt, addr, hitm);
+            io.write_perf_to_db(stmt, entry.first, entry.second.hitm,
+                                entry.second.loads, entry.second.stores);
         }
     }
     io.end_transaction();

@@ -40,7 +40,9 @@ IOHandler::IOHandler() :    zErrMsg{0},
     rc = sqlite3_exec(db, "DROP TABLE IF EXISTS PERF;" \
                             "CREATE TABLE PERF(" \
                             "CLADDRESS  INT NOT NULL," \
-                            "HITM       FLOAT NOT NULL);", nullptr, 0, &zErrMsg);
+                            "HITM       FLOAT NOT NULL," \
+                            "LOADS      INT NOT NULL," \
+                            "STORES     INT NOT NULL);", nullptr, 0, &zErrMsg);
 
     if (rc != SQLITE_OK) {
         std::cout << "SQL error creating PERF table: " << zErrMsg << std::endl;
@@ -275,33 +277,31 @@ std::unordered_map<memory_event_t, mem_interval_t> IOHandler::get_event_interval
     return event_interval_info;
 }
 
-std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, double>>
+std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>>
     IOHandler::get_perf_addrs(std::string perf_filename, size_t page_size, size_t cl_size,
         double cutoff) {
-    std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, double>> perf_pages{};
+    std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>> perf_pages{};
     std::ifstream pfile;
     pfile.open(perf_filename);
     std::string line;
-    std::vector<struct perf_data> entries{};
     std::cmatch matches;
-    std::regex rgx("\\s*[0-9]+\\s+(0x[a-f0-9]+)\\s+\\S+\\s+[0-9]+\\s+([0-9]+\\.[0-9]+)%");
+    std::regex rgx("\\s*[0-9]+\\s+(0x[a-f0-9]+)\\s+\\S+\\s+[0-9]+\\s+([0-9]+\\.[0-9]+)%\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+[0-9]+\\s+([0-9]+)\\s+([0-9]+)");
     if (pfile.good()) {
         while(getline(pfile, line)) {
             if (regex_search(line.c_str(), matches, rgx)) {
                 // printf("Here is the matching perf line: %s\n", line.c_str());
                 double hitm = stof(matches[2].str());
-                if (hitm >= cutoff) {
-                    uintptr_t cl_addr = strtoull(matches[1].str().c_str(), nullptr, 16);
-                    // uintptr_t page_addr = cl_addr - (cl_addr % page_size);
-                    uintptr_t page_num = cl_addr / page_size; // TODO make sure you don't need to mult by CLS here
-                    if (perf_pages.find(page_num) == perf_pages.end()) {
-                        perf_pages.insert(std::pair<uintptr_t, std::unordered_map<uintptr_t, double>>
-                            {page_num, std::unordered_map<uintptr_t, double>{}});
-                    }
-                    perf_pages[page_num][cl_addr] = hitm;
+                size_t loads = stoul(matches[3].str());
+                size_t stores = stoul(matches[4].str());
+
+                uintptr_t cl_addr = strtoull(matches[1].str().c_str(), nullptr, 16);
+                // uintptr_t page_addr = cl_addr - (cl_addr % page_size);
+                uintptr_t page_num = cl_addr / page_size; // TODO make sure you don't need to mult by CLS here
+                if (perf_pages.find(page_num) == perf_pages.end()) {
+                    perf_pages.insert(std::pair<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>>
+                        {page_num, std::unordered_map<uintptr_t, perf_data_t>{}});
                 }
-                else
-                    break;
+                perf_pages[page_num][cl_addr] = perf_data_t{hitm, loads, stores};
             }
             else {
                 // printf("Perf line did NOT match: %s\n", line.c_str());
@@ -381,8 +381,8 @@ void IOHandler::prepare_write_to_fields(sqlite3_stmt** stmt) {
 void IOHandler::prepare_write_to_perf(sqlite3_stmt** stmt) {
     // TODO I think the following should be actual address rather than CLADDRESS - 
     // make sure this is consistent with vis program
-    int rc = sqlite3_prepare_v2(db, "INSERT INTO PERF (CLADDRESS,HITM) " \
-        "VALUES (?, ?);", -1, stmt, 0);
+    int rc = sqlite3_prepare_v2(db, "INSERT INTO PERF (CLADDRESS,HITM,LOADS,STORES) " \
+        "VALUES (?, ?, ?, ?);", -1, stmt, 0);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "Error after sqlite prepare: %s\n", sqlite3_errstr(rc));
         fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
@@ -462,9 +462,12 @@ void IOHandler::write_lines_to_db(std::unordered_map<uintptr_t, std::vector<int6
     end_transaction();
 }
 
-void IOHandler::write_perf_to_db(sqlite3_stmt* stmt, uintptr_t addr, double hitm) {
+void IOHandler::write_perf_to_db(sqlite3_stmt* stmt, uintptr_t addr, double hitm,
+                                 size_t loads, size_t stores) {
     sqlite3_bind_int64(stmt, 1, addr);
     sqlite3_bind_double(stmt, 2, hitm);
+    sqlite3_bind_int64(stmt, 3, loads);
+    sqlite3_bind_int64(stmt, 4, stores);
     step_and_clear_bindings(stmt);
 }
 

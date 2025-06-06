@@ -125,9 +125,9 @@ memhook_memory_pool::~memhook_memory_pool(){
 	char file_path[] = "binary_dump.txt";
   char fileset_path[] = "fileset_dump.txt";
   char typeset_path[] = "typeset_dump.txt";
-  ofstream fileset, typeset;
-  fileset.open(fileset_path);
-  typeset.open(typeset_path);
+  std::ofstream fileset, typeset;
+  fileset.open(fileset_path, std::ofstream::out | std::ofstream::app);
+  typeset.open(typeset_path, std::ofstream::out | std::ofstream::app);
 
 	//instead of doing this, the memory_pool array can keep track of cumulative bytes
 

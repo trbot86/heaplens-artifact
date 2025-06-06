@@ -27,7 +27,7 @@ private:
 
     IOHandler io;
     std::vector<memory_event_t> all_events;
-    std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, double>> perf_pages;
+    std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>> perf_pages;
     std::unordered_set<uintptr_t> seen_perf_pages;
 
     std::vector<addr_and_size> split_event(memory_event_t& ev, size_t gran);

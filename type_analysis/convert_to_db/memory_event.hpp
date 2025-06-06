@@ -55,6 +55,12 @@ typedef struct size_and_event_list {
     std::vector<addr_and_size> events;
 } size_and_event_list_t;
 
+typedef struct perf_data {
+    double hitm;
+    size_t loads;
+    size_t stores;
+} perf_data_t;
+
 enum class Overlap { None, Overwritten, Contains };
 
 typedef struct mem_interval {
