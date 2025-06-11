@@ -690,7 +690,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                             .filter((perfAddr) => perfAddr >= addr && perfAddr < addr + pageSize &&
                                                     ((perf.addrs[perfAddr].hitm >= hitmCutoff && showHitm) || (perf.addrs[perfAddr].loads + perf.addrs[perfAddr].stores >= perf.avgAccesses && showHot)))
                             .map((perfAddr) => <circle 
-                                                    cx={`${pageScale(perfAddr % pageSize)}`}
+                                                    cx={`${pageScale(perfAddr % pageSize) + 2*PERF_INDICATOR_SIZE + 1}`} // TODO: not sure why the extra shift is needed here
                                                     cy={`${PAGE_CARD_SVG_HEIGHT / 2}`}
                                                     r={`${PERF_INDICATOR_SIZE}`}
                                                     fill={theme.palette.primary.main} />)
