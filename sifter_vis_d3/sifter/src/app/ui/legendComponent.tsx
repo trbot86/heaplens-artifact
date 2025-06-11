@@ -132,7 +132,6 @@ function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded 
                 visExpanded &&
                 <td />
                 }
-                <td />
                 <td>
                     <div className='centerTableCell' >
                         <Tooltip 
@@ -146,6 +145,7 @@ function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded 
                         </Tooltip>
                     </div>
                 </td>
+                <td />
                 <td />
                 <td>
                     <TextField 
@@ -514,7 +514,11 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
             id='alignAndSizeContainer' >
             <div
                 id='sizesTitleContainer' >
-                <Typography textAlign='center' >Sizes</Typography>
+                <Typography
+                    textAlign='center'
+                    variant='h6' >
+                        Sizes
+                </Typography>
                 <div
                     id='sizesContainer' >
                     {
@@ -540,7 +544,11 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
             </div>
             <div
                 id='alignSVGTitleContainer' >
-                <Typography textAlign='center' >Alignments</Typography>
+                <Typography
+                    textAlign='center'
+                    variant='h6' >
+                        Alignments
+                </Typography>
                 <svg
                     id='alignSVG'
                     viewBox={`${-ALIGN_SIZE_MARGIN} ${ALIGN_SIZE_MARGIN} ${ALIGN_SIZE_WIDTH} ${ALIGN_SIZE_HEIGHT}`} >

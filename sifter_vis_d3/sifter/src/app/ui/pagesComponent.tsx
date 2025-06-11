@@ -8,6 +8,7 @@ import { Box, Checkbox, Icon, IconButton, Stack, ToggleButton, ToggleButtonGroup
 import { SubtypeEntry } from './legendComponent';
 import { HtmlTooltip } from './cacheSetComponent';
 import Grid from '@mui/material/Grid2';
+import { theme } from '../page';
 
 interface MemoryObject {
     file: string | null,
@@ -49,10 +50,11 @@ const PAGE_CARD_SVG_HEIGHT = 50;
 const PAGE_CARD_BORDER_WIDTH = PAGE_CARD_SVG_WIDTH - 10;
 const OBJECT_LAYOUT_WIDTH = 300;
 const OBJECT_LAYOUT_HEIGHT = 300;
-const OBJECT_LAYOUT_MARGIN = 25;
+const OBJECT_LAYOUT_MARGIN = 32;
 const NUM_SLOTS_HUGEPAGE = 128;
 const SEL_AND_ZOOM_GRANULARITY = 4096;
-const MAX_HOT_ADDRS = 20;
+const MAX_HITM_ADDRS = 20;
+const PERF_INDICATOR_SIZE = 4;
 
 /*  TODO: Currently, this function just looks at the starting address of each
     event, without considering events crossing slot/page boundaries. This
@@ -332,7 +334,8 @@ function HoverableSplitBlock({  event, colourOfType, viewStartAddr, viewSize,
 }
 
 function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData, expandedTypes,
-                        setExpandedTypes, viewStartAddr, showHot, showHitm, pageVis, perf, currTs } :
+                        setExpandedTypes, viewStartAddr, showHot, showHitm, pageVis, perf, currTs,
+                        hitmCutoff } :
     {
         data: MemoryObject[],
         colourOfType: TypeToColourMap,
@@ -346,6 +349,7 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
         showHitm: boolean,
         pageVis: {[tp: string]: boolean},
         perf: PerfMap,
+        hitmCutoff: number,
         currTs: number
     }) {
     const objSVG = useRef(null);
@@ -380,7 +384,7 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
     useEffect(() => {
         const zoom = d3.zoom()
             .scaleExtent([1, 6])
-            .translateExtent([[0, 0], [OBJECT_LAYOUT_WIDTH, (OBJECT_LAYOUT_HEIGHT / cacheLineSize)*(viewSize / cacheLineSize) + 30]]) // I think the +30 comes from the relative position of the object svg in the css, but not sure
+            .translateExtent([[0, -OBJECT_LAYOUT_MARGIN], [OBJECT_LAYOUT_WIDTH, (OBJECT_LAYOUT_HEIGHT / cacheLineSize)*(viewSize / cacheLineSize) + OBJECT_LAYOUT_MARGIN]]) // I think the +30 comes from the relative position of the object svg in the css, but not sure
             .on('zoom', (event) => {
                 setYScale(() => event.transform.rescaleY(yScaleOrig));
             });
@@ -392,14 +396,14 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
         <div id='objectLayoutDiv' >
             <svg
                 id='objectSVG'
-                viewBox={`0 0 ${OBJECT_LAYOUT_WIDTH + OBJECT_LAYOUT_MARGIN + 5} ${OBJECT_LAYOUT_HEIGHT + OBJECT_LAYOUT_MARGIN + 5}`}
+                viewBox={`${-OBJECT_LAYOUT_MARGIN} ${-OBJECT_LAYOUT_MARGIN} ${OBJECT_LAYOUT_WIDTH + 2*OBJECT_LAYOUT_MARGIN} ${OBJECT_LAYOUT_HEIGHT + 2*OBJECT_LAYOUT_MARGIN}`}
                 ref={objSVG} >
                 <defs>
                     <clipPath id='objectLayoutClip' >
                         <rect
                             id='objectLayoutClipRect'
-                            x={OBJECT_LAYOUT_MARGIN}
-                            y={OBJECT_LAYOUT_MARGIN}
+                            x={0}
+                            y={0}
                             width={OBJECT_LAYOUT_WIDTH}
                             height={OBJECT_LAYOUT_HEIGHT} />
                     </clipPath>
@@ -441,6 +445,35 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
                     <g
                         id='objectYAxisGroup'
                         clipPath='url(#objectLayoutYAxisClip)' />
+                    {
+                    (showHitm || showHot) &&
+                    <g 
+                        className='objectPerfGroup' >
+                        {
+                            Object.keys(perf.addrs)
+                                .map((perfAddr) => parseInt(perfAddr))
+                                .filter((perfAddr) => perfAddr >= viewStartAddr && perfAddr <= viewStartAddr + viewSize &&
+                                                        ((perf.addrs[perfAddr].hitm >= hitmCutoff && showHitm) || (perf.addrs[perfAddr].loads + perf.addrs[perfAddr].stores >= perf.avgAccesses && showHot)))
+                                .map((perfAddr) =>  <g>
+                                                        <circle
+                                                            className='objectPerfIcon' 
+                                                            cx={OBJECT_LAYOUT_WIDTH + 2*PERF_INDICATOR_SIZE}
+                                                            cy={`${yScale(Math.floor((perfAddr - viewStartAddr) / cacheLineSize)) + ((yScale(1) - yScale(0)) / 2)}`}
+                                                            r={`${PERF_INDICATOR_SIZE}`}
+                                                            fill={theme.palette.primary.main} >
+                                                            <title>{`HITM: ${perf.addrs[perfAddr].hitm.toFixed(2)}%\nloads: ${perf.addrs[perfAddr].loads}\nstores: ${perf.addrs[perfAddr].stores}`}</title>
+                                                        </circle>
+                                                        <rect 
+                                                            className='perfHighlight'
+                                                            x={0}
+                                                            y={yScale(Math.floor((perfAddr - viewStartAddr) / cacheLineSize))}
+                                                            width={xScale(cacheLineSize)}
+                                                            height={yScale(1) - yScale(0)}
+                                                            fill={theme.palette.primary.main} />
+                                                    </g>)
+                        }
+                    </g>
+                    }
                 </>
                 :
                 <Tooltip
@@ -451,47 +484,6 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
                 </Tooltip>
                 }
             </svg>
-            {
-            Object.keys(perf.addrs)
-                .map((perfAddr) => parseInt(perfAddr))
-                .filter((perfAddr) => perfAddr >= viewStartAddr && perfAddr <= viewStartAddr + viewSize)
-                .slice(0, MAX_HOT_ADDRS)
-                .map((perfAddr) =>  <Box
-                                        key={`objectperfi-${perfAddr}`}
-                                        className='objectPerfIndicator'
-                                        sx={{
-                                            top: `${yScale(Math.floor((perfAddr - viewStartAddr) / cacheLineSize))}px`
-                                        }} >
-                                        <Box
-                                            className='objectPerfIconContainer' >
-                                            {
-                                            ((perf.addrs[perfAddr].loads + perf.addrs[perfAddr].stores) > /*perf.avgAccesses*/2900 && showHot) &&
-                                            <Tooltip
-                                                title={`stores: ${perf.addrs[perfAddr].stores}, loads: ${perf.addrs[perfAddr].loads}`} >
-                                                <LocalFireDepartment
-                                                    fontSize='small'
-                                                    className='objectHotIndicator' />
-                                            </Tooltip>
-                                            }
-                                            {
-                                            showHitm &&
-                                            <Tooltip
-                                                title={`HITM: ${perf.addrs[perfAddr].hitm}%`} >
-                                                <SportsMma
-                                                    fontSize='small'
-                                                    className='objectHitmIndicator' />
-                                            </Tooltip>
-                                            }
-                                        </Box>
-                                        <div
-                                            className='perfHighlight'
-                                            style={{
-                                                width: `${xScale(cacheLineSize)}px`,
-                                                height: `${yScale(1) - yScale(0)}px`,
-                                                left: `${-xScale(cacheLineSize)}px`
-                                            }} />
-                                    </Box>)
-            }
         </div>
     );
 }
@@ -643,7 +635,7 @@ function PageObject({ x, y, width, fill, currTs, allocTs, freeTs, isVis } :
 }
 
 function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourOfType,
-                    showHot, pageVis, showHitm, perf, currTs } :
+                    showHot, pageVis, showHitm, perf, currTs, hitmCutoff } :
     {
         addr: number,
         selAddr: number,
@@ -654,6 +646,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
         showHot: boolean,
         showHitm: boolean,
         perf: PerfMap,
+        hitmCutoff: number,
         pageVis: {[tp: string]: boolean},
         currTs: number
     }) {
@@ -687,32 +680,24 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                                                 freeTs={ev.freeTs} />)
                     }
                 </g>
+                {
+                (showHitm || showHot) &&
+                <g 
+                    className='pagePerfIcons' >
+                    {
+                        Object.keys(perf.addrs)
+                            .map((perfAddr) => parseInt(perfAddr))
+                            .filter((perfAddr) => perfAddr >= addr && perfAddr < addr + pageSize &&
+                                                    ((perf.addrs[perfAddr].hitm >= hitmCutoff && showHitm) || (perf.addrs[perfAddr].loads + perf.addrs[perfAddr].stores >= perf.avgAccesses && showHot)))
+                            .map((perfAddr) => <circle 
+                                                    cx={`${pageScale(perfAddr % pageSize)}`}
+                                                    cy={`${PAGE_CARD_SVG_HEIGHT / 2}`}
+                                                    r={`${PERF_INDICATOR_SIZE}`}
+                                                    fill={theme.palette.primary.main} />)
+                    }
+                </g>
+                }
             </svg>
-            {
-            Object.keys(perf.addrs)
-                .map((perfAddr) => parseInt(perfAddr))
-                .filter((perfAddr) => perfAddr >= addr && perfAddr < addr + pageSize)
-                .slice(0, MAX_HOT_ADDRS)
-                .map((perfAddr) =>  <Stack
-                                        key={`pageperfi-${perfAddr}`}
-                                        className='pagePerfIndicator'
-                                        sx={{
-                                            left: `${pageScale(perfAddr % pageSize)}px`
-                                        }} >
-                                        {
-                                        ((perf.addrs[perfAddr].loads + perf.addrs[perfAddr].stores) > /*perf.avgAccesses*/2900 && showHot) &&
-                                        <LocalFireDepartment
-                                            fontSize='small'
-                                            className='pageHotIndicator' />
-                                        }
-                                        {
-                                        showHitm &&
-                                        <SportsMma
-                                            fontSize='small'
-                                            className='pageHitmIndicator' />
-                                        }
-                                    </Stack>)
-            }
         </div>
     );
 }
@@ -850,7 +835,8 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
 
 function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType, 
                     setSelPageAddr, pageVis, showHot, showHitm, perf,
-                    clusterSize, sumClusterSizes, maxClusterSize } : 
+                    clusterSize, sumClusterSizes, maxClusterSize,
+                    hitmCutoff } : 
     {
         clusterSize: number,
         sumClusterSizes: number,
@@ -866,7 +852,8 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
         pageVis: {[tp: string]: boolean},
         showHot: boolean,
         showHitm: boolean,
-        perf: PerfMap
+        perf: PerfMap,
+        hitmCutoff: number
     }) {
     // const [currData, setCurrData] = useState(data);
 
@@ -897,7 +884,8 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
                 showHitm={showHitm}
                 perf={perf}
                 pageVis={pageVis}
-                currTs={currTs} />
+                currTs={currTs}
+                hitmCutoff={hitmCutoff} />
             <Grid
                 container
                 rowSpacing={0.3}
@@ -1051,6 +1039,8 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
 
     const maxClusterSize = Object.values(clustersData).reduce((size: number, curr: {'pages': number[], 'size': number}) => Math.max(size, curr['size']), 0);
     const focusData = useMemo(() => pages[selPageAddr], [selPageAddr]);
+    const hitmCutoff = useMemo(() => Object.values(perf.addrs)
+                                            .toSorted((a, b) => b.hitm - a.hitm)[Math.min(Object.keys(perf.addrs).length, MAX_HITM_ADDRS) - 1].hitm, [perf]);
 
     return (
         <div id='pageAndObjectVis'>
@@ -1093,7 +1083,8 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                                                     pageVis={pageVis}
                                                     showHot={showHot}
                                                     showHitm={showHitm}
-                                                    perf={perf} />)
+                                                    perf={perf}
+                                                    hitmCutoff={hitmCutoff} />)
                     }
                     </>
                     :
@@ -1140,6 +1131,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                     showHot={showHot}
                     showHitm={showHitm}
                     perf={perf}
+                    hitmCutoff={hitmCutoff}
                     pageVis={pageVis}
                     currTs={currTs} />
             </div>

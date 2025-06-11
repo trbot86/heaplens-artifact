@@ -352,7 +352,9 @@ class Sampler:
         try:
             con = sqlite3.connect(self.fname)
             df = pd.read_sql_query("""SELECT CLADDRESS as cl_addr,
-                                        HITM as hitm
+                                        HITM as hitm,
+                                        LOADS as loads,
+                                        STORES as stores
                                     FROM PERF""",
                                     con)
             con.close()

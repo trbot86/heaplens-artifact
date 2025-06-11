@@ -8,7 +8,7 @@ $pageCardBorderBottomHeightLow: 1px;
 $pageCardBorderBottomHeightHi: 3px;
 $objectLayoutWidth: 300px;
 $objectLayoutHeight: 300px;
-$objectLayoutLabelMargin: 25px;
+// $objectLayoutLabelMargin: 32px;
 $pageCardBackColour: rgb(70, 70, 70);
 $pageCardBackColourHover: rgb(88, 88, 88);
 
@@ -233,12 +233,12 @@ rect.selection {
     stroke: none;
 }
 
-.pagePerfIndicator {
-    position: absolute;
-    top: calc($pageCardSVGHeight / 2);
-    pointer-events: none;
-    transform: translate(-25%, -50%);
-}
+// .pagePerfIndicator {
+//     position: absolute;
+//     top: calc($pageCardSVGHeight / 2);
+//     pointer-events: none;
+//     transform: translate(-25%, -50%);
+// }
 
 #selPageIcon {
     position: absolute;
@@ -282,9 +282,9 @@ rect.selection {
     height: inherit;
 }
 
-#objectGroup rect, #objectGroup .objDelimLine, #objectXAxisGroup, #objectYAxisGroup, #objectYAxisGridGroup {
-    transform: translate($objectLayoutLabelMargin, $objectLayoutLabelMargin);
-}
+// #objectGroup rect, #objectGroup .objDelimLine, #objectXAxisGroup, #objectYAxisGroup, #objectYAxisGridGroup {
+//     transform: translate($objectLayoutLabelMargin, $objectLayoutLabelMargin);
+// }
 
 #objectYAxisGridGroup {
     pointer-events: none;
@@ -300,29 +300,36 @@ rect.selection {
 }
 
 .perfHighlight {
-    position: absolute;
-    border: 2px dotted red;
+    // position: absolute;
+    // border: 2px dotted red;
     pointer-events: none;
-    opacity: 0.0;
+    visibility: hidden;
+    animation: fadeCycle 2s ease-in-out infinite;
 }
 
-.objectPerfIndicator {
-    display: flex;
-    flex-direction: row;
-    // align-items: center;
-    justify-content: flex-start;
-    position: absolute;
-    left: 0px;
-    transform: translate(calc($objectLayoutLabelMargin + $objectLayoutWidth), calc($objectLayoutLabelMargin));
+@keyframes fadeCycle {
+    0%      { opacity: 0.0; }
+    50%     { opacity: 1.0; }
+    100%    { opacity: 0.0; }
 }
 
-.objectPerfIconContainer {
+// .objectPerfIndicator {
+//     display: flex;
+//     flex-direction: row;
+//     // align-items: center;
+//     justify-content: flex-start;
+//     position: absolute;
+//     left: 0px;
+//     // transform: translate(calc($objectLayoutLabelMargin + $objectLayoutWidth), calc($objectLayoutLabelMargin));
+// }
+
+.objectPerfIcon {
     pointer-events: all;
     position: relative;
-    transform: translateY(-20%);
+    // transform: translateY(-20%);
 
     &:hover ~ .perfHighlight {
-        opacity: 1.0;
+        visibility: visible;
     }
 }
 
