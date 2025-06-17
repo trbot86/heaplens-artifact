@@ -602,17 +602,23 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, lineV
                 open={Boolean(colourMenuAnchor)}
                 anchorEl={colourMenuAnchor}
                 onClose={() => setColourMenuAnchor(null)} >
-                    {/* TODO: Get the following "OK" and "Cancel" buttons to work */}
                 <PhotoshopPicker
                     color={currColourSel}
-                    onChange={(col) => setCurrColourSel(col.hex)}
-                    onChangeComplete={(col) => {
+                    onAccept={() => {
                         if (selMenuType) {
-                            const newColourOfType = colourOfType;
-                            newColourOfType[selMenuType] = d3.color(col.hex);
+                            const newColourOfType: TypeToColourMap = {};
+                            Object.keys(colourOfType).forEach((tp: string) => {
+                                newColourOfType[tp] = colourOfType[tp] ? colourOfType[tp].copy() : d3.color("white");
+                            });
+                            console.log("Here is newColourOfType:");
+                            console.log(newColourOfType);
+                            newColourOfType[selMenuType] = d3.color(currColourSel);
                             setColourOfType(newColourOfType);
                         }
-                    }} />
+                        setColourMenuAnchor(null);
+                    }}
+                    onCancel={() => setColourMenuAnchor(null)}
+                    onChange={(col) => setCurrColourSel(col.hex)} />
             </Popover>
             {alignTypeDisplay == null ?
             <table

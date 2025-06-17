@@ -21,7 +21,7 @@ class Logger:
         try:
             data = dict()
             with open("saved_state/{}_save.json".format(self.fname.split(".")[0]), 'r') as f:
-                data= json.load(f)
+                data = json.load(f)
             return json.dumps(data["myNotes"])
         except FileNotFoundError:
             return json.dumps("")
@@ -30,7 +30,7 @@ class Logger:
         try:
             data = dict()
             with open("saved_state/{}_save.json".format(self.fname.split(".")[0]), 'r') as f:
-                data= json.load(f)
+                data = json.load(f)
             return json.dumps(data["colours"])
         except FileNotFoundError:
             return json.dumps([])

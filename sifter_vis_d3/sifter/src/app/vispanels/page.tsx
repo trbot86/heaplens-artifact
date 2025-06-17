@@ -542,9 +542,9 @@ export default function VisPanels() {
                         console.log(`cache info size: ${cacheInfoSetting[selCacheName].size}, cachelinesize setting: ${cacheLineSizeSetting}`);
 
                         if (fname) {
-                            getNotesForFile(fname).then((resp) => resp.json())
-                                .then((json) => {
-                                    setNotesText(json);
+                            getNotesForFile(fname)
+                                .then((resp: string[]) => {
+                                    setNotesText(resp[1]);
                                     setLoading(false);
                                 });
                         }
@@ -663,7 +663,6 @@ export default function VisPanels() {
                                                 window.location.href = "http://localhost:3000/";
                                             });
                                     }
-                                    // window.location.href = "http://localhost:3000/"
                                 }} >
                                 <ArrowBack />
                             </IconButton>

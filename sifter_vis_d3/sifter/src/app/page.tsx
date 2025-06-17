@@ -8,6 +8,10 @@ import Box from '@mui/material/Box';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+function saveFileNameToDBFileName(sfn: string) {
+    return sfn.slice(0, -10) /* remove _save.json */ + '.sqlite';
+}
+
 async function getDBFiles() {
     const resp = await fetch('http://localhost:5000/get-fnames');
     const files = await resp.json();
@@ -33,7 +37,8 @@ export async function getNotesForFile(fname: string) {
             'Content-Type': 'application/json'
         }
     });
-    return data;
+    const json = await data.json();
+    return [fname, json];
 }
 
 export const theme: Theme = createTheme({
@@ -60,6 +65,7 @@ export default function FileSelect() {
     const [files, setFiles] = useState([]);
     const [filterText, setFilterText] = useState('');
     const [logFiles, setLogFiles] = useState<Set<string>>(new Set());
+    const [logNotes, setLogNotes] = useState<{[a: string]: string}>({});
     const [notesDisplayed, setNotesDisplayed] = useState<string | null>(null);
     const [notesDisplayedFname, setNotesDisplayedFname] = useState<string | null>(null);
 
@@ -68,7 +74,23 @@ export default function FileSelect() {
             .then((resp) => setFiles(resp));
         getLogFiles()
             .then((resp) => {
-                resp.json().then((logs) => setLogFiles(new Set(logs.map((fname: string) => fname.slice(0, -10) /* remove _save.json */ + '.sqlite'))))
+                resp.json().then((logs) => {
+                    setLogFiles(new Set(logs.map((fname: string) => saveFileNameToDBFileName(fname))));
+                    Promise.all(logs.map((fname: string) => {
+                        return getNotesForFile(saveFileNameToDBFileName(fname));
+                    })).then((fileNotes: [string, string][]) => {
+                        console.log("fileNotes:");
+                        console.log(fileNotes);
+                        const newLogNotes: {[a: string]: string} = {};
+                        fileNotes.forEach((entry: [string, string]) => {
+                            if (entry[1] !== "")
+                                newLogNotes[entry[0]] = entry[1];
+                        });
+                        console.log("newLogNotes:");
+                        console.log(newLogNotes);
+                        setLogNotes(newLogNotes);
+                    });
+                })
             });
     }, []);
 
@@ -105,18 +127,13 @@ export default function FileSelect() {
                                                                     primary={file} />
                                                             </ListItemButton>
                                                             {
-                                                            logFiles.has(file) &&
+                                                            (file in logNotes) &&
                                                             <ListItemAvatar
                                                                 className={'showNotesButton' + (notesDisplayedFname == file ? ' selectedFile' : '')}
                                                                 onClick={() => {
                                                                     if (notesDisplayedFname != file) {
-                                                                        getNotesForFile(file).then((resp) => resp.json())
-                                                                            .then((notes) => {
-                                                                                console.log('Here are notes:');
-                                                                                console.log(notes);
-                                                                                setNotesDisplayed(notes);
-                                                                                setNotesDisplayedFname(file);
-                                                                            });
+                                                                        setNotesDisplayed(logNotes[file]);
+                                                                        setNotesDisplayedFname(file);
                                                                     }
                                                                 }} >
                                                                 <Avatar>

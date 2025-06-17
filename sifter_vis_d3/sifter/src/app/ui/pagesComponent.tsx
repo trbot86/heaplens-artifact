@@ -1039,8 +1039,8 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
 
     const maxClusterSize = Object.values(clustersData).reduce((size: number, curr: {'pages': number[], 'size': number}) => Math.max(size, curr['size']), 0);
     const focusData = useMemo(() => pages[selPageAddr], [selPageAddr]);
-    const hitmCutoff = useMemo(() => Object.values(perf.addrs)
-                                            .toSorted((a, b) => b.hitm - a.hitm)[Math.min(Object.keys(perf.addrs).length, MAX_HITM_ADDRS) - 1].hitm, [perf]);
+    const hitmCutoff = useMemo(() => Object.keys(perf.addrs).length > 0 ? Object.values(perf.addrs)
+                                            .toSorted((a, b) => b.hitm - a.hitm)[Math.min(Object.keys(perf.addrs).length, MAX_HITM_ADDRS) - 1].hitm : 0, [perf]);
 
     return (
         <div id='pageAndObjectVis'>
