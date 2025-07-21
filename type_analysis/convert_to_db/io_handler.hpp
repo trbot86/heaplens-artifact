@@ -11,6 +11,7 @@
 #include <sys/mman.h>
 #include <regex>
 #include <errno.h>
+#include <unistd.h>
 #include "memory_event.hpp"
 
 class IOHandler {
@@ -49,9 +50,9 @@ private:
     void step_and_clear_bindings(sqlite3_stmt*);
 
 public:
-    IOHandler(string in_fname="binary_dump.txt", string ts_fname="typeset_dump.txt", 
-            string fs_fname="fileset_dump.txt", string frag_fname="frag_includes.txt",
-            string out_fname="allocs.txt");
+    IOHandler(std::string in_fname="binary_dump.txt", std::string ts_fname="typeset_dump.txt", 
+            std::string fs_fname="fileset_dump.txt", std::string frag_fname="frag_includes.txt",
+            std::string out_fname="allocs.txt");
 
     ~IOHandler();
 

@@ -1,4 +1,5 @@
 #include "memhook_interface.h"
+#include "sampler_test_paths.h"
 #include <iostream>
 #include <fstream>
 
@@ -19,10 +20,10 @@ int main() {
     delete blocks[1];
 
     std::ofstream ans_file;
-    ans_file.open("generate_small_static.ans");
+    ans_file.open(TEST_DATA_DIR "generate_small_static.ans");
     ans_file << "char " << NUM_BLOCKS << " " << NUM_BLOCKS*SIZE_BLOCK*sizeof(char) << " alloc" << std::endl;
     ans_file << "char " << 1 << " " << SIZE_BLOCK*sizeof(char) << " free" << std::endl;
-    ans_file << "int " << NUM_BLOCKS*NUM_NESTED << NUM_BLOCKS*NUM_NESTED*sizeof(int) << " alloc";
-    ans_file << "int " << NUM_NESTED << NUM_NESTED*sizeof(int) << " free";
+    ans_file << "int " << NUM_BLOCKS*NUM_NESTED << " " << NUM_BLOCKS*NUM_NESTED*sizeof(int) << " alloc" << std::endl;
+    ans_file << "int " << NUM_NESTED << " " << NUM_NESTED*sizeof(int) << " free" << std::endl;
     ans_file.close();
 }

@@ -8,8 +8,8 @@
     ALIGNMENT x: contains # allocations for each alignment, size, and type
     LINES x: contains all of the line information for the memory consumption graph
 */
-IOHandler::IOHandler(string in_fname, string ts_fname, string fs_fname,
-                    string frag_fname, string out_fname) :
+IOHandler::IOHandler(std::string in_fname, std::string ts_fname, std::string fs_fname,
+                    std::string frag_fname, std::string out_fname) :
                             zErrMsg{0},
                             in_filename{in_fname},
                             out_filename{out_fname},
@@ -453,7 +453,7 @@ std::unordered_set<file_and_line_num_t> IOHandler::include_frag_allocs() {
     return retset;
 }
 
-std::unordered_map<uintptr_t, std::string> get_type_map() {
+std::unordered_map<uintptr_t, std::string> IOHandler::get_type_map() {
     return type_map;
 }
 

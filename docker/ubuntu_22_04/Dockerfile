@@ -44,7 +44,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
                                             # linux-tools-common \
                                             # linux-tools-generic \
                                             # linux-tools-`uname -r` \
-                                            autoconf
+                                            autoconf \
+                                            libtbb-dev
 
 COPY . /root/sifter
 WORKDIR /root/sifter

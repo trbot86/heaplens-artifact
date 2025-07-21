@@ -68,24 +68,24 @@ __attribute__((constructor)) static void init() {
     const char* fileset_env_path = std::getenv("MEMHOOK_OUTPUT_FILE_FILE");
 
     if (file_env_path) {
-	memhook_file_path = file_env_path;
+	    memhook_file_path = file_env_path;
     }
     else {
-	memhook_file_path = "binary_dump.txt";
+	    memhook_file_path = "binary_dump.txt";
     }
 
     if (typeset_env_path) {
-	memhook_typeset_path = typeset_env_path;
+	    memhook_typeset_path = typeset_env_path;
     }
     else {
-	memhook_typeset_path = "typeset_dump.txt";
+	    memhook_typeset_path = "typeset_dump.txt";
     }
 
     if (fileset_env_path) {
-	memhook_fileset_path = fileset_env_path;
+	    memhook_fileset_path = fileset_env_path;
     }
     else {
-	memhook_fileset_path = "fileset_dump.txt";
+	    memhook_fileset_path = "fileset_dump.txt";
     }
 
     next_free = (void (*)(void *)) dlsym(RTLD_NEXT, "free");
