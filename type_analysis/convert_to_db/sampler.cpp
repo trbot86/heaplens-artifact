@@ -1,8 +1,13 @@
 #include "sampler.hpp"
 
-Sampler::Sampler() : io{}, all_events{io.get_all_events()}, 
+Sampler::Sampler() : io{},
             perf_pages{std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>>{}},
-            seen_perf_pages{std::unordered_set<uintptr_t>{}} {}
+            seen_perf_pages{std::unordered_set<uintptr_t>{}} {
+            
+    auto events_and_size = io.get_all_events();
+    all_events = events_and_size.first;
+    num_events = events_and_size.second;
+}
 
 Sampler::~Sampler() {}
 
@@ -99,14 +104,15 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
     std::unordered_map<uintptr_t, std::unordered_set<uintptr_t>> 
         tp_to_untaken_containing_pages{};
     std::unordered_map<uintptr_t, std::vector<int64_t>> buckets{};
-    uint64_t min_ts = all_events.begin()->timestamp;
-    uint64_t max_ts = all_events.rbegin()->timestamp;
+    uint64_t min_ts = all_events[0].timestamp;
+    uint64_t max_ts = all_events[num_events - 1].timestamp;
     std::unordered_map<uintptr_t, tp_stats_t> tp_stats{};
 
     io.begin_transaction();
     sqlite3_stmt* stmt;
     io.prepare_write_to_supertable(&stmt);
-    for (auto& event : all_events) {
+    for (size_t i = 0; i < num_events; i++) {
+        auto event = all_events[i];
         uintptr_t event_addr = reinterpret_cast<uintptr_t>(event.addr);
         uintptr_t event_tindex = reinterpret_cast<uintptr_t>(event.tindex_name);
         uintptr_t event_type = reinterpret_cast<uintptr_t>(event.tindex_name);
@@ -209,12 +215,13 @@ void Sampler::output_frag(size_t frag_gran) {
     auto event_interval_info = io.get_event_interval_info();
     std::unordered_map<uintptr_t, std::map<uintptr_t, size_t>> chunk_map{};
     std::unordered_map<uintptr_t, size_and_event_list_t> chunk_size{};
-    uint64_t min_ts = all_events.begin()->timestamp;
-    uint64_t max_ts = all_events.rbegin()->timestamp;
+    uint64_t min_ts = all_events[0].timestamp;
+    uint64_t max_ts = all_events[num_events - 1].timestamp;
     uint64_t quarter_ts = (max_ts - min_ts) / 4;
     char quarter_num = 1;
     std::unordered_set<uintptr_t> last_alloc{};
-    for (auto& event : all_events) {
+    for (size_t i = 0; i < num_events; i++) {
+        auto event = all_events[i];
         if (event.timestamp >= min_ts + (quarter_num*quarter_ts) || (quarter_num <= 4 && event.timestamp == max_ts)) {
             double numerator = 0.0;
             double denominator = 0.0;

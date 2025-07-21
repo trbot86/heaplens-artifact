@@ -27,19 +27,12 @@ extern "C" {
 #include <bits/stdc++.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-// #include <fcntl.h>
 #include <unistd.h>
 #include <malloc.h>
 #include <mm_malloc.h>
 #include "memstamp.h"
 #include "hash.h"
 
-
-// #include "/root/teststatic/a.h"
-// #include "mem_alloc.h"
-//#include <execinfo.h>
-//#include <cxxabi.h>
-//#include <dlfcn.h>
 
 using namespace std;
 
@@ -102,6 +95,7 @@ using namespace std;
         unit_log.typeofop = false; \
         memhookCollector.copy(unit_log);
 
+
 struct slot;
 struct memhook_info_t;
 
@@ -123,7 +117,7 @@ extern "C"
 {
 #endif
 
-    void* malloc_s(size_t, int, const char*, const char*, bool, void*);
+    void* malloc_s(size_t, int, const char*, const char*);
     // void free_s(void *, int, const char*);
     void free_log(void*);
     #if defined(MEMHOOK_ASCYLIB)
@@ -138,17 +132,6 @@ extern "C"
     void* xmalloc_s(size_t, int, const char*, const char*);
     void* xcalloc_s(size_t, size_t, int, const char*, const char*);
     #endif
-    // void ssmem_free_s(ssmem_allocator_t*, void*, int, const char*);
-    // void free(void* ptr);
-
-    // void* ssalloc_alloc_s(unsigned int allocator, size_t size, const char* filepath, int line);
-    // void* ssalloc_aligned_alloc_s(unsigned int allocator, size_t alignment, size_t size, const char* filepath, int line);
-    // void ssfree_alloc_s(unsigned int allocator, void* ptr, const char* filepath, int line);
-
-// #define SIFTER_NEW
-// #define new MemStamp((__FILE__), (__LINE__)) * new
-// #define delete MemStamp((__FILE__), (__LINE__)) * delete
-
 #ifdef __cplusplus
 }
 #endif
@@ -157,15 +140,11 @@ extern "C"
 
 extern MemStampCollector memhookCollector;
 extern thread_local memhook_info_t unit_log;
-// extern thread_local unordered_set<const char*> threadFiles;
-// extern thread_local unordered_set<const char*> typeFiles;
 extern memhook_hashtable filetable;
 extern memhook_hashtable typetable;
 extern void *memhook_malloc(size_t size, const char *file, int line, bool log);
 extern void memhook_free(void *ptr, const char* file, int line, bool log);
 
-// template <typename T>
-// T malloc(size_t size, bool fakearg=true);
 
 template <class T>
 inline T* operator*(const MemStamp &stamp, T* p)
@@ -192,7 +171,6 @@ inline T* operator*(const MemStamp &stamp, T* p)
     return p;
 }
 
-#if defined(_mm_malloc)
 template <typename T, int line, char... filename>
 static __inline__ void* __attribute__((__always_inline__, __malloc__))
 _mm_malloc(size_t __size, size_t __align)
@@ -230,7 +208,6 @@ _mm_malloc(size_t __size, size_t __align)
 
     return __mallocedMemory;
 }
-#endif
 
 template <typename T, int line, char... filename>
 int posix_memalign(void** ptr, size_t align, size_t size) {

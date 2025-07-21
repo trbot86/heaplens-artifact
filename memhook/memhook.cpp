@@ -20,7 +20,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "memhook_interface.h"
+#include <cstring>
 #include "memhook.h"
 
 // #define MEMHOOK_FORCE_MALLOC
@@ -37,6 +37,10 @@
         #define mallog_likely(x)       (x)
     #endif
 #endif
+
+const char * memhook_file_path;
+const char * memhook_typeset_path;
+const char * memhook_fileset_path;
 
 static char tmpbuff[1<<20];
 static unsigned long tmppos = 0;
@@ -59,15 +63,129 @@ static unsigned long tmpallocs = 0;
 static volatile int initialized = 0;
 
 __attribute__((constructor)) static void init() {
+    const char* file_env_path = std::getenv("MEMHOOK_OUTPUT_DUMP_FILE");
+    const char* typeset_env_path = std::getenv("MEMHOOK_OUTPUT_TYPE_FILE");
+    const char* fileset_env_path = std::getenv("MEMHOOK_OUTPUT_FILE_FILE");
+
+    if (file_env_path) {
+	memhook_file_path = file_env_path;
+    }
+    else {
+	memhook_file_path = "binary_dump.txt";
+    }
+
+    if (typeset_env_path) {
+	memhook_typeset_path = typeset_env_path;
+    }
+    else {
+	memhook_typeset_path = "typeset_dump.txt";
+    }
+
+    if (fileset_env_path) {
+	memhook_fileset_path = fileset_env_path;
+    }
+    else {
+	memhook_fileset_path = "fileset_dump.txt";
+    }
+
     next_free = (void (*)(void *)) dlsym(RTLD_NEXT, "free");
     if (!next_free) {
         fprintf(stderr, "Error in `dlsym`: %s\n", dlerror());
         exit(1);
     }
 
-    global_fd = open(file_path,O_RDWR|O_APPEND|O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
+    global_fd = open(memhook_file_path,O_RDWR|O_APPEND|O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
     initialized = 1;
     fprintf(stdout, "Done memhook constructor\n");
+}
+
+memhook_memory_pool::memhook_memory_pool(){
+  //dummy constructor
+  printf("memory_pool Constructor \n");
+}
+
+memhook_memory_pool::~memhook_memory_pool(){
+  cout << "MEMHOOK POOL DESTRUCTOR" << endl;
+	int total_byte_count = 0, status = 0;
+
+	//confirm this method works with trevor
+	struct thread_record_array * destructor_mem_array = &memory_pool[0];
+
+	// char file_path[] = "binary_dump.txt";
+  // char fileset_path[] = "fileset_dump.txt";
+  // char typeset_path[] = "typeset_dump.txt";
+  std::ofstream fileset, typeset;
+  fileset.open(memhook_fileset_path, std::ofstream::out | std::ofstream::app);
+  typeset.open(memhook_typeset_path, std::ofstream::out | std::ofstream::app);
+
+	//instead of doing this, the memory_pool array can keep track of cumulative bytes
+
+	for(int i = 0; i < memory_pool.size(); i++){
+    // cout << "Buffer size: " << memory_pool[i].buffer_size_nbytes << endl;
+    // cout << "File: " << memory_pool[i].allocation_log->file << endl;
+    // cout << "t_index name: " << memory_pool[i].allocation_log->tindex_name << endl;
+    // cout << "line: " << memory_pool[i].allocation_log->line << endl;
+    // cout << "timestamp: " << memory_pool[i].allocation_log->timestamp << endl;
+    // cout << "size: " << memory_pool[i].allocation_log->size << endl;
+		total_byte_count += memory_pool[i].buffer_size_nbytes;
+		write(global_fd, memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
+	}
+
+  for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
+    // if(filetable.bucket[i] != NULL)
+    if(filetable.bucket[i].full) {
+      printf("Filetable bucket is: %p\n", (void*) filetable.bucket[i].str);
+      fileset << (void*)filetable.bucket[i].str << "|" << filetable.bucket[i].str << endl;
+    }
+  }
+
+  for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
+    // if(typetable.bucket[i] != NULL) {
+    if(typetable.bucket[i].full) {
+      char* real_tname = abi::__cxa_demangle(typetable.bucket[i].str, 0, 0, &status);
+      if (real_tname) {
+        printf("(C++) Typetable bucket is: %p\n", typetable.bucket[i].str);
+        typeset << (void*)typetable.bucket[i].str << "|" << real_tname << endl;
+      }
+      else {
+        printf("(C) Typetable bucket is: %p\n", typetable.bucket[i].str);
+        typeset << (void*)typetable.bucket[i].str << "|" << typetable.bucket[i].str << endl;
+      }
+      // cout << typetable.bucket[i] << endl;
+    }
+  }
+
+  fileset.close();
+  typeset.close();
+}
+
+//max buffer size is already known
+void memhook_memory_pool::add(memhook_info_t *logarray, int buffer_size_nbytes){
+
+  if(buffer_size_nbytes == 0)
+    return;
+
+  pthread_mutex_lock(&lock);
+
+  //thread_first_call = 0;
+  // makes sure that calling thread never calls add function again
+  //this.memory_pool.push_back(logarray);
+
+  // printf("within mem_pool add \n");
+  this->memory_pool.push_back(thread_record_array());
+  memory_pool[memory_pool.size() - 1].allocation_log = logarray;
+  memory_pool[memory_pool.size() - 1].buffer_size_nbytes = buffer_size_nbytes;
+
+  // for(auto const& i : threadFiles) {
+  //   globalFiles.insert(i);
+  // }
+
+  // for(auto const& i : typeFiles) {
+  //   globalTypes.insert(i);
+  // }
+
+  
+  pthread_mutex_unlock(&lock);
 }
 
 void *memhook_malloc(size_t size, const char* file = "specialfile", int line = 0, bool log = true) {
@@ -150,17 +268,8 @@ void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, boo
 extern "C" {
 
     // Used for C/C++ projects which do not support templating
-    void* malloc_s(size_t size, int line, const char* filename, const char* name_of_type, bool do_alloc = true, void* log_ptr = nullptr) {
-        void* ptr = log_ptr;
-        if (mallog_likely(do_alloc)) {
-            ptr = memhook_malloc(size, filename, line, true);
-        }
-        else {
-#if defined(MEMHOOK_C_LOG)
-            MEMHOOK_LOG_ALLOC(ptr, size, filename, line, name_of_type)
-#endif
-            return ptr;
-        }
+    void* malloc_s(size_t size, int line, const char* filename, const char* name_of_type) {
+        void* ptr = memhook_malloc(size, filename, line, true);
         if (initialized) {
             unit_log.tindex_name = typetable.insert(name_of_type);
             // cout << "CALLED CUSTOM MALLOC, TYPE: " << (void*) unit_log.tindex_name << endl;
@@ -215,7 +324,6 @@ extern "C" {
     }
     #endif
 
-    #if !defined(__cplusplus)
     #if defined(MEMHOOK_ASCYLIB)
     void* ssmem_alloc_s(ssmem_allocator_t* a, size_t size, int line, const char* filename, const char* name_of_type) {
         // if (!next_ssmem_alloc) next_ssmem_alloc = (void * (*)(ssmem_allocator_t*, size_t))dlsym(RTLD_NEXT, "ssmem_alloc");
@@ -295,13 +403,13 @@ extern "C" {
 
     int posix_memalign_s(void** memptr, size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
         int ret = posix_memalign(memptr, alignment, size);
-        MEMHOOK_LOG_ALLOC(memptr, memhook_roundUp(size, alignment), filename, line, name_of_type)
+        MEMHOOK_LOG_ALLOC(memptr, memhook_roundUp(size, alignment), name_of_type)
         return ret;
     }
 
     void* memalign_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
         void* ptr = memalign(alignment, size);
-        MEMHOOK_LOG_ALLOC(ptr, memhook_roundUp(size, alignment), filename, line, name_of_type)
+        MEMHOOK_LOG_ALLOC(ptr, memhook_roundUp(size, alignment), name_of_type)
         return ptr;
     }
 
@@ -314,11 +422,10 @@ extern "C" {
         }
 
         void* ptr = calloc(nmemb, size);
-        MEMHOOK_LOG_ALLOC(ptr, size * nmemb, filename, line, name_of_type)
+        MEMHOOK_LOG_ALLOC(ptr, size * nmemb, name_of_type)
 
         return ptr;
     }
-    #endif // !defined(__cplusplus)
 }
 
 /**********************

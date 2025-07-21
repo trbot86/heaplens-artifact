@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 #include <stddef.h>
 #include <unordered_set>
@@ -6,7 +8,15 @@
 #include <string>
 #include <cassert>
 
-#pragma once
+#ifndef MEMHOOK_OUTPUT_DUMP_FILE
+  #define MEMHOOK_OUTPUT_DUMP_FILE "binary_dump.txt"
+#endif
+#ifndef MEMHOOK_OUTPUT_TYPE_FILE
+  #define MEMHOOK_OUTPUT_TYPE_FILE "typeset_dump.txt"
+#endif
+#ifndef MEMHOOK_OUTPUT_FILE_FILE
+  #define MEMHOOK_OUTPUT_FILE_FILE "fileset_dump.txt"
+#endif
 
 using file_and_line_num_t = std::pair<uintptr_t, unsigned int>;
 using addr_and_size = std::pair<uintptr_t, size_t>;
@@ -68,6 +78,7 @@ typedef struct mem_interval {
     struct mem_interval* container;
     std::unordered_set<struct mem_interval*> contained;
     memory_event_t* alloc_info;
+    size_t alloc_info_index;
 
     /*
     Here, 'other' represents an allocation that was performed AFTER 'this'
@@ -83,19 +94,11 @@ typedef struct mem_interval {
         Overlap::None iff the intervals of 'other' and 'this' do not overlap
             at all.
     */
-    Overlap contains(struct mem_interval* other) {
-        uintptr_t my_start = reinterpret_cast<uintptr_t>(alloc_info->addr);
-        uintptr_t other_start = 
-            reinterpret_cast<uintptr_t>(other->alloc_info->addr);
-        uintptr_t my_end = my_start +
-            reinterpret_cast<uintptr_t>(alloc_info->size);
-        uintptr_t other_end = other_start +
-            reinterpret_cast<uintptr_t>(other->alloc_info->size);
-        
-        return (my_start <= other_start && my_end > other_end ||
-                my_start < other_start && my_end >= other_end) ?
+    Overlap contains(struct mem_interval* other) {        
+        return (start <= other->start && end > other->end ||
+                start < other->start && end >= other->end) ?
                 Overlap::Contains :
-                (my_start >= other_end || my_end <= other_start) ?
+                (start >= other->end || end <= other->start) ?
                 Overlap::None : Overlap::Overwritten;
     }
 } mem_interval_t;

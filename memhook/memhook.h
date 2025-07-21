@@ -20,13 +20,14 @@
 #include <aio.h>
 #include <unordered_set>
 
+#include "memhook_interface.h"
 #include "memstamp.h"
 #include "hash.h"
 #include "memhook_ssmem.h"
 
 #define MEMHOOK_BACKTRACE_DEPTH 2
 #ifndef MEMHOOK_MAX_THREADS
-    #define MEMHOOK_MAX_THREADS 1000
+  #define MEMHOOK_MAX_THREADS 1000
 #endif
 #define MEMHOOK_MAX_TRACK 1000000
 #define MEMHOOK_MAX_TYPE_LENGTH 1000
@@ -46,7 +47,6 @@ class ThreadExiter;
 
 memhook_hashtable filetable;
 memhook_hashtable typetable;
-char file_path[] = "binary_dump.txt";
 
 thread_local int thread_first_call = 1;
 thread_local int first_filled_buffer_status = 0;
@@ -71,6 +71,16 @@ thread_local memhook_info_t unit_log;
 thread_local int fileset_fd;
 
 int global_fd;
+
+/*#ifdef __cplusplus
+extern "C" {
+#endif
+__attribute__((weak)) extern const char memhook_file_path[] = "binary_dump.txt";
+__attribute__((weak)) extern const char memhook_typeset_path[] = "typeset_dump.txt";
+__attribute__((weak)) extern const char memhook_fileset_path[] = "fileset_dump.txt";
+#ifdef __cplusplus
+}
+#endif*/
 
 uint64_t memhook_get_server_clock() {
 #if defined(__i386__)
@@ -110,94 +120,6 @@ class memhook_memory_pool {
     //virtual void dumptodisk();
 };
 
-memhook_memory_pool::memhook_memory_pool(){
-  //dummy constructor
-  printf("memory_pool Constructor \n");
-}
-
-memhook_memory_pool::~memhook_memory_pool(){
-  cout << "MEMHOOK POOL DESTRUCTOR" << endl;
-	int total_byte_count = 0, status = 0;
-
-	//confirm this method works with trevor
-	struct thread_record_array * destructor_mem_array = &memory_pool[0];
-
-	char file_path[] = "binary_dump.txt";
-  char fileset_path[] = "fileset_dump.txt";
-  char typeset_path[] = "typeset_dump.txt";
-  std::ofstream fileset, typeset;
-  fileset.open(fileset_path, std::ofstream::out | std::ofstream::app);
-  typeset.open(typeset_path, std::ofstream::out | std::ofstream::app);
-
-	//instead of doing this, the memory_pool array can keep track of cumulative bytes
-
-	for(int i = 0; i < memory_pool.size(); i++){
-    // cout << "Buffer size: " << memory_pool[i].buffer_size_nbytes << endl;
-    // cout << "File: " << memory_pool[i].allocation_log->file << endl;
-    // cout << "t_index name: " << memory_pool[i].allocation_log->tindex_name << endl;
-    // cout << "line: " << memory_pool[i].allocation_log->line << endl;
-    // cout << "timestamp: " << memory_pool[i].allocation_log->timestamp << endl;
-    // cout << "size: " << memory_pool[i].allocation_log->size << endl;
-		total_byte_count += memory_pool[i].buffer_size_nbytes;
-		write(global_fd, memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
-	}
-
-  for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
-    // if(filetable.bucket[i] != NULL)
-    if(filetable.bucket[i].full) {
-      printf("Filetable bucket is: %p\n", (void*) filetable.bucket[i].str);
-      fileset << (void*)filetable.bucket[i].str << "|" << filetable.bucket[i].str << endl;
-    }
-  }
-
-  for(int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
-    // if(typetable.bucket[i] != NULL) {
-    if(typetable.bucket[i].full) {
-      char* real_tname = abi::__cxa_demangle(typetable.bucket[i].str, 0, 0, &status);
-      if (real_tname) {
-        printf("(C++) Typetable bucket is: %p\n", typetable.bucket[i].str);
-        typeset << (void*)typetable.bucket[i].str << "|" << real_tname << endl;
-      }
-      else {
-        printf("(C) Typetable bucket is: %p\n", typetable.bucket[i].str);
-        typeset << (void*)typetable.bucket[i].str << "|" << typetable.bucket[i].str << endl;
-      }
-      // cout << typetable.bucket[i] << endl;
-    }
-  }
-
-  fileset.close();
-  typeset.close();
-}
-
-//max buffer size is already known
-void memhook_memory_pool::add(memhook_info_t *logarray, int buffer_size_nbytes){
-
-  if(buffer_size_nbytes == 0)
-    return;
-
-  pthread_mutex_lock(&lock);
-
-  //thread_first_call = 0;
-  // makes sure that calling thread never calls add function again
-  //this.memory_pool.push_back(logarray);
-
-  // printf("within mem_pool add \n");
-  this->memory_pool.push_back(thread_record_array());
-  memory_pool[memory_pool.size() - 1].allocation_log = logarray;
-  memory_pool[memory_pool.size() - 1].buffer_size_nbytes = buffer_size_nbytes;
-
-  // for(auto const& i : threadFiles) {
-  //   globalFiles.insert(i);
-  // }
-
-  // for(auto const& i : typeFiles) {
-  //   globalTypes.insert(i);
-  // }
-
-  
-  pthread_mutex_unlock(&lock);
-}
 
 memhook_memory_pool mem_pool_obj;
 
@@ -240,9 +162,9 @@ class ThreadExiter
     }
   };
 
-int get_slot(thread::id id);
-void insert_type(void *p, const MemStamp &stamp, const type_index);
-void insert_info(size_t size, void* ptr, type_index tindex);
+// int get_slot(thread::id id);
+// void insert_type(void *p, const MemStamp &stamp, const type_index);
+// void insert_info(size_t size, void* ptr, type_index tindex);
 
 void  (memhook_free)(void *ptr, const char* file, int line, bool log);
 void* memhook_malloc(size_t size, const char* file, int line, bool log);
