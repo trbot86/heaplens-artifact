@@ -29,12 +29,13 @@ fieldandtypedumper: clang_parser.cpp
 	$(CC) $(Includes) clang_parser.cpp $(CLANGLIBS) $(LLVMLIBS) -g -o bin/fieldandtypedumper
 
 $(TEST_DATA_DIR)/%.gen: $(TEST_DATA_DIR)/%.cpp
-	g++ -std=c++17 -I../memhook/ $< -o $@ -L../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
+	g++ -std=c++17 -g -I../memhook/ $< -o $@ -L../memhook/ -Wl,-rpath=../memhook/ -lmemhook -ldl
 
 build_test_binds: $(TEST_BINS)
 
 # Target to build and run test data generators
 prepare_test: $(TEST_BINS)
+	@echo "Removing old test data..."
 	@rm -f $(TEST_DATA_DIR)/*.txt
 	@echo "Generating test data..."
 	@parallel --halt now,fail=1 --lb --jobs 0 ' \
@@ -49,10 +50,10 @@ prepare_test: $(TEST_BINS)
 $(RUN_TEST_BIN): $(RUN_TEST_SRC) $(SRCS_TO_TEST)
 	$(CXX) -I./convert_to_db/ -std=c++17 -g -o $@ $^ -lsqlite3 -lpthread -ltbb
 
-# Target to build and run the test
+# Target to build and run the tests
 run_tests: $(RUN_TEST_BIN)
 	@echo "Running tests..."
 	@./$(RUN_TEST_BIN)
 
 clean:
-	rm bin/*
+	rm -f bin/* $(TEST_DATA_DIR)/*.gen

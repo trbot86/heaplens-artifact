@@ -71,7 +71,7 @@ public:
 
     Fills in the event_interval_info map to help calculate fragmentation
     */
-    std::pair<memory_event_t*, size_t> get_all_events();
+    std::pair<memory_event_t*, size_t> get_all_events(bool use_container=false);
 
     std::unordered_map<memory_event_t, mem_interval_t> get_event_interval_info();
 
