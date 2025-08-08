@@ -4,6 +4,7 @@
 #include <fstream>
 #include <thread>
 #include <random>
+#include <mutex>
 
 #define NUM_THREADS 8
 #define NUM_BLOCKS_PER_THREAD 100000
@@ -56,14 +57,20 @@ typedef struct alloc_free {
 } alloc_free_t;
 
 void allocate_work(std::unordered_map<std::string, alloc_free_t>& type_counts,
-                    std::unordered_map<std::string, alloc_free_t>& type_sizes) {
+                    std::unordered_map<std::string, alloc_free_t>& type_sizes,
+                    std::mutex& print_m) {
     char* blocks[NUM_BLOCKS_PER_THREAD];
     std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> type_dist(0, 2);
-    std::uniform_int_distribution<int> inner_size_dist(0, (SIZE_BLOCK * sizeof(char)) / sizeof(LongType));
+    std::uniform_int_distribution<int> inner_size_dist(2, ((SIZE_BLOCK * sizeof(char)) / sizeof(LongType)) - 1);
 
     for (int i = 0; i < NUM_BLOCKS_PER_THREAD; i++) {
-        blocks[i] = (char*) malloc<char, 60, MACRO_GET_STR("generate_large_random.cpp")>(SIZE_BLOCK * sizeof(char));
+        blocks[i] = (char*) malloc<char, __LINE__, MACRO_GET_STR(__FILE__)>(SIZE_BLOCK * sizeof(char));
+        // {
+        //     std::unique_lock<std::mutex> lock{print_m};
+        //     std::cout << "Thread " << std::this_thread::get_id();
+        //     printf(": %p\n", blocks[i]);
+        // }
         int inner_block_size = inner_size_dist(rng) * sizeof(LongType);
         char* inner_block = blocks[i] + (SIZE_BLOCK * sizeof(char)) - inner_block_size;
         MEMHOOK_LOG_ALLOC(inner_block, inner_block_size, typeid(char).name())
@@ -132,10 +139,12 @@ int main() {
     };
     auto combined_size{combined_count};
 
+    std::mutex print_m;
+
     for (int i = 0; i < NUM_THREADS; i++) {
         type_counts.push_back(combined_count);
         type_sizes.push_back(combined_count);
-        threads.emplace_back(allocate_work, std::ref(type_counts[i]), std::ref(type_sizes[i]));
+        threads.emplace_back(allocate_work, std::ref(type_counts[i]), std::ref(type_sizes[i]), std::ref(print_m));
     }
 
     for (int i = 0; i < NUM_THREADS; i++) {

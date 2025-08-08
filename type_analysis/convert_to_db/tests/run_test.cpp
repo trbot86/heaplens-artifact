@@ -4,6 +4,12 @@
 #include <unordered_set>
 
 #define SUFFIX_LEN 9
+#ifndef PRINT_WARNING
+#define PRINT_WARNING 0
+#endif
+#ifndef SELECT_TEST
+#define SELECT_TEST ""
+#endif
 
 typedef struct type_tracker {
     std::string type_name;
@@ -13,7 +19,7 @@ typedef struct type_tracker {
     size_t size_frees;
 } type_tracker_t;
 
-void check_stats(std::string type, std::string event_kind, size_t num_observed,
+bool check_stats(std::string type, std::string event_kind, size_t num_observed,
                 size_t size_observed, size_t num_expect, size_t size_expect) {
     if (num_observed != num_expect || size_observed != size_expect) {
         printf("ERROR: stats for type %s %s does not match expected\n"
@@ -21,14 +27,17 @@ void check_stats(std::string type, std::string event_kind, size_t num_observed,
                 "\tExpected: num=%lu, size=%lu\n\n", type.c_str(), event_kind.c_str(),
                                                     num_observed, size_observed,
                                                     num_expect, size_expect);
+        return false;
     }
     else {
         printf("%s stats for type %s ok!\n", event_kind.c_str(), type.c_str());
+        return true;
     }
 }
 
 int main() {
     std::unordered_set<std::string> names{};
+    std::string select_test{SELECT_TEST};
 
     for (const auto& entry : std::filesystem::directory_iterator(TEST_DATA_DIR)) {
         if (!entry.is_regular_file()) continue;
@@ -36,8 +45,12 @@ int main() {
         if (filepath.substr(filepath.size() - 4) != ".txt") continue;
         std::string fname = filepath.substr(0, filepath.size() - SUFFIX_LEN);
         if (names.find(fname) != names.end()) continue;
+        if (select_test.size() > 0 && select_test != fname) continue;
 
+        size_t  warning_num = 0,
+                error_num = 0;
         names.insert(fname);
+        printf("Running tests for file: %s\n", fname.c_str());
 
         IOHandler io{TEST_DATA_DIR + fname + "_dump.txt",
                     TEST_DATA_DIR + fname + "_type.txt",
@@ -53,11 +66,17 @@ int main() {
             std::string tname;
             uintptr_t tindex_ptr = reinterpret_cast<uintptr_t>(event.tindex_name);
             if (type_map.find(tindex_ptr) == type_map.end()) {
-                if (event.typeofop)
+                if (event.typeofop) {
                     printf("ERROR: unmapped type in data: %p\n\n", event.tindex_name);
-                else
+                    error_num++;
+                }
+                else {
+#if PRINT_WARNING == 1
                     printf("WARNING: unfilled type for free at addr %p with ts %lu\n\n",
                             event.addr, event.timestamp);
+#endif
+                    warning_num++;
+                }
                 continue;
             }
             else
@@ -80,13 +99,26 @@ int main() {
         while (ans_file >> type >> num >> total_size >> event_kind) {
             if (stats.find(type) == stats.end()) {
                 printf("ERROR: type %s not observed\n\n", type.c_str());
+                error_num++;
             }
             else {
                 size_t num_observed = (event_kind == "alloc" ? stats[type].num_allocs : stats[type].num_frees);
                 size_t size_observed = (event_kind == "alloc" ? stats[type].size_allocs : stats[type].size_frees);
-                check_stats(type, event_kind, num_observed, size_observed, num, total_size);
+                if (!check_stats(type, event_kind, num_observed, size_observed, num, total_size))
+                    error_num++;
             }
         }
         ans_file.close();
+
+        printf("\n--- TEST RESULTS FOR FILE %s ---\n", fname.c_str());
+        if (warning_num > 0) {
+            printf("\tNumber of warnings: %lu\n", warning_num);
+        }
+        if (error_num > 0) {
+            printf("\tNumber of errors: %lu\n", error_num);
+        }
+        else {
+            printf("\tAll tests passed!\n\n");
+        }
     }
 }

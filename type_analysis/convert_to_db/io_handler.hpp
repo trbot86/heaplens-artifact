@@ -12,6 +12,7 @@
 #include <regex>
 #include <errno.h>
 #include <unistd.h>
+#include <stdint.h>
 #include "memory_event.hpp"
 
 class IOHandler {

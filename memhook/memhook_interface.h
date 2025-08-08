@@ -67,7 +67,6 @@ using namespace std;
 
 #define MACRO_GET_STR(str) MACRO_GET_128(str, 0), 0
 
-#if defined(__cplusplus) && ! defined(MEMHOOK_C_LOG)
 #define MEMHOOK_LOG_ALLOC(ptr, sz, tname) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
@@ -77,17 +76,17 @@ using namespace std;
         unit_log.tindex_name = typetable.insert(tname); \
         unit_log.line = __LINE__; \
         memhookCollector.copy(unit_log);
-#else
-#define MEMHOOK_LOG_ALLOC(ptr, sz, tname) \
+
+#define MEMHOOK_LOG_FNAME_ALLOC(ptr, sz, fname, tname) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.file = filetable.insert(MACRO_GET_STR(__FILE__)); \
+        unit_log.file = filetable.insert(fname); \
         unit_log.tindex_name = typetable.insert(tname); \
         unit_log.line = __LINE__; \
         memhookCollector.copy(unit_log);
-#endif // __cplusplus
+
 
 #define MEMHOOK_LOG_FREE(ptr) \
         unit_log.timestamp = memhook_get_server_clock(); \
@@ -142,8 +141,8 @@ extern MemStampCollector memhookCollector;
 extern thread_local memhook_info_t unit_log;
 extern memhook_hashtable filetable;
 extern memhook_hashtable typetable;
-extern void *memhook_malloc(size_t size, const char *file, int line, bool log);
-extern void memhook_free(void *ptr, const char* file, int line, bool log);
+extern void *memhook_malloc(size_t size, int line, bool log);
+extern void memhook_free(void *ptr, int line, bool log);
 
 
 template <class T>
@@ -181,7 +180,7 @@ _mm_malloc(size_t __size, size_t __align)
     unit_log.tindex_name = typetable.insert(typeid(T).name());
     if (__align == 1)
     {
-        void* ptr = memhook_malloc(__size, unit_log.file, line, true);
+        void* ptr = memhook_malloc(__size, line, true);
         memhookCollector.copy(unit_log);
         return ptr;
     }
@@ -232,7 +231,7 @@ void* malloc(size_t size)
     unit_log.file = filetable.insert<filename...>();
     unit_log.tindex_name = typetable.insert(typeid(T).name());
 
-    void* ptr = memhook_malloc(size, unit_log.file, line, true);
+    void* ptr = memhook_malloc(size, line, true);
 
     memhookCollector.copy(unit_log);
     return ptr;

@@ -11,7 +11,7 @@ int main() {
     char* blocks[NUM_BLOCKS];
 
     for (int i = 0; i < NUM_BLOCKS; i++) {
-        blocks[i] = (char*) malloc<char, 7, MACRO_GET_STR("generate_small_static_overlap_free.cpp")>(SIZE_BLOCK*sizeof(char));
+        blocks[i] = (char*) malloc<char, __LINE__, MACRO_GET_STR(__FILE__)>(SIZE_BLOCK*sizeof(char));
         for (int j = 0; j < NUM_NESTED; j++) {
             MemStamp(__FILE__, __LINE__) * (int*) new (blocks[i] + (j*sizeof(int))) int{j};
         }

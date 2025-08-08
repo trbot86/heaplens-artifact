@@ -46,9 +46,11 @@ prepare_test: $(TEST_BINS)
 		MEMHOOK_OUTPUT_FILE_FILE=$(TEST_DATA_DIR)/$${BASE}_file.txt \
 		./$$BIN' ::: $(TEST_BINS)
 
+PRINT_WARNING ?= 0
+
 # Target to build the run_test binary
 $(RUN_TEST_BIN): $(RUN_TEST_SRC) $(SRCS_TO_TEST)
-	$(CXX) -I./convert_to_db/ -std=c++17 -g -o $@ $^ -lsqlite3 -lpthread -ltbb
+	$(CXX) -I./convert_to_db/ -std=c++17 -DSELECT_TEST="\"$(SELECT_TEST)\"" -DPRINT_WARNING=$(PRINT_WARNING) -g -o $@ $^ -lsqlite3 -lpthread -ltbb
 
 # Target to build and run the tests
 run_tests: $(RUN_TEST_BIN)
@@ -56,4 +58,4 @@ run_tests: $(RUN_TEST_BIN)
 	@./$(RUN_TEST_BIN)
 
 clean:
-	rm -f bin/* $(TEST_DATA_DIR)/*.gen
+	rm -f bin/* $(TEST_DATA_DIR)/*.gen $(RUN_TEST_BIN)

@@ -11,7 +11,6 @@ struct memhook_info_t {
     size_t size;
     void* addr;
     bool typeofop;
-    //char padding[PADDING];
 
     memhook_info_t() : file(nullptr), tindex_name(nullptr), line(0), timestamp(0), size(0), addr(nullptr) {
         (void) 0;

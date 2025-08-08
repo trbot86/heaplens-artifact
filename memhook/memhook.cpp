@@ -188,7 +188,7 @@ void memhook_memory_pool::add(memhook_info_t *logarray, int buffer_size_nbytes){
   pthread_mutex_unlock(&lock);
 }
 
-void *memhook_malloc(size_t size, const char* file = "specialfile", int line = 0, bool log = true) {
+void *memhook_malloc(size_t size, int line = 0, bool log = true) {
     if (!initialized) {
         if (tmppos + size < sizeof(tmpbuff)) {
             void *retptr = tmpbuff + tmppos;
@@ -221,15 +221,16 @@ void *memhook_malloc(size_t size, const char* file = "specialfile", int line = 0
     unit_log.size = size;
     unit_log.addr = mem;
     unit_log.typeofop = true;
-    if (log) {
-        unit_log.file = filetable.insert(file);
-        unit_log.line = line;
-    }
+    unit_log.line = line;
+    // if (log) {
+    //     unit_log.file = filetable.insert(file);
+    //     unit_log.line = line;
+    // }
 
     return mem;
 }
 
-void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, bool log = false) {
+void memhook_free(void *ptr, int line = 0, bool log = false) {
     if (!setup) {
         exiter.add();
         setup = true;
@@ -248,10 +249,10 @@ void memhook_free(void *ptr, const char* file = "specialfile", int line = 0, boo
     unit_log.size = 0;
     unit_log.addr = ptr;
     unit_log.typeofop = false;
-    if (log) {
-        unit_log.file = file;
-        unit_log.line = line;
-    }
+    // if (log) {
+    //     unit_log.file = file;
+    //     unit_log.line = line;
+    // }
 }
 // void *realloc(void *ptr, size_t size) {
 // //     // if (mallog_unlikely(next_malloc == 0)) {
@@ -269,8 +270,9 @@ extern "C" {
 
     // Used for C/C++ projects which do not support templating
     void* malloc_s(size_t size, int line, const char* filename, const char* name_of_type) {
-        void* ptr = memhook_malloc(size, filename, line, true);
+        void* ptr = memhook_malloc(size, line, true);
         if (initialized) {
+            unit_log.file = filetable.insert(filename);
             unit_log.tindex_name = typetable.insert(name_of_type);
             // cout << "CALLED CUSTOM MALLOC, TYPE: " << (void*) unit_log.tindex_name << endl;
             memhookCollector.copy(unit_log);
@@ -284,7 +286,7 @@ extern "C" {
 
     void free(void* ptr) {
         if (!ptr) return;
-        memhook_free(ptr, NULL, 0, false);
+        memhook_free(ptr, 0, false);
         if (initialized) {
             // cout << "CALLED CUSTOM FREE" << endl;
             memhookCollector.copy(unit_log);
@@ -313,13 +315,13 @@ extern "C" {
     #if defined(MEMHOOK_GZIP)
     void* xmalloc_s(size_t size, int line, const char* filename, const char* name_of_type) {
         void* ptr = xmalloc(size);
-        MEMHOOK_LOG_ALLOC(ptr, size, filename, line, name_of_type)
+        MEMHOOK_LOG_FNAME_ALLOC(ptr, size, filename, name_of_type)
         return ptr;
     }
 
     void* xcalloc_s(size_t nmemb, size_t size, int line, const char* filename, const char* name_of_type) {
         void* ptr = xcalloc(nmemb, size);
-        MEMHOOK_LOG_ALLOC(ptr, size * nmemb, filename, line, name_of_type)
+        MEMHOOK_LOG_FNAME_ALLOC(ptr, size * nmemb, filename, name_of_type)
         return ptr;
     }
     #endif
@@ -335,7 +337,7 @@ extern "C" {
         #endif
         #ifndef MEMHOOK_FORCE_MALLOC
         void* ptr = ssmem_alloc(a, size);
-        MEMHOOK_LOG_ALLOC(ptr, size, filename, line, name_of_type)
+        MEMHOOK_LOG_FNAME_ALLOC(ptr, size, filename, name_of_type)
         #endif
 
         return ptr;
@@ -364,7 +366,7 @@ extern "C" {
         #endif
         #ifndef MEMHOOK_FORCE_MALLOC
         void* ptr = ssalloc(size);
-        MEMHOOK_LOG_ALLOC(ptr, size, filename, line, name_of_type)
+        MEMHOOK_LOG_FNAME_ALLOC(ptr, size, filename, name_of_type)
         #endif
 
         return ptr;
@@ -381,7 +383,7 @@ extern "C" {
         void* ptr = ssalloc_aligned(alignment, size);
         #endif
 
-        MEMHOOK_LOG_ALLOC(ptr, memhook_roundUp(size, alignment), filename, line, name_of_type)
+        MEMHOOK_LOG_FNAME_ALLOC(ptr, memhook_roundUp(size, alignment), filename, name_of_type)
 
         return ptr;
     }
@@ -403,26 +405,26 @@ extern "C" {
 
     int posix_memalign_s(void** memptr, size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
         int ret = posix_memalign(memptr, alignment, size);
-        MEMHOOK_LOG_ALLOC(memptr, memhook_roundUp(size, alignment), name_of_type)
+        MEMHOOK_LOG_FNAME_ALLOC(memptr, memhook_roundUp(size, alignment), filename, name_of_type)
         return ret;
     }
 
     void* memalign_s(size_t alignment, size_t size, int line, const char* filename, const char* name_of_type) {
         void* ptr = memalign(alignment, size);
-        MEMHOOK_LOG_ALLOC(ptr, memhook_roundUp(size, alignment), name_of_type)
+        MEMHOOK_LOG_FNAME_ALLOC(ptr, memhook_roundUp(size, alignment), filename, name_of_type)
         return ptr;
     }
 
     void* calloc_s(size_t nmemb, size_t size, int line, const char* filename, const char* name_of_type) {
         if (!initialized) {
-            void *ptr = memhook_malloc(nmemb*size, filename, line, false);
+            void *ptr = memhook_malloc(nmemb*size, line, false);
             if (ptr) memset(ptr, 0, nmemb*size);
             if (!ptr) exit(70);
             return ptr;
         }
 
         void* ptr = calloc(nmemb, size);
-        MEMHOOK_LOG_ALLOC(ptr, size * nmemb, name_of_type)
+        MEMHOOK_LOG_FNAME_ALLOC(ptr, size * nmemb, filename, name_of_type)
 
         return ptr;
     }
@@ -436,7 +438,7 @@ extern "C" {
  * 
  **********************/
 void * operator new(size_t size) {
-    void* mem = memhook_malloc(size == 0?1:size, NULL, 0, false);
+    void* mem = memhook_malloc(size, 0, false);
 
     if(mem == 0) {
         throw bad_alloc();
@@ -446,7 +448,7 @@ void * operator new(size_t size) {
 }
 
 void *operator new[] (size_t size) {
-    void* mem = memhook_malloc(size == 0?1:size, NULL, 0, false);
+    void* mem = memhook_malloc(size, 0, false);
     
     if(mem == 0) {
         throw bad_alloc();
@@ -456,13 +458,13 @@ void *operator new[] (size_t size) {
 }
 
 void operator delete(void * mem) _GLIBCXX_USE_NOEXCEPT {
-    memhook_free(mem, NULL, 0, false);
+    memhook_free(mem, 0, false);
     memhookCollector.copy(unit_log);
     return;
 }
 
 void operator delete[](void *mem)  _GLIBCXX_USE_NOEXCEPT {
-    memhook_free(mem, NULL, 0, false);
+    memhook_free(mem, 0, false);
     memhookCollector.copy(unit_log);
     return;
 }
