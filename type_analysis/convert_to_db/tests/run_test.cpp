@@ -53,8 +53,8 @@ int main() {
         printf("Running tests for file: %s\n", fname.c_str());
 
         IOHandler io{TEST_DATA_DIR + fname + "_dump.txt",
-                    TEST_DATA_DIR + fname + "_type.txt",
-                    TEST_DATA_DIR + fname + "_file.txt"};
+                    TEST_DATA_DIR + fname + ".types",
+                    TEST_DATA_DIR + fname + ".files"};
         std::pair<memory_event_t*, size_t> data = io.get_all_events(true);
         std::unordered_map<uintptr_t, std::string> type_map = io.get_type_map();
         auto stats = std::unordered_map<std::string, type_tracker_t>{};

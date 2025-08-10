@@ -67,24 +67,24 @@ using namespace std;
 
 #define MACRO_GET_STR(str) MACRO_GET_128(str, 0), 0
 
-#define MEMHOOK_LOG_ALLOC(ptr, sz, tname) \
+#ifdef USE_TEMPLATE
+#define MEMHOOK_LOG_CPP_ALLOC(ptr, sz, tid) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.file = filetable.insert<MACRO_GET_STR(__FILE__)>(); \
-        unit_log.tindex_name = typetable.insert(tname); \
+        unit_log.tindex_name = typetable.insert(tid); \
         unit_log.line = __LINE__; \
         memhookCollector.copy(unit_log);
+#endif
 
-#define MEMHOOK_LOG_FNAME_ALLOC(ptr, sz, fname, tname) \
+#define MEMHOOK_LOG_C_ALLOC(ptr, sz, line, fname, tid) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.file = filetable.insert(fname); \
-        unit_log.tindex_name = typetable.insert(tname); \
-        unit_log.line = __LINE__; \
+        unit_log.tindex_name = tid; \
+        unit_log.line = line; \
         memhookCollector.copy(unit_log);
 
 
@@ -116,20 +116,20 @@ extern "C"
 {
 #endif
 
-    void* malloc_s(size_t, int, const char*, const char*);
+    void* malloc_s(size_t, int, uint16_t, uint16_t);
     // void free_s(void *, int, const char*);
     void free_log(void*);
     #if defined(MEMHOOK_ASCYLIB)
-    void* ssalloc_s(size_t, int, const char*, const char*);
-    void* ssalloc_aligned_s(size_t, size_t, int, const char*, const char*);
-    void* ssmem_alloc_s(ssmem_allocator_t*, size_t, int, const char*, const char*);
+    void* ssalloc_s(size_t, int, uint16_t, uint16_t);
+    void* ssalloc_aligned_s(size_t, size_t, int, uint16_t, uint16_t);
+    void* ssmem_alloc_s(ssmem_allocator_t*, size_t, int, uint16_t, uint16_t);
     #endif
-    int posix_memalign_s(void**, size_t, size_t, int, const char*, const char*);
-    void* memalign_s(size_t, size_t, int, const char*, const char*);
-    void* calloc_s(size_t, size_t, int, const char*, const char*);
+    int posix_memalign_s(void**, size_t, size_t, int, uint16_t, uint16_t);
+    void* memalign_s(size_t, size_t, int, uint16_t, uint16_t);
+    void* calloc_s(size_t, size_t, int, uint16_t, uint16_t);
     #if defined(MEMHOOK_GZIP)
-    void* xmalloc_s(size_t, int, const char*, const char*);
-    void* xcalloc_s(size_t, size_t, int, const char*, const char*);
+    void* xmalloc_s(size_t, int, uint16_t, uint16_t);
+    void* xcalloc_s(size_t, size_t, int, uint16_t, uint16_t);
     #endif
 #ifdef __cplusplus
 }
@@ -162,22 +162,24 @@ inline T* operator*(const MemStamp &stamp, T* p)
         unit_log.addr = (void*) p;
         unit_log.typeofop = true;
     }
-    unit_log.file = filetable.insert(stamp.filename);
+    // unit_log.file = filetable.insert(stamp.filename);
+    unit_log.file = stamp.filename;
     unit_log.line = stamp.lineNum;
-    unit_log.tindex_name = typetable.insert(typeid(T).name());
+    unit_log.tindex_name = typetable.insert(&typeid(T));
 
     memhookCollector.copy(unit_log);
     return p;
 }
 
-template <typename T, int line, char... filename>
+template <typename T, int line, uint16_t filename>
 static __inline__ void* __attribute__((__always_inline__, __malloc__))
 _mm_malloc(size_t __size, size_t __align)
 {
     // string filestring = {filename...};
 
-    unit_log.file = filetable.insert<filename...>();
-    unit_log.tindex_name = typetable.insert(typeid(T).name());
+    // unit_log.file = filetable.insert<filename...>();
+    unit_log.file = filename;
+    unit_log.tindex_name = typetable.insert(&typeid(T));
     if (__align == 1)
     {
         void* ptr = memhook_malloc(__size, line, true);
@@ -208,10 +210,11 @@ _mm_malloc(size_t __size, size_t __align)
     return __mallocedMemory;
 }
 
-template <typename T, int line, char... filename>
+template <typename T, int line, uint16_t filename>
 int posix_memalign(void** ptr, size_t align, size_t size) {
-    unit_log.file = filetable.insert<filename...>();
-    unit_log.tindex_name = typetable.insert(typeid(T).name());
+    // unit_log.file = filetable.insert<filename...>();
+    unit_log.file = filename;
+    unit_log.tindex_name = typetable.insert(&typeid(T));
     unit_log.timestamp = memhook_get_server_clock();
     unit_log.size = memhook_roundUp(size, align);
     unit_log.line = line;
@@ -225,11 +228,12 @@ int posix_memalign(void** ptr, size_t align, size_t size) {
     return r;
 }
 
-template <typename T, int line, char... filename>
+template <typename T, int line, uint16_t filename>
 void* malloc(size_t size)
 {
-    unit_log.file = filetable.insert<filename...>();
-    unit_log.tindex_name = typetable.insert(typeid(T).name());
+    // unit_log.file = filetable.insert<filename...>();
+    unit_log.file = filename;
+    unit_log.tindex_name = typetable.insert(&typeid(T));
 
     void* ptr = memhook_malloc(size, line, true);
 

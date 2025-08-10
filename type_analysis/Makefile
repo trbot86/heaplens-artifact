@@ -42,8 +42,7 @@ prepare_test: $(TEST_BINS)
 		BIN={}; \
 		BASE=$$(basename $$BIN .gen); \
 		MEMHOOK_OUTPUT_DUMP_FILE=$(TEST_DATA_DIR)/$${BASE}_dump.txt \
-		MEMHOOK_OUTPUT_TYPE_FILE=$(TEST_DATA_DIR)/$${BASE}_type.txt \
-		MEMHOOK_OUTPUT_FILE_FILE=$(TEST_DATA_DIR)/$${BASE}_file.txt \
+		MEMHOOK_OUTPUT_TYPE_FILE=$(TEST_DATA_DIR)/$${BASE}.types \
 		./$$BIN' ::: $(TEST_BINS)
 
 PRINT_WARNING ?= 0

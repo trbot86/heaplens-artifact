@@ -3,29 +3,27 @@
 #include <stdio.h>
 
 
-char* memhook_hashtable::insert(const char* str) {
-    uint64_t h = djb2(str);
+uint16_t memhook_hashtable::insert(const std::type_info* typeid_ptr) {
+    uint64_t h = reinterpret_cast<uintptr_t>(typeid_ptr) * 11400714819323198485ull; // Knuth's multiplicative hash function
 
     for(int i = 0; i < MEMHOOK_HASH_TABLE_SIZE; i++) {
-        int index = (h + i) & (MEMHOOK_HASH_TABLE_SIZE - 1);
+        uint16_t index = (h + i) & (MEMHOOK_HASH_TABLE_SIZE - 1);
 
-        if (!bucket[index].full) {
+        if(!bucket[index].full.load(std::memory_order_acquire)) {
             guard[index].lock();
             if (!bucket[index].full) {
-                uint16_t len = strlen(str);
-                strncpy(bucket[index].str, str, len+1);
-                bucket[index].len = len;
-                bucket[index].full = true;
+                bucket[index].typeid_ptr = typeid_ptr;
+                bucket[index].full.store(true, std::memory_order_release);
                 guard[index].unlock();
-                return bucket[index].str;
+                return index;
             }
             guard[index].unlock();
         }
         
-        if (strcmp(str, bucket[index].str) == 0) {
+        if (typeid_ptr == bucket[index].typeid_ptr) {
             // cout << "found" << endl;
-            return bucket[index].str;
+            return index;
         }
     }
-    return NULL;
+    return 0;
 }

@@ -40,13 +40,11 @@ using namespace std;
 struct slot;
 struct memhook_info_t;
 class ThreadExiter;
-// thread_local unordered_set<const char*> threadFiles;
-// thread_local unordered_set<const char*> typeFiles;
-// unordered_set<const char*> globalTypes;
-// unordered_set<const char*> globalFiles;
 
-memhook_hashtable filetable;
+// memhook_hashtable filetable;
+#ifdef USE_TEMPLATE
 memhook_hashtable typetable;
+#endif
 
 thread_local int thread_first_call = 1;
 thread_local int first_filled_buffer_status = 0;
@@ -72,16 +70,6 @@ thread_local int fileset_fd;
 
 int global_fd;
 
-/*#ifdef __cplusplus
-extern "C" {
-#endif
-__attribute__((weak)) extern const char memhook_file_path[] = "binary_dump.txt";
-__attribute__((weak)) extern const char memhook_typeset_path[] = "typeset_dump.txt";
-__attribute__((weak)) extern const char memhook_fileset_path[] = "fileset_dump.txt";
-#ifdef __cplusplus
-}
-#endif*/
-
 uint64_t memhook_get_server_clock() {
 #if defined(__i386__)
     uint64_t ret;
@@ -103,7 +91,7 @@ struct thread_record_array{
 };
 
 class memhook_memory_pool {
- private:
+private:
   char padding1[PADDING];
   int array_count;
 
@@ -112,7 +100,7 @@ class memhook_memory_pool {
   pthread_mutex_t lock;
   char padding2[PADDING];
 
-  public:
+public:
   void add(memhook_info_t* logarray, int buffer_count);
   memhook_memory_pool();
   ~memhook_memory_pool();
@@ -200,10 +188,6 @@ thread_local int max_retry = 0;
 
 ostream& operator << (ostream& os, memhook_info_t& info);
 
-MemStamp::MemStamp(char const *filename, int lineNum)
-    : filename(filename), lineNum(lineNum) { }
-MemStamp::~MemStamp() { }
-
 MemStampCollector::MemStampCollector() {
   
 }
@@ -213,7 +197,7 @@ MemStampCollector::~MemStampCollector() {
 }
 
 void MemStampCollector::copy(memhook_info_t &unit_log){
-	if(thread_first_call) {
+	if (thread_first_call) {
 		allocation_log = (struct memhook_info_t **) malloc(sizeof(struct memhook_info_t*)*number_of_buffers);
     for(int i = 0; i < number_of_buffers; i++) {
       allocation_log[i] = (struct memhook_info_t*) malloc(sizeof(struct memhook_info_t)*MEMHOOK_MAX_BUFFER_SIZE);
@@ -231,7 +215,7 @@ void MemStampCollector::copy(memhook_info_t &unit_log){
   memset(&unit_log, 0, sizeof(unit_log));
   log_index++;
 
-  if(log_index == MEMHOOK_MAX_BUFFER_SIZE) {
+  if (log_index == MEMHOOK_MAX_BUFFER_SIZE) {
     async_struct_array[buffer_index].aio_buf = allocation_log[buffer_index];
     async_struct_array[buffer_index].aio_nbytes = sizeof(struct memhook_info_t)*MEMHOOK_MAX_BUFFER_SIZE;
     async_struct_array[buffer_index].aio_fildes = global_fd;
@@ -249,7 +233,7 @@ void MemStampCollector::copy(memhook_info_t &unit_log){
     if (aio_error(&async_struct_array[buffer_index]) == EINPROGRESS){
       async_api_struct_list[0] = &async_struct_array[buffer_index];
       
-      if(aio_suspend(async_api_struct_list, 1, NULL) != 0) {
+      if (aio_suspend(async_api_struct_list, 1, NULL) != 0) {
         cout << "aio_suspend failed in copy" << endl;
       }
     }
