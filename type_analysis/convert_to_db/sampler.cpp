@@ -77,7 +77,7 @@ void Sampler::record_perf_addrs() {
     io.end_transaction();
 }
 
-void Sampler::record_stats_and_align(std::unordered_map<uintptr_t, tp_stats_t> tp_stats) {
+void Sampler::record_stats_and_align(std::unordered_map<uint16_t, tp_stats_t> tp_stats) {
     io.begin_transaction();
     sqlite3_stmt* stmt_stats;
     sqlite3_stmt* stmt_align;
@@ -100,13 +100,13 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
                                             size_t cache_line_size, size_t num_buckets,
                                             double sample_prop) {
     std::unordered_map<uintptr_t, page_info_t> pages{};
-    std::unordered_map<uintptr_t, size_t> tp_to_num_pages_taken{};
-    std::unordered_map<uintptr_t, std::unordered_set<uintptr_t>> 
+    std::unordered_map<uint16_t, size_t> tp_to_num_pages_taken{};
+    std::unordered_map<uint16_t, std::unordered_set<uintptr_t>> 
         tp_to_untaken_containing_pages{};
-    std::unordered_map<uintptr_t, std::vector<int64_t>> buckets{};
+    std::unordered_map<uint16_t, std::vector<int64_t>> buckets{};
     uint64_t min_ts = all_events[0].timestamp;
     uint64_t max_ts = all_events[num_events - 1].timestamp;
-    std::unordered_map<uintptr_t, tp_stats_t> tp_stats{};
+    std::unordered_map<uint16_t, tp_stats_t> tp_stats{};
 
     io.begin_transaction();
     sqlite3_stmt* stmt;
@@ -114,19 +114,17 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
     for (size_t i = 0; i < num_events; i++) {
         auto event = all_events[i];
         uintptr_t event_addr = reinterpret_cast<uintptr_t>(event.addr);
-        uintptr_t event_tindex = reinterpret_cast<uintptr_t>(event.tindex_name);
-        uintptr_t event_type = reinterpret_cast<uintptr_t>(event.tindex_name);
-        if (buckets.find(event_type) == buckets.end()) {
+        if (buckets.find(event.tindex_name) == buckets.end()) {
             buckets.insert(std::pair<uintptr_t, std::vector<int64_t>>{
-                event_type,
+                event.tindex_name,
                 std::vector<int64_t>(num_buckets+2, 0)
             });
         }
         size_t event_bucket = get_bucket(event.timestamp, num_buckets, min_ts, max_ts);
         if (event.typeofop) {
-            buckets[event_type][event_bucket] += event.size;
-            if (tp_stats.find(event_tindex) == tp_stats.end()) {
-                tp_stats.insert(std::pair<uintptr_t, tp_stats_t>{event_tindex, 
+            buckets[event.tindex_name][event_bucket] += event.size;
+            if (tp_stats.find(event.tindex_name) == tp_stats.end()) {
+                tp_stats.insert({event.tindex_name, 
                     tp_stats_t{
                         0,
                         std::unordered_map<size_t, std::unordered_map<size_t, uint64_t>>{},
@@ -134,42 +132,44 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
                     }});
             }
             size_t event_align = event_addr % cache_line_size;
-            tp_stats[event_tindex].num_allocs++;
-            tp_stats[event_tindex].align_to_size_to_count[event_align][event.size]++;
+            tp_stats[event.tindex_name].num_allocs++;
+            tp_stats[event.tindex_name].align_to_size_to_count[event_align][event.size]++;
         }
         else {
-            buckets[event_type][event_bucket] -= event.size;
+            buckets[event.tindex_name][event_bucket] -= event.size;
         }
 
         for (auto& addr_sz : split_event(event, page_size)) {
-            memory_event_t* sp_ev = new memory_event_t{event.file, event.tindex_name, event.line,
-                                                    event.timestamp, addr_sz.second,
+            memory_event_t* sp_ev = new memory_event_t{
+                                                    event.line,
+                                                    event.timestamp,
+                                                    addr_sz.second,
                                                     reinterpret_cast<void*>(addr_sz.first),
-                                                    event.typeofop};
+                                                    event.file,
+                                                    event.tindex_name,
+                                                    event.typeofop
+                                                };
             uintptr_t page_num = reinterpret_cast<uintptr_t>(sp_ev->addr) / page_size;
 
             if (event.typeofop) {
-                tp_stats[event_tindex].resident_pages
+                tp_stats[event.tindex_name].resident_pages
                     .insert(addr_sz.first / page_size);
             }
 
             event_and_actual_addr* new_event = new event_and_actual_addr{sp_ev, event_addr};
             sample_page_and_add_event(pages, new_event, page_num, sample_prop);
-            if (tp_to_num_pages_taken.find(event_tindex)
+            if (tp_to_num_pages_taken.find(event.tindex_name)
                 == tp_to_num_pages_taken.end()) {
-                tp_to_num_pages_taken.insert(
-                    std::pair<uintptr_t, size_t>{event_tindex, 0});
-                tp_to_untaken_containing_pages.insert(
-                    std::pair<uintptr_t, std::unordered_set<uintptr_t>>{event_tindex, 
-                                                std::unordered_set<uintptr_t>{}});
+                tp_to_num_pages_taken.insert({event.tindex_name, 0});
+                tp_to_untaken_containing_pages.insert({event.tindex_name, std::unordered_set<uintptr_t>{}});
             }
 
             if (pages[page_num].sampled == PageSample::Yes) {
                 io.write_event_to_db(stmt, *sp_ev, event_addr);
-                tp_to_num_pages_taken[event_tindex]++;
+                tp_to_num_pages_taken[event.tindex_name]++;
             }
             else {
-                tp_to_untaken_containing_pages[event_tindex].insert(page_num);
+                tp_to_untaken_containing_pages[event.tindex_name].insert(page_num);
             }
         }
     }
@@ -239,19 +239,18 @@ void Sampler::output_frag(size_t frag_gran) {
             quarter_num++;
         }
 
-        file_and_line_num_t event_info{reinterpret_cast<uintptr_t>(event.file), event.line};
+        file_and_line_num_t event_info{event.file, event.line};
         if (include_allocs.size() == 0 ||
-            include_allocs.find(event_info) == include_allocs.end()) {
+            include_allocs.find(event.file) == include_allocs.end() ||
+            include_allocs[event.file].find(event.line) == include_allocs[event.file].end()) {
             continue;
         }
         if (include_allocs.size() > 0) {
             auto curr_interval = event_interval_info[event].container;
             bool skip_event = false;
             while (curr_interval != nullptr) {
-                file_and_line_num_t container_event_info
-                    {reinterpret_cast<uintptr_t>(curr_interval->alloc_info->file),
-                    curr_interval->alloc_info->line};
-                if (include_allocs.find(container_event_info) != include_allocs.end()) {
+                if (include_allocs.find(curr_interval->alloc_info->file) != include_allocs.end() &&
+                    include_allocs[curr_interval->alloc_info->file].find(curr_interval->alloc_info->line) != include_allocs[curr_interval->alloc_info->file].end()) {
                     skip_event = true;
                     break;
                 }

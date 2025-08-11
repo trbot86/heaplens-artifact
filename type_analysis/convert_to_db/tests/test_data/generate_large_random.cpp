@@ -65,7 +65,7 @@ void allocate_work(std::unordered_map<std::string, alloc_free_t>& type_counts,
     std::uniform_int_distribution<int> inner_size_dist(2, ((SIZE_BLOCK * sizeof(char)) / sizeof(LongType)) - 1);
 
     for (int i = 0; i < NUM_BLOCKS_PER_THREAD; i++) {
-        blocks[i] = (char*) malloc<char, __LINE__, MACRO_GET_STR(__FILE__)>(SIZE_BLOCK * sizeof(char));
+        blocks[i] = (char*) malloc<char, __LINE__, 0>(SIZE_BLOCK * sizeof(char));
         // {
         //     std::unique_lock<std::mutex> lock{print_m};
         //     std::cout << "Thread " << std::this_thread::get_id();
@@ -73,7 +73,7 @@ void allocate_work(std::unordered_map<std::string, alloc_free_t>& type_counts,
         // }
         int inner_block_size = inner_size_dist(rng) * sizeof(LongType);
         char* inner_block = blocks[i] + (SIZE_BLOCK * sizeof(char)) - inner_block_size;
-        MEMHOOK_LOG_ALLOC(inner_block, inner_block_size, typeid(char).name())
+        MEMHOOK_LOG_CPP_ALLOC(inner_block, inner_block_size, typeid(char))
 
         type_counts["char"].alloc += 2;
         type_sizes["char"].alloc += SIZE_BLOCK*sizeof(char) + inner_block_size;
@@ -85,21 +85,21 @@ void allocate_work(std::unordered_map<std::string, alloc_free_t>& type_counts,
         while (rem_inner_block_size >= sizeof(LongType)) {
             switch (type_dist(rng)) {
                 case CHAR_TYPE:
-                    MemStamp(__FILE__, __LINE__) * (CharType*) new (inner_block) CharType{0};
+                    MemStamp(0, __LINE__) * (CharType*) new (inner_block) CharType{0};
                     type_counts["CharType"].alloc += 1;
                     type_sizes["CharType"].alloc += sizeof(CharType);
                     inner_block += sizeof(CharType);
                     rem_inner_block_size -= sizeof(CharType);
                     break;
                 case INT_TYPE:
-                    MemStamp(__FILE__, __LINE__) * (IntType*) new (inner_block) IntType{0};
+                    MemStamp(0, __LINE__) * (IntType*) new (inner_block) IntType{0};
                     type_counts["IntType"].alloc += 1;
                     type_sizes["IntType"].alloc += sizeof(IntType);
                     inner_block += sizeof(IntType);
                     rem_inner_block_size -= sizeof(IntType);
                     break;
                 case LONG_TYPE:
-                    MemStamp(__FILE__, __LINE__) * (LongType*) new (inner_block) LongType{0};
+                    MemStamp(0, __LINE__) * (LongType*) new (inner_block) LongType{0};
                     type_counts["LongType"].alloc += 1;
                     type_sizes["LongType"].alloc += sizeof(LongType);
                     inner_block += sizeof(LongType);
@@ -109,7 +109,7 @@ void allocate_work(std::unordered_map<std::string, alloc_free_t>& type_counts,
                     break;
             }
         }
-        MEMHOOK_LOG_ALLOC(blocks[i], inner_block_size, typeid(char).name())
+        MEMHOOK_LOG_CPP_ALLOC(blocks[i], inner_block_size, typeid(char))
         type_counts["char"].alloc += 1;
         type_sizes["char"].alloc += inner_block_size;
         if (inner_block_size > SIZE_BLOCK / 2) {

@@ -33,8 +33,8 @@ private:
     FILE* input_file;
     size_t input_file_bytes;
     memory_event_t* filemap;
-    std::unordered_map<uintptr_t, std::string> file_map, type_map;
-    std::unordered_map<std::string, uintptr_t> rev_file_map;
+    std::unordered_map<uint16_t, std::string> file_map, type_map;
+    std::unordered_map<std::string, uint16_t> rev_file_map;
     std::unordered_map<memory_event_t, mem_interval_t> event_interval_info;
 
     void free_all_descendants(memory_event_t*,
@@ -46,7 +46,7 @@ private:
     
     size_t sort_and_add_overlap_frees(memory_event_t*, size_t, bool use_container=false);
 
-    std::unordered_map<uintptr_t, std::string> construct_map(std::string, bool remove_volatile=false);
+    std::unordered_map<uint16_t, std::string> construct_map(std::string, bool remove_volatile=false);
 
     void step_and_clear_bindings(sqlite3_stmt*);
 
@@ -79,9 +79,9 @@ public:
     std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>> get_perf_addrs(
         std::string perf_filename, size_t page_size, size_t cl_size, double cutoff);
 
-    std::unordered_set<file_and_line_num_t> include_frag_allocs();
+    std::unordered_map<uint16_t, std::unordered_set<size_t>> include_frag_allocs();
 
-    std::unordered_map<uintptr_t, std::string> get_type_map();
+    std::unordered_map<uint16_t, std::string> get_type_map();
 
     void begin_transaction();
 
@@ -101,7 +101,7 @@ public:
 
     void write_event_to_db(sqlite3_stmt*, memory_event_t&, uintptr_t actual_addr=0);
 
-    void write_lines_to_db(std::unordered_map<uintptr_t, std::vector<int64_t>>&);
+    void write_lines_to_db(std::unordered_map<uint16_t, std::vector<int64_t>>&);
 
     void write_perf_to_db(sqlite3_stmt*, uintptr_t, double, size_t, size_t);
 

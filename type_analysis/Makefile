@@ -14,6 +14,7 @@ SRCS := $(wildcard convert_to_db/*.cpp)
 HEADERS := $(wildcard convert_to_db/*.hpp)
 
 TEST_DATA_DIR := convert_to_db/tests/test_data
+TEST_DATA_DIR_ABS := /root/sifter/type_analysis/convert_to_db/tests/test_data
 TEST_SRCS := $(wildcard $(TEST_DATA_DIR)/*.cpp)
 TEST_BINS := $(patsubst %.cpp, %.gen, $(TEST_SRCS))
 
@@ -36,13 +37,13 @@ build_test_binds: $(TEST_BINS)
 # Target to build and run test data generators
 prepare_test: $(TEST_BINS)
 	@echo "Removing old test data..."
-	@rm -f $(TEST_DATA_DIR)/*.txt
+	@rm -f $(TEST_DATA_DIR)/*.txt $(TEST_DATA_DIR)/*.types
 	@echo "Generating test data..."
 	@parallel --halt now,fail=1 --lb --jobs 0 ' \
 		BIN={}; \
 		BASE=$$(basename $$BIN .gen); \
-		MEMHOOK_OUTPUT_DUMP_FILE=$(TEST_DATA_DIR)/$${BASE}_dump.txt \
-		MEMHOOK_OUTPUT_TYPE_FILE=$(TEST_DATA_DIR)/$${BASE}.types \
+		MEMHOOK_OUTPUT_DUMP_FILE=$(TEST_DATA_DIR_ABS)/$${BASE}_dump.txt \
+		MEMHOOK_OUTPUT_TYPE_FILE=$(TEST_DATA_DIR_ABS)/$${BASE}.types \
 		./$$BIN' ::: $(TEST_BINS)
 
 PRINT_WARNING ?= 0

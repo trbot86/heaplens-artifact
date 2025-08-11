@@ -67,16 +67,14 @@ using namespace std;
 
 #define MACRO_GET_STR(str) MACRO_GET_128(str, 0), 0
 
-#ifdef USE_TEMPLATE
 #define MEMHOOK_LOG_CPP_ALLOC(ptr, sz, tid) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.tindex_name = typetable.insert(tid); \
+        unit_log.tindex_name = typetable.insert(&tid); \
         unit_log.line = __LINE__; \
         memhookCollector.copy(unit_log);
-#endif
 
 #define MEMHOOK_LOG_C_ALLOC(ptr, sz, line, fname, tid) \
         unit_log.timestamp = memhook_get_server_clock(); \

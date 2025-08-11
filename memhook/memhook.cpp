@@ -134,14 +134,14 @@ memhook_memory_pool::~memhook_memory_pool(){
     std::ofstream typeset;
     typeset.open(memhook_typeset_path, std::ofstream::out | std::ofstream::app);
 
-    for(int i = 0; i < MEMHOOK_HASH_TABLE_SIZE; i++) {
+    for(uint16_t i = 0; i < MEMHOOK_HASH_TABLE_SIZE; i++) {
         // if(typetable.bucket[i] != NULL) {
         if(typetable.bucket[i].full) {
             char* real_tname = abi::__cxa_demangle((*typetable.bucket[i].typeid_ptr).name(), 0, 0, &status);
             assert(real_tname != nullptr);
             // if (real_tname) {
             printf("(C++) Typetable bucket is: %p\n", typetable.bucket[i].typeid_ptr);
-            typeset << (void*)typetable.bucket[i].typeid_ptr << "|" << real_tname << endl;
+            typeset << i << "|" << real_tname << endl;
             // }
             // else {
             //     printf("(C) Typetable bucket is: %p\n", typetable.bucket[i].str);

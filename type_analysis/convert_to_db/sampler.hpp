@@ -42,7 +42,7 @@ private:
 
     void record_perf_addrs();
 
-    void record_stats_and_align(std::unordered_map<uintptr_t, tp_stats_t>);
+    void record_stats_and_align(std::unordered_map<uint16_t, tp_stats_t>);
     
 public:
     Sampler();

@@ -11,12 +11,12 @@ int main() {
     char* blocks[NUM_BLOCKS];
 
     for (int i = 0; i < NUM_BLOCKS; i++) {
-        blocks[i] = (char*) malloc<char, __LINE__, MACRO_GET_STR(__FILE__)>(SIZE_BLOCK*sizeof(char));
+        blocks[i] = (char*) malloc<char, __LINE__, 0>(SIZE_BLOCK*sizeof(char));
         for (int j = 0; j < NUM_NESTED; j++) {
-            MemStamp(__FILE__, __LINE__) * (int*) new (blocks[i] + (j*sizeof(int))) int{j};
+            MemStamp(0, __LINE__) * (int*) new (blocks[i] + (j*sizeof(int))) int{j};
         }
         // Following long allocation overlaps the first three int allocations in this block
-        MemStamp(__FILE__, __LINE__) * (long*) new (blocks[i] + sizeof(char)) long{i};
+        MemStamp(0, __LINE__) * (long*) new (blocks[i] + sizeof(char)) long{i};
     }
 
     delete blocks[1];

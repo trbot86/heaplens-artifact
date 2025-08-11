@@ -9,25 +9,25 @@
 #include <cassert>
 
 #ifndef MEMHOOK_OUTPUT_DUMP_FILE
-  #define MEMHOOK_OUTPUT_DUMP_FILE "binary_dump.txt"
+#define MEMHOOK_OUTPUT_DUMP_FILE "binary_dump.txt"
 #endif
 #ifndef MEMHOOK_OUTPUT_TYPE_FILE
-  #define MEMHOOK_OUTPUT_TYPE_FILE "typeset_dump.txt"
+#define MEMHOOK_OUTPUT_TYPE_FILE "typeset_dump.txt"
 #endif
 #ifndef MEMHOOK_OUTPUT_FILE_FILE
-  #define MEMHOOK_OUTPUT_FILE_FILE "fileset_dump.txt"
+#define MEMHOOK_OUTPUT_FILE_FILE "fileset_dump.txt"
 #endif
 
-using file_and_line_num_t = std::pair<uintptr_t, unsigned int>;
+using file_and_line_num_t = std::pair<uint16_t, unsigned int>;
 using addr_and_size = std::pair<uintptr_t, size_t>;
 
 typedef struct memory_event {
-    const char* file;
-    const char* tindex_name;
-    unsigned int line;
+    size_t line;
     uint64_t timestamp;
     size_t size;
     void* addr;
+    uint16_t file;
+    uint16_t tindex_name;
     bool typeofop;
 
     bool operator==(const struct memory_event& other) const {

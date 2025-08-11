@@ -56,7 +56,7 @@ int main() {
                     TEST_DATA_DIR + fname + ".types",
                     TEST_DATA_DIR + fname + ".files"};
         std::pair<memory_event_t*, size_t> data = io.get_all_events(true);
-        std::unordered_map<uintptr_t, std::string> type_map = io.get_type_map();
+        auto type_map = io.get_type_map();
         auto stats = std::unordered_map<std::string, type_tracker_t>{};
         for (auto t : type_map) {
             stats[t.second] = type_tracker_t{t.second, 0, 0, 0, 0};
@@ -64,10 +64,10 @@ int main() {
         for (int i = 0; i < data.second; i++) {
             memory_event_t event = data.first[i];
             std::string tname;
-            uintptr_t tindex_ptr = reinterpret_cast<uintptr_t>(event.tindex_name);
+            uint16_t tindex_ptr = event.tindex_name;
             if (type_map.find(tindex_ptr) == type_map.end()) {
                 if (event.typeofop) {
-                    printf("ERROR: unmapped type in data: %p\n\n", event.tindex_name);
+                    printf("ERROR: unmapped type in data: %d\n\n", event.tindex_name);
                     error_num++;
                 }
                 else {

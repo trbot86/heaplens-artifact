@@ -159,9 +159,9 @@ IOHandler::~IOHandler() {
     sqlite3_close(db);
 }
 
-std::unordered_map<uintptr_t, std::string> IOHandler::construct_map(std::string filename, 
+std::unordered_map<uint16_t, std::string> IOHandler::construct_map(std::string filename, 
         bool remove_volatile) {
-    std::unordered_map<uintptr_t, std::string> retmap{};
+    std::unordered_map<uint16_t, std::string> retmap{};
     std::ifstream fd{filename.c_str()};
     std::string val;
     for (std::string key; getline(fd, key, '|'); ) {
@@ -169,8 +169,8 @@ std::unordered_map<uintptr_t, std::string> IOHandler::construct_map(std::string 
         if (remove_volatile && val.length() >= 8 && val.substr(0, 8) == "volatile")
             val = val.substr(9);
 
-        uintptr_t ptr = (uintptr_t) stoul(key, nullptr, 16);
-        retmap.insert(std::pair<uintptr_t, std::string>{ptr, val});
+        uint16_t ptr = (uint16_t) stoul(key, nullptr);
+        retmap.insert({ptr, val});
     }
     return retmap;
 }
@@ -198,12 +198,12 @@ void IOHandler::free_all_descendants(memory_event_t* event_list,
         assert(size_pre == alloc_intervals.size() + 1);
         if (add_event) {
             event_list[num_events] = memory_event_t{
-                node->alloc_info->file,
-                node->alloc_info->tindex_name,
                 node->alloc_info->line,
                 ts,
                 node->alloc_info->size,
                 node->alloc_info->addr,
+                node->alloc_info->file,
+                node->alloc_info->tindex_name,
                 false
             };
             num_events++;
@@ -383,12 +383,12 @@ size_t IOHandler::sort_and_add_overlap_frees(memory_event_t* event_list, size_t 
                     do {
                         stats.add_free_loop_overlap++;
                         event_list[num_events] = memory_event_t{
-                            (*first_del)->alloc_info->file,
-                            (*first_del)->alloc_info->tindex_name,
                             (*first_del)->alloc_info->line,
                             event_list[i].timestamp,
                             (*first_del)->alloc_info->size,
                             (*first_del)->alloc_info->addr,
+                            (*first_del)->alloc_info->file,
+                            (*first_del)->alloc_info->tindex_name,
                             false
                         };
                         num_events++;
@@ -449,12 +449,12 @@ size_t IOHandler::sort_and_add_overlap_frees(memory_event_t* event_list, size_t 
             while (first_del != last_del) {
                 stats.add_free_loop_free++;
                 event_list[num_events] = memory_event_t{
-                    (*first_del)->alloc_info->file,
-                    (*first_del)->alloc_info->tindex_name,
                     (*first_del)->alloc_info->line,
                     event_list[i].timestamp,
                     (*first_del)->alloc_info->size,
                     (*first_del)->alloc_info->addr,
+                    (*first_del)->alloc_info->file,
+                    (*first_del)->alloc_info->tindex_name,
                     false
                 };
                 num_events++;
@@ -585,23 +585,23 @@ std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>>
     return perf_pages;
 }
 
-std::unordered_set<file_and_line_num_t> IOHandler::include_frag_allocs() {
-    std::unordered_set<file_and_line_num_t> retset{};
+std::unordered_map<uint16_t, std::unordered_set<size_t>> IOHandler::include_frag_allocs() {
+    std::unordered_map<uint16_t, std::unordered_set<size_t>> retset{};
     std::ifstream fd{frag_filename};
     std::string line;
     for (std::string file; getline(fd, file, '|'); ) {
         getline(fd, line);
         if (rev_file_map.find(file) == rev_file_map.end())
             continue;
-        retset.insert(file_and_line_num_t{
-            rev_file_map[file],
-            std::stoi(line)
-        });
+        if (retset.find(rev_file_map[file]) == retset.end())
+            retset.insert({rev_file_map[file], std::unordered_set<size_t>{}});
+
+        retset[rev_file_map[file]].insert(std::stoul(line));
     }
     return retset;
 }
 
-std::unordered_map<uintptr_t, std::string> IOHandler::get_type_map() {
+std::unordered_map<uint16_t, std::string> IOHandler::get_type_map() {
     return type_map;
 }
 
@@ -697,12 +697,12 @@ void IOHandler::prepare_write_to_align(sqlite3_stmt** stmt) {
 
 void IOHandler::write_event_to_db(sqlite3_stmt* stmt, memory_event_t& ev, 
                                 uintptr_t actual_addr) {
-    if (ev.file && file_map.find(reinterpret_cast<uintptr_t>(ev.file)) == file_map.end()) {
-        printf("FAILED to find file %p in file_map\n", ev.file);
-        printf("addr: %p, line: %u, timestamp: %lu\n", ev.addr, ev.line, ev.timestamp);
+    if (ev.file && file_map.find(ev.file) == file_map.end()) {
+        printf("FAILED to find file %d in file_map\n", ev.file);
+        printf("addr: %p, line: %lu, timestamp: %lu\n", ev.addr, ev.line, ev.timestamp);
     }
-    const char* fname = ev.file ? file_map.at(reinterpret_cast<uintptr_t>(ev.file)).c_str() : "NULL";
-    const char* tname = ev.tindex_name ? type_map.at(reinterpret_cast<uintptr_t>(ev.tindex_name)).c_str() : "NULL";
+    const char* fname = ev.file ? file_map.at(ev.file).c_str() : "NULL";
+    const char* tname = ev.tindex_name ? type_map.at(ev.tindex_name).c_str() : "NULL";
     sqlite3_bind_text(stmt, 1, fname, strlen(fname), SQLITE_STATIC);
     sqlite3_bind_int(stmt, 2, ev.line);
     sqlite3_bind_int64(stmt, 3, ev.timestamp);
@@ -714,7 +714,7 @@ void IOHandler::write_event_to_db(sqlite3_stmt* stmt, memory_event_t& ev,
     step_and_clear_bindings(stmt);
 }
 
-void IOHandler::write_lines_to_db(std::unordered_map<uintptr_t, std::vector<int64_t>>& buckets) {
+void IOHandler::write_lines_to_db(std::unordered_map<uint16_t, std::vector<int64_t>>& buckets) {
     begin_transaction();
     sqlite3_stmt* stmt;
     prepare_write_to_lines(&stmt);
