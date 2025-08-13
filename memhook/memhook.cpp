@@ -122,14 +122,6 @@ memhook_memory_pool::~memhook_memory_pool(){
 		write(global_fd, memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
 	}
 
-//   for (int i = 0;i < MEMHOOK_HASH_TABLE_SIZE;i++) {
-//     // if(filetable.bucket[i] != NULL)
-//     if(filetable.bucket[i].full) {
-//       printf("Filetable bucket is: %p\n", (void*) filetable.bucket[i].str);
-//       fileset << (void*)filetable.bucket[i].str << "|" << filetable.bucket[i].str << endl;
-//     }
-//   }
-
 #ifdef USE_TEMPLATE
     std::ofstream typeset;
     typeset.open(memhook_typeset_path, std::ofstream::out | std::ofstream::app);
@@ -246,6 +238,7 @@ void memhook_free(void *ptr, int line = 0, bool log = false) {
     unit_log.size = 0;
     unit_log.addr = ptr;
     unit_log.typeofop = false;
+    unit_log.line = line;
     // if (log) {
     //     unit_log.file = file;
     //     unit_log.line = line;
@@ -261,21 +254,15 @@ extern "C" {
         if (initialized) {
             unit_log.file = fid;
             unit_log.tindex_name = tid;
-            // cout << "CALLED CUSTOM MALLOC, TYPE: " << (void*) unit_log.tindex_name << endl;
             memhookCollector.copy(unit_log);
         }
         return ptr;
-    }
-
-    void free_log(void* ptr) {
-        MEMHOOK_LOG_FREE(ptr)
     }
 
     void free(void* ptr) {
         if (!ptr) return;
         memhook_free(ptr, 0, false);
         if (initialized) {
-            // cout << "CALLED CUSTOM FREE" << endl;
             memhookCollector.copy(unit_log);
         }
     }
@@ -288,16 +275,6 @@ extern "C" {
         MEMHOOK_LOG_FREE(ptr)
     }
     #endif
-
-    // void free_s(void* ptr, int line, const char* filename, const char* typename) {
-    //     filetable.insert(filename);
-    //     if (!ptr) return;
-    //     memhook_free(ptr, filename, line, false);
-    //     if (initialized) {
-    //         // cout << "CALLED CUSTOM FREE" << endl;
-    //         memhookCollector.copy(unit_log);
-    //     }
-    // }
 
     #if defined(MEMHOOK_GZIP)
     void* xmalloc_s(size_t size, int line, uint16_t fid, uint16_t tid) {
@@ -370,7 +347,7 @@ extern "C" {
         void* ptr = ssalloc_aligned(alignment, size);
         #endif
 
-        MEMHOOK_LOG_C_ALLOC(ptr, memhook_roundUp(size, alignment), line, fid, tid)
+        MEMHOOK_LOG_C_ALLOC(ptr, size, line, fid, tid)
 
         return ptr;
     }
@@ -392,13 +369,13 @@ extern "C" {
 
     int posix_memalign_s(void** memptr, size_t alignment, size_t size, int line, uint16_t fid, uint16_t tid) {
         int ret = posix_memalign(memptr, alignment, size);
-        MEMHOOK_LOG_C_ALLOC(memptr, memhook_roundUp(size, alignment), line, fid, tid)
+        MEMHOOK_LOG_C_ALLOC(memptr, size, line, fid, tid)
         return ret;
     }
 
     void* memalign_s(size_t alignment, size_t size, int line, uint16_t fid, uint16_t tid) {
         void* ptr = memalign(alignment, size);
-        MEMHOOK_LOG_C_ALLOC(ptr, memhook_roundUp(size, alignment), line, fid, tid)
+        MEMHOOK_LOG_C_ALLOC(ptr, size, line, fid, tid)
         return ptr;
     }
 

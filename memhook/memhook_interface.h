@@ -3,7 +3,6 @@
 #define __MEMHOOK_INTERFACE_H
 #pragma once
 
-// ASK ABOUT DIFFERENT IMPLEMENTATIONS OF BOOL IN C/C++. WILL THAT BE A PROBLEM?
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -98,7 +97,7 @@ struct memhook_info_t;
 
 uint64_t memhook_get_server_clock();
 
-inline size_t memhook_roundUp(size_t size, size_t mult) {
+inline size_t memhook_round_up(size_t size, size_t mult) {
     if (mult <= 1)
         return size;
 
@@ -106,17 +105,11 @@ inline size_t memhook_roundUp(size_t size, size_t mult) {
     return rem == 0 ? size : size + mult - rem;
 }
 
-// extern void* ssmem_alloc(ssmem_allocator_t* a, size_t size);
-// extern void ssmem_free(ssmem_allocator_t* a, void* ptr);
-
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
     void* malloc_s(size_t, int, uint16_t, uint16_t);
-    // void free_s(void *, int, const char*);
-    void free_log(void*);
     #if defined(MEMHOOK_ASCYLIB)
     void* ssalloc_s(size_t, int, uint16_t, uint16_t);
     void* ssalloc_aligned_s(size_t, size_t, int, uint16_t, uint16_t);
@@ -171,15 +164,10 @@ inline T* operator*(const MemStamp &stamp, T* p)
 
 template <typename T, int line, uint16_t filename>
 static __inline__ void* __attribute__((__always_inline__, __malloc__))
-_mm_malloc(size_t __size, size_t __align)
-{
-    // string filestring = {filename...};
-
-    // unit_log.file = filetable.insert<filename...>();
+_mm_malloc(size_t __size, size_t __align) {
     unit_log.file = filename;
     unit_log.tindex_name = typetable.insert(&typeid(T));
-    if (__align == 1)
-    {
+    if (__align == 1) {
         void* ptr = memhook_malloc(__size, line, true);
         memhookCollector.copy(unit_log);
         return ptr;
@@ -198,7 +186,7 @@ _mm_malloc(size_t __size, size_t __align)
     __mallocedMemory = _mm_malloc(__size, __align);
 #endif
     unit_log.timestamp = memhook_get_server_clock();
-    unit_log.size = memhook_roundUp(__size, __align);
+    unit_log.size = __size;
     unit_log.addr = __mallocedMemory;
     unit_log.line = line;
     unit_log.typeofop = true;
@@ -210,11 +198,10 @@ _mm_malloc(size_t __size, size_t __align)
 
 template <typename T, int line, uint16_t filename>
 int posix_memalign(void** ptr, size_t align, size_t size) {
-    // unit_log.file = filetable.insert<filename...>();
     unit_log.file = filename;
     unit_log.tindex_name = typetable.insert(&typeid(T));
     unit_log.timestamp = memhook_get_server_clock();
-    unit_log.size = memhook_roundUp(size, align);
+    unit_log.size = size;
     unit_log.line = line;
     unit_log.typeofop = true;
 
@@ -227,9 +214,7 @@ int posix_memalign(void** ptr, size_t align, size_t size) {
 }
 
 template <typename T, int line, uint16_t filename>
-void* malloc(size_t size)
-{
-    // unit_log.file = filetable.insert<filename...>();
+void* malloc(size_t size) {
     unit_log.file = filename;
     unit_log.tindex_name = typetable.insert(&typeid(T));
 

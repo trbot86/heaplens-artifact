@@ -165,10 +165,9 @@ elif [ "$database" = true ]; then
         echo "(Did you forget to run your application?)"
         exit 1
     fi
-    mv $indir/binary_dump.txt type_analysis
-    if [ "$template" = true ]; then
-        mv $indir/typeset_dump.txt type_analysis
-    fi
+    mv $indir/binary_dump.txt type_analysis/
+    cp $indir/typeset_dump.txt type_analysis/
+    cp $indir/fileset_dump.txt type_analysis/
     if ! [[ -z "$perffile" ]]; then
         cp "$indir"/"$perffile" type_analysis
         perffile="--perf-file $perffile"
@@ -271,6 +270,12 @@ else
 fi
 if [ "$?" -ne 0 ]; then echo "ERROR templating mallocs" ; exit 1 ; fi
 echo ""
+
+cd /root/sifter
+cp type_analysis/fileset_dump.txt $outdir/$subdirectory
+if [ "$template" = false ]; then
+    cp type_analysis/typeset_dump.txt $outdir/$subdirectory
+fi
 
 echo "You need to include the memhook library in your Makefile:"
 echo "-I/root/sifter/memhook/ -L/root/sifter/memhook/ -Wl,-rpath=/root/sifter/memhook/ -lmemhook -ldl"
