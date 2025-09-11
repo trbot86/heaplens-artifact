@@ -3,7 +3,6 @@
 #define __MEMHOOK_INTERFACE_H
 #pragma once
 
-// ASK ABOUT DIFFERENT IMPLEMENTATIONS OF BOOL IN C/C++. WILL THAT BE A PROBLEM?
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -27,19 +26,12 @@ extern "C" {
 #include <bits/stdc++.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-// #include <fcntl.h>
 #include <unistd.h>
 #include <malloc.h>
 #include <mm_malloc.h>
 #include "memstamp.h"
 #include "hash.h"
 
-
-// #include "/root/teststatic/a.h"
-// #include "mem_alloc.h"
-//#include <execinfo.h>
-//#include <cxxabi.h>
-//#include <dlfcn.h>
 
 using namespace std;
 
@@ -74,27 +66,24 @@ using namespace std;
 
 #define MACRO_GET_STR(str) MACRO_GET_128(str, 0), 0
 
-#if defined(__cplusplus) && ! defined(MEMHOOK_C_LOG)
-#define MEMHOOK_LOG_ALLOC(ptr, sz, tname) \
+#define MEMHOOK_LOG_CPP_ALLOC(ptr, sz, tid) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.file = filetable.insert<MACRO_GET_STR(__FILE__)>(); \
-        unit_log.tindex_name = typetable.insert(tname); \
+        unit_log.tindex_name = typetable.insert(&tid); \
         unit_log.line = __LINE__; \
         memhookCollector.copy(unit_log);
-#else
-#define MEMHOOK_LOG_ALLOC(ptr, sz, tname) \
+
+#define MEMHOOK_LOG_C_ALLOC(ptr, sz, line, fname, tid) \
         unit_log.timestamp = memhook_get_server_clock(); \
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
-        unit_log.file = filetable.insert(MACRO_GET_STR(__FILE__)); \
-        unit_log.tindex_name = typetable.insert(tname); \
-        unit_log.line = __LINE__; \
+        unit_log.tindex_name = tid; \
+        unit_log.line = line; \
         memhookCollector.copy(unit_log);
-#endif // __cplusplus
+
 
 #define MEMHOOK_LOG_FREE(ptr) \
         unit_log.timestamp = memhook_get_server_clock(); \
@@ -102,12 +91,13 @@ using namespace std;
         unit_log.typeofop = false; \
         memhookCollector.copy(unit_log);
 
+
 struct slot;
 struct memhook_info_t;
 
 uint64_t memhook_get_server_clock();
 
-inline size_t memhook_roundUp(size_t size, size_t mult) {
+inline size_t memhook_round_up(size_t size, size_t mult) {
     if (mult <= 1)
         return size;
 
@@ -115,40 +105,23 @@ inline size_t memhook_roundUp(size_t size, size_t mult) {
     return rem == 0 ? size : size + mult - rem;
 }
 
-// extern void* ssmem_alloc(ssmem_allocator_t* a, size_t size);
-// extern void ssmem_free(ssmem_allocator_t* a, void* ptr);
-
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-    void* malloc_s(size_t, int, const char*, const char*, bool, void*);
-    // void free_s(void *, int, const char*);
-    void free_log(void*);
+    void* malloc_s(size_t, int, uint16_t, uint16_t);
     #if defined(MEMHOOK_ASCYLIB)
-    void* ssalloc_s(size_t, int, const char*, const char*);
-    void* ssalloc_aligned_s(size_t, size_t, int, const char*, const char*);
-    void* ssmem_alloc_s(ssmem_allocator_t*, size_t, int, const char*, const char*);
+    void* ssalloc_s(size_t, int, uint16_t, uint16_t);
+    void* ssalloc_aligned_s(size_t, size_t, int, uint16_t, uint16_t);
+    void* ssmem_alloc_s(ssmem_allocator_t*, size_t, int, uint16_t, uint16_t);
     #endif
-    int posix_memalign_s(void**, size_t, size_t, int, const char*, const char*);
-    void* memalign_s(size_t, size_t, int, const char*, const char*);
-    void* calloc_s(size_t, size_t, int, const char*, const char*);
+    int posix_memalign_s(void**, size_t, size_t, int, uint16_t, uint16_t);
+    void* memalign_s(size_t, size_t, int, uint16_t, uint16_t);
+    void* calloc_s(size_t, size_t, int, uint16_t, uint16_t);
     #if defined(MEMHOOK_GZIP)
-    void* xmalloc_s(size_t, int, const char*, const char*);
-    void* xcalloc_s(size_t, size_t, int, const char*, const char*);
+    void* xmalloc_s(size_t, int, uint16_t, uint16_t);
+    void* xcalloc_s(size_t, size_t, int, uint16_t, uint16_t);
     #endif
-    // void ssmem_free_s(ssmem_allocator_t*, void*, int, const char*);
-    // void free(void* ptr);
-
-    // void* ssalloc_alloc_s(unsigned int allocator, size_t size, const char* filepath, int line);
-    // void* ssalloc_aligned_alloc_s(unsigned int allocator, size_t alignment, size_t size, const char* filepath, int line);
-    // void ssfree_alloc_s(unsigned int allocator, void* ptr, const char* filepath, int line);
-
-// #define SIFTER_NEW
-// #define new MemStamp((__FILE__), (__LINE__)) * new
-// #define delete MemStamp((__FILE__), (__LINE__)) * delete
-
 #ifdef __cplusplus
 }
 #endif
@@ -157,15 +130,11 @@ extern "C"
 
 extern MemStampCollector memhookCollector;
 extern thread_local memhook_info_t unit_log;
-// extern thread_local unordered_set<const char*> threadFiles;
-// extern thread_local unordered_set<const char*> typeFiles;
 extern memhook_hashtable filetable;
 extern memhook_hashtable typetable;
-extern void *memhook_malloc(size_t size, const char *file, int line, bool log);
-extern void memhook_free(void *ptr, const char* file, int line, bool log);
+extern void *memhook_malloc(size_t size, int line, bool log);
+extern void memhook_free(void *ptr, int line, bool log);
 
-// template <typename T>
-// T malloc(size_t size, bool fakearg=true);
 
 template <class T>
 inline T* operator*(const MemStamp &stamp, T* p)
@@ -184,26 +153,22 @@ inline T* operator*(const MemStamp &stamp, T* p)
         unit_log.addr = (void*) p;
         unit_log.typeofop = true;
     }
-    unit_log.file = filetable.insert(stamp.filename);
+    // unit_log.file = filetable.insert(stamp.filename);
+    unit_log.file = stamp.filename;
     unit_log.line = stamp.lineNum;
-    unit_log.tindex_name = typetable.insert(typeid(T).name());
+    unit_log.tindex_name = typetable.insert(&typeid(T));
 
     memhookCollector.copy(unit_log);
     return p;
 }
 
-#if defined(_mm_malloc)
-template <typename T, int line, char... filename>
+template <typename T, int line, uint16_t filename>
 static __inline__ void* __attribute__((__always_inline__, __malloc__))
-_mm_malloc(size_t __size, size_t __align)
-{
-    // string filestring = {filename...};
-
-    unit_log.file = filetable.insert<filename...>();
-    unit_log.tindex_name = typetable.insert(typeid(T).name());
-    if (__align == 1)
-    {
-        void* ptr = memhook_malloc(__size, unit_log.file, line, true);
+_mm_malloc(size_t __size, size_t __align) {
+    unit_log.file = filename;
+    unit_log.tindex_name = typetable.insert(&typeid(T));
+    if (__align == 1) {
+        void* ptr = memhook_malloc(__size, line, true);
         memhookCollector.copy(unit_log);
         return ptr;
     }
@@ -221,7 +186,7 @@ _mm_malloc(size_t __size, size_t __align)
     __mallocedMemory = _mm_malloc(__size, __align);
 #endif
     unit_log.timestamp = memhook_get_server_clock();
-    unit_log.size = memhook_roundUp(__size, __align);
+    unit_log.size = __size;
     unit_log.addr = __mallocedMemory;
     unit_log.line = line;
     unit_log.typeofop = true;
@@ -230,14 +195,13 @@ _mm_malloc(size_t __size, size_t __align)
 
     return __mallocedMemory;
 }
-#endif
 
-template <typename T, int line, char... filename>
+template <typename T, int line, uint16_t filename>
 int posix_memalign(void** ptr, size_t align, size_t size) {
-    unit_log.file = filetable.insert<filename...>();
-    unit_log.tindex_name = typetable.insert(typeid(T).name());
+    unit_log.file = filename;
+    unit_log.tindex_name = typetable.insert(&typeid(T));
     unit_log.timestamp = memhook_get_server_clock();
-    unit_log.size = memhook_roundUp(size, align);
+    unit_log.size = size;
     unit_log.line = line;
     unit_log.typeofop = true;
 
@@ -249,13 +213,12 @@ int posix_memalign(void** ptr, size_t align, size_t size) {
     return r;
 }
 
-template <typename T, int line, char... filename>
-void* malloc(size_t size)
-{
-    unit_log.file = filetable.insert<filename...>();
-    unit_log.tindex_name = typetable.insert(typeid(T).name());
+template <typename T, int line, uint16_t filename>
+void* malloc(size_t size) {
+    unit_log.file = filename;
+    unit_log.tindex_name = typetable.insert(&typeid(T));
 
-    void* ptr = memhook_malloc(size, unit_log.file, line, true);
+    void* ptr = memhook_malloc(size, line, true);
 
     memhookCollector.copy(unit_log);
     return ptr;

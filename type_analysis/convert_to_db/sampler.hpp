@@ -26,7 +26,9 @@ private:
     } page_info_t;
 
     IOHandler io;
-    std::vector<memory_event_t> all_events;
+    memory_event_t* all_events;
+    size_t num_events;
+    // std::vector<memory_event_t> all_events;
     std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>> perf_pages;
     std::unordered_set<uintptr_t> seen_perf_pages;
 
@@ -40,7 +42,7 @@ private:
 
     void record_perf_addrs();
 
-    void record_stats_and_align(std::unordered_map<uintptr_t, tp_stats_t>);
+    void record_stats_and_align(std::unordered_map<uint16_t, tp_stats_t>);
     
 public:
     Sampler();

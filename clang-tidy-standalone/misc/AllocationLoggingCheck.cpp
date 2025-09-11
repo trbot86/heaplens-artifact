@@ -159,11 +159,19 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
             else if (typenode->isPointerType()) {
                 type = typenode->getPointeeType().getAsString();
             }
+#ifndef ALLOCLOGGING_TEMPLATE
+            if (typemap.find(type) == typemap.end()) {
+                typemap[type] = typemap.size();
+            }
+#endif
 
             FullSourceLoc fsrcloc = Result.Context->getFullLoc(mnode->getExprLoc());
             /* TODO: get the following to work will allocations performed in macro defs */
             if (!fsrcloc.isMacroID()) {
                 std::string FileName = fsrcloc.getFileEntry()->getName().str();
+                if (filemap.find(FileName) == filemap.end()) {
+                    filemap[FileName] = filemap.size();
+                }
                 int line = fsrcloc.getLineNumber();
 
                 // SmallString<200> pathVector;
@@ -179,7 +187,7 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
                     DiagnosticIDs::Error)
                     << FixItHint::CreateInsertion(
                         mnode->getExprLoc().getLocWithOffset(offset),
-                        "<" + type + ", " + std::to_string(line) + ", MACRO_GET_STR(\"" + FileName + "\")" + ">");
+                        "<" + type + ", " + std::to_string(line) + ", " + std::to_string(filemap[FileName]) + ">");
     #else    
                 diag(mnode->getExprLoc().getLocWithOffset(offset), "insert _s here",
                     DiagnosticIDs::Error)
@@ -189,7 +197,7 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
                     DiagnosticIDs::Error)
                     << FixItHint::CreateInsertion(
                         mnode->getEndLoc(),
-                        ", " + std::to_string(line) + ", \"" + FileName + "\", \"" + type + "\"");
+                        ", " + std::to_string(line) + ", " + std::to_string(filemap[FileName]) + ", " + std::to_string(typemap[type]));
     #endif // TEMPLATE
             }
         }
@@ -201,19 +209,24 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
         Result.Nodes.getNodeAs<clang::CXXNewExpr>(newbind);
 
     if (node) {
+        auto &SM = Result.Context->getSourceManager();
+        std::string FileName = SM.getFilename(node->getExprLoc()).str();
+        if (filemap.find(FileName) == filemap.end()) {
+            filemap[FileName] = filemap.size();
+        }
         if (node->getNumPlacementArgs() == 0) {
             diag(node->getExprLoc(), "insert MemStamp",
                 DiagnosticIDs::Error)
                 << FixItHint::CreateInsertion(
                         node->getExprLoc(),
-                        "MemStamp((__FILE__), (__LINE__)) * ");
+                        "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * ");
         }
 #ifdef ALLOCLOGGING_PLACEMENT_NEW
         // TODO: if dereference on same line, need to put parentheses around like *(MemStamp() * (T*) new () T())
         else if (node->getNumPlacementArgs() > 0) {
             std::string type = node->getAllocatedType().getUnqualifiedType().getAsString();
             // std::string type = node->getAllocatedType().getTypePtr()->getAs<clang::RecordType>()->getDecl()->getNameAsString();
-            std::string out = "MemStamp((__FILE__), (__LINE__)) * (" + type + "*) ";
+            std::string out = "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * (" + type + "*) ";
             diag(node->getExprLoc(), "insert MemStamp (placement new)",
                 DiagnosticIDs::Error)
                 << FixItHint::CreateInsertion(

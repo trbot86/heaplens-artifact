@@ -165,7 +165,9 @@ elif [ "$database" = true ]; then
         echo "(Did you forget to run your application?)"
         exit 1
     fi
-    mv $indir/binary_dump.txt type_analysis ; mv $indir/fileset_dump.txt type_analysis ; mv $indir/typeset_dump.txt type_analysis
+    mv $indir/binary_dump.txt type_analysis/
+    cp $indir/typeset_dump.txt type_analysis/
+    cp $indir/fileset_dump.txt type_analysis/
     if ! [[ -z "$perffile" ]]; then
         cp "$indir"/"$perffile" type_analysis
         perffile="--perf-file $perffile"
@@ -215,12 +217,17 @@ echo ""
 
 ## goto memhook and compile
 
-bash -c 'cd memhook ; make -j'
+if [ "$template" = true ]; then
+    bash -c 'cd memhook ; make USE_TEMPLATE=1 -j'
+else
+    bash -c 'cd memhook ; make -j'
+fi
 if [ "$?" -ne 0 ]; then echo "ERROR building memhook" ; exit 1 ; fi
 
 ## then goto type_analysis and compile
 
 cd type_analysis
+rm -f binary_dump.txt fileset_dump.txt typeset_dump.txt
 if ! [[ -d ./bin ]]; then
     mkdir bin
 fi
@@ -254,15 +261,21 @@ else
     echo "replacing malloc with malloc_s..."
 fi
 if [ "$skipRefactor" = true ]; then
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -export-fixes=fixes.yaml
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -export-fixes=fixes.yaml
     echo "skipped refactoring step - fixes written to fixes.yaml"
 else
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -fix
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -fix
     echo "performed refactoring with clang-tidy"
     add_includes $outdir
 fi
 if [ "$?" -ne 0 ]; then echo "ERROR templating mallocs" ; exit 1 ; fi
 echo ""
+
+cd /root/sifter
+cp type_analysis/fileset_dump.txt $outdir/$subdirectory
+if [ "$template" = false ]; then
+    cp type_analysis/typeset_dump.txt $outdir/$subdirectory
+fi
 
 echo "You need to include the memhook library in your Makefile:"
 echo "-I/root/sifter/memhook/ -L/root/sifter/memhook/ -Wl,-rpath=/root/sifter/memhook/ -lmemhook -ldl"

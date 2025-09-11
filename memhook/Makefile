@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS= -fPIC -g -O2
+CFLAGS= -fPIC -ftls-model=initial-exec -g -O2
 Includes= /usr/lib/llvm-6.0/include/
 Libs=
 OBJ= memhook.o hash.o
@@ -7,6 +7,10 @@ DEPS=hash.h memhook.h memhook_interface.h memstamp.h memhook_xoshiro256p.h
 
 ifdef MEMHOOK_ASCYLIB
 	CFLAGS += -DMEMHOOK_ASCYLIB
+endif
+
+ifdef USE_TEMPLATE
+	CFLAGS += -DUSE_TEMPLATE
 endif
 
 ifdef MEMHOOK_C_LOG
@@ -33,7 +37,7 @@ memhook.o: memhook.cpp $(DEPS)
 # 	$(CC) hash.cpp -shared -fPIC -g -lrt -O2 -c
 
 hash_test: hash.cpp hash.h
-	$(CC) hash.cpp -fPIC -g -lrt -pthread -O2 -o hash_test
+	$(CC) hash.cpp $(CFLAGS) -lrt -pthread -o hash_test
 
 # link:
 # 	$(CC) memhook.cpp memalloc.cpp -pthread -Wall -g -o b.out

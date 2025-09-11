@@ -3,6 +3,7 @@ sifter_vis_d3
 docker
 ssmem
 ASCYLIB/exp*
+setbench/exp*
 fielddump_tester
 rocksdb
 ralloc*

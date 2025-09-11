@@ -1,5 +1,16 @@
 #include "io_handler.hpp"
 
+typedef struct pstats {
+    size_t outer_loop;
+    size_t inserts;
+    size_t lower_bound_calls;
+    size_t rise_loop_1;
+    size_t rise_loop_2;
+    size_t backwards_loop;
+    size_t add_free_loop_overlap;
+    size_t add_free_loop_free;
+} pstats_t;
+
 /*
     SUPERTABLE x: contains all of the sampled memory events
     PERF x: contains information about addresses recorded by perf c2c
@@ -8,14 +19,44 @@
     ALIGNMENT x: contains # allocations for each alignment, size, and type
     LINES x: contains all of the line information for the memory consumption graph
 */
-IOHandler::IOHandler() :    zErrMsg{0},
-                            in_filename{"binary_dump.txt"},
-                            out_filename{"allocs.sqlite"},
-                            types_filename{"typeset_dump.txt"},
-                            files_filename{"fileset_dump.txt"},
-                            frag_filename{"frag_includes.txt"},
+IOHandler::IOHandler(std::string in_fname, std::string ts_fname, std::string fs_fname,
+                    std::string frag_fname, std::string out_fname) :
+                            zErrMsg{0},
+                            in_filename{in_fname},
+                            out_filename{out_fname},
+                            types_filename{ts_fname},
+                            files_filename{fs_fname},
+                            frag_filename{frag_fname},
                             event_interval_info{},
                             rev_file_map{} {
+    
+    input_file = fopen(in_filename.c_str(), "r+");
+    if (input_file ==  NULL) {
+        std::cout << in_filename << " not found or permissions insufficient" << std::endl;
+        exit(-1);
+	}
+
+    struct stat sb;
+	fstat(fileno(input_file), &sb);
+    input_file_bytes = sb.st_size;
+    size_t num_structs = input_file_bytes / sizeof(memory_event_t);
+    printf("Number of structs in file: %lu\n", num_structs);
+
+    if (ftruncate(fileno(input_file), 2*input_file_bytes) != 0) {
+        printf("Failed to expand input file: %s\n", strerror(errno));
+        exit(-1);
+    }
+    filemap = reinterpret_cast<memory_event_t*>(
+        mmap(NULL, 2*input_file_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE, fileno(input_file), 0));
+
+    if (filemap == MAP_FAILED) {
+        printf("Failed to map input file to memory\n");
+        exit(-1);
+    }
+    else {
+        printf("Successfully mapped input file\n");
+    }
+    
     int rc = sqlite3_open("allocs.sqlite", &db);
     if (rc) {
         std::cout << "Can't open database allocs.sqlite: " << sqlite3_errstr(rc) << std::endl;
@@ -107,13 +148,20 @@ IOHandler::IOHandler() :    zErrMsg{0},
 }
 
 IOHandler::~IOHandler() {
+    munmap(filemap, 2*input_file_bytes);
+    if (ftruncate(fileno(input_file), input_file_bytes) != 0) {
+        printf("Failed to shrink input file: %s\n", strerror(errno));
+        exit(-1);
+    }
+    fclose(input_file);
+
     sqlite3_free(zErrMsg);
     sqlite3_close(db);
 }
 
-std::unordered_map<uintptr_t, std::string> IOHandler::construct_map(std::string filename, 
+std::unordered_map<uint16_t, std::string> IOHandler::construct_map(std::string filename, 
         bool remove_volatile) {
-    std::unordered_map<uintptr_t, std::string> retmap{};
+    std::unordered_map<uint16_t, std::string> retmap{};
     std::ifstream fd{filename.c_str()};
     std::string val;
     for (std::string key; getline(fd, key, '|'); ) {
@@ -121,156 +169,379 @@ std::unordered_map<uintptr_t, std::string> IOHandler::construct_map(std::string 
         if (remove_volatile && val.length() >= 8 && val.substr(0, 8) == "volatile")
             val = val.substr(9);
 
-        uintptr_t ptr = (uintptr_t) stoul(key, nullptr, 16);
-        retmap.insert(std::pair<uintptr_t, std::string>{ptr, val});
+        uint16_t ptr = (uint16_t) stoul(key, nullptr);
+        retmap.insert({ptr, val});
     }
     return retmap;
 }
 
-void IOHandler::free_all_descendants(std::vector<memory_event_t>& event_list, 
+void IOHandler::free_all_descendants(memory_event_t* event_list, 
     std::set<mem_interval_t*, std::function<bool (mem_interval_t*, mem_interval_t*)>>& alloc_intervals,
     uint64_t ts,
     mem_interval_t* node,
+    size_t& num_events,
     bool add_event) {
+
+    printf("Here is address of event for free_all_des: %p\n", node->alloc_info->addr);
+    printf("Size of node->contained: %lu\n", node->contained.size());
+
     for (auto& child : node->contained) {
-        free_all_descendants(event_list, alloc_intervals, ts, child);
+        printf("\tstart addr of child: %lx\n", child->start);
+        free_all_descendants(event_list, alloc_intervals, ts, child, num_events);
     }
-    alloc_intervals.erase(node);
-    if (add_event) {
-        event_list.push_back(memory_event_t{
-            node->alloc_info->file,
-            node->alloc_info->tindex_name,
-            node->alloc_info->line,
-            ts,
-            node->alloc_info->size,
-            node->alloc_info->addr,
-            false
-        });
+    size_t size_pre = alloc_intervals.size();
+    if (alloc_intervals.erase(node) == 1) {
+        if (size_pre != alloc_intervals.size() + 1) {
+            printf("find(node) = set.end()? %d\n", alloc_intervals.find(node) == alloc_intervals.end());
+            printf("Here is size pre: %lu, here is size post: %lu\n", size_pre, alloc_intervals.size());
+        }
+        assert(size_pre == alloc_intervals.size() + 1);
+        if (add_event) {
+            event_list[num_events] = memory_event_t{
+                node->alloc_info->line,
+                ts,
+                node->alloc_info->size,
+                node->alloc_info->addr,
+                node->alloc_info->file,
+                node->alloc_info->tindex_name,
+                false
+            };
+            num_events++;
+        }
     }
 }
 
-void IOHandler::sort_and_add_overlap_frees(std::vector<memory_event_t>& event_list) {
-    printf("About to do first sort\n");
-    std::sort(event_list.begin(), event_list.end(), 
-        [](memory_event_t& a, memory_event_t& b) { return a.timestamp < b.timestamp; });
+mem_interval_t* get_latest_start(mem_interval_t* node) {
+    if (node->contained.size() == 0) {
+        return node;
+    }
 
-    printf("done first sort\n");
+    mem_interval_t* latest = node;
+    for (auto child : node->contained) {
+        mem_interval_t* other = get_latest_start(child);
+        latest = (other->start >= latest->start ? other : latest);
+    }
+    return latest;
+}
 
+size_t IOHandler::sort_and_add_overlap_frees(memory_event_t* event_list, size_t num_events, bool use_container) {
+    // Order object intervals first by start address (ASC), then by end address (DES)
     std::function<bool (mem_interval_t*, mem_interval_t*)> comp = 
         [](mem_interval_t* a, mem_interval_t* b) -> bool {
-            return a->start < b->start || (a->start == b->start && a->end < b->end);
+            return a->start < b->start || (a->start == b->start && a->end > b->end);
         };
     auto alloc_intervals = std::set<mem_interval_t*, decltype(comp)>{comp};
-    size_t init_event_list_size = event_list.size();
-    for (int i = 0; i < init_event_list_size; i++) {
+    // auto addr_to_size_to_alloc_interval = std::unordered_map<uintptr_t,
+    //                                                         std::unordered_map<std::size_t, mem_interval_t*>>{};
+    // size_t init_event_list_size = event_list.size();
+    size_t init_num_events = num_events;
+    size_t num_allocs = 0, num_frees = 0;
+    pstats_t stats{};
+
+    for (size_t i = 0; i < init_num_events; i++) {
+        stats.outer_loop++;
+        // printf("Here is i: %lu, num_allocs: %lu, num_frees: %lu\n", i, num_allocs, num_frees);
+        // printf("\t size of alloc_intervals: %lu\n", alloc_intervals.size());
+
         uintptr_t event_addr = reinterpret_cast<uintptr_t>(event_list[i].addr);
         mem_interval_t* event_interval = new mem_interval_t{
             event_addr,
             event_addr + reinterpret_cast<uintptr_t>(event_list[i].size),
             nullptr,
             std::unordered_set<mem_interval_t*>{},
-            &event_list[i]
+            &(event_list[i]),
+            i
         };
+
         if (event_list[i].typeofop) {
-            event_interval_info.insert(std::pair{event_list[i], 
-                                                *event_interval});
-            auto it = alloc_intervals.lower_bound(event_interval);
-            bool continue_searching = false;
-            if (it != alloc_intervals.end())
-                it++;
-            do {
+            // if (addr_to_size_to_alloc_interval.find(event_addr) == addr_to_size_to_alloc_interval.end()) {
+            //     addr_to_size_to_alloc_interval[event_addr] = std::unordered_map<std::size_t, mem_interval_t*>{};
+            // }
+            // if (addr_to_size_to_alloc_interval[event_addr].find(event_list[i].size) == addr_to_size_to_alloc_interval[event_addr].end()) {
+            //     addr_to_size_to_alloc_interval[event_addr][event_list[i].size] = event_interval;
+            // }
+
+            num_allocs++;
+            event_interval_info.insert({event_list[i], *event_interval});
+            stats.inserts++;
+            if (alloc_intervals.size() > 0) {
+
+                /*  Get the latest-starting interval that starts before 
+                    event_interval ends. */
+                auto saved_start = event_interval->start;
+                auto saved_end = event_interval->end;
+                event_interval->start = event_interval->end;
+                event_interval->end = UINTPTR_MAX;
+                auto it = alloc_intervals.lower_bound(event_interval);
+                stats.lower_bound_calls++;
                 if (it != alloc_intervals.begin())
                     it--;
-                mem_interval_t* other_interval = *it;
-                continue_searching = false;
+                assert(it != alloc_intervals.end());
+                event_interval->start = saved_start;
+                event_interval->end = saved_end;
 
-                while (other_interval != nullptr) {
-                    if (other_interval->contains(event_interval) == Overlap::Contains) {
+                auto first_del = alloc_intervals.end();
+                auto last_del = alloc_intervals.end();
+                bool found_container = false;
+
+                // if (it == alloc_intervals.end())
+                //     it--;
+
+                // printf("searching on event with addr %p, start %lx, end %lx\n", event_list[i].addr, event_interval->start, event_interval->end);
+                // printf("here is lower bound addr: %p start %lx end %lx\n", (*it)->alloc_info->addr, (*it)->start, (*it)->end);
+                
+                mem_interval_t* other_interval = *it;
+                Overlap contains_result = other_interval->contains(event_interval);
+
+                // printf("contains result: %s\n", contains_result == Overlap::None ? "None" :
+                //                                 contains_result == Overlap::Contains ? "Contains" :
+                //                                 "Overwritten");
+
+                /*  If this event overwrites other_interval, we find the latest starting
+                    time among other_interval's descendants and assign the corresponding
+                    interval to last_del. This way, we can remove all of the overwritten
+                    events in a single call to erase. */
+                if (contains_result == Overlap::Overwritten) {
+                    while (other_interval->container != nullptr &&
+                            other_interval->container->contains(event_interval) == Overlap::Overwritten) {
+                        other_interval = other_interval->container;
+                        stats.rise_loop_1++;
+                    }
+                    it = alloc_intervals.find(other_interval);
+                    assert(it != alloc_intervals.end());
+                    contains_result = other_interval->contains(event_interval);
+                    first_del = it;
+                    mem_interval_t* latest_starter = get_latest_start(other_interval);
+                    last_del = alloc_intervals.find(latest_starter);
+                    assert(last_del != alloc_intervals.end());
+                }
+
+                while (contains_result != Overlap::None ||
+                        other_interval->start >= event_interval->end) {
+                    stats.backwards_loop++;
+                    
+                    // printf("\t checking cont for event at addr %p\n", event_list[i].addr);
+                    if (use_container && contains_result == Overlap::Contains) {
+                        // printf("\t\t container found at addr %p!\n", other_interval->alloc_info->addr);
                         other_interval->contained.insert(event_interval);
                         event_interval->container = other_interval;
+                        found_container = true;
                         break;
                     }
-                    else if (other_interval->contains(event_interval) == Overlap::Overwritten) {
-                        free_all_descendants(event_list, alloc_intervals,
-                                            event_list[i].timestamp, other_interval);
-                        it = alloc_intervals.lower_bound(event_interval);
-                        if (it == alloc_intervals.end())
-                            it--;
-                        other_interval = *it;
-                        continue_searching = true;
+                    else if (contains_result == Overlap::Overwritten) {
+                        // printf("\t\t no container - adding to del list\n");
+                        if (last_del == alloc_intervals.end()) {
+                            first_del = last_del = it;
+                            // last_del++;
+                        }
+                        else {
+                            first_del = it;
+                        }
                     }
-                    // else if (event_end <= other_addr) {
-                    //     continue_searching = true;
-                    // }
-                    if (it != alloc_intervals.end() && other_interval != nullptr)
-                        other_interval = other_interval->container;
-                }
-            } while (it != alloc_intervals.begin() && continue_searching);
 
+                    if (it == alloc_intervals.begin())
+                        break;
+
+                    it--;
+                    other_interval = *it;
+                    contains_result = other_interval->contains(event_interval);
+                }
+
+                if (use_container && !found_container) {
+                    // printf("\tentering rise loop\n");
+                    mem_interval* top_del_interval = nullptr;
+                    while (other_interval != nullptr) {
+                        stats.rise_loop_2++;
+                        contains_result = other_interval->contains(event_interval);
+                        if (contains_result == Overlap::Contains) {
+                            other_interval->contained.insert(event_interval);
+                            event_interval->container = other_interval;
+                            found_container = true;
+                            // printf("\t\t container2 found at addr %p!\n", other_interval->alloc_info->addr);
+                            break;
+                        }
+                        else if (contains_result == Overlap::Overwritten) {
+                            top_del_interval = other_interval;
+                        }
+                        other_interval = other_interval->container;
+                    }
+                    if (top_del_interval != nullptr) {
+                        // printf("FREEING BEFORE CONTINUING\n");
+                        // free_all_descendants(event_list, alloc_intervals, event_list[i].timestamp,
+                        //                     top_del_interval, num_events);
+                        first_del = alloc_intervals.find(top_del_interval);
+                        assert(first_del != alloc_intervals.end());
+                    }
+                }
+
+                size_t size_alloc_intervals_pre = alloc_intervals.size();
+                size_t num_events_pre = num_events;
+                auto first_del_copy = first_del;
+                // printf("Set first_del_copy = %p, about to check last_del\n", *first_del_copy);
+                if (last_del != alloc_intervals.end()) {
+                    last_del++;
+                    do {
+                        stats.add_free_loop_overlap++;
+                        event_list[num_events] = memory_event_t{
+                            (*first_del)->alloc_info->line,
+                            event_list[i].timestamp,
+                            (*first_del)->alloc_info->size,
+                            (*first_del)->alloc_info->addr,
+                            (*first_del)->alloc_info->file,
+                            (*first_del)->alloc_info->tindex_name,
+                            false
+                        };
+                        num_events++;
+                        if ((*first_del)->container) {
+                            int num_erased = (*first_del)->container->contained.erase(*first_del);
+                            assert(num_erased == 1);
+                        }
+                        first_del++;
+                    } while (first_del != last_del);
+                    
+                    // printf("Erasing from %p\n", *first_del_copy);
+                    alloc_intervals.erase(first_del_copy, last_del);
+                }
+                // else printf("LAST DEL IS END - BAD\n");
+                size_t num_events_post = num_events;
+                // if (size_alloc_intervals_pre - (num_events_post - num_events_pre) != alloc_intervals.size()) {
+                //     printf("Size before: %lu, elems removed: %lu, diff: %lu, actual size: %lu\n", size_alloc_intervals_pre,
+                //                                                                                 num_events_post - num_events_pre,
+                //                                                                                 size_alloc_intervals_pre - (num_events_post - num_events_pre),
+                //                                                                                 alloc_intervals.size());
+                // }
+                assert(size_alloc_intervals_pre - (num_events_post - num_events_pre) == alloc_intervals.size());
+            }
+
+            size_t size_alloc_intervals_pre_insert = alloc_intervals.size();
             alloc_intervals.insert(event_interval);
+            assert(size_alloc_intervals_pre_insert + 1 == alloc_intervals.size());
         }
         else {
-            free_all_descendants(event_list, alloc_intervals, event_list[i].timestamp,
-                                event_interval, false);
-        }
+            num_frees++;
+            // printf("processing free event addr %p\n", event_list[i].addr);
+            // if (addr_to_size_to_alloc_interval.find(event_addr) == addr_to_size_to_alloc_interval.end() ||
+            //     addr_to_size_to_alloc_interval[event_addr].find(event_list[i].size) == addr_to_size_to_alloc_interval[event_addr].end()) {
+            //     printf("\t failed to find matching alloc interval\n");
+            //     continue;
+            // }
 
-        if (event_list.size() % 1000000 == 0) {
-            printf("Size of event_list: %lu\n", event_list.size());
-            printf("Size of event_interval_info: %lu\n", event_interval_info.size());
-            printf("Size of alloc_intervals: %lu\n", alloc_intervals.size());
+            // auto event_interval = addr_to_size_to_alloc_interval[event_addr][event_list[i].size];
+            auto first_del = alloc_intervals.find(event_interval);
+            if (first_del == alloc_intervals.end()) {
+                // printf("\t failed to find matching alloc interval\n");
+                continue;
+            }
+            if ((*first_del)->container) {
+                int num_erased = (*first_del)->container->contained.erase(*first_del);
+                assert(num_erased == 1);
+            }
+
+            mem_interval_t* latest_starter = get_latest_start(*first_del);
+            auto last_del = alloc_intervals.find(latest_starter);
+            assert(last_del != alloc_intervals.end());
+
+            // TODO avoid repeating this part from alloc case
+            auto first_del_copy = first_del;
+            // need to increment first_del so we don't duplicate free from event_list[i]
+            first_del++;
+            last_del++;
+            while (first_del != last_del) {
+                stats.add_free_loop_free++;
+                event_list[num_events] = memory_event_t{
+                    (*first_del)->alloc_info->line,
+                    event_list[i].timestamp,
+                    (*first_del)->alloc_info->size,
+                    (*first_del)->alloc_info->addr,
+                    (*first_del)->alloc_info->file,
+                    (*first_del)->alloc_info->tindex_name,
+                    false
+                };
+                num_events++;
+                first_del++;
+            }
+
+            // printf("Erasing from %p\n", *first_del_copy);
+            alloc_intervals.erase(first_del_copy, last_del);
+            
+            // free_all_descendants(event_list, alloc_intervals, event_list[i].timestamp,
+            //                     event_interval, num_events, false);
+            if (event_interval->container) {
+                int num_erased = event_interval->container->contained.erase(event_interval);
+                assert(num_erased == 1);
+            }
         }
     }
 
     printf("done processing events\n");
 
-    std::sort(event_list.begin(), event_list.end(), 
-        [](memory_event_t& a, memory_event_t& b) { return a.timestamp < b.timestamp; });
+    printf("Outer loop: %lu\n"
+            "Inserts: %lu\n"
+            "Lower bound calls: %lu\n"
+            "Rise loop 1: %lu\n"
+            "Rise loop 2: %lu\n"
+            "Backwards loop: %lu\n"
+            "Add free overlap: %lu\n"
+            "Add free free: %lu\n", stats.outer_loop, stats.inserts, stats.lower_bound_calls,
+            stats.rise_loop_1, stats.rise_loop_2, stats.backwards_loop, stats.add_free_loop_overlap,
+            stats.add_free_loop_free);
+
+    std::sort(std::execution::par, event_list, event_list + num_events, 
+        [](const memory_event_t a, const memory_event_t b) { return a.timestamp < b.timestamp; });
     printf("done second sort\n");
+
+    return num_events;
 }
 
-std::vector<memory_event_t> IOHandler::get_all_events() {
-    FILE* input_file = fopen(in_filename.c_str(), "r");
-    if (input_file ==  NULL) {
-        std::cout << in_filename << " not found" << std::endl;
-        exit(-1);
-	}
+std::pair<memory_event_t*, size_t> IOHandler::get_all_events(bool use_container) {
+    printf("About to do first sort\n");
+    std::sort(std::execution::par, filemap, filemap + (input_file_bytes / sizeof(memory_event_t)), 
+        [](const memory_event_t a, const memory_event_t b) { return a.timestamp < b.timestamp; });
+    printf("done first sort\n");
 
-    struct stat sb;
-	fstat(fileno(input_file), &sb);
-    long int num_structs = sb.st_size / sizeof(memory_event_t);
-    printf("Number of structs in file: %ld\n", num_structs);
-    memory_event_t* filemap = reinterpret_cast<memory_event_t*>(
-        mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, fileno(input_file), 0));
-    if (filemap == MAP_FAILED) {
-        std::cout << "Failed to map input file to memory" << std::endl;
-        exit(-1);
-    }
-
-    std::vector<memory_event_t> event_list{};
+    // printf("AAAAAAAAAAAAA HERE ARE ALL EVENTS AAAAAAAAAAA\n");
+    // std::vector<memory_event_t> event_list{};
     std::unordered_map<uintptr_t, memory_event_t*> last_alloc{};
-    for (int i = 0; i < num_structs; i++) {
+    for (int i = 0; i < input_file_bytes / sizeof(memory_event_t); i++) {
         memory_event_t* event = filemap + i;
         uintptr_t event_addr = reinterpret_cast<uintptr_t>(event->addr);
+
+        // printf("\t event dets: addr: %lx, size: %lu, tindex: %p\n", event_addr, event->size, event->tindex_name);
+
         if (event->typeofop) {
-            last_alloc[event_addr] = event;
-            event_list.push_back(*event);
+            if (last_alloc.find(event_addr) == last_alloc.end())
+                last_alloc[event_addr] = event;
+            // event_list.push_back(*event);
         }
-        else if (last_alloc.find(event_addr) != last_alloc.end()) {
-            event_list.push_back(memory_event_t{
-                event->file,
-                last_alloc[event_addr]->tindex_name,
-                event->line,
-                event->timestamp,
-                last_alloc[event_addr]->size,
-                event->addr,
-                event->typeofop
-            });
-            last_alloc.erase(event_addr);
+        else {
+            if (last_alloc.find(event_addr) != last_alloc.end()) {
+                // printf("FOUND matching alloc for addr %p\n", event->addr);
+                // event->file = last_alloc[event_addr]->file;
+                event->tindex_name = last_alloc[event_addr]->tindex_name;
+                event->size = last_alloc[event_addr]->size;
+                last_alloc.erase(event_addr);
+                // event_list.push_back(memory_event_t{
+                //     event->file,
+                //     last_alloc[event_addr]->tindex_name,
+                //     event->line,
+                //     event->timestamp,
+                //     last_alloc[event_addr]->size,
+                //     event->addr,
+                //     event->typeofop
+                // });
+                // last_alloc.erase(event_addr);
+            }
+            else {
+                // printf("could not find matching alloc for addr %p\n", event->addr);
+            }
         }
     }
 
-    sort_and_add_overlap_frees(event_list);
-    return event_list;
+    size_t new_size = sort_and_add_overlap_frees(filemap,
+                                                input_file_bytes / sizeof(memory_event_t),
+                                                use_container);
+    return std::pair<memory_event_t*, size_t>{filemap, new_size};
+    // return event_list;
 }
 
 std::unordered_map<memory_event_t, mem_interval_t> IOHandler::get_event_interval_info() {
@@ -314,20 +585,24 @@ std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>>
     return perf_pages;
 }
 
-std::unordered_set<file_and_line_num_t> IOHandler::include_frag_allocs() {
-    std::unordered_set<file_and_line_num_t> retset{};
+std::unordered_map<uint16_t, std::unordered_set<size_t>> IOHandler::include_frag_allocs() {
+    std::unordered_map<uint16_t, std::unordered_set<size_t>> retset{};
     std::ifstream fd{frag_filename};
     std::string line;
     for (std::string file; getline(fd, file, '|'); ) {
         getline(fd, line);
         if (rev_file_map.find(file) == rev_file_map.end())
             continue;
-        retset.insert(file_and_line_num_t{
-            rev_file_map[file],
-            std::stoi(line)
-        });
+        if (retset.find(rev_file_map[file]) == retset.end())
+            retset.insert({rev_file_map[file], std::unordered_set<size_t>{}});
+
+        retset[rev_file_map[file]].insert(std::stoul(line));
     }
     return retset;
+}
+
+std::unordered_map<uint16_t, std::string> IOHandler::get_type_map() {
+    return type_map;
 }
 
 void IOHandler::begin_transaction() {
@@ -422,12 +697,12 @@ void IOHandler::prepare_write_to_align(sqlite3_stmt** stmt) {
 
 void IOHandler::write_event_to_db(sqlite3_stmt* stmt, memory_event_t& ev, 
                                 uintptr_t actual_addr) {
-    if (ev.file && file_map.find(reinterpret_cast<uintptr_t>(ev.file)) == file_map.end()) {
-        printf("FAILED to find file %p in file_map\n", ev.file);
-        printf("addr: %p, line: %u, timestamp: %lu\n", ev.addr, ev.line, ev.timestamp);
+    if (ev.file && file_map.find(ev.file) == file_map.end()) {
+        printf("FAILED to find file %d in file_map\n", ev.file);
+        printf("addr: %p, line: %lu, timestamp: %lu\n", ev.addr, ev.line, ev.timestamp);
     }
-    const char* fname = ev.file ? file_map.at(reinterpret_cast<uintptr_t>(ev.file)).c_str() : "NULL";
-    const char* tname = ev.tindex_name ? type_map.at(reinterpret_cast<uintptr_t>(ev.tindex_name)).c_str() : "NULL";
+    const char* fname = ev.file ? file_map.at(ev.file).c_str() : "NULL";
+    const char* tname = ev.tindex_name ? type_map.at(ev.tindex_name).c_str() : "NULL";
     sqlite3_bind_text(stmt, 1, fname, strlen(fname), SQLITE_STATIC);
     sqlite3_bind_int(stmt, 2, ev.line);
     sqlite3_bind_int64(stmt, 3, ev.timestamp);
@@ -439,7 +714,7 @@ void IOHandler::write_event_to_db(sqlite3_stmt* stmt, memory_event_t& ev,
     step_and_clear_bindings(stmt);
 }
 
-void IOHandler::write_lines_to_db(std::unordered_map<uintptr_t, std::vector<int64_t>>& buckets) {
+void IOHandler::write_lines_to_db(std::unordered_map<uint16_t, std::vector<int64_t>>& buckets) {
     begin_transaction();
     sqlite3_stmt* stmt;
     prepare_write_to_lines(&stmt);
