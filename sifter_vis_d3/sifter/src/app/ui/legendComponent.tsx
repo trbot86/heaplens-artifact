@@ -101,7 +101,7 @@ function LegendTableHeader({ visExpanded, setVisExpanded, currSortMode, setCurrS
                     <div
                         className='legendColumnLabel'
                         onClick={() => setCurrSortMode(currSortMode.mode == 'allocs' ? {mode: 'allocs', rev: !currSortMode.rev} : {mode: 'allocs', rev: false})} >
-                        # allocs{currSortMode.mode == 'allocs' ? (currSortMode.rev ? ' ▲' : ' ▼') : ''}
+                        # allocs{currSortMode.mode == 'allocs' ? (currSortMode.rev ? '▲' : '▼') : ''}
                     </div>
                 </th>
                 <th style={{
@@ -110,7 +110,7 @@ function LegendTableHeader({ visExpanded, setVisExpanded, currSortMode, setCurrS
                     <div
                         className='legendColumnLabel'
                         onClick={() => setCurrSortMode(currSortMode.mode == 'pages' ? {mode: 'pages', rev: !currSortMode.rev} : {mode: 'pages', rev: false})} >
-                        # pages{currSortMode.mode == 'pages' ? (currSortMode.rev ? ' ▲' : ' ▼') : ''}
+                        # pages{currSortMode.mode == 'pages' ? (currSortMode.rev ? '▲' : '▼') : ''}
                     </div>
                 </th>
             </tr>
@@ -422,7 +422,12 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
                             </div>
                         </td>
                         <td/>
-                        <td>{'↳ ' + field.subtype}</td>
+                        <td/>
+                        <td>
+                            <Typography className='legendText' >
+                                {'↳ ' + field.subtype}
+                            </Typography>
+                        </td>
                         <td/>
                         <td/>
                     </tr>)

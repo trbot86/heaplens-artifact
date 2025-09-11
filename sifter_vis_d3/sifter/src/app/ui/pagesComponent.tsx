@@ -765,7 +765,7 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
             }), [pageScale]);
 
     // console.log(`pageScale domain: ${pageScale.domain()[0]}, ${pageScale.domain()[1]}`);
-    const colScale = useMemo(() => d3.scaleLinear().domain([0, slotSize]).range(['rgb(70, 70, 70)', '#e33a2b']), []);
+    const colScale = useMemo(() => d3.scaleLinear().domain([0, slotSize]).range(['rgb(51, 51, 51)', '#e33a2b']), []);
 
     useEffect(() => {
         d3.select(brushRef.current)
@@ -794,7 +794,9 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
     }, [zoomedSize]);
 
     return (
-        <svg className={`pageCard hugePageCard${zoomedSize > 0 ? ' zoomedHugePageCard' : ''}`} >
+        <svg
+            className={`pageCard hugePageCard${zoomedSize > 0 ? ' zoomedHugePageCard' : ''}`}
+            viewBox={`0 0 ${PAGE_CARD_SVG_WIDTH} ${(zoomedSize > 0 ? 4 : 1)*PAGE_CARD_SVG_HEIGHT}`} >
             <rect className='hugePageCardBack' />
             <g
                 className='pageCardClipGroup'
@@ -921,8 +923,12 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
 
 function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setSelPageAddr,
                        numBuckets, setFocusData, setZoomedSize, getBucketIdx, selSize,
-                       setSelSize, pageVis, zoomedSize, zoomedAddr, setZoomedAddr } : 
+                       setSelSize, pageVis, zoomedSize, zoomedAddr, setZoomedAddr,
+                       clusterSize, sumClusterSizes, maxClusterSize } : 
     {
+        clusterSize: number,
+        sumClusterSizes: number,
+        maxClusterSize: number,
         pageSize: number,
         addr: number,
         data: PageContents,
@@ -962,13 +968,13 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
             console.log(filtered);
             console.log(`Here is zoomedAddr: ${zoomedAddr}, zoomedSize: ${zoomedSize}`);
         }
-        if (Math.floor(selAddr / pageSize) == Math.floor(addr / pageSize)) {
+        // if (Math.floor(selAddr / pageSize) == Math.floor(addr / pageSize)) {
 
-            setFocusData({
-                events: filtered.events.filter((obj: MemoryObject) => obj.addr < selAddr + selSize && selAddr < obj.addr + obj.size),
-                cluster: filtered.cluster
-            });
-        }
+        //     setFocusData({
+        //         events: filtered.events.filter((obj: MemoryObject) => obj.addr < selAddr + selSize && selAddr < obj.addr + obj.size),
+        //         cluster: filtered.cluster
+        //     });
+        // }
     }, [currTs, selAddr, data, pageVis, zoomedSize]);
 
     return (
@@ -987,16 +993,35 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
                 selSize={selSize}
                 setSelSize={setSelSize}
                 slotSize={Math.floor(pageSize / NUM_SLOTS_HUGEPAGE)} />
-            <div className='pageRowLabel' >
-                <div>{`0x${addr.toString(16)}`}</div>
-                <div>{`cluster: ${data.cluster}`}</div>
-            </div>
-            {
+            <Grid
+                container
+                rowSpacing={0.3}
+                columnSpacing={0.8}
+                className='pageRowLabel' >
+                <Grid size={12} >
+                    <div className='pageLabelDiv' >{`0x${addr.toString(16)}`}</div>
+                </Grid>
+                
+                <Grid size={5} >
+                    <div className='clusterLabelDiv' >{`cluster: ${data.cluster}`}</div>
+                </Grid>
+                <Grid size={4} >
+                    <Tooltip
+                        placement='right'
+                        title={`${clusterSize} of ${sumClusterSizes} pages`} >
+                        <SizeIndicator
+                            clusterSize={clusterSize}
+                            sumClusterSizes={sumClusterSizes}
+                            maxClusterSize={maxClusterSize} />
+                    </Tooltip>
+                </Grid>
+            </Grid>
+            {/* {
             (Math.floor(addr / pageSize) == Math.floor(selAddr / pageSize)) &&
             <div id='selPageIcon' >
                 <RadioButtonChecked fontSize='small' />
             </div>
-            }
+            } */}
         </div>
     );
 }
@@ -1038,7 +1063,12 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
     const [showHitm, setShowHitm] = useState<boolean>(false);
 
     const maxClusterSize = Object.values(clustersData).reduce((size: number, curr: {'pages': number[], 'size': number}) => Math.max(size, curr['size']), 0);
-    const focusData = useMemo(() => pages[selPageAddr], [selPageAddr]);
+    const focusData = useMemo(() => {
+        console.log(`Here is the page addr: ${Math.round(selPageAddr / pageSize) * pageSize}`);
+        console.log('Here is the page:');
+        console.log(pages[Math.round(selPageAddr / pageSize) * pageSize]);
+        return pages[Math.round(selPageAddr / pageSize) * pageSize];
+    }, [selPageAddr]);
     const hitmCutoff = useMemo(() => Object.keys(perf.addrs).length > 0 ? Object.values(perf.addrs)
                                             .toSorted((a, b) => b.hitm - a.hitm)[Math.min(Object.keys(perf.addrs).length, MAX_HITM_ADDRS) - 1].hitm : 0, [perf]);
 
@@ -1096,6 +1126,9 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                         .filter((addr: string) => zoomedSize == 0 || Math.floor(parseInt(addr) / pageSize) == Math.floor(selPageAddr / pageSize))
                         .map((addr: string) =>  <HugePageRow
                                                     key={addr}
+                                                    clusterSize={clustersData[pages[parseInt(addr)].cluster]['size']}
+                                                    sumClusterSizes={sumClusterSizes}
+                                                    maxClusterSize={maxClusterSize}
                                                     pageSize={pageSize}
                                                     addr={parseInt(addr)}
                                                     data={pages[parseInt(addr)]}

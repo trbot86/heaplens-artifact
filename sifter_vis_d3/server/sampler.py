@@ -16,7 +16,7 @@ from random import randint, shuffle
 MAX_PAGE_PROP = 7560
 MAX_OBJ_STATS = 1000000
 CHANGE_POINT_THRESHOLD = 10
-event_labels = ['file', 'size', 'addr', 'type', 'allocTs', 'freeTs', 'line']
+event_labels = ['file', 'size', 'addr', 'type', 'allocTs', 'freeTs', 'line', 'actualAddr']
 
 FILE_IND = 0
 SIZE_IND = 1
@@ -24,8 +24,10 @@ ADDR_IND = 2
 TYPE_IND = 3
 ALLOC_TS_IND = 4
 FREE_TS_IND = 5
-TYPE_KIND_IND = 6
-LINE_IND = 7
+# TYPE_KIND_IND = 6
+LINE_IND = 6
+ACTUAL_ADDR_IND = 7
+TYPE_NO_SPACE_IND = 8
 
 
 def replace_nan(event, key):
@@ -90,7 +92,7 @@ class Sampler:
         # objects with distinct types)
         # df.loc[df["freeTs"].isnull(),"freeTs"] = df.groupby(["addr", "type"])["allocTs"].shift(periods=-1).dropna()
         # return df.iloc[:,[]]
-        return df.iloc[:,[0, 1, 2, 3, 4, 6, 5]]
+        return df.loc[:,["file", "size", "addr", "type", "allocTs", "freeTs", "line", "actualAddr"]]
     
     def get_all_lines(self):
         con = sqlite3.connect(self.fname)
@@ -111,7 +113,8 @@ class Sampler:
                                     TYPE as type,
                                     TIMESTAMP as ts,
                                     isNew as is_alloc,
-                                    LINE as line
+                                    LINE as line,
+                                    ACTUALADDR as actualAddr
                                 FROM SUPERTABLE""",
                                 con,
                                 chunksize=100000):
@@ -332,7 +335,8 @@ class Sampler:
                                     TYPE as type,
                                     TIMESTAMP as ts,
                                     isNew as is_alloc,
-                                    LINE as line
+                                    LINE as line,
+                                    ACTUALADDR as actualAddr
                                 FROM SUPERTABLE
                                 WHERE is_alloc=0 OR (ts <= {} AND is_alloc=1)""".format(end_ts),
                                 con)
@@ -382,6 +386,7 @@ class Sampler:
         recs = self.all_data
         # df = self.__add_free_types(recs).dropna(subset=['size'])
         df = self.get_objects(recs)
+        print(df.columns)
         df = df.drop(df[df['freeTs'] < start_ts].index)
         df.loc[:,'page_num'] = df.loc[:,'addr'] // self.page_size
 
@@ -495,7 +500,7 @@ class Sampler:
 
         print("about to start sampling loop")
         sys.stdout.flush()
-        
+
         taken = 0
         cluster_keys = list(clusters.keys())
         shuffle(cluster_keys)
@@ -517,11 +522,11 @@ class Sampler:
         # print(sampled_pages)
         print("Done sampling loop")
         sys.stdout.flush()
-        
+
         sampled_pages_df = pd.DataFrame({'page_num': sorted(sampled_pages)})
         features = sampled_pages_df.merge(features, how='left', on='page_num')
         merged = sampled_pages_df.merge(labeled_data, how='left', on='page_num')
-        
+
         all_merged = merged.set_index('page_num').set_axis(['events', 'cluster'], axis='columns')
         dict_merged = all_merged.to_dict(orient='index')
         fts = event_labels.index("freeTs")
@@ -549,7 +554,7 @@ class Sampler:
                 'sum_cluster_sizes': sum([len(clusters[c]) for c in clusters.keys()]),
                 'num_clusters': len(clusters.keys()),
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()}}
-    
+
     def get_cache_data(self, size, assoc):
         print("start of get_cache_data")
         sys.stdout.flush()
@@ -586,38 +591,62 @@ class Sampler:
         print("Initialized empty data")
         sys.stdout.flush()
 
+        print("rows.shape:", rows.shape)
+
+        clean_types = np.char.replace(rows[:, TYPE_IND].astype(str), ' ', '')
+        rows = np.column_stack([rows, clean_types])
+        print("Done removing spaces from type names")
+        print("rows.shape:", rows.shape)
+
         for obj in rows:
+            obj_page = obj[ADDR_IND] // self.page_size
             entries = [obj]
-            if obj[TYPE_IND].replace(' ', '') in fields:
-                for field_ent in fields[obj[TYPE_IND].replace(' ', '')]:
-                    entries.append([obj[FILE_IND],
-                                    field_ent["size"],
-                                    obj[ADDR_IND] + field_ent["offset"],
-                                    get_sub_tname(obj[TYPE_IND].replace(' ', ''), field_ent["subtype"]),
-                                    obj[ALLOC_TS_IND],
-                                    obj[FREE_TS_IND]])
+            if obj[TYPE_NO_SPACE_IND] in fields:
+                for field_ent in fields[obj[TYPE_NO_SPACE_IND]]:
+                    if obj[ACTUAL_ADDR_IND] + field_ent["offset"] + field_ent["size"] > obj[ADDR_IND] and \
+                        obj[ACTUAL_ADDR_IND] + field_ent["offset"] < obj[ADDR_IND] + obj[SIZE_IND]:
+                        entries.append([obj[FILE_IND],
+                                        min(field_ent["size"], obj[ACTUAL_ADDR_IND] + field_ent["offset"] + field_ent["size"] - obj[ADDR_IND]),
+                                        max(obj[ACTUAL_ADDR_IND] + field_ent["offset"], obj[ADDR_IND]),
+                                        get_sub_tname(obj[TYPE_NO_SPACE_IND], field_ent["subtype"]),
+                                        obj[ALLOC_TS_IND],
+                                        obj[FREE_TS_IND]])
             for entry in entries:
                 start_set = math.floor(entry[ADDR_IND] / self.cache_line_size) % num_cache_sets
-                rem_size = entry[SIZE_IND] - (self.cache_line_size - (entry[ADDR_IND] % self.cache_line_size))
+                # rem_size = entry[SIZE_IND] - (self.cache_line_size - (entry[ADDR_IND] % self.cache_line_size))
                 alloc_time_bucket = get_bucket(self.min_ts, self.max_ts, self.num_buckets, entry[ALLOC_TS_IND])
                 free_time_bucket = -1 if math.isnan(entry[FREE_TS_IND]) else get_bucket(self.min_ts, self.max_ts, self.num_buckets, entry[FREE_TS_IND])
+                n_sets = (int(entry[SIZE_IND]) + (int(entry[ADDR_IND]) % self.cache_line_size) + self.cache_line_size - 1) // self.cache_line_size
                 # if entry[TYPE_IND] == "leanstore::storage::btree::BTreeVI::ChainedTuple":
                 #     print("alloc bucket: {}, free bucket: {}".format(alloc_time_bucket, free_time_bucket))
                 try:
-                    data[alloc_time_bucket, start_set, tp_and_st_to_idx[entry[TYPE_IND]]] += 1
+                    cache_sets = (start_set + np.arange(n_sets)) % num_cache_sets
+                    np.add.at(
+                        data,
+                        (np.full(n_sets, alloc_time_bucket),
+                         cache_sets,
+                         np.full(n_sets, tp_and_st_to_idx[entry[TYPE_IND]])),
+                        1
+                    )
+
                     if free_time_bucket >= 0:
-                        data[free_time_bucket, start_set, tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
-                    i = 1
-                    while rem_size > 0 and i <= num_cache_sets:
-                        data[alloc_time_bucket, (start_set + i) % num_cache_sets, tp_and_st_to_idx[entry[TYPE_IND]]] += 1
-                        if free_time_bucket >= 0:
-                            data[free_time_bucket, (start_set + i) % num_cache_sets, tp_and_st_to_idx[entry[TYPE_IND]]] -= 1
-                        rem_size -= self.cache_line_size
-                        i += 1
+                        np.add.at(
+                            data,
+                            (np.full(n_sets, free_time_bucket),
+                             cache_sets,
+                             np.full(n_sets, tp_and_st_to_idx[entry[TYPE_IND]])),
+                            -1
+                        )
+
                 except KeyError:
                     print('KEY ERROR!!!')
                     print(tp_and_st_to_idx)
                     print(entry)
+                except ValueError:
+                    print('VALUE ERROR!!!')
+                    print(entry)
+                    print("n_sets:", n_sets)
+                    print("alloc_time_bucket:", alloc_time_bucket)
 
         # flatten the data matrix to 2d
         flat = np.array(data).reshape(len(data), -1)

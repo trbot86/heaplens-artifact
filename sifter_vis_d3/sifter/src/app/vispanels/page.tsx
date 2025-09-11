@@ -462,15 +462,21 @@ export default function VisPanels() {
 
                         getData(`log-data/get-colours/${fname}`, null).then((resp) => resp.json())
                             .then((json) => {
+                                let newColourMap = null;
                                 if (json.length > 0) {
-                                    setColourOfType(json.reduce((map: TypeToColourMap, entry: {'type': string, 'colour': string}) => {
+                                    newColourMap = json.reduce((map: TypeToColourMap, entry: {'type': string, 'colour': string}) => {
                                                             map[entry['type']] = d3.color(entry['colour']);
                                                             return map;
-                                                        }, {}));
+                                                        }, {});
                                 }
                                 else {
-                                    setColourOfType(generateColours(allData['types'].concat(allFieldNames)));
+                                    newColourMap = generateColours(allData['types'].concat(allFieldNames));
                                 }
+                                setColourOfType(newColourMap);
+                                console.log("Here is the new colour map:");
+                                console.log(newColourMap);
+                                console.log("allData[types] =");
+                                console.log(allData['types']);
                             });
 
                         // const numLinePts = allData['linesAndStats']['pts'].reduce((maxBucket: number, curr: LinePoint) => Math.max(curr['bucket'], maxBucket), 0);
