@@ -599,7 +599,6 @@ class Sampler:
         print("rows.shape:", rows.shape)
 
         for obj in rows:
-            obj_page = obj[ADDR_IND] // self.page_size
             entries = [obj]
             if obj[TYPE_NO_SPACE_IND] in fields:
                 for field_ent in fields[obj[TYPE_NO_SPACE_IND]]:

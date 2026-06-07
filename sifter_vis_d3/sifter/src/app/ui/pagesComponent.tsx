@@ -56,6 +56,146 @@ const SEL_AND_ZOOM_GRANULARITY = 4096;
 const MAX_HITM_ADDRS = 20;
 const PERF_INDICATOR_SIZE = 4;
 
+const SNAPSHOT_INTERVALS = 8; // number of intervals between earliest event and latest event
+const SNAPSHOT_FILE_NAME = 'page_layout_snapshots.txt';
+
+interface SnapshotObject {
+    type: string,
+    start_addr: number,
+    size: number,
+    alloc_ts: number,
+    free_ts: number | null,
+    actual_addr?: number
+}
+
+interface SnapshotPage {
+    page_addr: number,
+    cluster: number,
+    objects: SnapshotObject[]
+}
+
+function getSnapshotTimes(pages: PageMap): number[] {
+    const allEvents = Object.values(pages).flatMap((page) => page.events);
+    if (allEvents.length === 0) {
+        return [0];
+    }
+    const minTs = Math.min(...allEvents.map((e) => e.allocTs));
+    const maxTs = Math.max(...allEvents.map((e) => e.allocTs));
+    const step = (maxTs - minTs) / SNAPSHOT_INTERVALS;
+    return Array.from({ length: SNAPSHOT_INTERVALS + 1 }, (_, i) => Number((minTs + step * i).toFixed(3)));
+}
+
+function serializeFieldsData(fieldsData: { [tp: string]: SubtypeEntry[] }): string {
+    const lines: string[] = ['FIELDS_DATA:'];
+    const types = Object.keys(fieldsData).sort();
+    if (types.length === 0) {
+        lines.push('  NONE');
+        return lines.join('\n');
+    }
+    for (const type of types) {
+        lines.push(`- type: ${type}`);
+        const entries = fieldsData[type];
+        if (!entries || entries.length === 0) {
+            lines.push('  subtypes: []');
+            continue;
+        }
+        lines.push('  subtypes:');
+        for (const entry of entries) {
+            lines.push(`    - name: ${entry.name}`);
+            lines.push(`      subtype: ${entry.subtype}`);
+            lines.push(`      offset: ${entry.offset}`);
+            lines.push(`      size: ${entry.size}`);
+        }
+    }
+    return lines.join('\n');
+}
+
+function serializeClusterData(clustersData: ClustersInfo): string {
+    const lines: string[] = ['CLUSTERS:'];
+    const clusterIds = Object.keys(clustersData).map((k) => parseInt(k)).sort((a, b) => a - b);
+    if (clusterIds.length === 0) {
+        lines.push('  NONE');
+        return lines.join('\n');
+    }
+    for (const clusterId of clusterIds) {
+        const cluster = clustersData[clusterId];
+        const pageEntries = cluster.pages;
+        let pageList: number[] = [];
+        if (Array.isArray(pageEntries)) {
+            pageList = pageEntries;
+        } else if (pageEntries && typeof pageEntries[Symbol.iterator] === 'function') {
+            pageList = Array.from(pageEntries as Iterable<number>);
+        } else if (pageEntries && typeof pageEntries === 'object') {
+            pageList = Object.values(pageEntries as Record<string, number>);
+        }
+        pageList = pageList.sort((a, b) => a - b);
+        lines.push(`- cluster_id: ${clusterId}`);
+        lines.push(`  size: ${cluster.size}`);
+        lines.push(`  page_count: ${pageList.length}`);
+        lines.push(`  pages: [${pageList.join(', ')}]`);
+    }
+    return lines.join('\n');
+}
+
+function buildPageSnapshotText(pages: PageMap, clustersData: ClustersInfo, fieldsData: { [tp: string]: SubtypeEntry[] }, pageSize: number): string {
+    const pageAddrs = Object.keys(pages).map((addr) => parseInt(addr)).sort((a, b) => a - b);
+    const snapshotTimes = getSnapshotTimes(pages);
+    const lines: string[] = [];
+
+    lines.push('MEMORY PAGE LAYOUT SNAPSHOTS');
+    lines.push(`SNAPSHOT_INTERVALS: ${SNAPSHOT_INTERVALS}`);
+    lines.push(`PAGE_SIZE: ${pageSize}`);
+    lines.push(`TOTAL_PAGES: ${pageAddrs.length}`);
+    lines.push(`GENERATED_AT: ${new Date().toISOString()}`);
+    lines.push('');
+    lines.push('');
+    lines.push(serializeFieldsData(fieldsData));
+    lines.push('');
+    lines.push(serializeClusterData(clustersData));
+    lines.push('');
+    lines.push('SNAPSHOTS:');
+
+    for (let i = 0; i < snapshotTimes.length; i++) {
+        const ts = snapshotTimes[i];
+        lines.push(`- snapshot_index: ${i}`);
+        lines.push(`  time: ${ts}`);
+        lines.push('  pages:');
+        for (const pageAddr of pageAddrs) {
+            const page = pages[pageAddr];
+            const visibleObjects = page.events.filter((obj) => obj.allocTs <= ts && (obj.freeTs === null || obj.freeTs >= ts));
+            lines.push(`  - page_addr: ${pageAddr}`);
+            lines.push(`    cluster: ${page.cluster}`);
+            lines.push(`    object_count: ${visibleObjects.length}`);
+            if (visibleObjects.length === 0) {
+                lines.push('    objects: []');
+                continue;
+            }
+            lines.push('    objects:');
+            for (const obj of visibleObjects) {
+                lines.push('      -');
+                lines.push(`        type: ${obj.type ?? 'UNKNOWN'}`);
+                lines.push(`        size: ${obj.size}`);
+                lines.push(`        actual_addr: ${obj.actualAddr ?? obj.addr}`);
+            }
+        }
+    }
+
+    return lines.join('\n');
+}
+
+function downloadTextFile(text: string, fileName: string): void {
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
 /*  TODO: Currently, this function just looks at the starting address of each
     event, without considering events crossing slot/page boundaries. This
     should be fine to give an approximate overview in most cases. */
@@ -87,7 +227,7 @@ function getSlotDataPerBucket(  events: MemoryObject[], pageAddr: number, pageSi
 }
 
 const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize, xScale, yScale,
-                                 expanded, viewSize, /*hoveredType, setHoveredType,*/ ...props } : 
+                                 expanded, viewSize, invisible, ...props } : 
     {
         obj: MemoryObject,
         colourOfType: TypeToColourMap,
@@ -96,14 +236,14 @@ const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize
         cacheLineSize: number,
         xScale: d3.ScaleLinear<number, number, never>,
         yScale: d3.ScaleLinear<number, number, never>,
-        expanded: boolean
-        /*hoveredType: string | null,
-        setHoveredType: (a: string | null) => void*/
+        expanded: boolean,
+        invisible?: boolean
     }, ref) => {
     return (
         <g
             {...props}
-            ref={ref} >
+            ref={ref}
+            visibility={invisible ? 'hidden' : 'visible'} >
             {/* onMouseEnter={() => setHoveredType(obj.type)}
             onMouseLeave={() => setHoveredType(null)} > */}
             
@@ -213,22 +353,6 @@ const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize
                 y1={yScale(Math.floor((obj.addr - viewStartAddr) / cacheLineSize))}
                 y2={yScale(Math.floor((obj.addr - viewStartAddr) / cacheLineSize)) + yScale(1) - yScale(0)} />
             }
-
-            {/* End line of object */}
-            {/* {
-            (obj.addr + obj.size <= viewStartAddr + viewSize) &&
-            <line
-                className='objDelimLine'
-                x1={xScale(((obj.addr + obj.size - 1) % cacheLineSize) + 1)}
-                x2={xScale(((obj.addr + obj.size - 1) % cacheLineSize) + 1)}
-                y1={yScale(Math.ceil((obj.size + (obj.addr % cacheLineSize) - 1) / cacheLineSize))
-                    + yScale(Math.ceil((obj.addr - viewStartAddr) / cacheLineSize))
-                }
-                y2={yScale(Math.ceil((obj.size + (obj.addr % cacheLineSize) - 1) / cacheLineSize))
-                    + yScale(Math.ceil((obj.addr - viewStartAddr) / cacheLineSize))
-                    + yScale(1) - yScale(0)
-                } />
-            } */}
         </g>
     );
 });
@@ -285,7 +409,7 @@ function HoverableSplitBlock({  event, colourOfType, viewStartAddr, viewSize,
                     expanded={event.type ? expandedTypes[event.type.replace(/\s+/g, '')] : false} />
             </HtmlTooltip>
             {
-            (event.type && fieldsData[event.type.replace(/\s+/g, '')] && expandedTypes[event.type.replace(/\s+/g, '')]) &&
+            (event.type && fieldsData[event.type.replace(/\s+/g, '')]) &&
             <>
             {
                 fieldsData[event.type.replace(/\s+/g, '')].map((field) =>   
@@ -322,7 +446,8 @@ function HoverableSplitBlock({  event, colourOfType, viewStartAddr, viewSize,
                                                                 cacheLineSize={cacheLineSize}
                                                                 xScale={xScale}
                                                                 yScale={yScale}
-                                                                expanded={false} />
+                                                                expanded={false}
+                                                                invisible={!expandedTypes[event.type.replace(/\s+/g, '')]} />
                                                         </HtmlTooltip>)
             }
             </>
@@ -1061,14 +1186,28 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
     const [zoomedSize, setZoomedSize] = useState<number>(0);
     const [showHot, setShowHot] = useState<boolean>(false);
     const [showHitm, setShowHitm] = useState<boolean>(false);
+    const snapshotSavedRef = useRef(false);
+
+    useEffect(() => {
+        if (snapshotSavedRef.current) {
+            return;
+        }
+        if (!pages || Object.keys(pages).length === 0) {
+            return;
+        }
+        const snapshotText = buildPageSnapshotText(pages, clustersData, fieldsData, pageSize);
+        downloadTextFile(snapshotText, SNAPSHOT_FILE_NAME);
+        snapshotSavedRef.current = true;
+    }, [pages, clustersData, fieldsData, pageSize]);
 
     const maxClusterSize = Object.values(clustersData).reduce((size: number, curr: {'pages': number[], 'size': number}) => Math.max(size, curr['size']), 0);
     const focusData = useMemo(() => {
-        console.log(`Here is the page addr: ${Math.round(selPageAddr / pageSize) * pageSize}`);
-        console.log('Here is the page:');
-        console.log(pages[Math.round(selPageAddr / pageSize) * pageSize]);
-        return pages[Math.round(selPageAddr / pageSize) * pageSize];
-    }, [selPageAddr]);
+        const currentPageAddr = Math.round(selPageAddr / pageSize) * pageSize;
+        if (!pages[currentPageAddr]) {
+            return { events: [], cluster: 0 } as PageContents;
+        }
+        return pages[currentPageAddr];
+    }, [selPageAddr, pages, pageSize]);
     const hitmCutoff = useMemo(() => Object.keys(perf.addrs).length > 0 ? Object.values(perf.addrs)
                                             .toSorted((a, b) => b.hitm - a.hitm)[Math.min(Object.keys(perf.addrs).length, MAX_HITM_ADDRS) - 1].hitm : 0, [perf]);
 

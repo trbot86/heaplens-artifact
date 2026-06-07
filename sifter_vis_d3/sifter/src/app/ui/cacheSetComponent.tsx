@@ -148,15 +148,28 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
         loading: boolean,
         expandedTypes: {[a: string]: boolean}
     }) {
+    const visibleTypes: boolean[] = useMemo(() => {
+        return cacheData.idxToTpAndSt.map((tp: string, i: number) => 
+                    (!isSubType(cacheData, i) && cacheVis[tp] && !expandedTypes[tp.replace(/\s+/g, '')]) ||
+                    (isSubType(cacheData, i) && cacheVis[tp] && expandedTypes[getTypeName(tp)]));
+    }, [cacheData, expandedTypes]);
     const totalData: number[][] = useMemo(() => {
+        console.log('Recomputing totalData');
+        console.log('Here is visibleTypes:');
+        console.log(visibleTypes);
         return  cacheData.occ.map((bucket) => {
+                    // console.log('Here is bucket:');
+                    // console.log(bucket);
                     return  bucket.reduce((res, v, i) => {
-                                    res[Math.floor(i / cacheData.idxToTpAndSt.length)] += v;
+                                    res[Math.floor(i / cacheData.idxToTpAndSt.length)] += (visibleTypes[i % cacheData.idxToTpAndSt.length] ?
+                                        v : 0);
                                     return res;
                                 }, new Array(cacheData.numSets).fill(0));
                 });
-    }, [cacheData]);
+    }, [cacheData, visibleTypes]);
     const aggDataPerBucket: {min: number, max: number}[] = useMemo(() => {
+        console.log('Recomputing aggDataPerBucket');
+        console.log(totalData);
         return totalData.map((bucket: number[]) => {
             return bucket.reduce((res: {min: number, max: number}, v: number) => {
                 res.min = Math.min(res.min, v);
@@ -164,7 +177,7 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                 return res;
             }, {min: Infinity, max: 0});
         });
-    }, [cacheData]);
+    }, [totalData]); // TODO changed this from cacheData to totalData - might be wrong
     const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
     return (
@@ -204,7 +217,7 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                         {
                             cacheData.occ[bucketIdx].slice(hoverIdx*cacheData.idxToTpAndSt.length, (hoverIdx+1)*cacheData.idxToTpAndSt.length)
                                 .map((v: number, tidx: number) => ({val: v, tidx: tidx}))
-                                .filter((v) => v.val > 0)
+                                .filter((v) => v.val > 0 && visibleTypes[v.tidx])
                                 .sort((a, b) => b.val - a.val)
                                 .map((v: {val: number, tidx: number}) =>    <tr key={`cb-${v.tidx}`} >
                                                                                 <td className='cacheTableTypeTextContainer' >
@@ -297,20 +310,20 @@ export default function CacheSets({ cacheData, cacheInfo, bucketIdx, cacheVis,
     // console.log(`Here is condition for ind ${j}:`);
     // console.log((isSubType(cacheData, j) && typeVisMatrix[cacheData.idxToTpAndSt[j % cacheData.idxToTpAndSt.length]].cacheVis && expandedTypes[getTypeName(cacheData.idxToTpAndSt[j % cacheData.idxToTpAndSt.length])]));
     
-    const filteredCacheData: CacheData = useMemo(() => {
-        // console.log(cacheData.occ.map((row) => row.map((v, i) => 
-        //     (!isSubType(cacheData, i) && typeVisMatrix[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]].cacheVis && !expandedTypes[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length].replace(/\s+/g, '')]) ||
-        //     (isSubType(cacheData, i) && typeVisMatrix[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]].cacheVis && expandedTypes[getTypeName(cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length])]) ?
-        //     v : 0)));
-        return {
-            occ: cacheData.occ.map((row) => row.map((v, i) => 
-                                                        (!isSubType(cacheData, i) && cacheVis[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]] && !expandedTypes[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length].replace(/\s+/g, '')]) ||
-                                                        (isSubType(cacheData, i) && cacheVis[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]] && expandedTypes[getTypeName(cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length])]) ?
-                                                        v : 0)),
-            idxToTpAndSt: cacheData.idxToTpAndSt,
-            numSets: cacheData.numSets
-        }
-    }, [cacheData, cacheVis, expandedTypes]);
+    // const filteredCacheData: CacheData = useMemo(() => {
+    //     // console.log(cacheData.occ.map((row) => row.map((v, i) => 
+    //     //     (!isSubType(cacheData, i) && typeVisMatrix[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]].cacheVis && !expandedTypes[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length].replace(/\s+/g, '')]) ||
+    //     //     (isSubType(cacheData, i) && typeVisMatrix[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]].cacheVis && expandedTypes[getTypeName(cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length])]) ?
+    //     //     v : 0)));
+    //     return {
+    //         occ: cacheData.occ.map((row) => row.map((v, i) => 
+                                                        // (!isSubType(cacheData, i) && cacheVis[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]] && !expandedTypes[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length].replace(/\s+/g, '')]) ||
+    //                                                     (isSubType(cacheData, i) && cacheVis[cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length]] && expandedTypes[getTypeName(cacheData.idxToTpAndSt[i % cacheData.idxToTpAndSt.length])]) ?
+    //                                                     v : 0)),
+    //         idxToTpAndSt: cacheData.idxToTpAndSt,
+    //         numSets: cacheData.numSets
+    //     }
+    // }, [cacheData, cacheVis, expandedTypes]);
 
     useEffect(() => {
         setCacheWidth({
@@ -336,7 +349,7 @@ export default function CacheSets({ cacheData, cacheInfo, bucketIdx, cacheVis,
                 setCacheWidth={setCacheWidth} />
             <CacheBoxArray
                 selCacheName={selCacheName}
-                cacheData={filteredCacheData}
+                cacheData={cacheData}
                 bucketIdx={bucketIdx}
                 cacheWidth={cacheWidth}
                 setCacheWidth={setCacheWidth}
