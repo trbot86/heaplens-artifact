@@ -56,4 +56,4 @@ install:
 	cp memhook.h ../prac/setbench-master/microbench
 
 clean:
-	rm libmemhook.so *.o
+	rm -f libmemhook.so *.o

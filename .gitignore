@@ -82,3 +82,10 @@ sifter_vis_d3/log.txt
 **/info_dump
 **/new_field_dump.txt
 sifter_vis_d3/server/venv
+
+# Pinned vendor sources for the ATC'26 artifact submission are tracked
+# deliberately (as submodules), even though their names collide with the
+# ad-hoc scratch-clone ignore patterns above. Experiment run outputs under
+# artifact/experiments/ (bin/, *.sqlite, etc.) should stay ignored as usual.
+!/artifact/vendor/
+!/artifact/vendor/**

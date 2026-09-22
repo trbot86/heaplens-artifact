@@ -1,11 +1,23 @@
 # .dockerignore
 sifter_vis_d3
 docker
+.git
+leanstore
+node_modules
+.next
+venv
+__pycache__
+*.sqlite
+*.sqlite-journal
+data.zip
+artifact/experiments/*/work
 ssmem
 ASCYLIB/exp*
 setbench/exp*
 fielddump_tester
 rocksdb
+!artifact/vendor/rocksdb
+!artifact/vendor/rocksdb/**
 ralloc*
 mimalloc
 zstd

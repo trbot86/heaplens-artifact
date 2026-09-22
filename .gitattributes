@@ -1,0 +1,7 @@
+# Shell scripts and Python tools in this repo are executed inside a Linux
+# Docker container (see docker/*/Dockerfile). Force LF line endings so a
+# Windows checkout with core.autocrlf=true doesn't corrupt their shebang
+# lines (this broke `RUN ./llvm.sh 14` in the Docker build in practice).
+*.sh text eol=lf
+*.py text eol=lf
+Dockerfile text eol=lf

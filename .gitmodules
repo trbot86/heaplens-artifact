@@ -4,3 +4,12 @@
 [submodule "prac/setbench_bk"]
 	path = prac/setbench_bk
 	url = https://gitlab.com/trbot86/setbench.git
+[submodule "artifact/vendor/ascylib"]
+	path = artifact/vendor/ascylib
+	url = https://github.com/LPD-EPFL/ASCYLIB.git
+[submodule "artifact/vendor/setbench"]
+	path = artifact/vendor/setbench
+	url = https://gitlab.com/trbot86/setbench.git
+[submodule "artifact/vendor/rocksdb"]
+	path = artifact/vendor/rocksdb
+	url = https://github.com/facebook/rocksdb.git

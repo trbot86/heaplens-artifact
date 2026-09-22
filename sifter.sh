@@ -134,7 +134,14 @@ done
 
 add_includes () {
     echo "refactoring all c h cc hh cpp hpp files to include memhook_interface.h..."
-    cd ./$1
+    # NOTE: was `cd ./$1`, which silently resolves to a bogus, nonexistent
+    # relative path (and fails to cd, without aborting the script) whenever
+    # $1 is an absolute path -- e.g. `./sifter.sh /abs/path --includes-only`.
+    # The `find . -name ...` below then ran from whatever directory the cd
+    # left it in instead, in practice injecting memhook_interface.h includes
+    # into every source file in the repository, including vendored/unrelated
+    # ones. `cd -- "$1"` works for both relative and absolute paths.
+    cd -- "$1" || { echo "ERROR: add_includes: cannot cd to '$1'" >&2; exit 1; }
     for f in $(for t in '*.h' '*.cpp' '*.c' '*.hpp' '*.cc' '*.hh' ; do find . -name "$t" ; done) ; do
         if [[ "$f" =~ .*memhook.* ]] || grep -q '#include "memhook_interface.h"' $f; then
             echo "   skipping file $f..."
