@@ -1,8 +1,0 @@
-ASCYLIB DVY tree: node padding 96B/72B/128B/192B (paper Appendix B.1 / Table 3)
-a_96B_default                threads=2 n=1 mean=47886000.00 ops/s SD=NA change=+0.00%
-b_72B_no_pad                 threads=2 n=1 mean=53296000.00 ops/s SD=NA change=+11.30%
-c_128B_pad                   threads=2 n=1 mean=49984000.00 ops/s SD=NA change=+4.38%
-d_192B_pad                   threads=2 n=1 mean=45419000.00 ops/s SD=NA change=-5.15%
-Counter columns are RAW whole-process totals, including initialization/prefill.
-They are NOT the paper's measurement-window events/operation. Unavailable/disabled events are NA.
-Per-run results and logs: /root/sifter/artifact/experiments/ascylib_dvy_bench/results.tsv

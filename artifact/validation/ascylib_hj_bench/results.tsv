@@ -1,3 +1,0 @@
-variant	threads	run	throughput_ops_s	cache_misses_raw	page_faults_raw	l1d_misses_raw	llc_load_misses_raw	llc_store_misses_raw	context_switches_raw	dtlb_misses_raw
-glibc_malloc	2	0	33490000.0000	NA	NA	NA	NA	NA	NA	NA
-jemalloc	2	0	33718000.0000	NA	NA	NA	NA	NA	NA	NA

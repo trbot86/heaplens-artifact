@@ -85,7 +85,7 @@ ascylib_perfbench_variant() {
             export LD_LIBRARY_PATH="./external/lib/"
             [ -n "$preload" ] && export LD_PRELOAD="$preload"
             perfbench_run_rep "$results_tsv" "$run_dir" "$variant" "$threads" "$run_idx" \
-                '(?<=#Mops )[0-9.]+' 1000000 -- \
+                ascylib -- \
                 "${placement[@]}" \
                 "./bin/${binary_name}" -i "$initial" -r "$range" -n "$threads" -u "$update" -d "$duration_ms"
         )

@@ -1,4 +1,4 @@
-# Newly generated EFRB teaching trace
+# Newly generated EFRB illustrative trace
 
 This is a **submission smoke-test trace**, not the historical paper input.
 Generated on September 23, 2026 UTC (September 22 in Toronto), in the packaged

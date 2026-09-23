@@ -1,4 +1,0 @@
-COMMAND: ['/opt/heaplens-python/bin/python3', 'benchmark.py', '--variant-label', 'separated_aligned64', '--variant-defines=HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_VECTOR_BASE_OFFSET=0', '--dims', '768', '--threads', '2', '--elements', '2000', '--queries', '200', '--m', '16', '--ef-construction', '200', '--ef', '64', '--k', '10', '--build-threads', '2', '--repeats', '1', '--warmup', '100', '--iterations', '1', '--query-mode', 'indexed', '--seed', '1', '--output', '/root/sifter/artifact/results/submission-alignment-smoke-1/block01_separated_aligned64.csv']
-building separated_aligned64 [HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_VECTOR_BASE_OFFSET=0]
-running separated_aligned64 dim=768 threads=2 repetition=1/1
-wrote /root/sifter/artifact/results/submission-alignment-smoke-1/block01_separated_aligned64.csv

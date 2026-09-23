@@ -1,5 +1,0 @@
-variant	threads	run	throughput_ops_s	cache_misses_raw	page_faults_raw	l1d_misses_raw	llc_load_misses_raw	llc_store_misses_raw	context_switches_raw	dtlb_misses_raw
-a_96B_default	2	0	47886000.0000	NA	NA	NA	NA	NA	NA	NA
-b_72B_no_pad	2	0	53296000.0000	NA	NA	NA	NA	NA	NA	NA
-c_128B_pad	2	0	49984000.0000	NA	NA	NA	NA	NA	NA	NA
-d_192B_pad	2	0	45419000.0000	NA	NA	NA	NA	NA	NA	NA

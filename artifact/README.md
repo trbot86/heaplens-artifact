@@ -2,46 +2,41 @@
 
 **Paper:** *HeapLENS: Heap Layout Evaluation & Navigation Suite*, ACM ATC 2026,
 paper 483. This artifact supplies the C/C++ instrumentation, allocation logger,
-trace reconstruction and sampling, interactive GUI, text exporter, retained
-application inputs/results, and before/after experiment drivers.
-
-Start with the small verified paths below. See [VALIDATION.md](VALIDATION.md)
-for the exact tested scope; packaging a driver does not imply its full paper
-experiment has been rerun. [PROVENANCE.md](PROVENANCE.md) distinguishes upstream
-source, authors' experimental modifications, retained results, and new runs.
+trace reconstruction and sampling, interactive GUI, text exporter, application
+inputs/results, and before/after experiment scripts.
 
 ## 1. Requirements and installation
 
-Use x86-64 Linux with Docker Engine, or Docker Desktop with WSL2 for the
-functionality checks. Run commands in a Linux/WSL shell from the repository
-root. Prefer a native Linux filesystem over `/mnt/c` for compilation speed.
-No LaTeX installation is needed. Avoid a native Windows checkout: some upstream filenames/symlinks
-are not representable on NTFS.
+Use x86-64 Linux with Docker Engine. Run the commands below in a Linux shell
+from the repository root. The artifact was tested with Docker Engine 29.4.0
+and Docker CLI 26.1.3.
 
-Allow roughly 20 GB of free disk space for the dependency image and small
-builds, and 8–16 GB RAM for basic checks; use at least 32 GB RAM and more
-scratch disk for the full application experiments. These are planning
-estimates, not measured peak guarantees. Full TPC-C/large trace generation
-can require substantially more memory/disk. Build with four jobs by default;
+Plan for roughly 20 GB of free disk space for the dependency image and small
+builds, and 8–16 GB RAM for basic checks. Use at least 32 GB RAM and additional
+scratch disk for the full application experiments; full TPC-C runs and large
+traces can require substantially more. Builds use four jobs by default;
 reduce `--jobs` if memory is limited.
 
 The source archive includes vendor content. For a Git checkout, initialize
-the pinned submodules **before** building:
+the pinned submodules before building:
 
 ```bash
 git submodule update --init artifact/vendor/ascylib artifact/vendor/setbench artifact/vendor/rocksdb
 git -C artifact/vendor/setbench submodule update --init common/recordmgr tools
+```
+
+Build the dependency image:
+
+```bash
 bash artifact/run.sh build
 ```
 
 The container uses Ubuntu 22.04, LLVM/Clang 14.0.6, Python 3.10, Node 18.18.2,
 and pinned direct Python/npm dependencies. Its first build needs Internet
-access to package registries. Typical first-build time is several minutes,
-but depends on download speed. No privileged container or host sysctl change
-is required for the quick start. The image is a dependency environment;
-the runner mounts this artifact at `/root/sifter`.
+access to package registries and normally takes several minutes. The runner
+mounts this repository at `/root/sifter` inside the container.
 
-## 2. Kick the tires
+## 2. Try HeapLENS
 
 ```bash
 bash artifact/run.sh smoke
@@ -49,160 +44,224 @@ bash artifact/run.sh gui
 ```
 
 `smoke` checks dependencies and SQLite integrity, recomputes summaries of
-saved results, and regenerates the LLM text export. It does not run large
-benchmarks. Expected output includes `Python imports OK`, ten saved runs per
-Valkey/HNSW variant, `Export OK`, and a new results directory. With the image
-built, this path normally finishes in under a minute on the submission host.
+saved results, and regenerates the LLM text export. Expected output includes
+`Python imports OK`, ten saved runs per Valkey/HNSW variant, `Export OK`,
+and a new results directory. With the image built, this normally finishes
+in under a minute.
 
 For the GUI, open <http://localhost:3000>, choose `valkey-artifact.sqlite`,
 and follow [GUIDED_WALKTHROUGH.md](GUIDED_WALKTHROUGH.md). Move the timeline
-away from its initially empty time. The servers bind only to the host's
-loopback interface. Ctrl-C stops them. No remote usage telemetry is enabled.
+away from its initially empty time. The GUI also lists `efrb-smoke.sqlite`,
+a small illustrative trace. The servers bind to the host's loopback interface;
+Ctrl-C stops them.
 
-Optional bounded application checks:
+To build and run small versions of the application benchmarks:
 
 ```bash
 bash artifact/run.sh hnsw --profile smoke
 bash artifact/run.sh valkey --profile smoke
-bash artifact/run.sh legacy ascylib_efrb_bench --profile smoke
-bash artifact/run.sh legacy ascylib_efrb --profile smoke
 ```
 
-The first two compile separate baseline/candidate copies. Valkey uses 10,000
-synthetic keys, two server/client threads, three timed seconds per variant;
-HNSW uses 10,000 128-D vectors and 1,000 queries. EFRB uses two threads and
-4,096 keys. Builds take minutes. **Smoke speedups are not paper evidence.**
+These compile separate baseline and optimized versions. Valkey uses 10,000
+synthetic keys, two server/client threads, and three timed seconds per variant.
+HNSW uses 10,000 128-D vectors and 1,000 queries. Builds take minutes.
+Smoke speedups are not paper evidence.
 
-New application output goes to `artifact/results/<command>-<UTC timestamp>/`:
-configuration/environment, build logs, per-run data, summary, and pass/fail
-status. `--out /root/sifter/artifact/results/NEW_NAME` chooses a new directory;
-existing directories are rejected. Legacy paths write under
-`artifact/experiments/<name>/`; the entry point refuses to overwrite a prior
-working tree/result. Use a fresh checkout for another legacy run.
+## 3. Run the performance experiments
 
-The GUI also lists `efrb-smoke.sqlite`, a newly generated small teaching trace.
-It avoids rebuilding the instrumentation toolchain just to try the interface.
+Use `--profile paper` for the full workloads; the default is `smoke`.
+Paper-mode runs use ten repetitions per variant by default; `--reps N`
+changes the repetition count. The HNSW attribution experiments in Section 4
+have their own repetition schedules.
 
-## 3. Experiment-to-paper map
+### Run an individual experiment
 
-Section/figure references below use the accepted submission, before
-camera-ready renumbering. The scripts and configurations are the durable IDs.
-
-| Paper result / capability | Entry point after `bash artifact/run.sh` | Inputs / expected comparison |
-|---|---|---|
-| Representative-page GUI and text export (§§4–5, §6.5) | `gui`, `export` | Retained Valkey SQLite, compact text, allocation types |
-| EFRB (§6.2, Fig. 5, Table 1) | `legacy ascylib_efrb_bench` | Baseline, object segregation, parallel prefill, both |
-| DVY (Appendix B, Table 3) | `legacy ascylib_dvy_bench` | 96/72/128/192-byte node-layout variants |
-| HJ (Appendix B, Table 4) | `legacy ascylib_hj_bench` | glibc malloc / jemalloc backing the suballocator |
-| TPC-C/BCCO (§6.3) | `legacy tpcc_bcco_bench` | Baseline / node segregation / segregation + packed row lock |
-| TPC-C/EFRB (§6.3) | `legacy tpcc_efrb_bench` | Allocator, row-padding, and reclamation variants; see caveat below |
-| RocksDB HashSkipList (§6.4) | `rocksdb --memtable prefix_hash` | Historical baseline / field reorder + node-alignment reduction |
-| RocksDB InlineSkipList (§6.4) | `rocksdb --memtable skip_list` | Historical baseline / align and separate tall nodes |
-| Valkey (§6.5 / Appendix D) | `valkey` | Saved baseline / B1C1_64 small-object placement patch |
-| HNSWLib (Appendix D) | `hnsw` | Original packed layout / separate aligned vector slab + huge-page advice |
-| HNSW rebuttal factorization | `hnsw-factorization --factors hugepage` | Four cells, corrected advice-before-first-touch source; ten blocks in paper mode |
-| HNSW separation/alignment follow-up | `hnsw-factorization --factors alignment` | Packed / separate +32-byte offset / separate aligned; six blocks in paper mode |
-| Fresh trace generation | `legacy NAME` | NAME = `ascylib_efrb`, `ascylib_dvy`, `ascylib_hj`, `tpcc_bcco`, `tpcc_efrb`, `rocksdb_hsl` |
-| Optional model-assisted exploration | See [LLM_EXAMPLE.md](LLM_EXAMPLE.md) | Saved inputs; fresh prompts optional and nondeterministic |
-
-## 4. Paper-size reruns
-
-Explicitly select `--profile paper`; the default is smoke. The application
-drivers default to ten repetitions per variant in paper mode; `--reps N`
-overrides this and is recorded. This is the **new driver's setting**, not a
-claim that every historical auxiliary experiment had ten repetitions.
+Each command below builds and runs all variants for the named experiment
+and prints a throughput comparison. `experiment NAME` selects one of the
+ASCYLIB or TPC-C experiments; names ending in `_bench` measure performance.
 
 ```bash
+# ASCYLIB trees: EFRB (§6.2), DVY and HJ (Appendix B)
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_efrb_bench --profile paper
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_dvy_bench --profile paper
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_hj_bench --profile paper
+
+# TPC-C indexes (§6.3)
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment tpcc_bcco_bench --profile paper
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment tpcc_efrb_bench --profile paper
+
+# RocksDB memtables (§6.4)
+HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable prefix_hash --profile paper
+HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable skip_list --profile paper
+
+# Valkey (§6.5 / Appendix D) and HNSWLib (Appendix D)
 HEAPLENS_NUMA=1 bash artifact/run.sh valkey --profile paper
 HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
-HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh legacy tpcc_bcco_bench --profile paper
-HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable prefix_hash --profile paper
 ```
 
-Valkey needs two NUMA nodes with 24 available physical cores each, 4M keys,
-128-byte values, 20% SET/80% GET, pipeline 16, four clients/thread, and 30-second
-measurements after preload. Server and client nodes default to 0 and 1;
-`--server-node` / `--client-node` select them. Persistence is off; networking
-is loopback, so a physical NIC is not required for this experiment.
+The section references use the accepted submission's numbering.
 
-HNSW needs 1M 768-D vectors, 100k indexed queries, 24 build/query threads,
-M=16, ef_construction=200, ef=64, k=10, 10k warmup, and five timed iterations.
-Allow hours for repeated fresh graph constructions. Report recall alongside
-QPS: multithreaded construction is nondeterministic even with a fixed seed.
+| Experiment | Variants compared |
+|---|---|
+| ASCYLIB EFRB | Baseline, object segregation, parallel prefill, both |
+| ASCYLIB DVY | 96/72/128/192-byte node layouts |
+| ASCYLIB HJ | glibc malloc / jemalloc backing the suballocator |
+| TPC-C/BCCO | Baseline, node segregation, segregation + packed row lock |
+| TPC-C/EFRB | Allocator, row-padding, and reclamation variants |
+| RocksDB HashSkipList (`prefix_hash`) | Baseline / field reorder + node-alignment reduction |
+| RocksDB InlineSkipList (`skip_list`) | Baseline / alignment and separation of tall nodes |
+| Valkey | Baseline / B1C1_64 small-object placement patch |
+| HNSWLib | Packed layout / separate aligned vector slab + huge-page advice |
 
-The two later HNSW analyses have separate commands and source snapshots:
+### Run all nine experiments
+
+```bash
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh all-performance --profile paper
+```
+
+This runs the nine groups listed above sequentially. Allow many hours and
+substantial scratch disk space. To include the two HNSW attribution
+experiments, also run the commands in Section 4.
+
+### Hardware and workloads
+
+The paper describes a dual-socket system with two 24-core Intel Xeon Gold
+5220R CPUs and 186 GiB DRAM.
+
+Valkey uses two NUMA nodes with 24 available physical cores each, 4M keys,
+128-byte values, 20% SET/80% GET, pipeline 16, four clients/thread, and
+30-second measurements after preload. Server and client nodes default to
+0 and 1; `--server-node` and `--client-node` select them. Persistence is off;
+networking is loopback, so a physical NIC is not required.
+
+HNSW uses 1M 768-D vectors, 100k indexed queries, 24 build/query threads,
+M=16, ef_construction=200, ef=64, k=10, 10k warmup queries, and five timed
+iterations. Allow hours for repeated fresh graph constructions. The output
+includes recall alongside QPS.
+
+RocksDB uses 17 reader threads plus a background writer, 10M keys, 64-byte
+keys, 256-byte values, 128 MiB write buffers, disabled WAL, and a 10-second
+measurement phase. `--rocks-key-size` and `--rocks-value-size` override the
+key and value sizes. Each trial creates a fresh database in its results
+directory.
+
+`HEAPLENS_NUMA=1` permits NUMA placement by relaxing the container's seccomp
+filter. `HEAPLENS_PERF=1` grants the PERFMON capability for hardware counters;
+the host must also permit PMU access. For throughput-only ASCYLIB/TPC-C runs,
+add `PERFBENCH_PERF=off` before the command, for example:
+
+```bash
+PERFBENCH_PERF=off HEAPLENS_NUMA=1 bash artifact/run.sh experiment tpcc_bcco_bench --profile paper
+```
+
+## 4. Attribute the HNSWLib improvement
+
+Two experiments separate the contributions of the HNSWLib layout changes
+and huge-page advice:
+
+- Layout versus huge pages: run the packed baseline, separation + alignment,
+  huge-page advice alone, and both changes together. This measures their
+  individual contributions and interaction. The paper profile runs ten
+  repetitions of each of the four variants, interleaving their order.
+- Separation versus alignment: compare the packed layout, a separate vector
+  slab offset by 32 bytes, and the same slab aligned to 64 bytes. The paper
+  profile runs six repetitions of each variant, covering all six run orders.
 
 ```bash
 HEAPLENS_NUMA=1 bash artifact/run.sh hnsw-factorization --factors hugepage --profile paper
 HEAPLENS_NUMA=1 bash artifact/run.sh hnsw-factorization --factors alignment --profile paper
 ```
 
-Retained 40-trial and 18-trial data are in `historical/hnsw-factorization/` and
-`historical/hnsw-alignment/`. These were collected on Pyke with GCC 13.3 and
-Ubuntu 24.04, unlike the artifact container. The new commands preserve the
-source/workload/factor structure, not an identical historical software stack.
-For huge-page mechanism claims inspect live mappings/THP backing on the target
-host; neither a successful `madvise` nor a tiny smoke run establishes backing.
+These commands use separate source snapshots. The huge-page experiment
+issues advice before first touch. Check live mappings for transparent
+huge-page backing when interpreting this comparison.
 
-RocksDB's paper profile follows the retained 18-thread protocol (17 reader
-threads plus background writer), 10M keys, 64-byte keys, 256-byte values,
-128 MiB write buffers, disabled WAL, and 10-second measured phase. Disk and
-allocator effects matter; exact performance is not guaranteed on a different
-machine. Fresh databases live only inside the new results directory.
+The recorded 40-trial and 18-trial datasets are in
+`artifact/historical/hnsw-factorization/` and
+`artifact/historical/hnsw-alignment/`. They were collected on the dual-socket
+Xeon Gold 5220R machine described in the paper (host name `pyke`), using
+Ubuntu 24.04 and GCC 13.3.
 
-**Protocol discrepancy to resolve:** the retained RocksDB script specifies
-64/256-byte keys/values, but Section 6.4's prose says 32/128. The default
-replays the script; `--rocks-key-size 32 --rocks-value-size 128` selects the
-prose sizes. Do not describe either as reconciled historical ground truth.
+## 5. Find and interpret results
 
-One umbrella command runs all nine available before/after experiment groups:
+Valkey, HNSWLib, RocksDB, and HNSW attribution runs write to
+`artifact/results/<command>-<UTC timestamp>/`. Each directory contains
+configuration/environment records, build logs, per-run data, and summaries.
+`--out /root/sifter/artifact/results/NEW_NAME` selects a specific new directory.
+
+ASCYLIB and TPC-C runs write `results.tsv`, `summary.txt`, and per-run logs
+under `artifact/experiments/<name>/`. The summary reports mean throughput,
+standard deviation, and percentage change from baseline. The `*_raw` columns
+in `results.tsv` are whole-process performance-counter totals, including
+initialization/prefill and teardown. The `*_per_op` columns divide these totals
+by `operation_count`: measured tree operations for ASCYLIB, or committed
+transactions for TPC-C, as identified by `operation_unit`. Throughput is in
+operations/second (transactions/second for TPC-C).
+
+The named `experiment` scripts use fixed build/output directories and refuse
+to overwrite an earlier run. To repeat one of these experiments (for example,
+after a smoke run), keep the previous copy and use another extraction or
+checkout of the artifact. Reuse the Docker image; it need not be rebuilt.
+Valkey, HNSWLib, and RocksDB commands create new directories automatically.
+
+### Saved experimental data
+
+The following files contain saved experimental measurements and configurations,
+separate from the outputs of new runs described above. `artifact/historical/`
+holds application results, HNSWLib attribution data, and original run scripts.
+
+| Location | Contents |
+|---|---|
+| `artifact/data/paper_data.xlsx` | Per-run measurements and aggregate tables for ASCYLIB, TPC-C, RocksDB, and instrumentation overhead; see the [sheet guide](data/README.md) |
+| `artifact/historical/valkey/` | Ten baseline and ten optimized runs: JSON measurements and configurations for the Valkey experiment |
+| `artifact/historical/hnswlib/` | Ten baseline and ten optimized HNSWLib runs in CSV form, plus comparison summaries |
+| `artifact/historical/hnsw-factorization/` | Forty trials separating layout changes, huge-page advice, and their interaction, as described in Section 4 above |
+| `artifact/historical/hnsw-alignment/` | Eighteen trials separating vector separation from alignment, as described in Section 4 above |
+| `artifact/historical/ascylib/`, `artifact/historical/rocksdb/` | Original experiment scripts; measurements for these experiments are in the workbook |
+
+The JSON and CSV results retain per-run measurements; the HNSWLib attribution
+directories also include benchmark logs and analysis summaries. Original scripts
+stored as `.txt` are for reference; use the commands above to run experiments.
+
+To recompute the saved Valkey/HNSWLib throughput comparisons and the
+layout-versus-huge-pages analysis:
 
 ```bash
-HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh all-performance --profile paper
+bash artifact/run.sh history
 ```
 
-Run individual groups first. The umbrella stops on failure, and is not a
-claim to cover every figure, sampling study, overhead measurement, or LLM
-control in the paper. It can take many hours and substantial disk space.
+## 6. Generate traces and try model-assisted analysis
 
-`HEAPLENS_NUMA=1` relaxes the container's seccomp filter for NUMA placement;
-`HEAPLENS_PERF=1` grants PERFMON, not blanket privileged mode. Use these only
-on an appropriate dedicated evaluation host. Host PMU policy may still deny
-access. Scripts do not change it; request administrator help if needed.
-VM/WSL results are functionality checks, not substitutes for bare-metal PMU
-measurements. For throughput-only legacy paper runs, prefix the wrapper with
-`PERFBENCH_PERF=off`. Missing counters must remain `NA`, never zero.
+Names without `_bench` generate instrumented allocation traces for the GUI.
+For example, to generate a small EFRB trace:
 
-## 5. Scope, interpretation, and extension
+```bash
+bash artifact/run.sh experiment ascylib_efrb --profile smoke
+```
 
-- `history` summarizes retained original data; it does not rerun experiments.
-  Raw configurations and records are distributed for independent analysis.
-- The legacy performance helper reports whole-process counter **totals**,
-  including prefill. It does not reproduce measurement-window per-operation
-  counters. Full counter fidelity remains a validation task.
-- The historical TPC-C/EFRB mimalloc comparison also changes the segregation
-  flag in one variant; do not present it as a pure one-factor padding study.
-- Original HNSW huge-page advice is not proof of huge-page backing. The later
-  rebuttal factorization used corrected first-touch placement and a different
-  environment; do not reinterpret the original replay as that factorization.
-- Fresh trace generation is separate from timing uninstrumented optimized
-  applications. An instrumented run's throughput is not an optimization result.
-- For another C/C++ application, follow the root README's instrumentation
-  procedure, add custom allocation APIs where needed, and preserve lifetimes
-  of nested regions. Use new output folders and inspect nonempty type/allocation
-  records before opening the GUI. Source instrumentation is not a one-command
-  guarantee for arbitrary custom allocators.
+The trace-generation names are `ascylib_efrb`, `ascylib_dvy`, `ascylib_hj`,
+`tpcc_bcco`, `tpcc_efrb`, and `rocksdb_hsl`. Their generated SQLite databases
+are written under `artifact/experiments/<name>/`. Trace generation is
+separate from the uninstrumented performance experiments above.
 
-See [VALIDATION.md](VALIDATION.md) for verified paths and remaining gaps.
+For a guided Valkey LLM example, follow [LLM_EXAMPLE.md](LLM_EXAMPLE.md).
+It includes the saved input and optimization patch, plus prompts for a
+fresh model-assisted run. To regenerate the text input from the supplied trace:
 
-Sean's latest additions are retained: `data/paper_data.xlsx` with its own
-[sheet guide](data/README.md), the RocksDB instrumentation-repair helpers,
-`export_llm_data.sh`, and the optional native GUI launcher
-`sifter_vis_d3/setup_and_launch.sh`. The documented primary entry point is
-`artifact/run.sh`; the two older `rocksdb_*_bench/run.sh` names now delegate
-to the restored historical-source driver (default smoke, explicit paper
-profile). The new source snapshot and patch are essential: the upstream
-diagnostic tree alone does not implement these experimental flags.
+```bash
+bash artifact/run.sh export
+```
 
-Questions during evaluation should use the conference's anonymous discussion
-channel. No reviewer accounts, identities, or activity need be reported to us.
+## Errata
+
+**Counter normalization.** The original ASCYLIB (EFRB, DVY, HJ) and TPC-C
+(BCCO, EFRB) scripts inadvertently divided cache/TLB miss and context-switch
+counts by throughput rather than operation/transaction counts. This artifact
+uses the actual counts and retains the raw counters. Corrected per-operation
+values therefore differ from those in the paper. Throughput measurements and
+speedups are unaffected. Relative counter changes are preserved when measurement
+durations match, apart from rounding; they require recalculation for
+variable-duration TPC-C runs. The supplied workbook preserves the original data.
+
+**Valkey improvement.** The maximum throughput improvement is 5.9%;
+the paper's inconsistent reference to 6.2% is incorrect.

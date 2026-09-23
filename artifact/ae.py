@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "artifact"
 VENDOR = ART / "vendor"
 IGNORE = shutil.ignore_patterns(".git", "__pycache__", "*.pyc", "*.o", "*.so", "build", ".cache")
-LEGACY = ["ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_efrb", "rocksdb_hsl",
+EXPERIMENTS = ["ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_efrb", "rocksdb_hsl",
           "ascylib_efrb_bench", "ascylib_dvy_bench", "ascylib_hj_bench", "tpcc_bcco_bench", "tpcc_efrb_bench"]
 
 def save(path, value):
@@ -76,7 +76,7 @@ def history():
         values[variant] = [float(row["qps_mean"]) for row in rows]
     print("SAVED HISTORICAL HNSWLIB RESULTS (not a new experiment)")
     print(json.dumps(compare(values), indent=2))
-    print("SAVED REBUTTAL FACTORIZATION (distinct campaign)")
+    print("SAVED HNSWLIB LAYOUT / HUGE-PAGE FACTORIZATION")
     run([sys.executable, ART / "historical/hnsw-factorization/analyze_completed_factorization.py", ART / "historical/hnsw-factorization"])
 
 def doctor():
@@ -285,10 +285,10 @@ def rocksdb(args, out):
     save(out / "summary.json", summary)
     print(json.dumps(summary, indent=2))
 
-def legacy(args):
+def experiment(args):
     work = ART / "experiments" / args.name
     if (work / "work").exists() or (work / "results.tsv").exists():
-        raise RuntimeError(f"Existing results at {work}; preserve them and use a fresh checkout for a new run")
+        raise RuntimeError(f"This experiment already has build files or results at {work}. Keep this copy and repeat the experiment in a fresh artifact extraction or checkout; the Docker image can be reused.")
     env = os.environ.copy()
     env["JOBS"] = str(args.jobs)
     env["ARTIFACT_PROFILE"] = args.profile
@@ -336,8 +336,9 @@ def factorization(args, out):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("command", choices=["doctor", "history", "export", "smoke", "hnsw", "hnsw-factorization", "valkey", "rocksdb", "gui", "legacy", "all-performance"])
-    p.add_argument("name", nargs="?", choices=LEGACY)
+    p.add_argument("command", choices=["doctor", "history", "export", "smoke", "hnsw", "hnsw-factorization", "valkey", "rocksdb", "gui", "experiment", "legacy", "all-performance"],
+                   help="Select an action; legacy is a compatibility alias for experiment")
+    p.add_argument("name", nargs="?", choices=EXPERIMENTS, help="Benchmark or trace name for the experiment command")
     p.add_argument("--profile", choices=["smoke", "paper"], default="smoke")
     p.add_argument("--out", help="NEW result directory; never overwrite existing results")
     p.add_argument("--jobs", type=int, default=4)
@@ -354,12 +355,12 @@ def main():
     if args.command == "doctor": doctor()
     elif args.command == "history": history()
     elif args.command == "gui": gui()
-    elif args.command == "legacy":
-        if not args.name: p.error("legacy requires an experiment name")
-        legacy(args)
+    elif args.command in {"experiment", "legacy"}:
+        if not args.name: p.error(f"{args.command} requires an experiment name")
+        experiment(args)
     elif args.command == "all-performance":
-        for name in [x for x in LEGACY if x.endswith("_bench")]:
-            args.name = name; legacy(args)
+        for name in [x for x in EXPERIMENTS if x.endswith("_bench")]:
+            args.name = name; experiment(args)
         args.command = "hnsw"; hnsw(args, new_output(args))
         args.command = "valkey"; valkey(args, new_output(args))
         for memtable in ("prefix_hash", "skip_list"):

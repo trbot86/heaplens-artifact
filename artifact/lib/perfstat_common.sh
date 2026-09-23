@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
-# Throughput and raw whole-process counters. Counts / (operations/second)
-# is NOT events/operation; do not describe these counters as such.
+# Throughput, raw whole-process counters, and counters per benchmark operation.
+# Counters include initialization/prefill; denominators count measured operations.
 set -euo pipefail
 PERFBENCH_EVENTS="${PERFBENCH_EVENTS:-cache-misses,page-faults,L1-dcache-load-misses,LLC-load-misses,LLC-store-misses,context-switches,dTLB-load-misses}"
+PERFBENCH_RESULTS_PY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/perfstat_results.py"
 
 perfbench_init_results() {
     mkdir -p "$(dirname "$1")"
-    printf 'variant\tthreads\trun\tthroughput_ops_s\tcache_misses_raw\tpage_faults_raw\tl1d_misses_raw\tllc_load_misses_raw\tllc_store_misses_raw\tcontext_switches_raw\tdtlb_misses_raw\n' > "$1"
+    python3 "$PERFBENCH_RESULTS_PY" header > "$1"
 }
 
 perfbench_run_rep() {
-    local results="$1" run_dir="$2" variant="$3" threads="$4" run_idx="$5" pattern="$6" multiplier="$7"
-    shift 7
-    [[ "$1" == -- ]] && shift
+    local results="$1" run_dir="$2" variant="$3" threads="$4" run_idx="$5" benchmark="$6"
+    shift 6
+    [[ "$1" == -- ]] || { echo "Expected -- before benchmark command" >&2; return 1; }
+    shift
     mkdir -p "$run_dir"
     local stats="$run_dir/perf.${variant}.t${threads}.r${run_idx}.csv"
     local log="$run_dir/stdout.${variant}.t${threads}.r${run_idx}.log"
@@ -27,23 +29,9 @@ perfbench_run_rep() {
             return 1
         }
     fi
-    local raw throughput
-    raw="$(grep -oP "$pattern" "$log" | tail -1)"
-    [[ -n "$raw" ]] || { echo "No throughput in $log" >&2; return 1; }
-    throughput="$(awk -v x="$raw" -v m="$multiplier" 'BEGIN {printf "%.4f", x*m}')"
-    awk -v t="$throughput" 'BEGIN {exit !(t>0)}' || { echo "Invalid throughput" >&2; return 1; }
-    event_count() {
-        awk -F, -v ev="$1" '
-          {gsub(/^[ \t]+|[ \t]+$/, "", $1); gsub(/^[ \t]+|[ \t]+$/, "", $3)}
-          $3==ev && $1 ~ /^[0-9]+([.][0-9]+)?$/ {print $1; found=1; exit}
-          END {if (!found) print "NA"}' "$stats"
-    }
-    printf '%s\t%s\t%s\t%s' "$variant" "$threads" "$run_idx" "$throughput" >> "$results"
-    for ev in cache-misses page-faults L1-dcache-load-misses LLC-load-misses LLC-store-misses context-switches dTLB-load-misses; do
-        printf '\t%s' "$(event_count "$ev")" >> "$results"
-    done
-    printf '\n' >> "$results"
-    echo "  $variant repetition $run_idx: $throughput operations/s"
+    python3 "$PERFBENCH_RESULTS_PY" append --benchmark "$benchmark" \
+        --results "$results" --log "$log" --perf "$stats" \
+        --variant "$variant" --threads "$threads" --run "$run_idx"
 }
 
 perfbench_print_summary() {
@@ -63,8 +51,8 @@ for (variant, threads), xs in groups.items():
     sd = f'{statistics.stdev(xs):.2f}' if len(xs) > 1 else 'NA'
     print(f'{variant:28s} threads={threads} n={len(xs)} mean={mean:.2f} ops/s SD={sd} change={100*(mean/baseline-1):+.2f}%')
 PY
-        echo "Counter columns are RAW whole-process totals, including initialization/prefill."
-        echo "They are NOT the paper's measurement-window events/operation. Unavailable/disabled events are NA."
+        echo "Counters include initialization/prefill: *_raw are totals; *_per_op divide by operation_count."
+        echo "operation_unit identifies tree operations or committed transactions. Unavailable/disabled events are NA."
         echo "Per-run results and logs: $results"
     } | tee "$summary"
 }

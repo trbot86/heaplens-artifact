@@ -1,7 +1,0 @@
-TPC-C/BCCO tree: default -> node segregation -> +row-lock fix (paper Section 6.3 / Table 1 row 4)
-a_default                    threads=2 n=1 mean=77713.61 ops/s SD=NA change=+0.00%
-b_seg_ds                     threads=2 n=1 mean=86874.90 ops/s SD=NA change=+11.79%
-c_seg_ds_pack_lock           threads=2 n=1 mean=91077.55 ops/s SD=NA change=+17.20%
-Counter columns are RAW whole-process totals, including initialization/prefill.
-They are NOT the paper's measurement-window events/operation. Unavailable/disabled events are NA.
-Per-run results and logs: /root/sifter/artifact/experiments/tpcc_bcco_bench/results.tsv

@@ -70,7 +70,7 @@ machine-specific paths or administrative commands; do not execute them.
 The artifact runners do not change ASLR, THP policy, CPU governors, sysctls,
 host storage, or other users' processes.
 
-EFRB: `data/efrb/allocs.sqlite` is a newly generated teaching trace from the
+EFRB: `data/efrb/allocs.sqlite` is a newly generated illustrative trace from the
 submission smoke test, not the database used for the paper's screenshot. It
 contains 16,414 allocation records; its accompanying README records settings.
 
@@ -90,9 +90,11 @@ contains 16,414 allocation records; its accompanying README records settings.
   ASCYLIB suballocation records have missing source-file metadata and are
   discarded by the GUI. This affects newly generated diagnostic traces;
   the retained historical inputs are not rewritten.
-- Report whole-process hardware counters as **raw totals**, not events per
-  operation. The existing helper's count/throughput normalization was not
-  dimensionally events/operation; historical paper results were not rewritten.
+- Retain whole-process hardware-counter totals and normalize them by actual
+  measured operation counts (committed transactions for TPC-C), including
+  setup/teardown costs in the numerator. This corrects the original
+  count/throughput denominator; historical paper results were not rewritten.
+  See the README errata for the affected experiments.
 - Use `s=1` for newly generated diagnostic databases. The historical trace
   metadata remains unchanged. Do not infer a study of arbitrary `s` from this.
 - Disable Next.js telemetry and replace the build-time Google-font download

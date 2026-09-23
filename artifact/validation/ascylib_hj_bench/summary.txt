@@ -1,6 +1,0 @@
-ASCYLIB HJ tree: glibc malloc vs jemalloc (paper Appendix B.2 / Table 4)
-glibc_malloc                 threads=2 n=1 mean=33490000.00 ops/s SD=NA change=+0.00%
-jemalloc                     threads=2 n=1 mean=33718000.00 ops/s SD=NA change=+0.68%
-Counter columns are RAW whole-process totals, including initialization/prefill.
-They are NOT the paper's measurement-window events/operation. Unavailable/disabled events are NA.
-Per-run results and logs: /root/sifter/artifact/experiments/ascylib_hj_bench/results.tsv

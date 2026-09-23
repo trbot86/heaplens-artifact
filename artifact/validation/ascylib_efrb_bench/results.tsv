@@ -1,5 +1,0 @@
-variant	threads	run	throughput_ops_s	cache_misses_raw	page_faults_raw	l1d_misses_raw	llc_load_misses_raw	llc_store_misses_raw	context_switches_raw	dtlb_misses_raw
-a_default	2	0	21186000.0000	NA	NA	NA	NA	NA	NA	NA
-b_obj_seg	2	0	22812000.0000	NA	NA	NA	NA	NA	NA	NA
-c_mt_prefill	2	0	22127000.0000	NA	NA	NA	NA	NA	NA	NA
-d_both	2	0	22652000.0000	NA	NA	NA	NA	NA	NA	NA

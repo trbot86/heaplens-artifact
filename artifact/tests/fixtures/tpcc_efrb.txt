@@ -1,0 +1,4 @@
+[tid=0] txn_cnt=100000,abort_cnt=1482
+[tid=1] txn_cnt=99058,abort_cnt=1289
+Aggregate index stats: numContains=2607525, timeContains=4.687984, numInsert=2085129, timeInsert=34.623388, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=4692654, totalTime=39.311372, throughput=238742.824862
+[summary] txn_cnt=199058, abort_cnt=2771, run_time=42.253646, time_wait=0.000000, time_ts_alloc=0.000000, time_man=0.000000, time_index=0.000000, time_abort=0.000000, time_cleanup=0.000000, latency=0.000000, deadlock_cnt=0, cycle_detect=0, dl_detect_time=0.000000, dl_wait_time=0.000000, time_query=0.000000, debug1=0.000000, debug2=0.000000, debug3=0.000000, debug4=0.000000, debug5=0.000000, ixNumContains=2607525, ixTimeContains=4.687984, ixNumInsert=2085129, ixTimeInsert=34.623388, ixNumRangeQuery=0, ixTimeRangeQuery=0.000000, ixTotalOps=4692654, ixTotalTime=39.311372, ixThroughput=238742.824862, nthreads=2, throughput=9422.050814, node_size=0, descriptor_size=0

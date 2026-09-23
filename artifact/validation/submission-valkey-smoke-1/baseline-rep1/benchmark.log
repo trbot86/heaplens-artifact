@@ -1,22 +1,0 @@
-COMMAND: ['/root/sifter/artifact/results/submission-valkey-smoke-1/memtier/memtier_benchmark', '--server=127.0.0.1', '--port=33221', '--protocol=redis', '--threads=2', '--clients=4', '--pipeline=16', '--key-prefix=heaplens:', '--key-minimum=1', '--key-maximum=10000', '--data-size=128', '--distinct-client-seed', '--hide-histogram', '--ratio=1:4', '--key-pattern=R:R', '--test-time=3', '--json-out-file=/root/sifter/artifact/results/submission-valkey-smoke-1/baseline-rep1/benchmark.json']
-Json file /root/sifter/artifact/results/submission-valkey-smoke-1/baseline-rep1/benchmark.json created...
-Writing results to stdout
-[RUN #1] Preparing benchmark client...
-[RUN #1] Launching threads now...
-[RUN #1 33%,   0 secs]  2 threads  4 conns:     1727888 ops, 1727936 (avg: 1727936) ops/sec, 279.96MB/sec (avg: 279.96MB/sec),  0.07 (avg:  0.07) msec latency[RUN #1 67%,   2 secs]  2 threads  4 conns:     3441552 ops, 1713225 (avg: 1720579) ops/sec, 277.58MB/sec (avg: 278.77MB/sec),  0.07 (avg:  0.07) msec latency[RUN #1 100%,   3 secs]  0 threads  4 conns:     5134352 ops, 1713225 (avg: 1711342) ops/sec, 277.58MB/sec (avg: 277.27MB/sec),  0.07 (avg:  0.07) msec latency
-
-Saving JSON output file: /root/sifter/artifact/results/submission-valkey-smoke-1/baseline-rep1/benchmark.json
-Json file closed.
-2         Threads
-4         Connections per thread
-3         Seconds
-
-
-ALL STATS
-============================================================================================================================
-Type         Ops/sec     Hits/sec   Misses/sec    Avg. Latency     p50 Latency     p99 Latency   p99.9 Latency       KB/sec 
-----------------------------------------------------------------------------------------------------------------------------
-Sets       342270.24          ---          ---         0.07307         0.07100         0.19900         0.29500     58122.24 
-Gets      1369076.61   1369076.61         0.00         0.07305         0.07100         0.19900         0.29500    225803.32 
-Waits           0.00          ---          ---             ---             ---             ---             ---          --- 
-Totals    1711346.84   1369076.61         0.00         0.07305         0.07100         0.19900         0.29500    283925.56 

@@ -1,4 +1,0 @@
-COMMAND: ['/opt/heaplens-python/bin/python3', 'benchmark.py', '--variant-label', 'hugepage', '--variant-defines=HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1', '--dims', '768', '--threads', '2', '--elements', '2000', '--queries', '200', '--m', '16', '--ef-construction', '200', '--ef', '64', '--k', '10', '--build-threads', '2', '--repeats', '1', '--warmup', '100', '--iterations', '1', '--query-mode', 'indexed', '--seed', '1', '--output', '/root/sifter/artifact/results/submission-factorization-smoke-1/block01_hugepage.csv']
-building hugepage [HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1]
-running hugepage dim=768 threads=2 repetition=1/1
-wrote /root/sifter/artifact/results/submission-factorization-smoke-1/block01_hugepage.csv

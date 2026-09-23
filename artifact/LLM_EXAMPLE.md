@@ -1,101 +1,164 @@
-# Optional LLM-guided Valkey exercise
+# LLM-guided Valkey analysis and optimization
 
-The core artifact does **not** need an LLM subscription, API key, or model call.
-Saved inputs and the final patch make its diagnosis and optimization auditable.
-Fresh LLM exploration is optional and nondeterministic; it is not expected
-to rediscover the identical patch or numerical result.
+The saved inputs and optimization patch can be examined without model access.
+Fresh LLM exploration is optional and nondeterministic.
 
-## Recorded path: no model access needed
+In the paper, Codex used HeapLENS's human-facing instructions to instrument
+Valkey and HNSWLib, including custom-allocator handling, collect allocation
+traces, and export data for analysis. The prompts below document this workflow,
+as well as the subsequent analysis and optimization stages.
+
+## Examine the recorded Valkey example
 
 1. Read `data/valkey/v2_export/compact/` and
-   `data/valkey/v2_export/heaplens_analysis.txt`. These are the historical
-   compact snapshots and their accompanying summary. Type aliases map to
-   concrete type names; addresses, sizes, lifetimes, page/cluster membership,
-   and cache-line boundaries provide the observations.
-2. Compare with `historical/valkey/recommendations.md`, then inspect
-   `patches/valkey-B1C1_64.patch`. This is a saved outcome, not evidence that
-   every model will discover it.
-3. Run `bash artifact/run.sh valkey --profile smoke`. The driver builds
-   pristine saved baseline and patched sources separately, preloads synthetic
-   data, and measures each without HeapLENS logging.
-4. On the required dual-NUMA hardware, use `--profile paper` for ten runs of
-   each variant. Inspect the raw memtier JSON, not only the summary. Read
-   `PROVENANCE.md` before comparing fresh measurements with historical ones.
+   `data/valkey/v2_export/heaplens_analysis.txt`. These are the compact page
+   snapshots and accompanying analysis. The legends identify object types;
+   the snapshots show addresses, sizes, lifetimes, page/cluster membership,
+   and cache-line boundaries.
+2. Read `historical/valkey/recommendations.md`, then inspect
+   `patches/valkey-B1C1_64.patch` for the resulting allocation-placement changes.
+3. Build and run a small baseline/optimized comparison:
 
-To exercise the exporter itself:
+   ```bash
+   bash artifact/run.sh valkey --profile smoke
+   ```
+
+4. For the full performance comparison, use a machine with two NUMA nodes
+   and 24 available physical cores per node:
+
+   ```bash
+   HEAPLENS_NUMA=1 bash artifact/run.sh valkey --profile paper
+   ```
+
+   This runs ten trials of each variant with 4M keys, 128-byte values,
+   20% SET/80% GET, and 30-second measurement phases. Results are written to
+   `artifact/results/valkey-<timestamp>/`. `summary.json` reports mean
+   throughput and the percentage change; each variant's `*-repN/` directory
+   contains its `benchmark.json` with throughput, latency, and error counts.
+
+To regenerate the text export from the supplied SQLite trace:
 
 ```bash
 bash artifact/run.sh export
 ```
 
-The printed results directory contains regenerated raw, compact, and analysis
-text. Clustering/resampling is nondeterministic, so representative pages and
-cluster IDs need not exactly match the saved export.
+The printed results directory contains raw snapshots, compact snapshots,
+and analysis text. Representative pages and cluster IDs can change when
+the trace is resampled.
 
-## Fresh exploration: keep the answer out of the input
+## Workspace and session setup
 
-Use a new isolated workspace with **only** these inputs:
+Appendix D's “LLM experiment methodology” describes three separate workspaces:
 
-- A copy of `vendor/valkey/` as `valkey/` (no `.git`, previous model sessions,
-  recommendations, optimized code, or historical results).
-- The supplied compact snapshots and type/field legends from
-  `data/valkey/v2_export/compact/`, plus the accompanying analysis text.
-- The neutral workload description below and, optionally, the paper's tool
-  explanation with application-optimization results removed.
+| Workspace | Contents and purpose |
+|---|---|
+| R1: instrumentation | Application source, `benchmark.py`, HeapLENS source, and a copy of the paper with all LLM-related content removed; generate the allocation trace and text export. |
+| R2: analysis with HeapLENS | Uninstrumented application source and `benchmark.py`, plus the exported text and the same tool-only paper; diagnose, recommend changes, implement and benchmark them. |
+| R3: analysis without HeapLENS | Uninstrumented application source and `benchmark.py`; perform the comparison without HeapLENS data or the paper. |
 
-Do not mount the complete artifact into an agent sandbox intended to test
-independent discovery: it contains the answer. A separate directory alone is
-not a security boundary if the agent can read its parent directories. For a
-controlled comparison use separate isolated environments with equal budgets,
-the same source/workload, and only the HeapLENS input varied. Keep agent
-credentials outside the artifact and do not include chat/account files in a
-release. No new guided-versus-unguided comparison is claimed by this exercise.
+Use a fresh, isolated Codex instance with no prior chat history in each
+workspace. Exclude the artifact's saved recommendations, optimized patch,
+and historical performance results from the agent's accessible files.
+`vendor/valkey/` supplies the baseline source. The original Valkey benchmark
+script is retained in `historical/valkey/benchmark.py`; it refers to the
+original Docker/directory layout, whereas the commands above use the packaged
+runner. Set up the benchmark and its dependencies before starting the agent.
 
-The historical study used Codex with GPT-5.5, extra-high reasoning. If that
-model is unavailable, record the actual model/version and reasoning setting;
-do not label a run with a newer model as an exact repetition of the study.
+Disable Codex memory for every session, including both memory reuse and
+generation. With the documented CLI settings:
 
-## Suggested prompts (new demonstration protocol)
+```bash
+codex -c features.memories=false \
+      -c memories.use_memories=false \
+      -c memories.generate_memories=false
+```
 
-These prompts are evaluator instructions, not a claimed verbatim historical
-transcript. Use a single new session for the following stages to retain the
-model's analysis between prompts. Do not show recommendations or the saved
-patch until exploration is complete.
+These are per-invocation overrides; use them again when starting each fresh
+session. See the official [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)
+and [CLI reference](https://learn.chatgpt.com/docs/developer-commands?surface=cli).
 
-**1. Diagnose, without editing.**
+## Prompts from the paper
 
-> This workspace contains Valkey source and HeapLENS observations from a
-> synthetic string-cache preload. The performance workload uses 128-byte
-> values, 4 million keys, 20% SET and 80% GET, 24 server I/O threads and
-> 24 memtier threads on separate NUMA nodes, 4 clients per thread, pipeline
-> depth 16, TCP loopback, and disabled persistence. The diagnostic trace
-> contains a 1-million-key preload; do not confuse its scale with the
-> throughput workload. Inspect the observations and relevant source. Report
-> concrete memory-layout hypotheses with supporting pages/types/offsets,
-> explain uncertainty, and distinguish modeled layout from measured cache
-> behavior. Do not modify code yet.
+The six prompt blocks below reproduce the wording in Appendix D, with LaTeX
+formatting removed. `sifter` is HeapLENS's internal directory name;
+`heaplens.pdf` means the paper copy with all LLM-related content removed.
+Replace `{PATH}` with the export location, arranging the analysis file and
+compact `heaplens_output*` files together there. Other paths refer to the
+workspace layout described above.
 
-**2. Propose bounded changes.**
+### 1. R1: instrument the application
 
-> Propose a small number of localized allocation or object-layout changes
-> motivated by that report. Preserve command behavior, object ownership,
-> lifetime, persistence/network formats, and public/module interfaces.
-> Explain memory-footprint costs and likely failure modes. Do not pursue a
-> cross-cutting string-embedding redesign. Recommend which hypothesis to
-> test first, without looking for prior solutions elsewhere.
+Start a new chat in R1.
 
-**3. Implement and verify.**
+```text
+Integrate heaplens according to sifter/README.md and sifter.sh, noting heaplens.pdf as background. Use the existing docker workflow to avoid dependency issues. Use sifter's built-in sampling, but try to limit runs to sizes that will produce <= ~5GB databases before sampling. Where custom allocators are used, augment the instrumentation with semantic type information. We should also use the visualization exporter that produces text from the sqlite database and the react frontend.
+```
 
-> Implement the selected localized change in a separate candidate copy.
-> Preserve the baseline. Check allocation/free/reallocation pairs and run
-> applicable tests. Supply a diff and exact build instructions. Do not claim
-> a speedup from a smoke run; request an independent, repeated baseline versus
-> candidate benchmark using the fixed workload before drawing a conclusion.
+### 2. R1: run and export
 
-An interactive Codex session is convenient. For scripting, official
-[non-interactive documentation](https://developers.openai.com/codex/noninteractive/)
-describes `codex exec` and `codex exec resume`; reuse the explicit session ID
-for later stages. `--ephemeral` prevents saved session files and is unsuitable
-when relying on later resumption; it is not a general promise of memory or
-filesystem isolation. Confirm flags against your installed CLI. This artifact
-does not install Codex or initiate paid model calls.
+Continue the instrumentation chat with this prompt. Copy the generated text
+and tool-only paper into R2 when this stage finishes.
+
+```text
+Let's run the benchmark in this folder, then use the visualization exporter that
+produces text from the sqlite database and the react frontend. Use the existing
+docker workflow.
+```
+
+### 3. R2: analyze the HeapLENS data
+
+Start a new chat in R2.
+
+```text
+We would like to identify memory layout problems/anomalies in this project.
+Produce a report summarizing the problems found, if any, highlighting specific
+layout problems, grouped by type (output to: report.md). In addition to finding
+what you can by code inspection, read the HeapLENS paper (heaplens.pdf) with an
+emphasis on understanding the specific memory layout issues that can be found
+using the data HeapLENS makes available. Analyze the data from
+{PATH}/heaplens_analysis.txt and
+{PATH}/heaplens_output*. Type aliases in the report data should be
+expanded to human readable form, which could mean a reasonable short form for
+long type names. The entrypoint is benchmark.py with jemalloc. Don't use
+resources outside of this directory tree (unless explicitly asked to).
+```
+
+### 4. R2: recommend improvements
+
+Start a new chat in R2, retaining `report.md` from the preceding stage.
+
+```text
+Look at the report and recommend a sequence of memory layout improvements
+suitable for progressive A/B testing and factor analysis, and save these
+recommendations as recommendations.md.
+```
+
+### 5. R2: implement and benchmark
+
+Start another new chat in R2, retaining the report and recommendations.
+
+```text
+Implement the recommendation sequence and use the included benchmark to judge
+improvements.
+```
+
+### 6. R3: analyze without HeapLENS
+
+For the no-HeapLENS comparison, start a new chat in R3 and use this analysis
+prompt instead of step 3. Then repeat steps 4 and 5 in fresh R3 chats using
+the report and recommendations generated there.
+
+```text
+We would like to identify memory layout problems/anomalies in this project.
+Produce a report summarizing the problems found, if any, highlighting specific
+layout problems, grouped by type (output to: report.md). The entrypoint is
+benchmark.py. Don't use resources outside of this directory tree (unless
+explicitly asked to).
+```
+
+The paper also records occasional continuation prompts, such as
+`continue the investigation`, and follow-ups when the unguided agent pursued
+a cross-cutting string-embedding redesign, for example:
+`suppose we can't do embedding. implement and A/B test your other suggestions that aren't massive sweeping changes.`
+That was an interactive follow-up, not a restriction added to the initial
+analysis or recommendation prompts.

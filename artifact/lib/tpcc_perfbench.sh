@@ -108,7 +108,7 @@ tpcc_perfbench_variant() {
             # variants that don't use MEMHOOK_SEG_DS.
             export GLIBC_TUNABLES="glibc.rtld.optional_static_tls=4194304"
             perfbench_run_rep "$results_tsv" "$run_dir" "$variant" "$threads" "$run_idx" \
-                '(?<=throughput=)[0-9.]+' 1 -- \
+                tpcc -- \
                 "${placement[@]}" "./bin/rundb_TPCC_${ds_name}" "${pin[@]}"
         )
     done

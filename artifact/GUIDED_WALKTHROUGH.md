@@ -13,7 +13,7 @@ Open <http://localhost:3000> in a desktop browser. Select
 `valkey-artifact.sqlite`. Allow the initial clustering/precomputation to finish.
 The GUI is intended for a wide desktop window; resize or zoom out if panels
 are cramped. Both services are exposed only on the host's loopback interface.
-Stop with Ctrl-C. Do not expose the research development server publicly.
+Stop with Ctrl-C.
 
 1. **Choose a populated time.** The timeline initially selects the beginning
    of the trace, when many pages are empty. Drag its small circular time handle
@@ -39,7 +39,7 @@ Stop with Ctrl-C. Do not expose the research development server publicly.
    allocated small object headers differently reduce unfavorable sharing or
    crossings without changing application semantics? A layout observation
    motivates that hypothesis; a separate uninstrumented benchmark tests it.
-   Inspect `patches/valkey-B1C1_64.patch` only after forming your hypothesis.
+   Inspect `patches/valkey-B1C1_64.patch` to see a patch motivated by this trace.
    It cache-line-aligns selected small `robj` and radix-tree allocations and
    preserves allocation/free/reallocation behavior. It also increases memory
    use: higher throughput alone is not a complete optimization assessment.
@@ -52,11 +52,10 @@ The `ADDRESS` / `CLUSTER` controls change page ordering. Small bars beside
 page labels show a cluster's weight. The page pane scrolls: a partly visible
 bar at its lower edge is not an additional special object or category.
 `Settings` exposes visualization/clustering choices and cache geometry;
-`Resample` selects a new representative view. Missing a pattern in one view
-does not prove its absence. The supplied SQLite database and exporter allow
+`Resample` selects a new representative view. The supplied SQLite database and exporter allow
 independent inspection of the retained data.
 
-## EFRB: a simpler, higher-contrast teaching example
+## EFRB: a higher-contrast illustrative example
 
 The package includes `efrb-smoke.sqlite`, a newly generated small trace.
 Select it in the GUI; no new build is needed. This demonstrates the kind of
@@ -85,7 +84,7 @@ of the paper's screenshot, addresses, cluster numbers, or performance result.
 To generate your own small trace:
 
 ```bash
-bash artifact/run.sh legacy ascylib_efrb --profile smoke
+bash artifact/run.sh experiment ascylib_efrb --profile smoke
 ```
 
 The output is `artifact/experiments/ascylib_efrb/ascylib_efrb.sqlite`. Copy it
@@ -96,8 +95,8 @@ cluster IDs, or speedups from a fresh small run.
 The corresponding uninstrumented four-variant experiment is:
 
 ```bash
-bash artifact/run.sh legacy ascylib_efrb_bench --profile paper
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_efrb_bench --profile paper
 ```
 
 It compares the baseline, descriptor/node segregation, multithreaded prefill,
-and their combination. See `VALIDATION.md` for what has actually been tested.
+and their combination.

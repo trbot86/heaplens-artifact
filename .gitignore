@@ -102,3 +102,7 @@ sifter_vis_d3/server/venv
 /artifact/experiments/*/runs/
 /artifact/experiments/*/results.tsv*
 /artifact/experiments/*/summary.txt
+
+# Packaging-check records are author-side material, not distributed datasets.
+/artifact/validation/
+/artifact/VALIDATION.md
