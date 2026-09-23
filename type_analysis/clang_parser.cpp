@@ -159,7 +159,8 @@ int main(int argc, const char **argv)
 
   Finder.addMatcher(classMatcher, &cp);
 
-  Tool.run(newFrontendActionFactory(&Finder).get());
+  const int tool_result = Tool.run(newFrontendActionFactory(&Finder).get());
+  if (tool_result != 0) return tool_result;
   // Tool.run(newFrontendActionFactory<SyntaxOnlyAction>().get());
   // Tool.run(newFrontendActionFactory<PreprocessOnlyAction>().get());
 

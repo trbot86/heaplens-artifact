@@ -1,0 +1,42 @@
+purpose=three-cell separation/alignment factorization with huge-page advice disabled
+run_id=20260903T005701Z
+timestamp_utc=2026-09-03T00:57:01Z
+hostname=pyke
+kernel=Linux 6.8.0-137-generic x86_64 GNU/Linux
+cmdline=BOOT_IMAGE=/boot/vmlinuz-6.8.0-137-generic root=UUID=b6d4f80e-ba8f-4115-86ef-b807cb1dde5d ro tsx=on tsx_async_abort=off mitigations=off
+python=Python 3.12.3
+python_path=/home/t35brown/vscode_projects/hnswlib_bench_opt_after_heaplens_jax2/.venv/bin/python
+cc_path=/usr/bin/gcc
+cc_version=13.3.0
+cxx_path=/usr/bin/g++
+cxx_version=13.3.0
+source_commit=472502feb6a2ba8444d2f3ec03fe9f2a01db87a3
+source_status_before=4 paths including smoke/diagnostic outputs
+benchmark_sha256=842b7189008f17d6995becce73f4f24f870fc0646809464af697ff922b2f16ab
+hnswalg_sha256=7f79e4add9d1db3c4ea39d77a7e0828d04ae4710220c588fe921e4342ee3020e
+summarizer_sha256=c8935959355b32a43ec6e1623af5d25ecd19c97b29efcc8d926435a0c4a665ce
+thp_enabled=always [madvise] never
+thp_defrag=always defer defer+madvise [madvise] never
+allocator=libc
+dims=768
+threads=24
+elements=1000000
+queries=100000
+m=16
+ef_construction=200
+ef=64
+k=10
+build_threads=24
+warmup=10000
+iterations=5
+query_mode=indexed
+numa_node=0
+seed=1
+blocks=6
+packed_defines=
+separated_unaligned32_defines=HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_VECTOR_BASE_OFFSET=32
+separated_aligned64_defines=HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_VECTOR_BASE_OFFSET=0
+CPU(s):                                  96
+Model name:                              Intel(R) Xeon(R) Gold 5220R CPU @ 2.20GHz
+Socket(s):                               2
+NUMA node(s):                            2

@@ -89,3 +89,16 @@ sifter_vis_d3/server/venv
 # artifact/experiments/ (bin/, *.sqlite, etc.) should stay ignored as usual.
 !/artifact/vendor/
 !/artifact/vendor/**
+
+# Curated evaluation inputs are deliberately distributed, not regenerated outputs.
+!/artifact/data/
+!/artifact/data/**
+!/artifact/historical/
+!/artifact/historical/**
+/artifact/results/
+/sifter_vis_d3/sifter/node_modules/
+/sifter_vis_d3/sifter/.next/
+/artifact/experiments/*/work/
+/artifact/experiments/*/runs/
+/artifact/experiments/*/results.tsv*
+/artifact/experiments/*/summary.txt

@@ -1,0 +1,260 @@
+#!/bin/bash
+
+K=1024
+M=$(( 1024 * $K ))
+G=$(( 1024 * $M ))
+
+experiment="readwhilewriting"
+disableASLR=false
+explabel=""
+memtableRep="prefix_hash"
+hugePage=false
+
+while [ $# -gt 0 ]; do
+    case $1 in
+        -e | --experiment)
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Must specify an experiment with option -e/--experiment." >&2
+                exit 1
+            fi
+            experiment=$2
+            shift
+        ;;
+	-h | --huge-page)
+	   hugePage=true
+	;;
+	--disableASLR)
+	    disableASLR=true
+	;;
+	-l | --label)
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Must specify a label with option -l/--label." >&2
+                exit 1
+            fi
+	    explabel=$2
+	    shift
+	;;
+	--memtable-rep)
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Must specify a memtable representation with --memtable-rep." >&2
+                exit 1
+            fi
+            memtableRep=$2
+            shift
+	;;
+    esac
+    shift
+done
+
+dirLabels=("throughput" "energy-pkg" "energy-ram" "memory" "cache-miss-rate" "page-faults" "L1-dcache-load-miss-rate" "LLC-load-miss-rate" "LLC-store-miss-rate" "context-switch-rate" "dTLB-load-miss-rate")
+
+if [ "$disableASLR" = true ]; then
+    echo "DISABLING ASLR"
+    echo 0 | tee /proc/sys/kernel/randomize_va_space > /dev/null
+else
+    echo "Leaving ASLR enabled"
+fi
+if [ "$hugePage" = true ]; then
+    echo "Enabling huge pages"
+    echo always | tee /sys/kernel/mm/transparent_hugepage/enabled
+fi
+
+PLAIN_TABLE=1
+if [ "$memtableRep" = "skip_list" ]; then
+    echo "skip_list memtable rep selected. Disabling plain table"
+    PLAIN_TABLE=0
+    expNames=("a_default" "b_align_memb_no_pad" "c_align_tall" "d_seg_tall" "e_align_seg_tall" "f_align_seg_tall_prefetch" "g_align_seg_tall_prefetch_nocheck" "h_prefetch_tall" "i_prefetch_no_check" "j_prefetch_all")
+    numExp=10
+else
+    expNames=("a_default" "b_reorder_fields" "c_clalign" "d_nocross" "e_nopad" "f_alignmemblock")
+    numExp=6
+fi
+
+for label in "${dirLabels[@]}"
+do
+    if [ ! -d exp_"$label"_"$experiment" ]; then
+        echo "Making directory for $label"
+        mkdir exp_"$label"_"$experiment"
+    fi
+    #rm exp_"$label"_"$experiment"/*
+done
+
+THRU_REGEX="$experiment.*micros/op ([0-9]+).*seconds ([0-9]+).*"
+PERF_REGEX="\s*([0-9]+)\s+([-a-zA-Z0-9]+).*"
+ENERGY_PKG_REGEX="\s*([0-9]+\.[0-9]+)\s+Joules\s+power/energy-pkg/"
+ENERGY_RAM_REGEX="\s*([0-9]+\.[0-9]+)\s+Joules\s+power/energy-ram/"
+MEM_REGEX="\s*RSS=([0-9]+)"
+
+processLine() {
+    line="$1"
+    line="${line//,/}"
+    if [[ $line =~ $THRU_REGEX ]]
+    then
+        # touch exp_throughput/out.txt
+        OPS_PER_SEC="${BASH_REMATCH[1]}"
+        NUM_OPS="${BASH_REMATCH[2]}"
+        echo "${expNames[$EXP_TYPE]}-$explabel $THREADS $OPS_PER_SEC" >> exp_throughput_"$experiment"/out.txt
+    elif [[ $line =~ $ENERGY_PKG_REGEX ]]
+    then
+	ENERGY_PKG_PER_OP=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.6f", $1 / $2}')
+	echo "${expNames[$EXP_TYPE]}-$explabel $THREADS $ENERGY_PKG_PER_OP" >> exp_energy-pkg_"$experiment"/out.txt
+    elif [[ $line =~ $ENERGY_RAM_REGEX ]]
+    then
+	ENERGY_RAM_PER_OP=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.6f", $1 / $2}')
+	echo "${expNames[$EXP_TYPE]}-$explabel $THREADS $ENERGY_RAM_PER_OP" >> exp_energy-ram_"$experiment"/out.txt
+    elif [[ $line =~ $MEM_REGEX ]]
+    then
+	echo "${expNames[$EXP_TYPE]}-$explabel $THREADS ${BASH_REMATCH[1]}" >> exp_memory_"$experiment"/out.txt
+    elif [[ $line =~ $PERF_REGEX ]]
+    then
+        case "${BASH_REMATCH[2]}" in
+            cache-misses)
+                CACHE_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "${expNames[$EXP_TYPE]}-$explabel $THREADS $CACHE_MISS_RATE" >> exp_cache-miss-rate_"$experiment"/out.txt
+            ;;
+            L1-dcache-load-misses)
+                L1_DCACHE_LOAD_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "${expNames[$EXP_TYPE]}-$explabel $THREADS $L1_DCACHE_LOAD_MISS_RATE" >> exp_L1-dcache-load-miss-rate_"$experiment"/out.txt
+            ;;
+            LLC-load-misses)
+                LLC_LOAD_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "${expNames[$EXP_TYPE]}-$explabel $THREADS $LLC_LOAD_MISS_RATE" >> exp_LLC-load-miss-rate_"$experiment"/out.txt
+            ;;
+            LLC-store-misses)
+                LLC_STORE_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "${expNames[$EXP_TYPE]}-$explabel $THREADS $LLC_STORE_MISS_RATE" >> exp_LLC-store-miss-rate_"$experiment"/out.txt
+            ;;
+            page-faults)
+                echo "${expNames[$EXP_TYPE]}-$explabel $THREADS ${BASH_REMATCH[1]}" >> exp_page-faults_"$experiment"/out.txt
+            ;;
+            context-switches)
+                CONTEXT_SWITCH_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "${expNames[$EXP_TYPE]}-$explabel $THREADS $CONTEXT_SWITCH_RATE" >> exp_context-switch-rate_"$experiment"/out.txt
+            ;;
+            dTLB-load-misses)
+                TLB_LOAD_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "${expNames[$EXP_TYPE]}-$explabel $THREADS $TLB_LOAD_MISS_RATE" >> exp_dTLB-load-miss-rate_"$experiment"/out.txt
+            ;;
+        esac
+    fi
+}
+
+ALIGN_MEMBLOCK=4096
+ALIGN_TALL_NODE=4
+SEG_TALL_NODE=4
+MEMTABLE_SIZE=$(( 128 * $M ))
+KEY_SIZE=64
+VALUE_SIZE=256
+
+#for (( EXP_TYPE=0; EXP_TYPE<$numExp; EXP_TYPE++ ))
+for EXP_TYPE in 0 4
+do
+    echo "Running experiment $EXP_TYPE"
+
+    case $memtableRep in
+        "prefix_hash")
+            case $EXP_TYPE in
+                0) # default
+                    make clean && make benchmarks -j
+                ;;
+                1) # reorder-fields
+                    make clean && make benchmarks REORDER_FIELDS=1 -j
+                ;;
+                2) # cl-align
+                    make clean && make benchmarks REORDER_FIELDS=1 CACHELINE_ALIGN_BUCKET=1 -j
+                ;;
+                3) # no-cross
+                    make clean && make benchmarks REORDER_FIELDS=1 SKIPLIST_NO_CACHELINE_CROSS=1 -j
+                ;;
+                4) # no-pad
+                    make clean && make benchmarks REORDER_FIELDS=1 NO_PADDING_NODE=1 -j
+                ;;
+                5) # align-memblock
+                    make clean && make benchmarks DISABLE_WARNING_AS_ERROR=1 REORDER_FIELDS=1 SKIPLIST_NO_CACHELINE_CROSS=1 ALIGN_MEMBLOCK="$ALIGN_MEMBLOCK" PAD_KEYHANDLE=128 -j
+                ;;
+            esac
+        ;;
+        "skip_list")
+            case $EXP_TYPE in
+                0) # default
+                    make clean && make benchmarks -j
+                ;;
+                1) # align-memblock-no-pad
+                    echo "Compiling with aligned memblocks. NO PADDING ON KEYHANDLE"
+                    make clean && make benchmarks -j ALIGN_MEMBLOCK="$ALIGN_MEMBLOCK" DISABLE_WARNING_AS_ERROR=1
+                ;;
+                2) # align-tall-node
+                    echo "Aligning tall nodes"
+                    make clean && make benchmarks -j ALIGN_TALL_NODE="$ALIGN_TALL_NODE"
+                ;;
+                3) # seg-tall-node
+                    echo "Separating tall nodes"
+                    make clean && make benchmarks -j SEG_TALL_NODE="$SEG_TALL_NODE" DISABLE_WARNING_AS_ERROR=1
+                ;;
+                4) # align-seg-tall-node
+                    echo "Aligning AND separating tall nodes"
+                    make clean && make benchmarks -j ALIGN_TALL_NODE="$ALIGN_TALL_NODE" SEG_TALL_NODE="$ALIGN_TALL_NODE" DISABLE_WARNING_AS_ERROR=1
+                ;;
+                5) # align-seg-tall-node-prefetch
+                    echo "Aligning and separating tall nodes, and prefetching"
+                    make clean && make benchmarks -j ALIGN_TALL_NODE="$ALIGN_TALL_NODE" SEG_TALL_NODE="$ALIGN_TALL_NODE" DISABLE_WARNING_AS_ERROR=1 PREFETCH_SKIPLIST_NODE=1
+                ;;
+                6) # align-seg-tall-node-prefetch-no-check
+                    echo "Aligning and separating tall nodes, and prefetching with no height check"
+                    make clean && make benchmarks -j ALIGN_TALL_NODE="$ALIGN_TALL_NODE" SEG_TALL_NODE="$ALIGN_TALL_NODE" DISABLE_WARNING_AS_ERROR=1 PREFETCH_NO_CHECK=1
+                ;;
+		7) # prefetch-skiplist-node
+		    echo "Prefetching tall nodes"
+		    make clean && make benchmarks -j PREFETCH_SKIPLIST_NODE=1 DISABLE_WARNING_AS_ERROR=1
+		;;
+		8) # prefetch-no-check
+		    echo "Prefetching with no height check"
+		    make clean && make benchmarks -j PREFETCH_NO_CHECK=1 DISABLE_WARNING_AS_ERROR=1
+		;; 
+		9) # prefetch-all
+		    echo "Prefetching all layers of tall nodes"
+		    make clean && make benchmarks -j PREFETCH_ALL=1 DISABLE_WARNING_AS_ERROR=1
+		;;
+            esac
+        ;;
+    esac
+
+    for THREADS in 18 36
+    do
+	if [[ "$experiment" = "readwhilewriting" ]]; then
+	    ACTUAL_THREADS=$(($THREADS - 1))
+        else
+	    ACTUAL_THREADS=$THREADS
+	fi
+        echo " number of threads: $THREADS"
+
+        for RUN in {0..9}
+        do
+        echo "  run $RUN"
+            case $THREADS in
+                18)
+			echo 'LD_PRELOAD=../jemalloc/lib/libjemalloc.so numactl -i 0 taskset -c 0-17 perf stat -e cache-misses,page-faults,L1-dcache-load-misses,LLC-load-misses,LLC-store-misses,context-switches,dTLB-load-misses ./db_bench --use_existing_db=0 --benchmarks=filluniquerandom,waitforcompaction,'"$experiment"' --key_size='"$KEY_SIZE"' --prefix_size='"$KEY_SIZE"' --value_size='"$VALUE_SIZE"' --compression_type=none --use_plain_table='"$PLAIN_TABLE"' --memtablerep='"$memtableRep"' --max_write_buffer_number=2 --write_buffer_size='"$MEMTABLE_SIZE"' --max_background_jobs='"$(( $THREADS / 4 ))"' --compaction_pri=3 --compaction_style=0 --bloom_bits=10 --bloom_locality=1 --num=10000000 --threads='"$ACTUAL_THREADS"' --allow_concurrent_memtable_write=false --disable_wal=1 --sync=0 --duration=10'
+		    LD_PRELOAD=../jemalloc/lib/libjemalloc.so numactl -i 0 taskset -c 0-17 perf stat -e cache-misses,page-faults,L1-dcache-load-misses,LLC-load-misses,LLC-store-misses,context-switches,dTLB-load-misses ./db_bench --use_existing_db=0 --benchmarks=filluniquerandom,waitforcompaction,"$experiment" --key_size=$KEY_SIZE --prefix_size=$KEY_SIZE --value_size=$VALUE_SIZE --compression_type=none --use_plain_table=$PLAIN_TABLE --memtablerep=$memtableRep --max_write_buffer_number=2 --write_buffer_size=$MEMTABLE_SIZE --max_background_jobs=$(( $THREADS / 4 )) --compaction_pri=3 --compaction_style=0 --bloom_bits=10 --bloom_locality=1 --num=10000000 --threads=$ACTUAL_THREADS --allow_concurrent_memtable_write=false --disable_wal=1 --sync=0 --duration=10 2>&1 | while read line; do
+                        processLine "$line"
+                    done
+                ;;
+                36)
+			echo 'LD_PRELOAD=../jemalloc/lib/libjemalloc.so numactl -i all taskset -c 0-17 perf stat -e cache-misses,page-faults,L1-dcache-load-misses,LLC-load-misses,LLC-store-misses,context-switches,dTLB-load-misses ./db_bench --use_existing_db=0 --benchmarks=filluniquerandom,'"$experiment"' --key_size='"$KEY_SIZE"' --prefix_size='"$KEY_SIZE"' --value_size='"$VALUE_SIZE"' --compression_type=none --use_plain_table='"$PLAIN_TABLE"' --memtablerep='"$memtableRep"' --max_write_buffer_number=2 --write_buffer_size='"$MEMTABLE_SIZE"' --disable_auto_compactions=true --num=10000000 --threads='"$ACTUAL_THREADS"' --allow_concurrent_memtable_write=false --disable_wal=1 --sync=0 --duration=10'
+			LD_PRELOAD=../jemalloc/lib/libjemalloc.so numactl -i all taskset -c 0-95 perf stat -e cache-misses,page-faults,L1-dcache-load-misses,LLC-load-misses,LLC-store-misses,context-switches,dTLB-load-misses ./db_bench --use_existing_db=0 --benchmarks=filluniquerandom,"$experiment" --key_size=$KEY_SIZE --prefix_size=$KEY_SIZE --value_size=$VALUE_SIZE --compression_type=none --use_plain_table=$PLAIN_TABLE --memtablerep=$memtableRep --max_write_buffer_number=2 --write_buffer_size=$MEMTABLE_SIZE --disable_auto_compactions=true --num=10000000 --threads=$ACTUAL_THREADS --allow_concurrent_memtable_write=false --disable_wal=1 --sync=0 --duration=10 2>&1 | while read line; do
+                        processLine "$line"
+                    done
+                ;;
+            esac
+        done
+    done
+done
+
+if [ "$disableASLR" = true ]; then
+    echo "RE-ENABLING ASLR"
+    echo 2 | tee /proc/sys/kernel/randomize_va_space > /dev/null
+fi
+if [ "$hugePage" = true ]; then
+    echo "Disabling huge pages"
+    echo madvise | tee /sys/kernel/mm/transparent_hugepage/enabled
+fi
+

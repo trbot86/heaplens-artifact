@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $(hostname -s) != pyke ]]; then
+    echo "ABORT: this factorization is configured for pyke, not $(hostname -s)" >&2
+    exit 2
+fi
+
+operator_root=/home/t35brown/vscode_projects/atc26_rebuttal_operator_20260831
+workspace=/home/t35brown/vscode_projects/atc26_rebuttal_cleanrooms_20260831/hnswlib_hugepage_prefault_validation/workspace
+expected_commit=8b2ac235017d7963ca237d9a523689538b121c32
+summarizer="$operator_root/hnswlib_factorization/summarize_factorization.py"
+
+[[ -d "$workspace/.git" ]] || { echo "missing corrected isolated workspace" >&2; exit 3; }
+[[ -f "$summarizer" ]] || { echo "missing validated factorization summarizer" >&2; exit 4; }
+actual_commit=$(git -C "$workspace" rev-parse HEAD)
+[[ "$actual_commit" == "$expected_commit" ]] || {
+    echo "ABORT: corrected source commit changed: $actual_commit" >&2
+    exit 5
+}
+git -C "$workspace" diff --quiet || { echo "tracked source has unstaged changes" >&2; exit 6; }
+git -C "$workspace" diff --cached --quiet || { echo "tracked source has staged changes" >&2; exit 7; }
+
+python_bin=${HNSW_PYTHON:-$HOME/vscode_projects/hnswlib_bench_opt_after_heaplens_jax2/.venv/bin/python}
+cc_bin=${HNSW_CC:-/usr/bin/gcc}
+cxx_bin=${HNSW_CXX:-/usr/bin/g++}
+[[ -x "$python_bin" ]] || { echo "Python executable not found: $python_bin" >&2; exit 8; }
+[[ -x "$cc_bin" ]] || { echo "C compiler not found: $cc_bin" >&2; exit 9; }
+[[ -x "$cxx_bin" ]] || { echo "C++ compiler not found: $cxx_bin" >&2; exit 10; }
+"$python_bin" -c 'import numpy, pybind11' >/dev/null
+command -v numactl >/dev/null
+export CC="$cc_bin"
+export CXX="$cxx_bin"
+
+run_id=${RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)}
+[[ "$run_id" =~ ^[A-Za-z0-9_.-]+$ ]] || { echo "unsafe RUN_ID: $run_id" >&2; exit 11; }
+run_dir="$workspace/corrected_factorization_runs/$run_id"
+[[ ! -e "$run_dir" ]] || { echo "run directory already exists: $run_dir" >&2; exit 12; }
+mkdir -p -- "$run_dir"
+
+{
+    printf 'purpose=full corrected 2x2 vector-SoA and huge-page factorization\n'
+    printf 'correction=madvise vector and level-0 slabs before first touch\n'
+    printf 'mapping_validation=hugepage_validation_runs/20260902T030620Z\n'
+    printf 'run_id=%s\n' "$run_id"
+    printf 'timestamp_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    printf 'hostname=%s\n' "$(hostname -s)"
+    printf 'kernel=%s\n' "$(uname -srmo)"
+    printf 'cmdline=%s\n' "$(cat /proc/cmdline)"
+    printf 'python=%s\n' "$($python_bin --version 2>&1)"
+    printf 'python_path=%s\n' "$python_bin"
+    printf 'cc_path=%s\n' "$cc_bin"
+    printf 'cc_version=%s\n' "$($cc_bin -dumpfullversion -dumpversion)"
+    printf 'cxx_path=%s\n' "$cxx_bin"
+    printf 'cxx_version=%s\n' "$($cxx_bin -dumpfullversion -dumpversion)"
+    printf 'source_commit=%s\n' "$actual_commit"
+    printf 'source_status_before=%s paths including prior diagnostic outputs\n' "$(git -C "$workspace" status --porcelain=v1 | wc -l)"
+    printf 'summarizer_sha256=%s\n' "$(sha256sum "$summarizer" | awk '{print $1}')"
+    printf 'thp_enabled=%s\n' "$(cat /sys/kernel/mm/transparent_hugepage/enabled)"
+    printf 'thp_defrag=%s\n' "$(cat /sys/kernel/mm/transparent_hugepage/defrag)"
+    printf 'allocator=libc\n'
+    printf 'dims=768\nthreads=24\nelements=1000000\nqueries=100000\n'
+    printf 'm=16\nef_construction=200\nef=64\nk=10\n'
+    printf 'build_threads=24\nwarmup=10000\niterations=5\nquery_mode=indexed\n'
+    printf 'numa_node=0\nseed=1\nblocks=10\n'
+    lscpu | grep -E '^(Model name|CPU\(s\)|Socket\(s\)|NUMA node\(s\)):' || true
+} > "$run_dir/environment.txt"
+
+declare -A defines
+defines[baseline]=''
+defines[vector_soa64]='HNSWLIB_LAYOUT_VECTOR_SOA64=1'
+defines[hugepage]='HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1'
+defines[both]='HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1'
+
+for block in $(seq 1 10); do
+    case $(((block - 1) % 4)) in
+        0) order=(baseline vector_soa64 hugepage both) ;;
+        1) order=(vector_soa64 both baseline hugepage) ;;
+        2) order=(hugepage baseline both vector_soa64) ;;
+        3) order=(both hugepage vector_soa64 baseline) ;;
+    esac
+
+    for label in "${order[@]}"; do
+        printf -v block_tag '%02d' "$block"
+        output="$run_dir/block${block_tag}_${label}.csv"
+        log="$run_dir/block${block_tag}_${label}.log"
+        [[ ! -e "$output" && ! -e "$log" ]] || {
+            echo "refusing to overwrite result for block $block label $label" >&2
+            exit 13
+        }
+        echo "block=$block label=$label compiler=$CXX defines=${defines[$label]}"
+        cmd=(
+            "$python_bin" benchmark.py
+            --variant-label "$label"
+            --variant-defines "${defines[$label]}"
+            --dims 768
+            --threads 24
+            --elements 1000000
+            --queries 100000
+            --m 16
+            --ef-construction 200
+            --ef 64
+            --k 10
+            --build-threads 24
+            --repeats 1
+            --warmup 10000
+            --iterations 5
+            --query-mode indexed
+            --numa-node 0
+            --seed 1
+            --output "$output"
+        )
+        (cd -- "$workspace" && "${cmd[@]}") 2>&1 | tee "$log"
+        [[ -s "$output" ]] || { echo "missing output: $output" >&2; exit 14; }
+    done
+done
+
+"$python_bin" "$summarizer" "$run_dir"
+git -C "$workspace" diff --quiet || { echo "tracked source changed during run" >&2; exit 15; }
+git -C "$workspace" diff --cached --quiet || { echo "tracked source staging changed during run" >&2; exit 16; }
+echo "Corrected factorization complete: $run_dir"

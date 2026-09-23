@@ -1,0 +1,39 @@
+purpose=full corrected 2x2 vector-SoA and huge-page factorization
+correction=madvise vector and level-0 slabs before first touch
+mapping_validation=hugepage_validation_runs/20260902T030620Z
+run_id=20260902T062628Z
+timestamp_utc=2026-09-02T06:26:28Z
+hostname=pyke
+kernel=Linux 6.8.0-137-generic x86_64 GNU/Linux
+cmdline=BOOT_IMAGE=/boot/vmlinuz-6.8.0-137-generic root=UUID=b6d4f80e-ba8f-4115-86ef-b807cb1dde5d ro tsx=on tsx_async_abort=off mitigations=off
+python=Python 3.12.3
+python_path=/home/t35brown/vscode_projects/hnswlib_bench_opt_after_heaplens_jax2/.venv/bin/python
+cc_path=/usr/bin/gcc
+cc_version=13.3.0
+cxx_path=/usr/bin/g++
+cxx_version=13.3.0
+source_commit=8b2ac235017d7963ca237d9a523689538b121c32
+source_status_before=4 paths including prior diagnostic outputs
+summarizer_sha256=013f7418049e1d8970a349491e311f8f9c330d949801257a9e2d04ebc12c122d
+thp_enabled=always [madvise] never
+thp_defrag=always defer defer+madvise [madvise] never
+allocator=libc
+dims=768
+threads=24
+elements=1000000
+queries=100000
+m=16
+ef_construction=200
+ef=64
+k=10
+build_threads=24
+warmup=10000
+iterations=5
+query_mode=indexed
+numa_node=0
+seed=1
+blocks=10
+CPU(s):                                  96
+Model name:                              Intel(R) Xeon(R) Gold 5220R CPU @ 2.20GHz
+Socket(s):                               2
+NUMA node(s):                            2

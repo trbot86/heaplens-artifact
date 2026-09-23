@@ -152,7 +152,7 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
         return cacheData.idxToTpAndSt.map((tp: string, i: number) => 
                     (!isSubType(cacheData, i) && cacheVis[tp] && !expandedTypes[tp.replace(/\s+/g, '')]) ||
                     (isSubType(cacheData, i) && cacheVis[tp] && expandedTypes[getTypeName(tp)]));
-    }, [cacheData, expandedTypes]);
+    }, [cacheData, cacheVis, expandedTypes]);
     const totalData: number[][] = useMemo(() => {
         console.log('Recomputing totalData');
         console.log('Here is visibleTypes:');

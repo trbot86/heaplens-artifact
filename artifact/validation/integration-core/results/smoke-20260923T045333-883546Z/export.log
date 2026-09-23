@@ -1,0 +1,24 @@
+COMMAND: ['/opt/heaplens-python/bin/python3', '/root/sifter/sifter_vis_d3/server/export_page_snapshots.py', '/root/sifter/artifact/data/valkey/allocs.sqlite', '/root/sifter/artifact/results/smoke-20260923T045333-883546Z/export']
+Returning from get_all_lines_and_stats
+starting to sample pages
+/opt/heaplens-python/lib/python3.10/site-packages/sklearn/cluster/_kmeans.py:1934: FutureWarning: The default value of `n_init` will change from 3 to 'auto' in 1.4. Set the value of `n_init` explicitly to suppress the warning
+  super()._check_params_vs_input(X, default_n_init=3)
+Index(['file', 'size', 'addr', 'type', 'allocTs', 'freeTs', 'line',
+       'actualAddr'],
+      dtype='object')
+About to start clustering pages
+Starting page grouping
+Done page grouping
+Done merging
+Done clustering pages
+about to start sampling loop
+Done sampling loop
+Done merging stuff
+done sampling pages
+Wrote raw: /root/sifter/artifact/results/smoke-20260923T045333-883546Z/export/heaplens_pages_v2.txt
+Wrote compact files: 11 in /root/sifter/artifact/results/smoke-20260923T045333-883546Z/export/compact
+Wrote analysis: /root/sifter/artifact/results/smoke-20260923T045333-883546Z/export/heaplens_analysis.txt
+Types: 47
+Selected pages: 51
+Clusters: 28
+Clustered pages: 1078

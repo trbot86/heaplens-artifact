@@ -1,0 +1,12 @@
+# heaplens compact snapshot v2
+# snapshot_index: 0
+# time: 41494148277035936
+# page_size: 4096
+# cache_line_size: 64
+# adjacent_line_window: 128
+# l1_sets: 64
+# pages_per_cluster: 3
+# object: offset, cache_line, l1_index, align_bucket, size, actual_size, split_offset, split_kind, is_container, type
+cluster 15
+140405255553024, 1
+0, 0, 0, 64, 936, 936, 0, whole, 0, Y

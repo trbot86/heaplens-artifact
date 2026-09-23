@@ -81,7 +81,7 @@ run_rocksdb_experiment() {
     # top of that multiplies memory pressure per parallel job). Default to
     # a small, safe job count; override via BUILD_JOBS if your host can
     # handle more.
-    local BUILD_JOBS="${BUILD_JOBS:-4}"
+    local BUILD_JOBS="${BUILD_JOBS:-${JOBS:-4}}"
 
     # fillrandom ignores --num once --duration is set (it keeps generating
     # keys for the full duration, cycling through the key space repeatedly
@@ -92,10 +92,10 @@ run_rocksdb_experiment() {
     # keep the resulting .sqlite in the "few hundred MB" range the root
     # README recommends for the visualizer.
     local SAMPLE_PROPORTION="${SAMPLE_PROPORTION:-0.05}"
-    local PAGES_PER_TYPE="${PAGES_PER_TYPE:-4}"
+    local PAGES_PER_TYPE="${PAGES_PER_TYPE:-1}"
 
     echo "=== [$out_name] 1/7: fresh working copy of RocksDB ==="
-    rm -rf "$WORK"
+    [[ ! -e "$WORK" ]] || { echo "Preserve existing results at $WORK; use a fresh checkout." >&2; return 1; }
     mkdir -p "$WORK"
     cp -r "$ROCKSDB_SRC" "$SRC_COPY"
     # Two fixups needed only for RocksDB (ASCYLIB/setbench's Makefiles don't
@@ -186,7 +186,6 @@ run_rocksdb_experiment() {
     # refuse to open with more than one thread otherwise.
     (
         cd "$INSTRUMENTED"
-        rm -rf /tmp/rocksdb_hsl_bench_db
         ./db_bench \
             --benchmarks="$BENCHMARKS" \
             --memtablerep=prefix_hash \
@@ -198,7 +197,7 @@ run_rocksdb_experiment() {
             --duration="$RUN_SECONDS" \
             --compression_type=none \
             --allow_concurrent_memtable_write=false \
-            --db=/tmp/rocksdb_hsl_bench_db
+            --db="$WORK/benchmark-db"
     )
     # Expected outputs in $INSTRUMENTED: binary_dump.txt, fileset_dump.txt,
     # typeset_dump.txt, fielddump.txt
@@ -212,6 +211,7 @@ run_rocksdb_experiment() {
 
     local RESULT_DB="$SIFTER_ROOT/artifact/experiments/${out_name}/${out_name}.sqlite"
     cp "$SIFTER_ROOT/type_analysis/allocs.sqlite" "$RESULT_DB"
+    python3 "$SIFTER_ROOT/artifact/check_database.py" "$RESULT_DB"
     echo "=== [$out_name] done. Database: $RESULT_DB ==="
     echo "    Open it in the visualizer (sifter_vis_d3/sifter) to inspect the"
     echo "    HashSkipList bucket/node cache-set occupancy at the pre-fix (56B"

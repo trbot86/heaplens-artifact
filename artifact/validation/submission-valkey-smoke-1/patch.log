@@ -1,0 +1,3 @@
+COMMAND: ['patch', '--batch', '-p1', '-i', '/root/sifter/artifact/patches/valkey-B1C1_64.patch']
+patching file src/object.c
+patching file src/rax_malloc.h

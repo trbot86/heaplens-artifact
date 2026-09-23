@@ -1,0 +1,69 @@
+--- a/src/object.c
++++ b/src/object.c
+@@ -48,8 +48,18 @@
+ /* For objects with large embedded keys, we reserve space for an expire field,
+  * so if expire is set later, we don't need to reallocate the object. */
+ #define KEY_SIZE_TO_INCLUDE_EXPIRE_THRESHOLD 128
++#define ROBJ_LINE_ALIGN_SIZE 64
+ 
+ /* ===================== Creation and parsing of objects ==================== */
++
++static robj *zmallocRobjUsable(size_t size, size_t *usable) {
++    if (size <= ROBJ_LINE_ALIGN_SIZE) {
++        /* Do not expose alignment padding as embedded object payload. */
++        if (usable) *usable = size;
++        return zmalloc_cache_aligned(size);
++    }
++    return zmalloc_usable(size, usable);
++}
+ 
+ /* Creates an object, optionally with embedded key and expire fields. The key
+  * and expire fields can be omitted by passing NULL and EXPIRY_NONE, respectively.
+@@ -72,7 +82,7 @@
+     }
+     /* Allocate and set the declared fields. */
+     size_t bufsize = 0;
+-    robj *o = zmalloc_usable(min_size, &bufsize);
++    robj *o = zmallocRobjUsable(min_size, &bufsize);
+     o->type = type;
+     o->encoding = OBJ_ENCODING_RAW;
+     o->refcount = 1;
+--- a/src/rax_malloc.h
++++ b/src/rax_malloc.h
+@@ -38,8 +38,34 @@
+ #ifndef RAX_ALLOC_H
+ #define RAX_ALLOC_H
+ #include "zmalloc.h"
+-#define rax_malloc zmalloc
+-#define rax_realloc zrealloc
++
++#include <string.h>
++
++#define RAX_SEGREGATED_MAX_SIZE 64
++
++static inline void *rax_segregated_malloc(size_t size) {
++    if (size <= RAX_SEGREGATED_MAX_SIZE) return zmalloc_cache_aligned(size);
++    return zmalloc(size);
++}
++
++static inline void *rax_segregated_realloc(void *ptr, size_t size) {
++    if (ptr == NULL) return rax_segregated_malloc(size);
++    if (size == 0) {
++        zfree(ptr);
++        return NULL;
++    }
++    if (size <= RAX_SEGREGATED_MAX_SIZE) {
++        size_t oldsize = zmalloc_size(ptr);
++        void *newptr = zmalloc_cache_aligned(size);
++        memcpy(newptr, ptr, oldsize < size ? oldsize : size);
++        zfree(ptr);
++        return newptr;
++    }
++    return zrealloc(ptr, size);
++}
++
++#define rax_malloc rax_segregated_malloc
++#define rax_realloc rax_segregated_realloc
+ #define rax_free zfree
+ #define rax_ptr_alloc_size zmalloc_size
+ #endif

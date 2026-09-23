@@ -1,0 +1,267 @@
+mem_allocator initialized!
+running TPCC workload
+reading schema file: ./benchmarks/TPCC_full_schema.txt
+INITIALIZING THE RECMGR
+TPCC schema initialized
+TPCC Data Initialization Complete!
+workload initialized!
+using NO_WAIT concurrency control
+using SERIALIZABLE isolation level
+running 2 threads
+Query Queue Init Time 0.056535
+query_queue initialized!
+Index: CUSTOMER_ID_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+Index: CUSTOMER_LAST_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+Index: DISTRICT_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+Index: ITEM_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+Index: NEWORDER_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+Index: ORDERLINE_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+Index: ORDERLINE_WD_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+Index: ORDER_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+Index: STOCK_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+Index: WAREHOUSE_IDX
+sizes: node=40 descriptor=64
+6node_tImP8itemid_tE_object_size=40
+6node_tImP8itemid_tE_allocated_count=1937208
+6node_tImP8itemid_tE_allocated_size=77.4883MB
+6node_tImP8itemid_tE_get_from_pool=0
+6node_tImP8itemid_tE_deallocated=645726
+6node_tImP8itemid_tE_limbo_count=0
+6node_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=230715
+
+6info_tImP8itemid_tE_object_size=64
+6info_tImP8itemid_tE_allocated_count=645726
+6info_tImP8itemid_tE_allocated_size=41.3265MB
+6info_tImP8itemid_tE_get_from_pool=0
+6info_tImP8itemid_tE_deallocated=645726
+6info_tImP8itemid_tE_limbo_count=0
+6info_tImP8itemid_tE_limbo_details=0 0 0 
+
+global_epoch_counter=0
+
+PASS! SimTime = 18272086679
+[tid=0] txn_cnt=99663,abort_cnt=328
+[tid=1] txn_cnt=100000,abort_cnt=2319
+Per-thread per-index stats: index=CUSTOMER_ID_IDX, thread=0, numContains=69919, timeContains=0.246290, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=69919, totalTime=0.246290, throughput=567776.787804
+Per-thread per-index stats: index=CUSTOMER_ID_IDX, thread=1, numContains=72203, timeContains=0.211232, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=72203, totalTime=0.211232, throughput=683637.230516
+Per-thread per-index stats: index=CUSTOMER_LAST_IDX, thread=0, numContains=30072, timeContains=0.086038, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=30072, totalTime=0.086038, throughput=699037.050428
+Per-thread per-index stats: index=CUSTOMER_LAST_IDX, thread=1, numContains=30116, timeContains=0.071537, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=30116, totalTime=0.071537, throughput=841965.111231
+Per-thread per-index stats: index=DISTRICT_IDX, thread=0, numContains=99991, timeContains=0.027816, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=99991, totalTime=0.027816, throughput=7189572.254928
+Per-thread per-index stats: index=DISTRICT_IDX, thread=1, numContains=102319, timeContains=0.023199, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=102319, totalTime=0.023199, throughput=8821007.617720
+Per-thread per-index stats: index=ITEM_IDX, thread=0, numContains=498712, timeContains=0.791605, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=498712, totalTime=0.791605, throughput=1260001.891271
+Per-thread per-index stats: index=ITEM_IDX, thread=1, numContains=503278, timeContains=0.794445, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=503278, totalTime=0.794445, throughput=1266992.009008
+Per-thread per-index stats: index=NEWORDER_IDX, thread=0, numContains=0, timeContains=0.000000, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=0, totalTime=0.000000, throughput=-nan
+Per-thread per-index stats: index=NEWORDER_IDX, thread=1, numContains=0, timeContains=0.000000, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=0, totalTime=0.000000, throughput=-nan
+Per-thread per-index stats: index=ORDERLINE_IDX, thread=0, numContains=0, timeContains=0.000000, numInsert=496325, timeInsert=10.219964, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=496325, totalTime=10.219964, throughput=97128.521186
+Per-thread per-index stats: index=ORDERLINE_IDX, thread=1, numContains=0, timeContains=0.000000, numInsert=498980, timeInsert=10.261898, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=498980, totalTime=10.261898, throughput=97249.065775
+Per-thread per-index stats: index=ORDERLINE_WD_IDX, thread=0, numContains=0, timeContains=0.000000, numInsert=496325, timeInsert=0.122888, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=496325, totalTime=0.122888, throughput=8077656.957545
+Per-thread per-index stats: index=ORDERLINE_WD_IDX, thread=1, numContains=0, timeContains=0.000000, numInsert=498980, timeInsert=0.117398, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=498980, totalTime=0.117398, throughput=8500625.549310
+Per-thread per-index stats: index=ORDER_IDX, thread=0, numContains=0, timeContains=0.000000, numInsert=49718, timeInsert=4.512016, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=49718, totalTime=4.512016, throughput=22038.041896
+Per-thread per-index stats: index=ORDER_IDX, thread=1, numContains=0, timeContains=0.000000, numInsert=49984, timeInsert=4.575821, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=49984, totalTime=4.575821, throughput=21847.006438
+Per-thread per-index stats: index=STOCK_IDX, thread=0, numContains=498712, timeContains=1.038747, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=498712, totalTime=1.038747, throughput=960218.712805
+Per-thread per-index stats: index=STOCK_IDX, thread=1, numContains=503278, timeContains=0.983237, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=503278, totalTime=0.983237, throughput=1023716.324362
+Per-thread per-index stats: index=WAREHOUSE_IDX, thread=0, numContains=99991, timeContains=0.015404, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=99991, totalTime=0.015404, throughput=12982606.934375
+Per-thread per-index stats: index=WAREHOUSE_IDX, thread=1, numContains=102319, timeContains=0.015266, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOperations=102319, totalTime=0.015266, throughput=13404786.926065
+Per-index stats: index=CUSTOMER_ID_IDX, numContains=142122, timeContains=0.457522, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=142122, totalTime=0.457522, throughput=621267.993891
+Per-index stats: index=CUSTOMER_LAST_IDX, numContains=60188, timeContains=0.157576, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=60188, totalTime=0.157576, throughput=763924.584240
+Per-index stats: index=DISTRICT_IDX, numContains=202310, timeContains=0.051014, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=202310, totalTime=0.051014, throughput=7931470.464280
+Per-index stats: index=ITEM_IDX, numContains=1001990, timeContains=1.586051, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=1001990, totalTime=1.586051, throughput=1263503.209004
+Per-index stats: index=NEWORDER_IDX, numContains=0, timeContains=0.000000, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=0, totalTime=0.000000, throughput=-nan
+Per-index stats: index=ORDERLINE_IDX, numContains=0, timeContains=0.000000, numInsert=995305, timeInsert=20.481862, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=995305, totalTime=20.481862, throughput=97188.916881
+Per-index stats: index=ORDERLINE_WD_IDX, numContains=0, timeContains=0.000000, numInsert=995305, timeInsert=0.240287, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=995305, totalTime=0.240287, throughput=8284309.377540
+Per-index stats: index=ORDER_IDX, numContains=0, timeContains=0.000000, numInsert=99702, timeInsert=9.087838, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=99702, totalTime=9.087838, throughput=21941.853541
+Per-index stats: index=STOCK_IDX, numContains=1001990, timeContains=2.021984, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=1001990, totalTime=2.021984, throughput=991095.919736
+Per-index stats: index=WAREHOUSE_IDX, numContains=202310, timeContains=0.030670, numInsert=0, timeInsert=0.000000, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=202310, totalTime=0.030670, throughput=13192748.494378
+Aggregate index stats: numContains=2610910, timeContains=4.304817, numInsert=2090312, timeInsert=29.809986, numRangeQuery=0, timeRangeQuery=0.000000, totalOps=4701222, totalTime=34.114803, throughput=275611.847188
+[summary] txn_cnt=199663, abort_cnt=2647, run_time=36.530078, time_wait=0.000000, time_ts_alloc=0.000000, time_man=0.000000, time_index=0.000000, time_abort=0.000000, time_cleanup=0.000000, latency=0.000000, deadlock_cnt=0, cycle_detect=0, dl_detect_time=0.000000, dl_wait_time=0.000000, time_query=0.000000, debug1=0.000000, debug2=0.000000, debug3=0.000000, debug4=0.000000, debug5=0.000000, ixNumContains=2610910, ixTimeContains=4.304817, ixNumInsert=2090312, ixTimeInsert=29.809986, ixNumRangeQuery=0, ixTimeRangeQuery=0.000000, ixTotalOps=4701222, ixTotalTime=34.114803, ixThroughput=275611.847188, nthreads=2, throughput=10931.430222, node_size=0, descriptor_size=0

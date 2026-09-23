@@ -1,0 +1,4 @@
+COMMAND: ['/opt/heaplens-python/bin/python3', 'benchmark.py', '--variant-label=vector_huge', '--variant-defines=HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1', '--dims', '128', '--threads', '2', '--build-threads', '2', '--elements', '10000', '--queries', '1000', '--m', '16', '--ef-construction', '200', '--ef', '64', '--k', '10', '--warmup', '100', '--iterations', '1', '--query-mode', 'indexed', '--seed', '1', '--repeats', '1', '--output', '/root/sifter/artifact/results/submission-hnsw-smoke-1/vector_huge.csv']
+building vector_huge [HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1]
+running vector_huge dim=128 threads=2 repetition=1/1
+wrote /root/sifter/artifact/results/submission-hnsw-smoke-1/vector_huge.csv

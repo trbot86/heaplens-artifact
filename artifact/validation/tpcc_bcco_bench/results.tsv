@@ -1,0 +1,4 @@
+variant	threads	run	throughput_ops_s	cache_misses_raw	page_faults_raw	l1d_misses_raw	llc_load_misses_raw	llc_store_misses_raw	context_switches_raw	dtlb_misses_raw
+a_default	2	0	77713.6148	NA	NA	NA	NA	NA	NA	NA
+b_seg_ds	2	0	86874.9006	NA	NA	NA	NA	NA	NA	NA
+c_seg_ds_pack_lock	2	0	91077.5545	NA	NA	NA	NA	NA	NA	NA

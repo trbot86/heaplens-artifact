@@ -1,0 +1,8 @@
+{
+  "flags": [
+    "ALIGN_TALL_NODE=4",
+    "SEG_TALL_NODE=4"
+  ],
+  "sha256": "704f6098b803f6a2f74e1f4683d2348c6d18c5387e627581277da1b1b54bf985",
+  "source_revision": "19e4aba3db75bd6add7177164c892ab6cdfd50b3 + rocksdb-historical.patch"
+}

@@ -1,0 +1,53 @@
+{
+  "benchmark": "valkey-memtier-cross-node-cache-ratio-1-4",
+  "config": {
+    "client_cpus": "24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47",
+    "client_numa_node": 1,
+    "data_size": 128,
+    "key_maximum": 4000000,
+    "key_minimum": 1,
+    "key_prefix": "heaplens:",
+    "layout": "cross-node",
+    "malloc_backend": "jemalloc",
+    "memtier_clients": 4,
+    "memtier_pipeline": 16,
+    "memtier_threads": 24,
+    "numa_pin": true,
+    "perf_events": "",
+    "perf_stat": false,
+    "port": 16379,
+    "preload_ratio": "1:0",
+    "ratio": "1:4",
+    "server_cpus": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23",
+    "server_io_threads": 24,
+    "server_numa_node": 0,
+    "test_time_seconds": 30,
+    "valkey_commit": "unknown",
+    "valkey_make_malloc": "MALLOC=jemalloc",
+    "valkey_source": "/root/sifter/benchmark_variants/B1C1_64/valkey"
+  },
+  "memory_after": {
+    "allocator_frag_ratio": "1.10",
+    "mem_fragmentation_ratio": "1.13",
+    "used_memory": "968950416",
+    "used_memory_rss": "1092071424"
+  },
+  "results": {
+    "avg_latency_ms": 1.365,
+    "connection_errors": 0,
+    "count": 33476896,
+    "hits_per_sec": 892685.68,
+    "kb_per_sec": 188216.2,
+    "misses_per_sec": 0.0,
+    "ops_per_sec": 1115858.97,
+    "p50_latency_ms": 1.031,
+    "p999_latency_ms": 3.583,
+    "p99_latency_ms": 3.279
+  },
+  "stats_after": {
+    "rejected_connections": "0",
+    "total_commands_processed": "37476930",
+    "total_net_input_bytes": "2793333541",
+    "total_net_output_bytes": "3695759030"
+  }
+}

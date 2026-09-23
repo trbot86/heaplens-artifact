@@ -1,0 +1,519 @@
+diff --git a/common/Makefile.common b/common/Makefile.common
+index 7306db9..b13fe73 100644
+--- a/common/Makefile.common
++++ b/common/Makefile.common
+@@ -260,6 +260,32 @@ CFLAGS += -I$(LIBAO_INC) -I$(ROOT)/include -I$(LIBSSMEM)/include
+ 
+ LDFLAGS += -lpthread -lrt -lm
+ 
++ifdef USE_MEMHOOK
++    CFLAGS += -I/root/sifter/memhook/ -DMEMHOOK_ASCYLIB
++    LDFLAGS += -L/root/sifter/memhook/ -Wl,-rpath=/root/sifter/memhook/ -lmemhook -ldl
++endif
++
++ifdef SEG_OBJS
++    CFLAGS += -DSEG_OBJS
++endif
++
++ifdef FORCE_MALLOC
++    CFLAGS += -DFORCE_MALLOC
++    LDFLAGS += -L../jemalloc/lib/ -Wl,-rpath=../jemalloc/lib/
++endif
++
++ifeq ($(FORCE_MALLOC),jemalloc)
++    LDFLAGS += -ljemalloc
++endif
++
++ifeq ($(FORCE_MALLOC),mimalloc)
++    LDFLAGS += -lmimalloc
++endif
++
++ifdef DRACHSLER_PAD
++    CFLAGS += -DDRACHSLER_PAD=$(DRACHSLER_PAD)
++endif
++
+ ######################
+ # compilation settings
+ ######################
+@@ -325,6 +351,14 @@ else
+ 	CFLAGS += -DINITIALIZE_FROM_ONE=1
+ endif
+ 
++ifeq ($(BAD_FIELDS),1)
++    CFLAGS += -DBAD_FIELDS
++endif
++
++ifeq ($(BRONSON_NO_PAD),1)
++    CFLAGS += -DBRONSON_NO_PAD
++endif
++
+ ifeq ($(SET_CPU),0)
+ 	CFLAGS += -DNO_SET_CPU
+ endif
+diff --git a/src/bst-drachsler/bst-drachsler.c b/src/bst-drachsler/bst-drachsler.c
+index ca7f8b4..35ed3ac 100644
+--- a/src/bst-drachsler/bst-drachsler.c
++++ b/src/bst-drachsler/bst-drachsler.c
+@@ -25,10 +25,13 @@
+ 
+ RETRY_STATS_VARS;
+ 
++#ifndef FORCE_MALLOC
+ __thread ssmem_allocator_t* alloc;
++#endif
+ 
+ node_t* create_node(skey_t k, sval_t value, int initializing) {
+     volatile node_t* new_node;
++#ifndef FORCE_MALLOC
+ #if GC == 1
+     if (unlikely(initializing)) {
+         new_node = (volatile node_t*) ssalloc_aligned(CACHE_LINE_SIZE, sizeof(node_t));
+@@ -37,6 +40,9 @@ node_t* create_node(skey_t k, sval_t value, int initializing) {
+     }
+ #else 
+     new_node = (volatile node_t*) ssalloc(sizeof(node_t));
++#endif
++#else // FORCE_MALLOC
++    new_node = (volatile node_t*) malloc(sizeof(node_t));
+ #endif
+     if (new_node == NULL) {
+         perror("malloc in bst create node");
+@@ -130,7 +136,6 @@ bool_t bst_insert(skey_t k, sval_t v, node_t* root) {
+ 	    return FALSE;
+ 	  }
+ #endif
+-
+         LOCK(&(p->succ_lock));
+         volatile node_t* s = (node_t*) p->succ;
+         if ((k > p->key) && (k <= s->key) && (p->mark == FALSE)) {
+@@ -338,7 +343,11 @@ void remove_from_tree(node_t* n, bool_t has_two_children,node_t* root) {
+     UNLOCK(&(n->tree_lock));
+ 
+ #if GC == 1
++#ifndef FORCE_MALLOC
+     ssmem_free(alloc, n);
++#else
++    free(n);
++#endif
+ #endif
+ }
+ 
+diff --git a/src/bst-drachsler/bst-drachsler.h b/src/bst-drachsler/bst-drachsler.h
+index ea18202..8a6f328 100644
+--- a/src/bst-drachsler/bst-drachsler.h
++++ b/src/bst-drachsler/bst-drachsler.h
+@@ -50,26 +50,51 @@
+ 
+ typedef uint8_t bool_t;
+ 
++#ifndef FORCE_MALLOC
+ extern __thread ssmem_allocator_t* alloc;
++#endif
+ 
+ typedef ALIGNED(64) struct node_t node_t;
+ 
+ struct node_t {
++#ifndef BAD_FIELDS
+     volatile node_t* left;
+     volatile node_t* right;
+-    volatile node_t* parent;
+     volatile node_t* succ;
+     volatile node_t* pred;
++    skey_t key;
++    sval_t value;
++    volatile node_t* parent;
++#endif
+ #ifdef DO_DRACHSLER_REBALANCE
+     int32_t left_height;
+     int32_t right_height;
+ #endif
+     ptlock_t tree_lock;
+     ptlock_t succ_lock;
++    bool_t mark;
++#ifdef BAD_FIELDS
+     skey_t key;
+     sval_t value;
+-    bool_t mark;
++#endif
++#ifndef DRACHSLER_PAD
+     char padding[96-5*sizeof(uintptr_t)-2*sizeof(ptlock_t)-sizeof(sval_t)-sizeof(skey_t)-sizeof(bool_t)];
++#endif
++#ifdef DRACHSLER_PAD
++#if DRACHSLER_PAD==128
++    char padding[128-5*sizeof(uintptr_t)-2*sizeof(ptlock_t)-sizeof(sval_t)-sizeof(skey_t)-sizeof(bool_t)];
++#endif
++#if DRACHSLER_PAD==192
++    char padding[192-5*sizeof(uintptr_t)-2*sizeof(ptlock_t)-sizeof(sval_t)-sizeof(skey_t)-sizeof(bool_t)];
++#endif
++#endif
++#ifdef BAD_FIELDS
++    volatile node_t* left;
++    volatile node_t* right;
++    volatile node_t* parent;
++    volatile node_t* succ;
++    volatile node_t* pred;
++#endif
+ };
+ 
+ node_t* initialize_tree();
+diff --git a/src/bst-drachsler/test_simple.c b/src/bst-drachsler/test_simple.c
+index f898f06..5402884 100644
+--- a/src/bst-drachsler/test_simple.c
++++ b/src/bst-drachsler/test_simple.c
+@@ -159,10 +159,12 @@ test(void* thread)
+     
+   seeds = seed_rand();
+ #if GC == 1
++#ifndef FORCE_MALLOC
+   alloc = (ssmem_allocator_t*) malloc(sizeof(ssmem_allocator_t));
+   assert(alloc != NULL);
+   ssmem_alloc_init_fs_size(alloc, SSMEM_DEFAULT_MEM_SIZE, SSMEM_GC_FREE_SET_SIZE, ID);
+ #endif
++#endif
+     
+ 
+   RR_INIT(phys_id);
+@@ -250,8 +252,10 @@ test(void* thread)
+ 
+   SSPFDTERM();
+ #if GC == 1
++#ifndef FORCE_MALLOC
+   ssmem_term();
+   free(alloc);
++#endif
+ #endif
+   THREAD_END();
+   pthread_exit(NULL);
+diff --git a/src/bst-ellen/bst_ellen.c b/src/bst-ellen/bst_ellen.c
+index d473f23..08d1a61 100644
+--- a/src/bst-ellen/bst_ellen.c
++++ b/src/bst-ellen/bst_ellen.c
+@@ -27,10 +27,16 @@
+ RETRY_STATS_VARS;
+ 
+ __thread search_result_t * last_result;
++#ifndef FORCE_MALLOC
+ __thread ssmem_allocator_t* alloc;
++#ifdef SEG_OBJS
++__thread ssmem_allocator_t* info_t_alloc;
++#endif
++#endif
+ 
+ node_t* create_node(skey_t key, sval_t value, bool_t is_leaf, int initializing) {
+     volatile node_t * new_node;
++#ifndef FORCE_MALLOC
+ #if GC == 1
+     if (unlikely(initializing)) {
+         new_node = (volatile node_t*) ssalloc(sizeof(node_t));
+@@ -39,6 +45,9 @@ node_t* create_node(skey_t key, sval_t value, bool_t is_leaf, int initializing)
+     }
+ #else
+     new_node = (volatile node_t*) ssalloc(sizeof(node_t));
++#endif
++#else
++    new_node = (volatile node_t*) malloc(sizeof(node_t));
+ #endif
+     if (new_node==NULL) {
+         perror("malloc in bst create node");
+@@ -113,10 +122,18 @@ node_t* bst_find(skey_t key, node_t* root) {
+ 
+ info_t* create_iinfo_t(node_t* p, node_t* ni, node_t* l){
+     volatile info_t * new_info;
++#ifndef FORCE_MALLOC
+ #if GC == 1
++    #ifdef SEG_OBJS
++    new_info = (volatile info_t*) ssmem_alloc(info_t_alloc,sizeof(info_t));
++    #else
+     new_info = (volatile info_t*) ssmem_alloc(alloc,sizeof(info_t));
++    #endif
+ #else
+     new_info = (volatile info_t*) ssalloc(sizeof(info_t));
++#endif
++#else
++    new_info = (volatile info_t*) malloc(sizeof(info_t));
+ #endif
+     if (new_info==NULL) {
+         perror("malloc in bst create node");
+@@ -132,10 +149,18 @@ info_t* create_iinfo_t(node_t* p, node_t* ni, node_t* l){
+ 
+ info_t* create_dinfo_t(node_t* gp, node_t* p, node_t* l, update_t u){
+     volatile info_t * new_info;
++#ifndef FORCE_MALLOC
+ #if GC == 1
++    #ifdef SEG_OBJS
++    new_info = (volatile info_t*) ssmem_alloc(info_t_alloc,sizeof(info_t));
++    #else
+     new_info = (volatile info_t*) ssmem_alloc(alloc,sizeof(info_t));
++    #endif
+ #else
+     new_info = (volatile info_t*) ssalloc(sizeof(info_t));
++#endif
++#else
++    new_info = (volatile info_t*) malloc(sizeof(info_t));
+ #endif
+     if (new_info==NULL) {
+         perror("malloc in bst create node");
+@@ -166,9 +191,14 @@ bool_t bst_insert(skey_t key, sval_t value,  node_t* root) {
+       UPDATE_TRY();
+         search_result = bst_search(key,root);
+         if (search_result->l->key == key) {
++
+ #if GC == 1
+             if (new_node!=NULL) {
++                #ifndef FORCE_MALLOC
+                 ssmem_free(alloc,new_node);
++                #else
++                free(new_node);
++                #endif
+             }
+ #endif
+             return FALSE;
+@@ -195,16 +225,34 @@ bool_t bst_insert(skey_t key, sval_t value,  node_t* root) {
+                 bst_help_insert(op);
+ #if GC == 1
+                 if (UNFLAG(result)!=0) {
++                    #ifndef FORCE_MALLOC
++                    #ifdef SEG_OBJS
++                    ssmem_free(info_t_alloc, (void*) UNFLAG(search_result->pupdate));
++                    #else
+                     ssmem_free(alloc, (void*) UNFLAG(search_result->pupdate));
++                    #endif
++                    #else
++                    free((void*) UNFLAG(search_result->pupdate));
++                    #endif
+                 }
+ #endif
+                 return TRUE;
+             } else {
+                 bst_help(result);
+ #if GC == 1
++                #ifndef FORCE_MALLOC
+                 ssmem_free(alloc,new_sibling);
+                 ssmem_free(alloc,new_internal);
++                #ifdef SEG_OBJS
++                ssmem_free(info_t_alloc,op);
++                #else
+                 ssmem_free(alloc,op);
++                #endif
++                #else
++                free(new_sibling);
++                free(new_internal);
++                free(op);
++                #endif
+ #endif
+             }
+         }
+@@ -219,8 +267,12 @@ void bst_help_insert(info_t * op) {
+     void* UNUSED dummy = CAS_PTR(&(op->iinfo.p->update),FLAG(op,STATE_IFLAG),FLAG(op,STATE_CLEAN));
+ #if GC == 1
+    if (i){
+-     info_t* uop= (info_t*) UNFLAG(op);
+-        ssmem_free(alloc,uop->iinfo.l);
++    info_t* uop= (info_t*) UNFLAG(op);
++    #ifndef FORCE_MALLOC
++    ssmem_free(alloc,uop->iinfo.l);
++    #else
++    free(uop->iinfo.l);
++    #endif
+     }
+ #endif
+ }
+@@ -249,14 +301,30 @@ sval_t bst_delete(skey_t key, node_t* root) {
+             if (result == search_result->gpupdate) {
+                 if (bst_help_delete(op)==TRUE) {
+ #if GC == 1
+-		  ssmem_free(alloc,(void*) UNFLAG(search_result->gpupdate));
++        #ifndef FORCE_MALLOC
++        #ifdef SEG_OBJS
++		  ssmem_free(info_t_alloc,(void*) UNFLAG(search_result->gpupdate));
++        #else
++          ssmem_free(alloc,(void*) UNFLAG(search_result->gpupdate));
++        #endif
++        #else
++          free((void*) UNFLAG(search_result->gpupdate));
++        #endif
+ #endif
+                     return found_value;
+                 }
+             } else {
+                 bst_help(result);
+ #if GC == 1
++                #ifndef FORCE_MALLOC
++                #ifdef SEG_OBJS
++                ssmem_free(info_t_alloc,op);
++                #else
+                 ssmem_free(alloc,op);
++                #endif
++                #else
++                free(op);
++                #endif
+ #endif
+             }
+         }
+@@ -270,9 +338,17 @@ bool_t bst_help_delete(info_t* op) {
+     result = CAS_PTR(&(op->dinfo.p->update), op->dinfo.pupdate, FLAG(op,STATE_MARK));
+     if ((result == op->dinfo.pupdate) || (result == ((info_t*)FLAG(op,STATE_MARK)))) {
+ #if GC == 1
+-      if ((result == op->dinfo.pupdate) && ((void*) UNFLAG(result)!=NULL)) {
+-	  ssmem_free(alloc,(void*) UNFLAG(result));
+-        }
++    if ((result == op->dinfo.pupdate) && ((void*) UNFLAG(result)!=NULL)) {
++        #ifndef FORCE_MALLOC
++        #ifdef SEG_OBJS
++        ssmem_free(info_t_alloc,(void*) UNFLAG(result));
++        #else
++        ssmem_free(alloc,(void*) UNFLAG(result));
++        #endif
++        #else
++        free((void*) UNFLAG(result));
++        #endif
++    }
+ #endif
+         bst_help_marked(op);
+         return TRUE;
+@@ -298,9 +374,14 @@ void bst_help_marked(info_t* op) {
+ 
+ #if GC == 1
+     if (i){
+-      info_t* opu= (info_t*) UNFLAG(op);
++        info_t* opu= (info_t*) UNFLAG(op);
++        #ifndef FORCE_MALLOC
+         ssmem_free(alloc,opu->dinfo.l);
+         ssmem_free(alloc,opu->dinfo.p);
++        #else
++        free(opu->dinfo.l);
++        free(opu->dinfo.p);
++        #endif
+     }
+ #endif
+ }
+diff --git a/src/bst-ellen/bst_ellen.h b/src/bst-ellen/bst_ellen.h
+index c4b1530..fe08dfc 100644
+--- a/src/bst-ellen/bst_ellen.h
++++ b/src/bst-ellen/bst_ellen.h
+@@ -59,7 +59,12 @@ typedef uint8_t bool_t;
+ #define INF1 (KEY_MAX)
+ #define MAX_KEY KEY_MAX //MAX_KEY should be of the form 2^n-1 for increased random key generation performance
+ 
++#ifndef FORCE_MALLOC
+ extern __thread ssmem_allocator_t* alloc;
++#ifdef SEG_OBJS
++extern __thread ssmem_allocator_t* info_t_alloc;
++#endif
++#endif
+ 
+ typedef ALIGNED(64) struct node_t node_t;
+ typedef union info_t info_t;
+@@ -107,7 +112,7 @@ typedef ALIGNED(64) struct search_result_t {
+ #endif
+ } search_result_t;
+ 
+-extern __thread search_result_t * last_result;
++extern __thread search_result_t* last_result;
+ 
+ int bst_cas_child(node_t* parent, node_t* old, node_t* new);
+ 
+diff --git a/src/bst-ellen/test_simple.c b/src/bst-ellen/test_simple.c
+index b22557b..d724bab 100644
+--- a/src/bst-ellen/test_simple.c
++++ b/src/bst-ellen/test_simple.c
+@@ -59,7 +59,7 @@
+ #define DS_REMOVE(k,r,t)    bst_delete(r,k)
+ #define DS_SIZE(s)          bst_size(s)
+ #define DS_NEW()            bst_initialize()
+-#define DS_LOCAL()          bst_init_local()
++#define DS_LOCAL(f)         bst_init_local(f)
+ 
+ #define DS_TYPE             node_t
+ #define DS_NODE             node_t
+@@ -131,7 +131,9 @@ test(void* thread)
+   thread_data_t* td = (thread_data_t*) thread;
+   uint32_t ID = td->id;
+   set_cpu(ID);
++  #ifndef FORCE_MALLOC
+   ssalloc_init();
++  #endif
+   DS_LOCAL();
+ 
+   DS_TYPE* set = td->set;
+@@ -161,11 +163,22 @@ test(void* thread)
+ #endif
+     
+   seeds = seed_rand();
++#ifndef FORCE_MALLOC
+ #if GC == 1
+   alloc = (ssmem_allocator_t*) malloc(sizeof(ssmem_allocator_t));
++  #ifdef SEG_OBJS
++  info_t_alloc = (ssmem_allocator_t*) malloc(sizeof(ssmem_allocator_t));
++  #endif
+   assert(alloc != NULL);
++  #ifdef SEG_OBJS
++  assert(info_t_alloc != NULL);
++  #endif
+   ssmem_alloc_init_fs_size(alloc, SSMEM_DEFAULT_MEM_SIZE, SSMEM_GC_FREE_SET_SIZE, ID);
+-#endif
++  #ifdef SEG_OBJS
++  ssmem_alloc_init_fs_size(info_t_alloc, SSMEM_DEFAULT_MEM_SIZE, SSMEM_GC_FREE_SET_SIZE, ID);
++  #endif
++#endif // GC == 1
++#endif // FORCE_MALLOC
+     
+ 
+   RR_INIT(phys_id);
+@@ -252,9 +265,14 @@ test(void* thread)
+   EXEC_IN_DEC_ID_ORDER_END(&barrier);
+ 
+   SSPFDTERM();
++#ifndef FORCE_MALLOC
+ #if GC == 1
+   ssmem_term();
+   free(alloc);
++  #ifdef SEG_OBJS
++  free(info_t_alloc);
++  #endif
++#endif
+ #endif
+   THREAD_END();
+   pthread_exit(NULL);
+@@ -264,7 +282,9 @@ int
+ main(int argc, char **argv) 
+ {
+   set_cpu(0);
++  #ifndef FORCE_MALLOC
+   ssalloc_init();
++  #endif
+   seeds = seed_rand();
+ 
+   struct option long_options[] = {
+@@ -503,7 +523,7 @@ main(int argc, char **argv)
+   volatile uint64_t removing_count_total = 0;
+   volatile uint64_t removing_count_total_succ = 0;
+     
+-  for(t=0; t < num_threads; t++) 
++  for(t=0; t < num_threads; t++)
+     {
+       PRINT_OPS_PER_THREAD();
+       putting_suc_total += putting_succ[t];
+diff --git a/src/bst-howley/test_simple.c b/src/bst-howley/test_simple.c
+index 12e08f3..db0fd4a 100644
+--- a/src/bst-howley/test_simple.c
++++ b/src/bst-howley/test_simple.c
+@@ -359,12 +359,12 @@ main(int argc, char **argv)
+     }
+ 
+ 
+-  if (!is_power_of_two(initial))
+-    {
+-      size_t initial_pow2 = pow2roundup(initial);
+-      printf("** rounding up initial (to make it power of 2): old: %zu / new: %zu\n", initial, initial_pow2);
+-      initial = initial_pow2;
+-    }
++  // if (!is_power_of_two(initial))
++  //   {
++  //     size_t initial_pow2 = pow2roundup(initial);
++  //     printf("** rounding up initial (to make it power of 2): old: %zu / new: %zu\n", initial, initial_pow2);
++  //     initial = initial_pow2;
++  //   }
+ 
+   if (range < initial)
+     {

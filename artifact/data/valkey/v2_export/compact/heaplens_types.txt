@@ -1,0 +1,49 @@
+# heaplens type lookup v2
+# alias, type
+A, KeyPrefetchInfo
+B, NULL
+C, PrefetchCommandsBatch
+D, _Atomic(void *)
+E, aclSelector
+F, aeApiState
+G, aeEventLoop
+H, aeFileEvent
+I, aeFiredEvent
+J, aeTimeEvent
+K, aofManifest
+L, blockingState
+M, char
+N, char *
+O, client
+P, client *
+Q, connection
+R, double
+S, fifo
+T, functionsLibCtx
+U, hashtable *
+V, int
+W, intset
+X, jeBinInfo
+Y, jemallocBinUsageData
+Z, kvstore
+AA, listNode
+AB, mutexQueue
+AC, rax
+AD, raxNode
+AE, replBacklog
+AF, robj
+AG, sds
+AH, serverDb
+AI, serverDb *
+AJ, spmcCell
+AK, standardConfig
+AL, struct (unnamed struct at ./server.h:1585:5)
+AM, struct ACLCategoryItem
+AN, struct epoll_event
+AO, struct evictionPoolEntry
+AP, struct list
+AQ, struct saveparam
+AR, struct serverMemOverhead
+AS, user
+AT, void
+AU, void *

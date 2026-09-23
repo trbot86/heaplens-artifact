@@ -1,0 +1,10 @@
+**
+!artifact/
+!artifact/Dockerfile
+!artifact/Dockerfile.dockerignore
+!sifter_vis_d3/
+!sifter_vis_d3/server/
+!sifter_vis_d3/server/requirements.txt
+!sifter_vis_d3/sifter/
+!sifter_vis_d3/sifter/package.json
+!sifter_vis_d3/sifter/package-lock.json

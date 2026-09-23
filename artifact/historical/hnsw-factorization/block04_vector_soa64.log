@@ -1,0 +1,3 @@
+building vector_soa64 [HNSWLIB_LAYOUT_VECTOR_SOA64=1]
+running vector_soa64 dim=768 threads=24 repetition=1/1
+wrote /home/t35brown/vscode_projects/atc26_rebuttal_cleanrooms_20260831/hnswlib_hugepage_prefault_validation/workspace/corrected_factorization_runs/20260902T062628Z/block04_vector_soa64.csv

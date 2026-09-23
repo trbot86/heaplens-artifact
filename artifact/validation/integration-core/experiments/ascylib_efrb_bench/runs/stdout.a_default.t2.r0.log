@@ -1,0 +1,11 @@
+## Initial: 4096 / Range: 8192 /
+Sizeof initial: 256.00 KB = 0.25 MB
+[ALLOC] initializing allocator with fs size: 507 objects
+#BEFORE size is: 4096
+#AFTER  size is: 4096
+    : total      | success    | succ %      | total %     | effective %
+srch: 19379789   | 9691880    |       50.0% |      100.0% | 
+insr: 0          | 0          |       -nan% |        0.0% |       -nan%
+rems: 0          | 0          |       -nan% |        0.0% |       -nan%
+#txs 2	(19379789  
+#Mops 19.380

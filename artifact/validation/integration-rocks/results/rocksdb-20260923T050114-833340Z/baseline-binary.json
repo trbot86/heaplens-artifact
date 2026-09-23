@@ -1,0 +1,5 @@
+{
+  "flags": [],
+  "sha256": "b52b9a89f88b564872f42fd879750c6fa65bfd76880a1c111c481afc5dfade56",
+  "source_revision": "19e4aba3db75bd6add7177164c892ab6cdfd50b3 + rocksdb-historical.patch"
+}

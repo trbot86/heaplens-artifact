@@ -1,0 +1,93 @@
+{
+  "config": {
+    "allocator": "bundled jemalloc",
+    "clients_per_thread": 4,
+    "data_size": 128,
+    "keys": 10000,
+    "order": "alternating AB/BA; fresh server and preload each trial",
+    "pipeline": 16,
+    "placement": {
+      "pinning": false
+    },
+    "profile": "smoke",
+    "repetitions": 1,
+    "seconds": 3,
+    "set_get_ratio": "1:4",
+    "threads": 2
+  },
+  "results": {
+    "Accumulated Latency": 372574,
+    "Average Latency": 0.073,
+    "Connection Errors": 0,
+    "Connection Errors/sec": 0.0,
+    "Count": 5134352,
+    "Hits/sec": 1369076.61,
+    "KB/sec": 283925.56,
+    "KB/sec RX": 183501.73,
+    "KB/sec RX/TX": 283925.56,
+    "KB/sec TX": 100423.83,
+    "Latency": 0.073,
+    "Max Latency": 1.319,
+    "Min Latency": 0.016,
+    "Misses/sec": 0.0,
+    "Ops/sec": 1711346.84,
+    "Percentile Latencies": {
+      "Histogram log format": {
+        "Compressed Histogram": "HISTFAAAALl4nJNpmSzMwMAwiwECmKA0F4hQPuzGYP8BIsDcwNsQuuCIxIE3PAs+qh54P52x4d4MxgMbig48tGy4IXpgG/eBfewL1rA+2Mny4Azzg4dMC9YxHWhjOvCSccExxoZ9jA1zGRdMZmwoash4EPnA7YHDA5MHKg8kD8g8EFkg8IDrAPcCvgOcDVwHWBpYDjA3MB9gPMD4gLGBMWEBkOGgoADCDkARB0YQE0goyCtwKtQqOLA6KAAAlp1BQw=="
+      },
+      "p50.00": 0.071,
+      "p99.00": 0.199,
+      "p99.90": 0.295
+    },
+    "Time-Serie": {
+      "0": {
+        "Accumulated Latency": 124073,
+        "Average Latency": 0.072,
+        "Bytes RX": 189727137,
+        "Bytes TX": 103831016,
+        "Count": 1727936,
+        "Max Latency": 1.312,
+        "Min Latency": 0.021,
+        "p50.00": 0.071,
+        "p99.00": 0.191,
+        "p99.90": 0.271
+      },
+      "1": {
+        "Accumulated Latency": 124214,
+        "Average Latency": 0.072,
+        "Bytes RX": 188126797,
+        "Bytes TX": 102955527,
+        "Count": 1713360,
+        "Max Latency": 0.439,
+        "Min Latency": 0.02,
+        "p50.00": 0.071,
+        "p99.00": 0.191,
+        "p99.90": 0.287
+      },
+      "2": {
+        "Accumulated Latency": 124256,
+        "Average Latency": 0.073,
+        "Bytes RX": 185883442,
+        "Bytes TX": 101726574,
+        "Count": 1692928,
+        "Max Latency": 0.515,
+        "Min Latency": 0.021,
+        "p50.00": 0.071,
+        "p99.00": 0.207,
+        "p99.90": 0.319
+      },
+      "3": {
+        "Accumulated Latency": 29,
+        "Average Latency": 0.231,
+        "Bytes RX": 14133,
+        "Bytes TX": 7608,
+        "Count": 128,
+        "Max Latency": 0.357,
+        "Min Latency": 0.056,
+        "p50.00": 0.079,
+        "p99.00": 0.079,
+        "p99.90": 0.079
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+$ /root/sifter/type_analysis/bin/convert_to_db --memory-dump /root/sifter/valkey_bench_heaplens_pyke/heaplens_runs/jemalloc_docker_20260608/binary_dump.txt --type-dump /root/sifter/valkey_bench_heaplens_pyke/heaplens_runs/jemalloc_docker_20260608/typeset_dump.txt --file-dump /root/sifter/valkey_bench_heaplens_pyke/heaplens_runs/jemalloc_docker_20260608/fileset_dump.txt --output-db /root/sifter/valkey_bench_heaplens_pyke/heaplens_runs/jemalloc_docker_20260608/allocs.sqlite --sample 0.1 --num-pages-per-type 2 --threads 1 --field-dump /root/sifter/valkey_bench_heaplens_pyke/heaplens_runs/jemalloc_docker_20260608/fielddump.txt
+Number of structs in file: 1016169
+Successfully mapped input file
+About to do first sort
+done first sort
+done processing events
+Outer loop: 1016169
+Inserts: 1014708
+Lower bound calls: 1014707
+Rise loop 1: 0
+Rise loop 2: 0
+Backwards loop: 569
+Add free overlap: 523
+Add free free: 0
+done second sort
+
+exit_code=0

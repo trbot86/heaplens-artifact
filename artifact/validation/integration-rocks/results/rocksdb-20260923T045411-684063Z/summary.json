@@ -1,0 +1,19 @@
+{
+  "memtable": "skip_list",
+  "profile": "smoke",
+  "statistic": "ratio of arithmetic means; not mean of paired ratios",
+  "variants": {
+    "baseline": {
+      "change_percent_vs_baseline": 0.0,
+      "mean": 804589.0,
+      "runs": 1,
+      "stdev": null
+    },
+    "optimized": {
+      "change_percent_vs_baseline": 7.649371293915275,
+      "mean": 866135.0,
+      "runs": 1,
+      "stdev": null
+    }
+  }
+}

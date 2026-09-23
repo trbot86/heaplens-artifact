@@ -68,7 +68,7 @@ run_tpcc_experiment() {
     local RUN_SECONDS="${RUN_SECONDS:-10}"
 
     local SAMPLE_PROPORTION="${SAMPLE_PROPORTION:-0.2}"
-    local PAGES_PER_TYPE="${PAGES_PER_TYPE:-4}"
+    local PAGES_PER_TYPE="${PAGES_PER_TYPE:-1}"
 
     echo "=== [$out_name] 1/7: fresh working copy of setbench (with submodules) ==="
     rm -rf "$WORK"

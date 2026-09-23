@@ -1,0 +1,66 @@
+aclocal.m4
+autom4te.cache
+config.guess
+config.h.in
+config.h.in~
+config.h
+config.sub
+configure
+configure~
+compile
+depcomp
+install-sh
+ltmain.sh
+m4
+Makefile.in
+missing
+*.o
+/memtier_benchmark
+.deps
+Makefile
+config.log
+config.status
+libtool
+stamp-h1
+version.h
+*.DS_Store
+.vscode/*
+.idea/*
+
+# tls helper related files
+tests/tls/*
+
+# memtier outputs
+*.hgrm
+*.txt
+!/tests/test_requirements.txt
+__pycache__
+*.csv
+*.json
+
+# Vendored Redis commands.json snapshot (refreshed via `make commands-meta`)
+!deps/commands_json/*.json
+!deps/commands_json/REDIS_TAG.txt
+
+# Code coverage with lcov/gcov
+*.gcno
+*.gcov
+*.gcda
+*.info
+
+# redis related
+*.rdb
+*.aof
+appendonlydir/
+*.conf
+
+tests/.env/
+
+# libFuzzer fuzz harness build artifacts and crash dumps
+/split_command_to_args_fuzz
+/monitor_input_fuzz
+/redis_protocol_fuzz
+crash-*
+leak-*
+timeout-*
+oom-*

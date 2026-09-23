@@ -1,0 +1,233 @@
+COMMAND: ['autoreconf', '-ivf']
+autoreconf: export WARNINGS=
+autoreconf: Entering directory '.'
+autoreconf: configure.ac: not using Gettext
+autoreconf: running: aclocal --force 
+autoreconf: configure.ac: tracing
+autoreconf: running: libtoolize --copy --force
+libtoolize: putting auxiliary files in '.'.
+libtoolize: copying file './ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+libtoolize: Consider adding '-I m4' to ACLOCAL_AMFLAGS in Makefile.am.
+autoreconf: configure.ac: not using Intltool
+autoreconf: configure.ac: not using Gtkdoc
+autoreconf: running: aclocal --force 
+autoreconf: running: /usr/bin/autoconf --force
+configure.ac:21: warning: The macro `AC_CONFIG_HEADER' is obsolete.
+configure.ac:21: You should run autoupdate.
+./lib/autoconf/status.m4:719: AC_CONFIG_HEADER is expanded from...
+configure.ac:21: the top level
+configure.ac:45: warning: The macro `AC_HEADER_STDC' is obsolete.
+configure.ac:45: You should run autoupdate.
+./lib/autoconf/headers.m4:704: AC_HEADER_STDC is expanded from...
+configure.ac:45: the top level
+autoreconf: running: /usr/bin/autoheader --force
+autoreconf: running: automake --add-missing --copy --force-missing
+configure.ac:25: installing './compile'
+configure.ac:25: installing './config.guess'
+configure.ac:25: installing './config.sub'
+configure.ac:22: installing './install-sh'
+configure.ac:22: installing './missing'
+Makefile.am: installing './depcomp'
+autoreconf: Leaving directory '.'
+COMMAND: ['./configure', '--disable-tls']
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a race-free mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports nested variables... (cached) yes
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking how to print strings... printf
+checking whether make supports the include directive... yes (GNU style)
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to enable C11 features... none needed
+checking whether gcc understands -c and -o together... yes
+checking dependency style of gcc... gcc3
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by gcc... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+checking the name lister (/usr/bin/nm -B) interface... BSD nm
+checking whether ln -s works... yes
+checking the maximum length of command line arguments... 1572864
+checking how to convert x86_64-pc-linux-gnu file names to x86_64-pc-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for /usr/bin/ld option to reload object files... -r
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for ar... ar
+checking for archiver @FILE support... @
+checking for strip... strip
+checking for ranlib... ranlib
+checking command to parse /usr/bin/nm -B output from gcc object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... no
+checking if : is a manifest tool... no
+checking for stdio.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for strings.h... yes
+checking for sys/stat.h... yes
+checking for sys/types.h... yes
+checking for unistd.h... yes
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if gcc supports -fno-rtti -fno-exceptions... no
+checking for gcc option to produce PIC... -fPIC -DPIC
+checking if gcc PIC flag -fPIC -DPIC works... yes
+checking if gcc static flag -static works... yes
+checking if gcc supports -c -o file.o... yes
+checking if gcc supports -c -o file.o... (cached) yes
+checking whether the gcc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking for a Python interpreter with version >= 3.6... python
+checking for python... /opt/heaplens-python/bin/python
+checking for python version... 3.10
+checking for python platform... linux
+checking for GNU default python prefix... ${prefix}
+checking for GNU default python exec_prefix... ${exec_prefix}
+checking for python script directory (pythondir)... ${PYTHON_PREFIX}/lib/python3.10/site-packages
+checking for python extension module directory (pyexecdir)... ${PYTHON_EXEC_PREFIX}/lib/python3.10/site-packages
+checking for g++... g++
+checking whether the compiler supports GNU C++... yes
+checking whether g++ accepts -g... yes
+checking for g++ option to enable C++11 features... none needed
+checking dependency style of g++... gcc3
+checking how to run the C++ preprocessor... g++ -E
+checking for ld used by g++... /usr/bin/ld -m elf_x86_64
+checking if the linker (/usr/bin/ld -m elf_x86_64) is GNU ld... yes
+checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking for g++ option to produce PIC... -fPIC -DPIC
+checking if g++ PIC flag -fPIC -DPIC works... yes
+checking if g++ static flag -static works... yes
+checking if g++ supports -c -o file.o... yes
+checking if g++ supports -c -o file.o... (cached) yes
+checking whether the g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... (cached) GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether to build with code coverage support... no
+checking for egrep... (cached) /usr/bin/grep -E
+checking for dirent.h that defines DIR... yes
+checking for library containing opendir... none required
+checking for stdlib.h... (cached) yes
+checking for string.h... (cached) yes
+checking for sys/time.h... yes
+checking for getopt.h... yes
+checking for limits.h... yes
+checking for malloc.h... yes
+checking for stdlib.h... (cached) yes
+checking for unistd.h... (cached) yes
+checking for utime.h... yes
+checking for assert.h... yes
+checking for sys/socket.h... yes
+checking for sys/types.h... (cached) yes
+checking for fcntl.h... yes
+checking for netinet/tcp.h... yes
+checking for execinfo.h... yes
+checking for pthread.h... yes
+checking for zlib.h... yes
+checking for event2/event.h... yes
+checking whether stat file-mode macros are broken... no
+checking for size_t... yes
+checking for GNU libc compatible malloc... yes
+checking for working memcmp... yes
+checking for gettimeofday... yes
+checking for memchr... yes
+checking for memset... yes
+checking for socket... yes
+checking for strerror... yes
+checking for random_r... yes
+checking for drand48... yes
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for library containing clock_gettime... none required
+checking for deflateInit_ in -lz... yes
+checking for pthread_create in -lpthread... yes
+checking for gai_strerror in -lsocket... no
+checking for libevent >= 2.0.10... yes
+checking for libevent_pthreads >= 2.0.10... yes
+checking for bash-completion >= 2.0... no
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+COMMAND: ['make', '-j4']
+/bin/bash ./version.sh
+(CDPATH="${ZSH_VERSION+.}:" && cd . && /bin/bash '/root/sifter/artifact/results/submission-valkey-smoke-1/memtier/missing' autoheader)
+rm -f stamp-h1
+touch config.h.in
+cd . && /bin/bash ./config.status config.h
+config.status: creating config.h
+config.status: config.h is unchanged
+make  all-am
+make[1]: Entering directory '/root/sifter/artifact/results/submission-valkey-smoke-1/memtier'
+  CXX      memtier_benchmark-memtier_benchmark.o
+  CXX      memtier_benchmark-client.o
+  CXX      memtier_benchmark-cluster_client.o
+  CXX      memtier_benchmark-shard_connection.o
+memtier_benchmark.cpp:96:20: warning: ‘std::string basename_only(const char*)’ defined but not used [-Wunused-function]
+   96 | static std::string basename_only(const char *p)
+      |                    ^~~~~~~~~~~~~
+  CXX      memtier_benchmark-run_stats_types.o
+  CXX      memtier_benchmark-run_stats.o
+  CXX      memtier_benchmark-JSON_handler.o
+  CXX      memtier_benchmark-protocol.o
+  CXX      memtier_benchmark-obj_gen.o
+  CXX      memtier_benchmark-item.o
+  CXX      memtier_benchmark-file_io.o
+  CXX      memtier_benchmark-config_types.o
+  CXX      memtier_benchmark-command_meta.o
+  CXX      memtier_benchmark-statsd.o
+  CXX      memtier_benchmark-retry_policy.o
+statsd.cpp: In member function ‘bool statsd_client::init(const char*, short unsigned int, const char*, const char*)’:
+statsd.cpp:107:50: warning: ‘%s’ directive output may be truncated writing up to 127 bytes into a region of size between 0 and 255 [-Wformat-truncation=]
+  107 |         snprintf(m_prefix, sizeof(m_prefix), "%s.%s.", sanitized_prefix, m_run_label);
+      |                                                  ^~
+In file included from /usr/include/stdio.h:894,
+                 from statsd.cpp:23:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:71:35: note: ‘__builtin___snprintf_chk’ output between 3 and 385 bytes into a destination of size 256
+   71 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   72 |                                    __glibc_objsize (__s), __fmt,
+      |                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   73 |                                    __va_arg_pack ());
+      |                                    ~~~~~~~~~~~~~~~~~
+  CC       deps/hdr_histogram/memtier_benchmark-hdr_histogram_log.o
+  CC       deps/hdr_histogram/memtier_benchmark-hdr_histogram.o
+  CC       deps/hdr_histogram/memtier_benchmark-hdr_time.o
+  CC       deps/hdr_histogram/memtier_benchmark-hdr_encoding.o
+  CXXLD    memtier_benchmark
+make[1]: Leaving directory '/root/sifter/artifact/results/submission-valkey-smoke-1/memtier'

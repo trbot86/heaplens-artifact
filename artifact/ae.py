@@ -1,0 +1,383 @@
+#!/usr/bin/env python3
+"""ATC artifact entry point. Only explicit paper profiles run large experiments."""
+from __future__ import annotations
+import argparse
+import csv
+import datetime as dt
+import hashlib
+import json
+import os
+from pathlib import Path
+import platform
+import re
+import shutil
+import socket
+import statistics
+import subprocess
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+ART = ROOT / "artifact"
+VENDOR = ART / "vendor"
+IGNORE = shutil.ignore_patterns(".git", "__pycache__", "*.pyc", "*.o", "*.so", "build", ".cache")
+LEGACY = ["ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_efrb", "rocksdb_hsl",
+          "ascylib_efrb_bench", "ascylib_dvy_bench", "ascylib_hj_bench", "tpcc_bcco_bench", "tpcc_efrb_bench"]
+
+def save(path, value):
+    Path(path).write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
+
+def run(cmd, *, cwd=ROOT, log=None, env=None, timeout=None):
+    cmd = [str(x) for x in cmd]
+    print("+", " ".join(cmd), flush=True)
+    if log:
+        with Path(log).open("a") as f:
+            f.write("COMMAND: " + repr(cmd) + "\n"); f.flush()
+            proc = subprocess.run(cmd, cwd=cwd, env=env, stdout=f, stderr=subprocess.STDOUT, timeout=timeout)
+        if proc.returncode:
+            raise RuntimeError(f"Exit {proc.returncode}; see {log}")
+    else:
+        subprocess.run(cmd, cwd=cwd, env=env, check=True, timeout=timeout)
+
+def new_output(args):
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S-%fZ")
+    path = Path(args.out).resolve() if args.out else ART / "results" / f"{args.command}-{stamp}"
+    path.mkdir(parents=True, exist_ok=False)
+    save(path / "environment.json", {"created_utc": stamp, "platform": platform.platform(),
+         "python": sys.version, "arguments": vars(args), "affinity": sorted(os.sched_getaffinity(0)),
+         "note": "Smoke runs are functionality checks, not performance evidence."})
+    for name, cmd in (("cpu.txt", ["lscpu"]), ("numa.txt", ["numactl", "--hardware"]),
+                      ("compiler.txt", ["gcc", "--version"])):
+        run(cmd, log=path / name)
+    return path
+
+def compare(values):
+    baseline = statistics.mean(values["baseline"])
+    return {"variants": {name: {"runs": len(xs), "mean": statistics.mean(xs),
+             "stdev": statistics.stdev(xs) if len(xs) > 1 else None,
+             "change_percent_vs_baseline": 100 * (statistics.mean(xs) / baseline - 1)}
+             for name, xs in values.items()}, "statistic": "ratio of arithmetic means; not mean of paired ratios"}
+
+def history():
+    values = {}
+    for variant, tag in (("baseline", "A0"), ("B1C1_64", "B1C1_64")):
+        files = sorted((ART / "historical/valkey/benchmark_runs").glob(f"*_{tag}_rep*/summary.json"))
+        if len(files) != 10:
+            raise RuntimeError(f"Expected 10 Valkey records for {tag}, got {len(files)}")
+        values[variant] = [json.loads(p.read_text())["results"]["ops_per_sec"] for p in files]
+    print("SAVED HISTORICAL VALKEY RESULTS (not a new experiment)")
+    print(json.dumps(compare(values), indent=2))
+    values = {}
+    for variant, name in (("baseline", "rerun_baseline_768t24_r10.csv"), ("vector_huge", "rerun_vector_huge_768t24_r10.csv")):
+        with (ART / "historical/hnswlib/results" / name).open() as f:
+            rows = list(csv.DictReader(f))
+        if len(rows) != 10:
+            raise RuntimeError(f"Expected 10 HNSW records in {name}, got {len(rows)}")
+        values[variant] = [float(row["qps_mean"]) for row in rows]
+    print("SAVED HISTORICAL HNSWLIB RESULTS (not a new experiment)")
+    print(json.dumps(compare(values), indent=2))
+    print("SAVED REBUTTAL FACTORIZATION (distinct campaign)")
+    run([sys.executable, ART / "historical/hnsw-factorization/analyze_completed_factorization.py", ART / "historical/hnsw-factorization"])
+
+def doctor():
+    missing = [tool for tool in ("clang-14", "clang-tidy-14", "clang-apply-replacements-14", "cmake", "bear",
+               "sqlite3", "node", "npm", "numactl", "patch", "gcc", "g++", "make") if not shutil.which(tool)]
+    run([sys.executable, "-c", "import flask,numpy,pandas,sklearn,pybind11,yaml; print('Python imports OK')"])
+    with __import__("sqlite3").connect(f"file:{ART / 'data/valkey/allocs.sqlite'}?mode=ro", uri=True) as db:
+        assert db.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+    print("Missing tools:", missing or "none")
+    print("perf is optional; PMU permission/support is NOT assumed. No sysctls are changed.")
+    if missing: raise RuntimeError("Missing dependencies; use artifact/Dockerfile")
+
+def export(out):
+    run([sys.executable, ROOT / "sifter_vis_d3/server/export_page_snapshots.py",
+         ART / "data/valkey/allocs.sqlite", out / "export"], log=out / "export.log")
+    files = list((out / "export/compact").glob("*.txt"))
+    if not files or not (out / "export/heaplens_analysis.txt").is_file():
+        raise RuntimeError("Exporter produced incomplete output")
+    print(f"Export OK: {len(files)} compact files; {out / 'export'}")
+
+def hnsw(args, out):
+    paper = args.profile == "paper"
+    n, dim, queries, threads = (1000000, 768, 100000, 24) if paper else (10000, 128, 1000, 2)
+    repeats = args.reps or (10 if paper else 1)
+    values = {}
+    for variant, defines in (("baseline", ""), ("vector_huge", "HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1")):
+        work = out / variant
+        shutil.copytree(VENDOR / "hnswlib", work, ignore=IGNORE)
+        cmd = [sys.executable, "benchmark.py", f"--variant-label={variant}", f"--variant-defines={defines}",
+               "--dims", dim, "--threads", threads, "--build-threads", threads, "--elements", n,
+               "--queries", queries, "--m", 16, "--ef-construction", 200, "--ef", 64, "--k", 10,
+               "--warmup", 10000 if paper else 100, "--iterations", 5 if paper else 1,
+               "--query-mode", "indexed", "--seed", 1, "--repeats", repeats, "--output", out / f"{variant}.csv"]
+        if paper: cmd += ["--numa-node", args.server_node]
+        run(cmd, cwd=work, log=out / f"{variant}.log")
+        with (out / f"{variant}.csv").open() as f:
+            rows = list(csv.DictReader(f))
+        values[variant] = [float(row["qps_mean"]) for row in rows]
+    summary = compare(values)
+    summary["profile"] = args.profile
+    summary["scope"] = "Saved original-patch replay. Huge-page advice is not proof of huge-page backing."
+    save(out / "summary.json", summary)
+    print(json.dumps(summary, indent=2))
+
+def node_cpus(node, needed):
+    text = subprocess.check_output(["lscpu", "-p=CPU,NODE,CORE,ONLINE"], text=True)
+    result, seen = [], set()
+    for line in text.splitlines():
+        if line.startswith("#"): continue
+        cpu, numa, core, online = line.split(",")
+        if numa == str(node) and online == "Y" and core not in seen and int(cpu) in os.sched_getaffinity(0):
+            result.append(int(cpu)); seen.add(core)
+    if len(result) < needed: raise RuntimeError(f"NUMA node {node}: need {needed} available physical cores, found {len(result)}; use smoke on smaller hosts")
+    return result[:needed]
+
+def valkey(args, out):
+    paper = args.profile == "paper"
+    threads, keys, seconds = (24, 4000000, 30) if paper else (2, 10000, 3)
+    reps = args.reps or (10 if paper else 1)
+    prefixes = [[], []]
+    placement = {"pinning": False}
+    if paper:
+        if args.server_node == args.client_node: raise RuntimeError("Paper profile requires separate NUMA nodes")
+        cpus = [node_cpus(args.server_node, threads), node_cpus(args.client_node, threads)]
+        prefixes = [["numactl", "--physcpubind=" + ",".join(map(str, ids)), f"--membind={node}"]
+                    for ids, node in zip(cpus, [args.server_node, args.client_node])]
+        placement = {"pinning": True, "server_cpus": cpus[0], "client_cpus": cpus[1],
+                     "server_node": args.server_node, "client_node": args.client_node}
+    config = {"profile": args.profile, "threads": threads, "keys": keys, "seconds": seconds, "repetitions": reps,
+              "allocator": "bundled jemalloc", "set_get_ratio": "1:4", "clients_per_thread": 4,
+              "pipeline": 16, "data_size": 128, "placement": placement,
+              "order": "alternating AB/BA; fresh server and preload each trial"}
+    save(out / "config.json", config)
+    memtier = out / "memtier"
+    shutil.copytree(VENDOR / "memtier", memtier, ignore=IGNORE)
+    for cmd in (["autoreconf", "-ivf"], ["./configure", "--disable-tls"], ["make", f"-j{args.jobs}"]):
+        run(cmd, cwd=memtier, log=out / "memtier-build.log")
+    for variant in ("baseline", "B1C1_64"):
+        work = out / variant
+        shutil.copytree(VENDOR / "valkey", work, ignore=IGNORE)
+        if variant != "baseline":
+            run(["patch", "--batch", "-p1", "-i", ART / "patches/valkey-B1C1_64.patch"], cwd=work, log=out / "patch.log")
+        run(["make", f"-j{args.jobs}", "MALLOC=jemalloc", "BUILD_TLS=no", "BUILD_RDMA=no", "BUILD_LUA=no", "USE_SYSTEMD=no"],
+            cwd=work, log=out / f"{variant}-build.log")
+    values = {"baseline": [], "B1C1_64": []}
+    for rep in range(reps):
+        variants = ["baseline", "B1C1_64"] if rep % 2 == 0 else ["B1C1_64", "baseline"]
+        for variant in variants:
+            trial = out / f"{variant}-rep{rep + 1}"
+            trial.mkdir()
+            # Choose an unused loopback port. Never stop an existing service.
+            with socket.socket() as sock:
+                sock.bind(("127.0.0.1", 0)); port = sock.getsockname()[1]
+            server_cmd = prefixes[0] + [str(out / variant / "src/valkey-server"), "--bind", "127.0.0.1", "--port", str(port),
+                         "--protected-mode", "yes", "--save", "", "--appendonly", "no", "--daemonize", "no", "--dir", str(trial),
+                         "--io-threads", str(threads), "--io-threads-always-active", "yes"]
+            save(trial / "server-command.json", server_cmd)
+            with (trial / "server.log").open("w") as log:
+                proc = subprocess.Popen(server_cmd, stdout=log, stderr=subprocess.STDOUT)
+                try:
+                    for attempt in range(200):
+                        if proc.poll() is not None: raise RuntimeError(f"Server exited; see {trial / 'server.log'}")
+                        try:
+                            with socket.create_connection(("127.0.0.1", port), timeout=.2) as sock:
+                                sock.sendall(b"PING\r\n")
+                                if sock.recv(100).startswith(b"+PONG"): break
+                        except OSError: pass
+                        time.sleep(.1)
+                    else: raise RuntimeError("Server did not become ready")
+                    common = prefixes[1] + [str(memtier / "memtier_benchmark"), "--server=127.0.0.1", f"--port={port}", "--protocol=redis",
+                        f"--threads={threads}", "--clients=4", "--pipeline=16", "--key-prefix=heaplens:", "--key-minimum=1",
+                        f"--key-maximum={keys}", "--data-size=128", "--distinct-client-seed", "--hide-histogram"]
+                    run(common + ["--ratio=1:0", "--key-pattern=P:P", "--requests=allkeys", f"--json-out-file={trial / 'preload.json'}"],
+                        log=trial / "preload.log", timeout=1800)
+                    run(common + ["--ratio=1:4", "--key-pattern=R:R", f"--test-time={seconds}", f"--json-out-file={trial / 'benchmark.json'}"],
+                        log=trial / "benchmark.log", timeout=seconds + 120)
+                    totals = json.loads((trial / "benchmark.json").read_text())["ALL STATS"]["Totals"]
+                    if totals["Connection Errors"] != 0 or totals["Misses/sec"] != 0:
+                        raise RuntimeError(f"Connection errors or cache misses in {trial}; check preload/workload")
+                    values[variant].append(float(totals["Ops/sec"]))
+                    save(trial / "summary.json", {"config": config, "results": totals})
+                finally:
+                    # Signal only the process started above, never a process found by port/name.
+                    if proc.poll() is None:
+                        proc.terminate()
+                        try: proc.wait(timeout=10)
+                        except subprocess.TimeoutExpired: proc.kill(); proc.wait()
+    summary = compare(values); summary["profile"] = args.profile
+    save(out / "summary.json", summary)
+    print(json.dumps(summary, indent=2))
+
+def gui():
+    dest = ROOT / "sifter_vis_d3/valkey-artifact.sqlite"
+    source = ART / "data/valkey/allocs.sqlite"
+    if dest.exists() and hashlib.sha256(dest.read_bytes()).digest() != hashlib.sha256(source.read_bytes()).digest():
+        raise RuntimeError(f"Refusing to replace {dest}")
+    if not dest.exists(): shutil.copy2(source, dest)
+    efrb = ROOT / "sifter_vis_d3/efrb-smoke.sqlite"
+    if not efrb.exists(): shutil.copy2(ART / "data/efrb/allocs.sqlite", efrb)
+    backend = ROOT / "sifter_vis_d3/server"
+    (backend / "saved_state").mkdir(exist_ok=True)
+    frontend = ROOT / "sifter_vis_d3/sifter"
+    if not (frontend / "node_modules").exists():
+        if Path("/opt/heaplens-ui/node_modules").exists(): (frontend / "node_modules").symlink_to("/opt/heaplens-ui/node_modules")
+        else: run(["npm", "ci", "--no-audit", "--no-fund"], cwd=frontend)
+    procs = []
+    try:
+        procs.append(subprocess.Popen([sys.executable, "-m", "flask", "--app", "server", "run", "--host=0.0.0.0"], cwd=backend))
+        procs.append(subprocess.Popen(["npm", "run", "dev", "--", "--hostname", "0.0.0.0"], cwd=frontend))
+        print("Open http://localhost:3000 and select valkey-artifact.sqlite. Ctrl-C stops both services.", flush=True)
+        while all(p.poll() is None for p in procs): time.sleep(1)
+        raise RuntimeError("A GUI service exited")
+    except KeyboardInterrupt: pass
+    finally:
+        for p in procs:
+            if p.poll() is None: p.terminate()
+        for p in procs:
+            try: p.wait(timeout=10)
+            except subprocess.TimeoutExpired: p.kill(); p.wait()
+
+def rocksdb(args, out):
+    paper = args.profile == "paper"
+    threads, keys, duration = (18, 10000000, 10) if paper else (2, 10000, 2)
+    reps = args.reps or (10 if paper else 1)
+    placement = []
+    if paper:
+        ids = node_cpus(args.server_node, threads)
+        placement = ["numactl", "--physcpubind=" + ",".join(map(str, ids)), f"--interleave={args.server_node}"]
+    flags = ["REORDER_FIELDS=1", "NO_PADDING_NODE=1"] if args.memtable == "prefix_hash" else ["ALIGN_TALL_NODE=4", "SEG_TALL_NODE=4"]
+    values = {}
+    for variant, extra in (("baseline", []), ("optimized", flags)):
+        work = out / variant
+        shutil.copytree(VENDOR / "rocksdb-historical", work, ignore=IGNORE)
+        # Preserve the experimental baseline used by the historical campaign;
+        # the flags, not a different parent revision, select before/after.
+        run(["patch", "--batch", "-p1", "-i", ART / "patches/rocksdb-historical.patch"], cwd=work, log=out / f"{variant}-build.log")
+        # Refuse a silent no-op experiment against pristine upstream source.
+        for definition in flags:
+            macro = definition.split("=")[0]
+            header = "memtable/skiplist.h" if args.memtable == "prefix_hash" else "memtable/inlineskiplist.h"
+            if macro not in (work / "Makefile").read_text() or macro not in (work / header).read_text():
+                raise RuntimeError(f"Missing implementation/build support for {macro}")
+        run(["make", f"-j{args.jobs}", "db_bench", "DEBUG_LEVEL=0", "PORTABLE=1", "DISABLE_WARNING_AS_ERROR=1", *extra],
+            cwd=work, log=out / f"{variant}-build.log")
+        save(out / f"{variant}-binary.json", {"sha256": hashlib.sha256((work / "db_bench").read_bytes()).hexdigest(),
+             "flags": extra, "source_revision": "19e4aba3db75bd6add7177164c892ab6cdfd50b3 + rocksdb-historical.patch"})
+        values[variant] = []
+        for rep in range(reps):
+            trial = out / f"{variant}-rep{rep+1}"
+            trial.mkdir()
+            cmd = placement + [str(work / "db_bench"), f"--db={trial / 'db'}", "--use_existing_db=0",
+                "--benchmarks=filluniquerandom,waitforcompaction,readwhilewriting", f"--key_size={args.rocks_key_size}", f"--prefix_size={args.rocks_key_size}",
+                f"--value_size={args.rocks_value_size}", "--compression_type=none", f"--use_plain_table={int(args.memtable == 'prefix_hash')}",
+                f"--memtablerep={args.memtable}", "--max_write_buffer_number=2", "--write_buffer_size=134217728",
+                f"--max_background_jobs={max(1, threads // 4)}", "--compaction_pri=3", "--compaction_style=0",
+                "--bloom_bits=10", "--bloom_locality=1", f"--num={keys}", f"--threads={threads-1}",
+                "--allow_concurrent_memtable_write=false", "--disable_wal=1", "--sync=0", f"--duration={duration}"]
+            env = os.environ.copy()
+            env["LD_PRELOAD"] = str(VENDOR / "setbench/lib/libjemalloc.so")
+            save(trial / "config.json", {"command": cmd, "build_flags": extra, "allocator": env["LD_PRELOAD"], "profile": args.profile})
+            run(cmd, cwd=work, log=trial / "benchmark.log", env=env, timeout=7200 if paper else 180)
+            matches = re.findall(r"readwhilewriting\s*:\s*[\d.]+\s+micros/op\s+([\d.]+)\s+ops/sec", (trial / "benchmark.log").read_text())
+            if not matches: raise RuntimeError(f"No throughput in {trial / 'benchmark.log'}")
+            values[variant].append(float(matches[-1]))
+    summary = compare(values); summary["profile"] = args.profile; summary["memtable"] = args.memtable
+    save(out / "summary.json", summary)
+    print(json.dumps(summary, indent=2))
+
+def legacy(args):
+    work = ART / "experiments" / args.name
+    if (work / "work").exists() or (work / "results.tsv").exists():
+        raise RuntimeError(f"Existing results at {work}; preserve them and use a fresh checkout for a new run")
+    env = os.environ.copy()
+    env["JOBS"] = str(args.jobs)
+    env["ARTIFACT_PROFILE"] = args.profile
+    env["PAGES_PER_TYPE"] = "1"
+    env["REPS"] = str(args.reps or (10 if args.profile == "paper" else 1))
+    if args.profile == "smoke":
+        env.update(THREADS="2", INITIAL="4096", RANGE="8192", DURATION_MS="1000", RUN_SECONDS="3", PERFBENCH_PERF="off", ARTIFACT_NO_NUMA="1")
+    run(["bash", work / "run.sh"], env=env)
+
+def factorization(args, out):
+    paper = args.profile == "paper"
+    alignment = args.factors == "alignment"
+    if alignment:
+        cells = {"packed": "", "separated_unaligned32": "HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_VECTOR_BASE_OFFSET=32",
+                 "separated_aligned64": "HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_VECTOR_BASE_OFFSET=0"}
+        import itertools
+        orders = list(itertools.permutations(cells))
+        blocks = args.reps or (6 if paper else 1)
+        source = VENDOR / "hnswlib-sep-align"
+    else:
+        cells = {"baseline": "", "vector_soa64": "HNSWLIB_LAYOUT_VECTOR_SOA64=1", "hugepage": "HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1",
+                 "both": "HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1"}
+        orders = [("baseline", "vector_soa64", "hugepage", "both"), ("vector_soa64", "both", "baseline", "hugepage"),
+                  ("hugepage", "baseline", "both", "vector_soa64"), ("both", "hugepage", "vector_soa64", "baseline")]
+        blocks = args.reps or (10 if paper else 1)
+        source = VENDOR / "hnswlib-corrected"
+    work = out / "source"
+    shutil.copytree(source, work, ignore=IGNORE)
+    save(out / "design.json", {"cells": cells, "orders": orders, "blocks": blocks, "profile": args.profile,
+                               "source": str(source), "note": "Fresh index per cell; compiler/environment recorded separately."})
+    for block in range(1, blocks + 1):
+        for label in orders[(block - 1) % len(orders)]:
+            cmd = [sys.executable, "benchmark.py", "--variant-label", label, f"--variant-defines={cells[label]}",
+                   "--dims", 768, "--threads", 24 if paper else 2, "--elements", 1000000 if paper else 2000,
+                   "--queries", 100000 if paper else 200, "--m", 16, "--ef-construction", 200, "--ef", 64, "--k", 10,
+                   "--build-threads", 24 if paper else 2, "--repeats", 1, "--warmup", 10000 if paper else 100,
+                   "--iterations", 5 if paper else 1, "--query-mode", "indexed", "--seed", 1,
+                   "--output", out / f"block{block:02d}_{label}.csv"]
+            if paper: cmd += ["--numa-node", args.server_node]
+            run(cmd, cwd=work, log=out / f"block{block:02d}_{label}.log")
+    if blocks == (6 if alignment else 10):
+        summarizer = "summarize_hnsw_alignment.py" if alignment else "summarize_hnsw_factorization.py"
+        run([sys.executable, ART / "lib" / summarizer, out])
+    else: print("Trials completed; the retained paper summarizer requires exactly 6 alignment or 10 huge-page blocks. Raw CSVs are available.")
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("command", choices=["doctor", "history", "export", "smoke", "hnsw", "hnsw-factorization", "valkey", "rocksdb", "gui", "legacy", "all-performance"])
+    p.add_argument("name", nargs="?", choices=LEGACY)
+    p.add_argument("--profile", choices=["smoke", "paper"], default="smoke")
+    p.add_argument("--out", help="NEW result directory; never overwrite existing results")
+    p.add_argument("--jobs", type=int, default=4)
+    p.add_argument("--reps", type=int)
+    p.add_argument("--server-node", type=int, default=0)
+    p.add_argument("--client-node", type=int, default=1)
+    p.add_argument("--memtable", choices=["prefix_hash", "skip_list"], default="prefix_hash")
+    p.add_argument("--rocks-key-size", type=int, default=64, help="Retained script default; paper prose says 32")
+    p.add_argument("--rocks-value-size", type=int, default=256, help="Retained script default; paper prose says 128")
+    p.add_argument("--factors", choices=["hugepage", "alignment"], default="hugepage")
+    args = p.parse_args()
+    if args.jobs < 1 or (args.reps is not None and args.reps < 1): p.error("jobs/reps must be positive")
+    if min(args.rocks_key_size, args.rocks_value_size) < 1: p.error("RocksDB sizes must be positive")
+    if args.command == "doctor": doctor()
+    elif args.command == "history": history()
+    elif args.command == "gui": gui()
+    elif args.command == "legacy":
+        if not args.name: p.error("legacy requires an experiment name")
+        legacy(args)
+    elif args.command == "all-performance":
+        for name in [x for x in LEGACY if x.endswith("_bench")]:
+            args.name = name; legacy(args)
+        args.command = "hnsw"; hnsw(args, new_output(args))
+        args.command = "valkey"; valkey(args, new_output(args))
+        for memtable in ("prefix_hash", "skip_list"):
+            args.command = "rocksdb"; args.memtable = memtable; rocksdb(args, new_output(args))
+    else:
+        out = new_output(args)
+        try:
+            if args.command == "smoke": doctor(); history(); export(out)
+            elif args.command == "export": export(out)
+            elif args.command == "hnsw": hnsw(args, out)
+            elif args.command == "valkey": valkey(args, out)
+            elif args.command == "rocksdb": rocksdb(args, out)
+            elif args.command == "hnsw-factorization": factorization(args, out)
+            save(out / "status.json", {"status": "passed", "scope": args.command, "profile": args.profile})
+        except Exception as exc:
+            save(out / "status.json", {"status": "failed", "error": str(exc)})
+            raise
+        print("Results:", out)
+
+if __name__ == "__main__":
+    main()

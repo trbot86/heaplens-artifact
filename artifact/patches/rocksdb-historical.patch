@@ -1,0 +1,1327 @@
+diff --git a/Makefile b/Makefile
+index 317b967ca..4c6486b0e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -13,6 +13,91 @@ include common.mk
+ CLEAN_FILES = # deliberately empty, so we can append below.
+ CFLAGS += ${EXTRA_CFLAGS}
+ CXXFLAGS += ${EXTRA_CXXFLAGS}
++
++ifdef REORDER_FIELDS
++$(info Reordering fields in SkipList object to shrink from 56B to 48B)
++CFLAGS += -DREORDER_FIELDS
++CXXFLAGS += -DREORDER_FIELDS
++endif
++
++ifdef CACHELINE_ALIGN_BUCKET
++$(info Aligning SkipList objects to cache line boundary)
++CFLAGS += -DCACHELINE_ALIGN_BUCKET
++CXXFLAGS += -DCACHELINE_ALIGN_BUCKET
++endif
++
++ifdef ALIGN_BUCKET
++$(info Aligning SkipList objects to $(ALIGN_BUCKET)B boundary)
++CFLAGS += -DALIGN_BUCKET=$(ALIGN_BUCKET)
++CXXFLAGS += -DALIGN_BUCKET=$(ALIGN_BUCKET)
++endif
++
++ifdef NO_PADDING_NODE
++$(info Removing all padding from Nodes, Node pointers, and SkipList objects)
++CFLAGS += -DNO_PADDING_NODE
++CXXFLAGS += -DNO_PADDING_NODE
++endif
++
++ifdef PAD_BUCKET
++$(info Padding SkipList objects to 128B)
++CFLAGS += -DPAD_BUCKET
++CXXFLAGS += -DPAD_BUCKET
++endif
++
++ifdef PAD_KEYHANDLE 
++$(info Padding KeyHandles to $(PAD_KEYHANDLE)B)
++CFLAGS += -DPAD_KEYHANDLE=$(PAD_KEYHANDLE)
++CXXFLAGS += -DPAD_KEYHANDLE=$(PAD_KEYHANDLE)
++endif
++
++ifdef ALIGN_MEMBLOCK 
++$(info Aligning memblocks to $(ALIGN_MEMBLOCK)B)
++CFLAGS += -DALIGN_MEMBLOCK=$(ALIGN_MEMBLOCK)
++CXXFLAGS += -DALIGN_MEMBLOCK=$(ALIGN_MEMBLOCK)
++endif
++
++ifdef SKIPLIST_NO_CACHELINE_CROSS
++$(info No crossing cachelines for SkipList objects - also enabling REORDER_FIELDS and CACHELINE_ALIGN_BUCKET)	
++CFLAGS += -DSKIPLIST_NO_CACHELINE_CROSS -DREORDER_FIELDS -DCACHELINE_ALIGN_BUCKET
++CXXFLAGS += -DSKIPLIST_NO_CACHELINE_CROSS -DREORDER_FIELDS -DCACHELINE_ALIGN_BUCKET
++endif
++
++ifdef ALIGN_TALL_NODE
++$(info Aligning nodes above $(ALIGN_TALL_NODE) height to cacheline boundary)
++CFLAGS += -DALIGN_TALL_NODE=$(ALIGN_TALL_NODE)
++CXXFLAGS += -DALIGN_TALL_NODE=$(ALIGN_TALL_NODE)
++endif
++
++ifdef SEG_TALL_NODE
++$(info Separating nodes above $(SEG_TALL_NODE) height to exclusive region)
++CFLAGS += -DSEG_TALL_NODE=$(SEG_TALL_NODE)
++CXXFLAGS += -DSEG_TALL_NODE=$(SEG_TALL_NODE)
++endif
++
++ifdef ALIGN_THREADDATA
++$(info Aligning ThreadData objects to cacheline boundary)	
++CFLAGS += -DALIGN_THREADDATA
++CXXFLAGS += -DALIGN_THREADDATA
++endif
++
++ifdef PREFETCH_SKIPLIST_NODE
++$(info Prefetching first layer of tall nodes)
++CFLAGS += -DPREFETCH_SKIPLIST_NODE
++CXXFLAGS += -DPREFETCH_SKIPLIST_NODE
++endif
++
++ifdef PREFETCH_NO_CHECK
++$(info Prefetching with no height check)
++CFLAGS += -DPREFETCH_NO_CHECK
++CXXFLAGS += -DPREFETCH_NO_CHECK
++endif
++
++ifdef PREFETCH_ALL
++$(info Prefetching all layers of tall nodes)
++CFLAGS += -DPREFETCH_ALL
++CXXFLAGS += -DPREFETCH_ALL
++endif
++
+ LDFLAGS += $(EXTRA_LDFLAGS)
+ MACHINE ?= $(shell uname -m)
+ ARFLAGS = ${EXTRA_ARFLAGS} rs
+diff --git a/db/memtable.cc b/db/memtable.cc
+index 157905c2e..3b311229b 100644
+--- a/db/memtable.cc
++++ b/db/memtable.cc
+@@ -88,11 +88,28 @@ MemTable::MemTable(const InternalKeyComparator& cmp,
+                  ? &mem_tracker_
+                  : nullptr,
+              mutable_cf_options.memtable_huge_page_size),
++#ifdef SEG_TALL_NODE
++      arena_tall_(moptions_.arena_block_size,
++             (write_buffer_manager != nullptr &&
++              (write_buffer_manager->enabled() ||
++               write_buffer_manager->cost_to_cache()))
++                 ? &mem_tracker_
++                 : nullptr,
++             mutable_cf_options.memtable_huge_page_size),
++#endif
+       table_(ioptions.memtable_factory->CreateMemTableRep(
+-          comparator_, &arena_, mutable_cf_options.prefix_extractor.get(),
++          comparator_, &arena_,
++#ifdef SEG_TALL_NODE
++	  &arena_tall_,
++#endif
++	  mutable_cf_options.prefix_extractor.get(),
+           ioptions.logger, column_family_id)),
+       range_del_table_(SkipListFactory().CreateMemTableRep(
+-          comparator_, &arena_, nullptr /* transform */, ioptions.logger,
++          comparator_, &arena_,
++#ifdef SEG_TALL_NODE
++	  &arena_tall_,
++#endif
++	  nullptr /* transform */, ioptions.logger,
+           column_family_id)),
+       is_range_del_table_empty_(true),
+       data_size_(0),
+@@ -118,7 +135,7 @@ MemTable::MemTable(const InternalKeyComparator& cmp,
+           mutable_cf_options.memtable_max_range_deletions) {
+   UpdateFlushState();
+   // something went wrong if we need to flush before inserting anything
+-  assert(!ShouldScheduleFlush());
++  //assert(!ShouldScheduleFlush());
+ 
+   // use bloom_filter_ for both whole key and prefix bloom filter
+   if ((prefix_extractor_ || moptions_.memtable_whole_key_filtering) &&
+@@ -145,14 +162,14 @@ MemTable::MemTable(const InternalKeyComparator& cmp,
+         std::memory_order_relaxed);
+   }
+   const Comparator* ucmp = cmp.user_comparator();
+-  assert(ucmp);
++  //assert(ucmp);
+   ts_sz_ = ucmp->timestamp_size();
+   persist_user_defined_timestamps_ = ioptions.persist_user_defined_timestamps;
+ }
+ 
+ MemTable::~MemTable() {
+   mem_tracker_.FreeMem();
+-  assert(refs_ == 0);
++  //assert(refs_ == 0);
+ }
+ 
+ size_t MemTable::ApproximateMemoryUsage() {
+@@ -259,7 +276,7 @@ void MemTable::UpdateOldestKeyTime() {
+     int64_t current_time = 0;
+     auto s = clock_->GetCurrentTime(&current_time);
+     if (s.ok()) {
+-      assert(current_time >= 0);
++      //assert(current_time >= 0);
+       // If fail, the timestamp is already set.
+       oldest_key_time_.compare_exchange_strong(
+           oldest_key_time, static_cast<uint64_t>(current_time),
+@@ -389,11 +406,11 @@ class MemTableIterator : public InternalIterator {
+                 (!read_options.total_order_seek &&
+                  !read_options.auto_prefix_mode))) {
+       // Auto prefix mode is not implemented in memtable yet.
+-      assert(kind == kPointEntries);
++      //assert(kind == kPointEntries);
+       bloom_ = mem.bloom_filter_.get();
+       iter_ = mem.table_->GetDynamicPrefixIterator(arena);
+     } else {
+-      assert(kind == kPointEntries);
++      //assert(kind == kPointEntries);
+       iter_ = mem.table_->GetIterator(arena);
+     }
+     status_.PermitUncheckedError();
+@@ -406,7 +423,7 @@ class MemTableIterator : public InternalIterator {
+ #ifndef NDEBUG
+     // Assert that the MemTableIterator is never deleted while
+     // Pinning is Enabled.
+-    assert(!pinned_iters_mgr_ || !pinned_iters_mgr_->PinningEnabled());
++    //assert(!pinned_iters_mgr_ || !pinned_iters_mgr_->PinningEnabled());
+ #endif
+     if (arena_mode_) {
+       iter_->~Iterator();
+@@ -425,7 +442,7 @@ class MemTableIterator : public InternalIterator {
+ 
+   bool Valid() const override {
+     // If inner iter_ is not valid, then this iter should also not be valid.
+-    assert(iter_->Valid() || !(valid_ && status_.ok()));
++    //assert(iter_->Valid() || !(valid_ && status_.ok()));
+     return valid_ && status_.ok();
+   }
+ 
+@@ -500,7 +517,7 @@ class MemTableIterator : public InternalIterator {
+   }
+   void Next() override {
+     PERF_COUNTER_ADD(next_on_memtable_count, 1);
+-    assert(Valid());
++    //assert(Valid());
+     if (paranoid_memory_checks_) {
+       status_ = iter_->NextAndValidate(allow_data_in_error);
+     } else {
+@@ -522,7 +539,7 @@ class MemTableIterator : public InternalIterator {
+   }
+   void Prev() override {
+     PERF_COUNTER_ADD(prev_on_memtable_count, 1);
+-    assert(Valid());
++    //assert(Valid());
+     if (paranoid_memory_checks_) {
+       status_ = iter_->PrevAndValidate(allow_data_in_error);
+     } else {
+@@ -532,12 +549,12 @@ class MemTableIterator : public InternalIterator {
+     VerifyEntryChecksum();
+   }
+   Slice key() const override {
+-    assert(Valid());
++    //assert(Valid());
+     return GetLengthPrefixedSlice(iter_->key());
+   }
+ 
+   uint64_t write_unix_time() const override {
+-    assert(Valid());
++    //assert(Valid());
+     ParsedInternalKey pikey;
+     Status s = ParseInternalKey(key(), &pikey, /*log_err_key=*/false);
+     if (!s.ok()) {
+@@ -551,7 +568,7 @@ class MemTableIterator : public InternalIterator {
+   }
+ 
+   Slice value() const override {
+-    assert(Valid());
++    //assert(Valid());
+     Slice key_slice = GetLengthPrefixedSlice(iter_->key());
+     return GetLengthPrefixedSlice(key_slice.data() + key_slice.size());
+   }
+@@ -600,7 +617,7 @@ InternalIterator* MemTable::NewIterator(
+     const ReadOptions& read_options,
+     UnownedPtr<const SeqnoToTimeMapping> seqno_to_time_mapping, Arena* arena,
+     const SliceTransform* prefix_extractor, bool /*for_flush*/) {
+-  assert(arena != nullptr);
++  //assert(arena != nullptr);
+   auto mem = arena->AllocateAligned(sizeof(MemTableIterator));
+   return new (mem)
+       MemTableIterator(MemTableIterator::kPointEntries, *this, read_options,
+@@ -617,7 +634,7 @@ class TimestampStrippingIterator : public InternalIterator {
+       UnownedPtr<const SeqnoToTimeMapping> seqno_to_time_mapping, Arena* arena,
+       const SliceTransform* cf_prefix_extractor, size_t ts_sz)
+       : arena_mode_(arena != nullptr), kind_(kind), ts_sz_(ts_sz) {
+-    assert(ts_sz_ != 0);
++    //assert(ts_sz_ != 0);
+     void* mem = arena ? arena->AllocateAligned(sizeof(MemTableIterator))
+                       : operator new(sizeof(MemTableIterator));
+     iter_ = new (mem)
+@@ -678,7 +695,7 @@ class TimestampStrippingIterator : public InternalIterator {
+     UpdateKeyAndValueBuffer();
+   }
+   Slice key() const override {
+-    assert(Valid());
++    //assert(Valid());
+     return key_buf_;
+   }
+ 
+@@ -729,7 +746,7 @@ InternalIterator* MemTable::NewTimestampStrippingIterator(
+     const ReadOptions& read_options,
+     UnownedPtr<const SeqnoToTimeMapping> seqno_to_time_mapping, Arena* arena,
+     const SliceTransform* prefix_extractor, size_t ts_sz) {
+-  assert(arena != nullptr);
++  //assert(arena != nullptr);
+   auto mem = arena->AllocateAligned(sizeof(TimestampStrippingIterator));
+   return new (mem) TimestampStrippingIterator(
+       MemTableIterator::kPointEntries, *this, read_options,
+@@ -777,7 +794,7 @@ FragmentedRangeTombstoneIterator* MemTable::NewRangeTombstoneIteratorInternal(
+   if (immutable_memtable) {
+     // Note that caller should already have verified that
+     // !is_range_del_table_empty_
+-    assert(IsFragmentedRangeTombstonesConstructed());
++    //assert(IsFragmentedRangeTombstonesConstructed());
+     return new FragmentedRangeTombstoneIterator(
+         fragmented_range_tombstone_list_.get(), comparator_.comparator,
+         read_seq, read_options.timestamp);
+@@ -921,9 +938,15 @@ Status MemTable::Add(SequenceNumber s, ValueType type,
+   uint32_t key_size = static_cast<uint32_t>(key.size());
+   uint32_t val_size = static_cast<uint32_t>(value.size());
+   uint32_t internal_key_size = key_size + 8;
++#ifdef PAD_KEYHANDLE
++  const uint32_t encoded_len = std::max((uint32_t) PAD_KEYHANDLE, VarintLength(internal_key_size) +
++                               internal_key_size + VarintLength(val_size) +
++                               val_size + moptions_.protection_bytes_per_key);
++#else
+   const uint32_t encoded_len = VarintLength(internal_key_size) +
+                                internal_key_size + VarintLength(val_size) +
+                                val_size + moptions_.protection_bytes_per_key;
++#endif
+   char* buf = nullptr;
+   std::unique_ptr<MemTableRep>& table =
+       type == kTypeRangeDeletion ? range_del_table_ : table_;
+@@ -938,8 +961,8 @@ Status MemTable::Add(SequenceNumber s, ValueType type,
+   p += 8;
+   p = EncodeVarint32(p, val_size);
+   memcpy(p, value.data(), val_size);
+-  assert((unsigned)(p + val_size - buf + moptions_.protection_bytes_per_key) ==
+-         (unsigned)encoded_len);
++  //assert((unsigned)(p + val_size - buf + moptions_.protection_bytes_per_key) ==
++   //      (unsigned)encoded_len);
+ 
+   UpdateEntryChecksum(kv_prot_info, key, value, type, s,
+                       buf + encoded_len - moptions_.protection_bytes_per_key);
+@@ -995,7 +1018,7 @@ Status MemTable::Add(SequenceNumber s, ValueType type,
+     }
+ 
+     // The first sequence number inserted into the memtable
+-    assert(first_seqno_ == 0 || s >= first_seqno_);
++    //assert(first_seqno_ == 0 || s >= first_seqno_);
+     if (first_seqno_ == 0) {
+       first_seqno_.store(s, std::memory_order_relaxed);
+ 
+@@ -1003,9 +1026,9 @@ Status MemTable::Add(SequenceNumber s, ValueType type,
+         earliest_seqno_.store(GetFirstSequenceNumber(),
+                               std::memory_order_relaxed);
+       }
+-      assert(first_seqno_.load() >= earliest_seqno_.load());
++      //assert(first_seqno_.load() >= earliest_seqno_.load());
+     }
+-    assert(post_process_info == nullptr);
++    //assert(post_process_info == nullptr);
+     // TODO(yuzhangyu): support updating newest UDT for when `allow_concurrent`
+     // is true.
+     MaybeUpdateNewestUDT(key_slice);
+@@ -1018,7 +1041,7 @@ Status MemTable::Add(SequenceNumber s, ValueType type,
+       return Status::TryAgain("key+seq exists");
+     }
+ 
+-    assert(post_process_info != nullptr);
++    //assert(post_process_info != nullptr);
+     post_process_info->num_entries++;
+     post_process_info->data_size += encoded_len;
+     if (type == kTypeDeletion) {
+@@ -1119,29 +1142,29 @@ struct Saver {
+ 
+ static bool SaveValue(void* arg, const char* entry) {
+   Saver* s = static_cast<Saver*>(arg);
+-  assert(s != nullptr);
+-  assert(!s->value || !s->columns);
+-  assert(!*(s->found_final_value));
+-  assert(s->status->ok() || s->status->IsMergeInProgress());
++  //assert(s != nullptr);
++  //assert(!s->value || !s->columns);
++  //assert(!*(s->found_final_value));
++  //assert(s->status->ok() || s->status->IsMergeInProgress());
+ 
+   MergeContext* merge_context = s->merge_context;
+   SequenceNumber max_covering_tombstone_seq = s->max_covering_tombstone_seq;
+   const MergeOperator* merge_operator = s->merge_operator;
+ 
+-  assert(merge_context != nullptr);
++  //assert(merge_context != nullptr);
+ 
+   // Refer to comments under MemTable::Add() for entry format.
+   // Check that it belongs to same user key.
+   uint32_t key_length = 0;
+   const char* key_ptr = GetVarint32Ptr(entry, entry + 5, &key_length);
+-  assert(key_length >= 8);
++  //assert(key_length >= 8);
+   Slice user_key_slice = Slice(key_ptr, key_length - 8);
+   const Comparator* user_comparator =
+       s->mem->GetInternalKeyComparator().user_comparator();
+   size_t ts_sz = user_comparator->timestamp_size();
+   if (ts_sz && s->timestamp && max_covering_tombstone_seq > 0) {
+     // timestamp should already be set to range tombstone timestamp
+-    assert(s->timestamp->size() == ts_sz);
++    //assert(s->timestamp->size() == ts_sz);
+   }
+   if (user_comparator->EqualWithoutTimestamp(user_key_slice,
+                                              s->key->user_key())) {
+@@ -1190,7 +1213,7 @@ static bool SaveValue(void* arg, const char* entry) {
+ 
+     if (ts_sz > 0 && s->timestamp != nullptr) {
+       if (!s->timestamp->empty()) {
+-        assert(ts_sz == s->timestamp->size());
++        //assert(ts_sz == s->timestamp->size());
+       }
+       // TODO optimize for smaller size ts
+       const std::string kMaxTs(ts_sz, '\xff');
+@@ -1282,7 +1305,7 @@ static bool SaveValue(void* arg, const char* entry) {
+                 s->inplace_update_support == false /* operand_pinned */);
+           }
+         } else if (*(s->merge_in_progress)) {
+-          assert(s->do_merge);
++          //assert(s->do_merge);
+ 
+           if (s->value || s->columns) {
+             // `op_failure_scope` (an output parameter) is not provided (set
+@@ -1432,7 +1455,7 @@ bool MemTable::Get(const LookupKey& key, std::string* value,
+       may_contain = bloom_filter_->MayContain(user_key_without_ts);
+       bloom_checked = true;
+     } else {
+-      assert(prefix_extractor_);
++      //assert(prefix_extractor_);
+       if (prefix_extractor_->InDomain(user_key_without_ts)) {
+         may_contain = bloom_filter_->MayContain(
+             prefix_extractor_->Transform(user_key_without_ts));
+@@ -1460,7 +1483,7 @@ bool MemTable::Get(const LookupKey& key, std::string* value,
+     if (s->ok()) {
+       *s = Status::MergeInProgress();
+     } else {
+-      assert(s->IsMergeInProgress());
++      //assert(s->IsMergeInProgress());
+     }
+   }
+   PERF_COUNTER_ADD(get_from_memtable_count, 1);
+@@ -1509,7 +1532,7 @@ void MemTable::GetFromTable(const LookupKey& key,
+       *(saver.found_final_value) = true;
+     }
+   }
+-  assert(s->ok() || s->IsMergeInProgress() || *found_final_value);
++  //assert(s->ok() || s->IsMergeInProgress() || *found_final_value);
+   *seq = saver.seq;
+ }
+ 
+@@ -1586,7 +1609,7 @@ void MemTable::MultiGet(const ReadOptions& read_options, MultiGetRange* range,
+       if (iter->s->ok()) {
+         *(iter->s) = Status::MergeInProgress();
+       } else {
+-        assert(iter->s->IsMergeInProgress());
++        //assert(iter->s->IsMergeInProgress());
+       }
+     }
+ 
+@@ -1595,12 +1618,12 @@ void MemTable::MultiGet(const ReadOptions& read_options, MultiGetRange* range,
+       // `found_final_value` should be set if an error/corruption occurs.
+       // The check on iter->s is just there in case GetFromTable() did not
+       // set `found_final_value` properly.
+-      assert(found_final_value);
++      //assert(found_final_value);
+       if (iter->value) {
+         iter->value->PinSelf();
+         range->AddValueSize(iter->value->size());
+       } else {
+-        assert(iter->columns);
++        //assert(iter->columns);
+         range->AddValueSize(iter->columns->serialized_size());
+       }
+ 
+@@ -1645,7 +1668,7 @@ Status MemTable::Update(SequenceNumber seq, ValueType value_type,
+       ValueType type;
+       SequenceNumber existing_seq;
+       UnPackSequenceAndType(tag, &existing_seq, &type);
+-      assert(existing_seq != seq);
++      //assert(existing_seq != seq);
+       if (type == value_type) {
+         Slice prev_value = GetLengthPrefixedSlice(key_ptr + key_length);
+         uint32_t prev_size = static_cast<uint32_t>(prev_value.size());
+@@ -1657,9 +1680,9 @@ Status MemTable::Update(SequenceNumber seq, ValueType value_type,
+           char* p =
+               EncodeVarint32(const_cast<char*>(key_ptr) + key_length, new_size);
+           memcpy(p, value.data(), value.size());
+-          assert((unsigned)((p + value.size()) - entry) ==
+-                 (unsigned)(VarintLength(key_length) + key_length +
+-                            VarintLength(value.size()) + value.size()));
++          //assert((unsigned)((p + value.size()) - entry) ==
++            //     (unsigned)(VarintLength(key_length) + key_length +
++             //               VarintLength(value.size()) + value.size()));
+           RecordTick(moptions_.statistics, NUMBER_KEYS_UPDATED);
+           if (kv_prot_info != nullptr) {
+             ProtectionInfoKVOS64 updated_kv_prot_info(*kv_prot_info);
+@@ -1721,7 +1744,7 @@ Status MemTable::UpdateCallback(SequenceNumber seq, const Slice& key,
+                                                  delta, &str_value);
+         if (status == UpdateStatus::UPDATED_INPLACE) {
+           // Value already updated by callback.
+-          assert(new_prev_size <= prev_size);
++          //assert(new_prev_size <= prev_size);
+           if (new_prev_size < prev_size) {
+             // overwrite the new prev_size
+             char* p = EncodeVarint32(const_cast<char*>(key_ptr) + key_length,
+@@ -1822,7 +1845,7 @@ void MemTableRep::Get(const LookupKey& k, void* callback_args,
+ }
+ 
+ void MemTable::RefLogContainingPrepSection(uint64_t log) {
+-  assert(log > 0);
++  //assert(log > 0);
+   auto cur = min_prep_log_referenced_.load();
+   while ((log < cur || cur == 0) &&
+          !min_prep_log_referenced_.compare_exchange_strong(cur, log)) {
+@@ -1848,7 +1871,7 @@ void MemTable::MaybeUpdateNewestUDT(const Slice& user_key) {
+ const Slice& MemTable::GetNewestUDT() const {
+   // This path should not be invoked for MemTables that does not enable the UDT
+   // in Memtable only feature.
+-  assert(ts_sz_ > 0 && !persist_user_defined_timestamps_);
++  //assert(ts_sz_ > 0 && !persist_user_defined_timestamps_);
+   return newest_udt_;
+ }
+ 
+diff --git a/db/memtable.h b/db/memtable.h
+index f53c614fd..113fed043 100644
+--- a/db/memtable.h
++++ b/db/memtable.h
+@@ -783,6 +783,9 @@ class MemTable final : public ReadOnlyMemTable {
+   const size_t kArenaBlockSize;
+   AllocTracker mem_tracker_;
+   ConcurrentArena arena_;
++#ifdef SEG_TALL_NODE
++  ConcurrentArena arena_tall_;
++#endif
+   std::unique_ptr<MemTableRep> table_;
+   std::unique_ptr<MemTableRep> range_del_table_;
+   std::atomic_bool is_range_del_table_empty_;
+diff --git a/include/rocksdb/memtablerep.h b/include/rocksdb/memtablerep.h
+index fd63f127f..61ee92bd6 100644
+--- a/include/rocksdb/memtablerep.h
++++ b/include/rocksdb/memtablerep.h
+@@ -339,13 +339,24 @@ class MemTableRepFactory : public Customizable {
+                                  std::shared_ptr<MemTableRepFactory>* factory);
+ 
+   virtual MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator&,
+-                                         Allocator*, const SliceTransform*,
++                                         Allocator*,
++#ifdef SEG_TALL_NODE
++					 Allocator*,
++#endif
++					 const SliceTransform*,
+                                          Logger* logger) = 0;
+   virtual MemTableRep* CreateMemTableRep(
+       const MemTableRep::KeyComparator& key_cmp, Allocator* allocator,
++#ifdef SEG_TALL_NODE
++      Allocator* allocator_tall,
++#endif
+       const SliceTransform* slice_transform, Logger* logger,
+       uint32_t /* column_family_id */) {
+-    return CreateMemTableRep(key_cmp, allocator, slice_transform, logger);
++    return CreateMemTableRep(key_cmp, allocator, 
++#ifdef SEG_TALL_NODE
++		    allocator_tall,
++#endif
++		    slice_transform, logger);
+   }
+ 
+   const char* Name() const override = 0;
+@@ -382,6 +393,9 @@ class SkipListFactory : public MemTableRepFactory {
+   // Methods for MemTableRepFactory class overrides
+   using MemTableRepFactory::CreateMemTableRep;
+   MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator&, Allocator*,
++#ifdef SEG_TALL_NODE
++		  		 Allocator*,
++#endif
+                                  const SliceTransform*,
+                                  Logger* logger) override;
+ 
+@@ -416,6 +430,9 @@ class VectorRepFactory : public MemTableRepFactory {
+   // Methods for MemTableRepFactory class overrides
+   using MemTableRepFactory::CreateMemTableRep;
+   MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator&, Allocator*,
++#ifdef SEG_TALL_NODE
++		  		 Allocator*,
++#endif
+                                  const SliceTransform*,
+                                  Logger* logger) override;
+ };
+diff --git a/memory/allocator.h b/memory/allocator.h
+index 0d7cd60a9..b4984dddc 100644
+--- a/memory/allocator.h
++++ b/memory/allocator.h
+@@ -26,7 +26,7 @@ class Allocator {
+ 
+   virtual char* Allocate(size_t bytes) = 0;
+   virtual char* AllocateAligned(size_t bytes, size_t huge_page_size = 0,
+-                                Logger* logger = nullptr) = 0;
++                                Logger* logger = nullptr, int custom_align = 16, bool force_align=false) = 0;
+ 
+   virtual size_t BlockSize() const = 0;
+ };
+diff --git a/memory/arena.cc b/memory/arena.cc
+index 0a920203d..44f801064 100644
+--- a/memory/arena.cc
++++ b/memory/arena.cc
+@@ -35,8 +35,8 @@ size_t Arena::OptimizeBlockSize(size_t block_size) {
+ 
+ Arena::Arena(size_t block_size, AllocTracker* tracker, size_t huge_page_size)
+     : kBlockSize(OptimizeBlockSize(block_size)), tracker_(tracker) {
+-  assert(kBlockSize >= kMinBlockSize && kBlockSize <= kMaxBlockSize &&
+-         kBlockSize % kAlignUnit == 0);
++  //assert(kBlockSize >= kMinBlockSize && kBlockSize <= kMaxBlockSize &&
++  //       kBlockSize % kAlignUnit == 0);
+   TEST_SYNC_POINT_CALLBACK("Arena::Arena:0", const_cast<size_t*>(&kBlockSize));
+   alloc_bytes_remaining_ = sizeof(inline_block_);
+   blocks_memory_ += alloc_bytes_remaining_;
+@@ -55,17 +55,17 @@ Arena::Arena(size_t block_size, AllocTracker* tracker, size_t huge_page_size)
+ 
+ Arena::~Arena() {
+   if (tracker_ != nullptr) {
+-    assert(tracker_->is_freed());
++    //assert(tracker_->is_freed());
+     tracker_->FreeMem();
+   }
+ }
+ 
+-char* Arena::AllocateFallback(size_t bytes, bool aligned) {
++char* Arena::AllocateFallback(size_t bytes, bool aligned, bool force_align) {
+   if (bytes > kBlockSize / 4) {
+     ++irregular_block_num;
+     // Object is more than a quarter of our block size.  Allocate it separately
+     // to avoid wasting too much space in leftover bytes.
+-    return AllocateNewBlock(bytes);
++    return AllocateNewBlock(bytes, force_align);
+   }
+ 
+   // We waste the remaining space in the current block.
+@@ -77,7 +77,7 @@ char* Arena::AllocateFallback(size_t bytes, bool aligned) {
+   }
+   if (!block_head) {
+     size = kBlockSize;
+-    block_head = AllocateNewBlock(size);
++    block_head = AllocateNewBlock(size, force_align);
+   }
+   alloc_bytes_remaining_ = size - bytes;
+ 
+@@ -106,13 +106,13 @@ char* Arena::AllocateFromHugePage(size_t bytes) {
+ }
+ 
+ char* Arena::AllocateAligned(size_t bytes, size_t huge_page_size,
+-                             Logger* logger) {
++                             Logger* logger, int custom_align, bool force_align) {
+   if (MemMapping::kHugePageSupported && hugetlb_size_ > 0 &&
+       huge_page_size > 0 && bytes > 0) {
+     // Allocate from a huge page TLB table.
+     size_t reserved_size =
+         ((bytes - 1U) / huge_page_size + 1U) * huge_page_size;
+-    assert(reserved_size >= bytes);
++    //assert(reserved_size >= bytes);
+ 
+     char* addr = AllocateFromHugePage(reserved_size);
+     if (addr == nullptr) {
+@@ -126,8 +126,12 @@ char* Arena::AllocateAligned(size_t bytes, size_t huge_page_size,
+   }
+ 
+   size_t current_mod =
+-      reinterpret_cast<uintptr_t>(aligned_alloc_ptr_) & (kAlignUnit - 1);
+-  size_t slop = (current_mod == 0 ? 0 : kAlignUnit - current_mod);
++      reinterpret_cast<uintptr_t>(aligned_alloc_ptr_) & (custom_align - 1);
++#if defined(SKIPLIST_NO_CACHELINE_CROSS) && defined(REORDER_FIELDS)
++  size_t slop = ((custom_align == 64 && current_mod <= 16) ? 0 : custom_align - current_mod);
++#else
++  size_t slop = (current_mod == 0 ? 0 : custom_align - current_mod);
++#endif
+   size_t needed = bytes + slop;
+   char* result;
+   if (needed <= alloc_bytes_remaining_) {
+@@ -136,16 +140,37 @@ char* Arena::AllocateAligned(size_t bytes, size_t huge_page_size,
+     alloc_bytes_remaining_ -= needed;
+   } else {
+     // AllocateFallback always returns aligned memory
+-    result = AllocateFallback(bytes, true /* aligned */);
++    result = AllocateFallback(bytes, true /* aligned */, force_align);
+   }
+-  assert((reinterpret_cast<uintptr_t>(result) & (kAlignUnit - 1)) == 0);
++  //assert((reinterpret_cast<uintptr_t>(result) & (sizeof(void*) - 1)) == 0);
+   return result;
+ }
+ 
+-char* Arena::AllocateNewBlock(size_t block_bytes) {
++char* Arena::AllocateNewBlock(size_t block_bytes, bool force_align) {
++#if _POSIX_C_SOURCE >= 200112L && defined(ALIGN_MEMBLOCK)
++  char* block = nullptr;
++  if (posix_memalign((void**)&block, ALIGN_MEMBLOCK, block_bytes) != 0) {
++    exit(1);
++  }
++#elif defined(OS_WIN)
++  char* block = nullptr;
++  if (nullptr ==
++	(block = reinterpret_cast<char*>(_aligned_malloc(block_bytes, ALIGN_MEMBLOCK)))) {
++    exit(1);
++  }
++#else
++  char* block = nullptr;
++  if (force_align) {
++	  if (posix_memalign((void**)&block, 64, block_bytes) != 0) {
++	    exit(1);
++	  }
++  }
++  else {
++	  block = new char[block_bytes];
++  }
++#endif
+   // NOTE: std::make_unique zero-initializes the block so is not appropriate
+   // here
+-  char* block = new char[block_bytes];
+   blocks_.push_back(std::unique_ptr<char[]>(block));
+ 
+   size_t allocated_size;
+diff --git a/memory/arena.h b/memory/arena.h
+index 2257a4935..b58d1a571 100644
+--- a/memory/arena.h
++++ b/memory/arena.h
+@@ -58,7 +58,7 @@ class Arena : public Allocator {
+   // huge_page_tlb_size > 0, we highly recommend a logger is passed in.
+   // Otherwise, the error message will be printed out to stderr directly.
+   char* AllocateAligned(size_t bytes, size_t huge_page_size = 0,
+-                        Logger* logger = nullptr) override;
++                        Logger* logger = nullptr, int custom_align = 16, bool force_align=false) override;
+ 
+   // Returns an estimate of the total memory usage of data allocated
+   // by the arena (exclude the space allocated but not yet used for future
+@@ -110,8 +110,8 @@ class Arena : public Allocator {
+   size_t hugetlb_size_ = 0;
+ 
+   char* AllocateFromHugePage(size_t bytes);
+-  char* AllocateFallback(size_t bytes, bool aligned);
+-  char* AllocateNewBlock(size_t block_bytes);
++  char* AllocateFallback(size_t bytes, bool aligned, bool force_align=false);
++  char* AllocateNewBlock(size_t block_bytes, bool force_align);
+ 
+   // Bytes of memory in blocks allocated so far
+   size_t blocks_memory_ = 0;
+diff --git a/memory/concurrent_arena.h b/memory/concurrent_arena.h
+index f14507d30..d65c8e002 100644
+--- a/memory/concurrent_arena.h
++++ b/memory/concurrent_arena.h
+@@ -55,15 +55,15 @@ class ConcurrentArena : public Allocator {
+   }
+ 
+   char* AllocateAligned(size_t bytes, size_t huge_page_size = 0,
+-                        Logger* logger = nullptr) override {
+-    size_t rounded_up = ((bytes - 1) | (sizeof(void*) - 1)) + 1;
+-    assert(rounded_up >= bytes && rounded_up < bytes + sizeof(void*) &&
+-           (rounded_up % sizeof(void*)) == 0);
++                        Logger* logger = nullptr, int custom_align = 16, bool force_align=false) override {
++    size_t rounded_up = bytes;//((bytes - 1) | (custom_align - 1)) + 1;
++    //assert(rounded_up >= bytes && rounded_up < bytes + custom_align &&
++    //       (rounded_up % custom_align) == 0);
+ 
+     return AllocateImpl(rounded_up, huge_page_size != 0 /*force_arena*/,
+-                        [this, rounded_up, huge_page_size, logger]() {
++                        [this, rounded_up, huge_page_size, logger, custom_align, force_align]() {
+                           return arena_.AllocateAligned(rounded_up,
+-                                                        huge_page_size, logger);
++                                                        huge_page_size, logger, custom_align, force_align);
+                         });
+   }
+ 
+diff --git a/memtable/hash_linklist_rep.cc b/memtable/hash_linklist_rep.cc
+index 57a0708a5..90272ec61 100644
+--- a/memtable/hash_linklist_rep.cc
++++ b/memtable/hash_linklist_rep.cc
+@@ -888,6 +888,9 @@ class HashLinkListRepFactory : public MemTableRepFactory {
+   using MemTableRepFactory::CreateMemTableRep;
+   MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator& compare,
+                                  Allocator* allocator,
++#ifdef SEG_TALL_NODE
++				 Allocator* allocator_tall,
++#endif
+                                  const SliceTransform* transform,
+                                  Logger* logger) override;
+ 
+@@ -904,6 +907,9 @@ class HashLinkListRepFactory : public MemTableRepFactory {
+ 
+ MemTableRep* HashLinkListRepFactory::CreateMemTableRep(
+     const MemTableRep::KeyComparator& compare, Allocator* allocator,
++#ifdef SEG_TALL_NODE
++    Allocator* allocator_tall,
++#endif
+     const SliceTransform* transform, Logger* logger) {
+   return new HashLinkListRep(
+       compare, allocator, transform, options_.bucket_count,
+diff --git a/memtable/hash_skiplist_rep.cc b/memtable/hash_skiplist_rep.cc
+index ca4c376db..c82b1f9c7 100644
+--- a/memtable/hash_skiplist_rep.cc
++++ b/memtable/hash_skiplist_rep.cc
+@@ -85,7 +85,7 @@ class HashSkipListRep : public MemTableRep {
+     ~Iterator() override {
+       // if we own the list, we should also delete it
+       if (own_list_) {
+-        assert(list_ != nullptr);
++        //assert(list_ != nullptr);
+         delete list_;
+       }
+     }
+@@ -96,21 +96,21 @@ class HashSkipListRep : public MemTableRep {
+     // Returns the key at the current position.
+     // REQUIRES: Valid()
+     const char* key() const override {
+-      assert(Valid());
++      //assert(Valid());
+       return iter_.key();
+     }
+ 
+     // Advances to the next position.
+     // REQUIRES: Valid()
+     void Next() override {
+-      assert(Valid());
++      //assert(Valid());
+       iter_.Next();
+     }
+ 
+     // Advances to the previous position.
+     // REQUIRES: Valid()
+     void Prev() override {
+-      assert(Valid());
++      //assert(Valid());
+       iter_.Prev();
+     }
+ 
+@@ -128,7 +128,7 @@ class HashSkipListRep : public MemTableRep {
+     void SeekForPrev(const Slice& /*internal_key*/,
+                      const char* /*memtable_key*/) override {
+       // not supported
+-      assert(false);
++      //assert(false);
+     }
+ 
+     // Position at the first entry in collection.
+@@ -150,7 +150,7 @@ class HashSkipListRep : public MemTableRep {
+    protected:
+     void Reset(Bucket* list) {
+       if (own_list_) {
+-        assert(list_ != nullptr);
++        //assert(list_ != nullptr);
+         delete list_;
+       }
+       list_ = list;
+@@ -211,7 +211,7 @@ class HashSkipListRep : public MemTableRep {
+     EmptyIterator() = default;
+     bool Valid() const override { return false; }
+     const char* key() const override {
+-      assert(false);
++      //assert(false);
+       return nullptr;
+     }
+     void Next() override {}
+@@ -255,7 +255,17 @@ HashSkipListRep::Bucket* HashSkipListRep::GetInitializedBucket(
+   size_t hash = GetHash(transformed);
+   auto bucket = GetBucket(hash);
+   if (bucket == nullptr) {
++#if defined(PAD_BUCKET)
++    auto addr = allocator_->AllocateAligned(128, 0, nullptr, 64);
++#elif defined(CACHELINE_ALIGN_BUCKET)
++    auto addr = allocator_->AllocateAligned(sizeof(Bucket), 0, nullptr, 64);
++#elif defined(ALIGN_BUCKET)
++    auto addr = allocator_->AllocateAligned(sizeof(Bucket), 0, nullptr, ALIGN_BUCKET);
++#elif defined(NO_PADDING_NODE)
++    auto addr = allocator_->AllocateAligned(sizeof(Bucket), 0, nullptr, 8);
++#else
+     auto addr = allocator_->AllocateAligned(sizeof(Bucket));
++#endif
+     bucket = new (addr) Bucket(compare_, allocator_, skiplist_height_,
+                                skiplist_branching_factor_);
+     buckets_[hash].store(bucket, std::memory_order_release);
+@@ -265,7 +275,7 @@ HashSkipListRep::Bucket* HashSkipListRep::GetInitializedBucket(
+ 
+ void HashSkipListRep::Insert(KeyHandle handle) {
+   auto* key = static_cast<char*>(handle);
+-  assert(!Contains(key));
++  //assert(!Contains(key));
+   auto transformed = transform_->Transform(UserKey(key));
+   auto bucket = GetInitializedBucket(transformed);
+   bucket->Insert(key);
+@@ -359,6 +369,9 @@ class HashSkipListRepFactory : public MemTableRepFactory {
+   using MemTableRepFactory::CreateMemTableRep;
+   MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator& compare,
+                                  Allocator* allocator,
++#ifdef SEG_TALL_NODE
++				 Allocator* allocator_tall,
++#endif
+                                  const SliceTransform* transform,
+                                  Logger* logger) override;
+ 
+@@ -376,6 +389,9 @@ class HashSkipListRepFactory : public MemTableRepFactory {
+ 
+ MemTableRep* HashSkipListRepFactory::CreateMemTableRep(
+     const MemTableRep::KeyComparator& compare, Allocator* allocator,
++#ifdef SEG_TALL_NODE
++    Allocator* allocator_tall,
++#endif
+     const SliceTransform* transform, Logger* /*logger*/) {
+   return new HashSkipListRep(compare, allocator, transform,
+                              options_.bucket_count, options_.skiplist_height,
+diff --git a/memtable/inlineskiplist.h b/memtable/inlineskiplist.h
+index 9fdf618fa..3e51c9d3b 100644
+--- a/memtable/inlineskiplist.h
++++ b/memtable/inlineskiplist.h
+@@ -75,6 +75,9 @@ class InlineSkipList {
+   // in the allocator must remain allocated for the lifetime of the
+   // skiplist object.
+   explicit InlineSkipList(Comparator cmp, Allocator* allocator,
++#ifdef SEG_TALL_NODE
++		  	  Allocator* allocator_tall,
++#endif
+                           int32_t max_height = 12,
+                           int32_t branching_factor = 4);
+   // No copying allowed
+@@ -211,6 +214,9 @@ class InlineSkipList {
+   const uint32_t kScaledInverseBranching_;
+ 
+   Allocator* const allocator_;  // Allocator used for allocations of nodes
++#ifdef SEG_TALL_NODE
++  Allocator* const allocator_tall_;
++#endif
+   // Immutable after construction
+   Comparator const compare_;
+   Node* const head_;
+@@ -540,6 +546,14 @@ InlineSkipList<Comparator>::FindGreaterOrEqual(
+   // we get a chance to call Next(0).
+   Node* x = head_;
+   int level = GetMaxHeight() - 1;
++#if defined(PREFETCH_SKIPLIST_NODE) || defined(PREFETCH_ALL)
++  int slot_num = ((uintptr_t)x->Next(level) % 64) / 8;
++  if (8 - slot_num < level)
++    PREFETCH(x->Next(level - (8 - slot_num)), 0, 1);
++#endif
++#ifdef PREFETCH_NO_CHECK
++  PREFETCH(x->Next(level - 8), 0, 1);
++#endif
+   Node* last_bigger = nullptr;
+   const DecodedKey key_decoded = compare_.decode_key(key);
+   while (true) {
+@@ -564,10 +578,19 @@ InlineSkipList<Comparator>::FindGreaterOrEqual(
+     } else if (cmp < 0) {
+       // Keep searching in this list
+       x = next;
++#ifdef PREFETCH_ALL
++      slot_num = ((uintptr_t)x->Next(level) % 64) / 8;
++      if (8 - slot_num < level)
++        PREFETCH(x->Next(level - (8 - slot_num)), 0, 1);
++#endif
+     } else {
+       // Switch to next list, reuse compare_() result
+       last_bigger = next;
+       level--;
++/*#ifdef PREFETCH_ALL
++      if ((++slot_num) % 8 == 0 && level > 8)
++        PREFETCH(x->Next(level - 8), 0, 1);
++#endif*/
+     }
+   }
+ }
+@@ -761,12 +784,18 @@ uint64_t InlineSkipList<Comparator>::ApproximateNumEntries(
+ template <class Comparator>
+ InlineSkipList<Comparator>::InlineSkipList(const Comparator cmp,
+                                            Allocator* allocator,
++#ifdef SEG_TALL_NODE
++					   Allocator* allocator_tall,
++#endif
+                                            int32_t max_height,
+                                            int32_t branching_factor)
+     : kMaxHeight_(static_cast<uint16_t>(max_height)),
+       kBranching_(static_cast<uint16_t>(branching_factor)),
+       kScaledInverseBranching_((Random::kMaxNext + 1) / kBranching_),
+       allocator_(allocator),
++#ifdef SEG_TALL_NODE
++      allocator_tall_(allocator_tall),
++#endif
+       compare_(cmp),
+       head_(AllocateNode(0, max_height)),
+       max_height_(1),
+@@ -791,12 +820,22 @@ typename InlineSkipList<Comparator>::Node*
+ InlineSkipList<Comparator>::AllocateNode(size_t key_size, int height) {
+   auto prefix = sizeof(std::atomic<Node*>) * (height - 1);
+ 
++#ifdef SEG_TALL_NODE
++#ifdef ALIGN_TALL_NODE
++  char* raw = height > SEG_TALL_NODE ? allocator_tall_->AllocateAligned(prefix + sizeof(Node) + key_size, 0, nullptr, 64) : allocator_->AllocateAligned(prefix + sizeof(Node) + key_size);
++#else
++  char* raw = height > SEG_TALL_NODE ? allocator_tall_->AllocateAligned(prefix + sizeof(Node) + key_size) : allocator_->AllocateAligned(prefix + sizeof(Node) + key_size);
++#endif
++#elif defined(ALIGN_TALL_NODE)
++  char* raw = height > ALIGN_TALL_NODE ? allocator_->AllocateAligned(prefix + sizeof(Node) + key_size, 0, nullptr, 64) : allocator_->AllocateAligned(prefix + sizeof(Node) + key_size);
++#else
+   // prefix is space for the height - 1 pointers that we store before
+   // the Node instance (next_[-(height - 1) .. -1]).  Node starts at
+   // raw + prefix, and holds the bottom-mode (level 0) skip list pointer
+   // next_[0].  key_size is the bytes for the key, which comes just after
+   // the Node.
+   char* raw = allocator_->AllocateAligned(prefix + sizeof(Node) + key_size);
++#endif
+   Node* x = reinterpret_cast<Node*>(raw + prefix);
+ 
+   // Once we've linked the node into the skip list we don't actually need
+diff --git a/memtable/memtablerep_bench.cc b/memtable/memtablerep_bench.cc
+index 47e206deb..3fc8e8823 100644
+--- a/memtable/memtablerep_bench.cc
++++ b/memtable/memtablerep_bench.cc
+@@ -615,11 +615,17 @@ int main(int argc, char** argv) {
+       ROCKSDB_NAMESPACE::BytewiseComparator());
+   ROCKSDB_NAMESPACE::MemTable::KeyComparator key_comp(internal_key_comp);
+   ROCKSDB_NAMESPACE::Arena arena;
++#ifdef SEG_TALL_NODE
++  ROCKSDB_NAMESPACE::Arena arena_tall;
++#endif
+   ROCKSDB_NAMESPACE::WriteBufferManager wb(FLAGS_write_buffer_size);
+   uint64_t sequence;
+   auto createMemtableRep = [&] {
+     sequence = 0;
+     return factory->CreateMemTableRep(key_comp, &arena,
++#ifdef SEG_TALL_NODE
++		    		      &arena_tall,
++#endif
+                                       options.prefix_extractor.get(),
+                                       options.info_log.get());
+   };
+diff --git a/memtable/skiplist.h b/memtable/skiplist.h
+index f2e2a829d..f9b5c1276 100644
+--- a/memtable/skiplist.h
++++ b/memtable/skiplist.h
+@@ -130,12 +130,17 @@ class SkipList {
+   // values are ok.
+   std::atomic<int> max_height_;  // Height of the entire list
+ 
++#ifdef REORDER_FIELDS
++  int32_t prev_height_;
++#endif
+   // Used for optimizing sequential insert patterns.  Tricky.  prev_[i] for
+   // i up to max_height_ is the predecessor of prev_[0] and prev_height_
+   // is the height of prev_[0].  prev_[0] can only be equal to head before
+   // insertion, in which case max_height_ and prev_height_ are 1.
+   Node** prev_;
++#ifndef REORDER_FIELDS
+   int32_t prev_height_;
++#endif
+ 
+   inline int GetMaxHeight() const {
+     return max_height_.load(std::memory_order_relaxed);
+@@ -176,13 +181,13 @@ struct SkipList<Key, Comparator>::Node {
+   // Accessors/mutators for links.  Wrapped in methods so we can
+   // add the appropriate barriers as necessary.
+   Node* Next(int n) {
+-    assert(n >= 0);
++    //assert(n >= 0);
+     // Use an 'acquire load' so that we observe a fully initialized
+     // version of the returned Node.
+     return (next_[n].load(std::memory_order_acquire));
+   }
+   void SetNext(int n, Node* x) {
+-    assert(n >= 0);
++    //assert(n >= 0);
+     // Use a 'release store' so that anybody who reads through this
+     // pointer observes a fully initialized version of the inserted node.
+     next_[n].store(x, std::memory_order_release);
+@@ -190,11 +195,11 @@ struct SkipList<Key, Comparator>::Node {
+ 
+   // No-barrier variants that can be safely used in a few locations.
+   Node* NoBarrier_Next(int n) {
+-    assert(n >= 0);
++    //assert(n >= 0);
+     return next_[n].load(std::memory_order_relaxed);
+   }
+   void NoBarrier_SetNext(int n, Node* x) {
+-    assert(n >= 0);
++    //assert(n >= 0);
+     next_[n].store(x, std::memory_order_relaxed);
+   }
+ 
+@@ -206,8 +211,13 @@ struct SkipList<Key, Comparator>::Node {
+ template <typename Key, class Comparator>
+ typename SkipList<Key, Comparator>::Node* SkipList<Key, Comparator>::NewNode(
+     const Key& key, int height) {
++#ifdef NO_PADDING_NODE
++  char* mem = allocator_->AllocateAligned(
++      sizeof(Node) + sizeof(std::atomic<Node*>) * (height - 1), 0, nullptr, 8);
++#else
+   char* mem = allocator_->AllocateAligned(
+       sizeof(Node) + sizeof(std::atomic<Node*>) * (height - 1));
++#endif
+   return new (mem) Node(key);
+ }
+ 
+@@ -229,13 +239,13 @@ inline bool SkipList<Key, Comparator>::Iterator::Valid() const {
+ 
+ template <typename Key, class Comparator>
+ inline const Key& SkipList<Key, Comparator>::Iterator::key() const {
+-  assert(Valid());
++  //assert(Valid());
+   return node_->key;
+ }
+ 
+ template <typename Key, class Comparator>
+ inline void SkipList<Key, Comparator>::Iterator::Next() {
+-  assert(Valid());
++  //assert(Valid());
+   node_ = node_->Next(0);
+ }
+ 
+@@ -243,7 +253,7 @@ template <typename Key, class Comparator>
+ inline void SkipList<Key, Comparator>::Iterator::Prev() {
+   // Instead of using explicit "prev" links, we just search for the
+   // last node that falls before key.
+-  assert(Valid());
++  //assert(Valid());
+   node_ = list_->FindLessThan(node_->key);
+   if (node_ == list_->head_) {
+     node_ = nullptr;
+@@ -289,8 +299,8 @@ int SkipList<Key, Comparator>::RandomHeight() {
+   while (height < kMaxHeight_ && rnd->Next() < kScaledInverseBranching_) {
+     height++;
+   }
+-  assert(height > 0);
+-  assert(height <= kMaxHeight_);
++  //assert(height > 0);
++  //assert(height <= kMaxHeight_);
+   return height;
+ }
+ 
+@@ -312,12 +322,12 @@ SkipList<Key, Comparator>::FindGreaterOrEqual(const Key& key) const {
+   int level = GetMaxHeight() - 1;
+   Node* last_bigger = nullptr;
+   while (true) {
+-    assert(x != nullptr);
++    //assert(x != nullptr);
+     Node* next = x->Next(level);
+     // Make sure the lists are sorted
+-    assert(x == head_ || next == nullptr || KeyIsAfterNode(next->key, x));
++    //assert(x == head_ || next == nullptr || KeyIsAfterNode(next->key, x));
+     // Make sure we haven't overshot during our search
+-    assert(x == head_ || KeyIsAfterNode(key, x));
++    //assert(x == head_ || KeyIsAfterNode(key, x));
+     int cmp =
+         (next == nullptr || next == last_bigger) ? 1 : compare_(next->key, key);
+     if (cmp == 0 || (cmp > 0 && level == 0)) {
+@@ -341,10 +351,10 @@ SkipList<Key, Comparator>::FindLessThan(const Key& key, Node** prev) const {
+   // KeyIsAfter(key, last_not_after) is definitely false
+   Node* last_not_after = nullptr;
+   while (true) {
+-    assert(x != nullptr);
++    //assert(x != nullptr);
+     Node* next = x->Next(level);
+-    assert(x == head_ || next == nullptr || KeyIsAfterNode(next->key, x));
+-    assert(x == head_ || KeyIsAfterNode(key, x));
++    //assert(x == head_ || next == nullptr || KeyIsAfterNode(next->key, x));
++    //assert(x == head_ || KeyIsAfterNode(key, x));
+     if (next != last_not_after && KeyIsAfterNode(key, next)) {
+       // Keep searching in this list
+       x = next;
+@@ -405,7 +415,7 @@ uint64_t SkipList<Key, Comparator>::ApproximateNumEntries(
+       if (next == ub) {
+         break;
+       }
+-      assert(next != nullptr);
++      //assert(next != nullptr);
+       if (compare_(next->Key(), start_ikey) >= 0) {
+         break;
+       }
+@@ -416,7 +426,7 @@ uint64_t SkipList<Key, Comparator>::ApproximateNumEntries(
+       if (next == ub) {
+         break;
+       }
+-      assert(next != nullptr);
++      //assert(next != nullptr);
+       if (compare_(next->Key(), end_ikey) >= 0) {
+         // Save refined upper bound to potentially save key comparison
+         ub = next;
+@@ -441,15 +451,20 @@ SkipList<Key, Comparator>::SkipList(const Comparator cmp, Allocator* allocator,
+       head_(NewNode(0 /* any key will do */, max_height)),
+       max_height_(1),
+       prev_height_(1) {
+-  assert(max_height > 0 && kMaxHeight_ == static_cast<uint32_t>(max_height));
+-  assert(branching_factor > 0 &&
+-         kBranching_ == static_cast<uint32_t>(branching_factor));
+-  assert(kScaledInverseBranching_ > 0);
++  //assert(max_height > 0 && kMaxHeight_ == static_cast<uint32_t>(max_height));
++  //assert(branching_factor > 0 &&
++  //       kBranching_ == static_cast<uint32_t>(branching_factor));
++  //assert(kScaledInverseBranching_ > 0);
+   // Allocate the prev_ Node* array, directly from the passed-in allocator.
+   // prev_ does not need to be freed, as its life cycle is tied up with
+   // the allocator as a whole.
++#ifdef NO_PADDING_NODE
++  prev_ = reinterpret_cast<Node**>(
++      allocator_->AllocateAligned(sizeof(Node*) * kMaxHeight_, 0, nullptr, 8));
++#else
+   prev_ = reinterpret_cast<Node**>(
+       allocator_->AllocateAligned(sizeof(Node*) * kMaxHeight_));
++#endif
+   for (int i = 0; i < kMaxHeight_; i++) {
+     head_->SetNext(i, nullptr);
+     prev_[i] = head_;
+@@ -461,7 +476,7 @@ void SkipList<Key, Comparator>::Insert(const Key& key) {
+   // fast path for sequential insertion
+   if (!KeyIsAfterNode(key, prev_[0]->NoBarrier_Next(0)) &&
+       (prev_[0] == head_ || KeyIsAfterNode(key, prev_[0]))) {
+-    assert(prev_[0] != head_ || (prev_height_ == 1 && GetMaxHeight() == 1));
++    //assert(prev_[0] != head_ || (prev_height_ == 1 && GetMaxHeight() == 1));
+ 
+     // Outside of this method prev_[1..max_height_] is the predecessor
+     // of prev_[0], and prev_height_ refers to prev_[0].  Inside Insert
+@@ -478,7 +493,7 @@ void SkipList<Key, Comparator>::Insert(const Key& key) {
+   }
+ 
+   // Our data structure does not allow duplicate insertion
+-  assert(prev_[0]->Next(0) == nullptr || !Equal(key, prev_[0]->Next(0)->key));
++  //assert(prev_[0]->Next(0) == nullptr || !Equal(key, prev_[0]->Next(0)->key));
+ 
+   int height = RandomHeight();
+   if (height > GetMaxHeight()) {
+diff --git a/memtable/skiplistrep.cc b/memtable/skiplistrep.cc
+index 93d32e9fe..bfdd97764 100644
+--- a/memtable/skiplistrep.cc
++++ b/memtable/skiplistrep.cc
+@@ -24,10 +24,18 @@ class SkipListRep : public MemTableRep {
+ 
+  public:
+   explicit SkipListRep(const MemTableRep::KeyComparator& compare,
+-                       Allocator* allocator, const SliceTransform* transform,
++                       Allocator* allocator,
++#ifdef SEG_TALL_NODE
++		       Allocator* allocator_tall,
++#endif
++		       const SliceTransform* transform,
+                        const size_t lookahead)
+       : MemTableRep(allocator),
+-        skip_list_(compare, allocator),
++        skip_list_(compare, allocator
++#ifdef SEG_TALL_NODE
++			, allocator_tall
++#endif
++			),
+         cmp_(compare),
+         transform_(transform),
+         lookahead_(lookahead) {}
+@@ -398,8 +406,15 @@ std::string SkipListFactory::GetId() const {
+ 
+ MemTableRep* SkipListFactory::CreateMemTableRep(
+     const MemTableRep::KeyComparator& compare, Allocator* allocator,
++#ifdef SEG_TALL_NODE
++    Allocator* allocator_tall,
++#endif
+     const SliceTransform* transform, Logger* /*logger*/) {
+-  return new SkipListRep(compare, allocator, transform, lookahead_);
++  return new SkipListRep(compare, allocator, 
++#ifdef SEG_TALL_NODE
++		  allocator_tall,
++#endif
++		  transform, lookahead_);
+ }
+ 
+ }  // namespace ROCKSDB_NAMESPACE
+diff --git a/memtable/vectorrep.cc b/memtable/vectorrep.cc
+index 9b0192cb8..606423d96 100644
+--- a/memtable/vectorrep.cc
++++ b/memtable/vectorrep.cc
+@@ -301,6 +301,9 @@ VectorRepFactory::VectorRepFactory(size_t count) : count_(count) {
+ 
+ MemTableRep* VectorRepFactory::CreateMemTableRep(
+     const MemTableRep::KeyComparator& compare, Allocator* allocator,
++#ifdef SEG_TALL_NODE
++    Allocator* allocator_tall,
++#endif
+     const SliceTransform*, Logger* /*logger*/) {
+   return new VectorRep(compare, allocator, count_);
+ }
+diff --git a/test_util/sync_point_impl.h b/test_util/sync_point_impl.h
+index 64cc0445e..63f3d17ef 100644
+--- a/test_util/sync_point_impl.h
++++ b/test_util/sync_point_impl.h
+@@ -32,7 +32,7 @@ class SingleAllocator : public Allocator {
+     assert(false);
+     return nullptr;
+   }
+-  char* AllocateAligned(size_t bytes, size_t, Logger*) override {
++  char* AllocateAligned(size_t bytes, size_t, Logger*, int, bool) override {
+     buf_.resize(bytes);
+     return const_cast<char*>(buf_.data());
+   }
+diff --git a/test_util/testutil.cc b/test_util/testutil.cc
+index 49ab2ebfd..dc541bc01 100644
+--- a/test_util/testutil.cc
++++ b/test_util/testutil.cc
+@@ -691,11 +691,18 @@ class SpecialSkipListFactory : public MemTableRepFactory {
+   using MemTableRepFactory::CreateMemTableRep;
+   MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator& compare,
+                                  Allocator* allocator,
++#ifdef SEG_TALL_NODE
++				 Allocator* allocator_tall,
++#endif
+                                  const SliceTransform* transform,
+                                  Logger* /*logger*/) override {
+     return new SpecialMemTableRep(
+         allocator,
+-        factory_.CreateMemTableRep(compare, allocator, transform, nullptr),
++        factory_.CreateMemTableRep(compare, allocator, 
++#ifdef SEG_TALL_NODE
++		allocator_tall,
++#endif
++		transform, nullptr),
+         num_entries_flush_);
+   }
+   static const char* kClassName() { return "SpecialSkipListFactory"; }
+diff --git a/tools/db_bench_tool.cc b/tools/db_bench_tool.cc
+index f64355260..2bcb7f94b 100644
+--- a/tools/db_bench_tool.cc
++++ b/tools/db_bench_tool.cc
+@@ -3313,13 +3313,13 @@ class Benchmark {
+   }
+ 
+   ~Benchmark() {
+-    DeleteDBs();
++    /*DeleteDBs();
+     if (cache_.get() != nullptr) {
+       // Clear cache reference first
+       open_options_.write_buffer_manager.reset();
+       // this will leak, but we're shutting down so nobody cares
+       cache_->DisownData();
+-    }
++    }*/
+   }
+ 
+   Slice AllocateKey(std::unique_ptr<const char[]>* key_guard) {
+diff --git a/util/thread_local.cc b/util/thread_local.cc
+index 805a0aad6..2fcae9623 100644
+--- a/util/thread_local.cc
++++ b/util/thread_local.cc
+@@ -352,7 +352,14 @@ void ThreadLocalPtr::StaticMeta::RemoveThreadData(ThreadData* d) {
+ ThreadData* ThreadLocalPtr::StaticMeta::GetThreadLocal() {
+   if (UNLIKELY(tls_ == nullptr)) {
+     auto* inst = Instance();
++#ifdef ALIGN_THREADDATA
++    if (posix_memalign((void**) &tls_, 64, sizeof(ThreadData)) != 0) {
++        exit(1);
++    } 
++    new (tls_) ThreadData(inst);
++#else
+     tls_ = new ThreadData(inst);
++#endif
+     {
+       // Register it in the global chain, needs to be done before thread exit
+       // handler registration

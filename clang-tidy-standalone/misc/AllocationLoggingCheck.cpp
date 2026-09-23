@@ -184,17 +184,17 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
 
     #ifdef ALLOCLOGGING_TEMPLATE
                 diag(mnode->getExprLoc().getLocWithOffset(offset), "insert type here",
-                    DiagnosticIDs::Error)
+                    DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(
                         mnode->getExprLoc().getLocWithOffset(offset),
                         "<" + type + ", " + std::to_string(line) + ", " + std::to_string(filemap[FileName]) + ">");
     #else    
                 diag(mnode->getExprLoc().getLocWithOffset(offset), "insert _s here",
-                    DiagnosticIDs::Error)
+                    DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(
                         mnode->getExprLoc().getLocWithOffset(offset), "_s");
                 diag(mnode->getEndLoc(), "insert file name, line number, and type",
-                    DiagnosticIDs::Error)
+                    DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(
                         mnode->getEndLoc(),
                         ", " + std::to_string(line) + ", " + std::to_string(filemap[FileName]) + ", " + std::to_string(typemap[type]));
@@ -216,7 +216,7 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
         }
         if (node->getNumPlacementArgs() == 0) {
             diag(node->getExprLoc(), "insert MemStamp",
-                DiagnosticIDs::Error)
+                DiagnosticIDs::Warning)
                 << FixItHint::CreateInsertion(
                         node->getExprLoc(),
                         "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * ");
@@ -228,7 +228,7 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
             // std::string type = node->getAllocatedType().getTypePtr()->getAs<clang::RecordType>()->getDecl()->getNameAsString();
             std::string out = "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * (" + type + "*) ";
             diag(node->getExprLoc(), "insert MemStamp (placement new)",
-                DiagnosticIDs::Error)
+                DiagnosticIDs::Warning)
                 << FixItHint::CreateInsertion(
                         node->getExprLoc(),
                         out);

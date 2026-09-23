@@ -15,6 +15,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/perfstat_common.sh"
+source "$SCRIPT_DIR/prepare_ascylib.sh"
 
 # ascylib_perfbench_setup <out_name>
 # Fresh copy of vendored ASCYLIB to build variants against. Sets the global
@@ -29,6 +30,7 @@ ascylib_perfbench_setup() {
     rm -rf "$ASCYLIB_PERFBENCH_WORK"
     mkdir -p "$ASCYLIB_PERFBENCH_WORK"
     cp -r "$SIFTER_ROOT/artifact/vendor/ascylib" "$ASCYLIB_SRC_COPY"
+    prepare_ascylib "$SIFTER_ROOT" "$ASCYLIB_SRC_COPY"
 }
 
 # ascylib_perfbench_build <tree_src_dir> [make_args...]
@@ -72,6 +74,9 @@ ascylib_perfbench_variant() {
     local threads="$5" initial="$6" range="$7" update="$8" duration_ms="$9"
     local reps="${10}"
     local preload="${11:-}"
+    local placement=(numactl -i 0 taskset -c "0-$((threads - 1))")
+    if [[ "${ARTIFACT_NO_NUMA:-0}" == 1 ]]; then placement=(); fi
+    sha256sum "$ASCYLIB_SRC_COPY/bin/$binary_name" | sed "s|$ASCYLIB_SRC_COPY/bin/$binary_name|$variant|" >> "${results_tsv}.binaries.sha256"
 
     echo "  variant: $variant (threads=$threads initial=$initial update=$update%)"
     for run_idx in $(seq 0 $((reps - 1))); do
@@ -81,7 +86,7 @@ ascylib_perfbench_variant() {
             [ -n "$preload" ] && export LD_PRELOAD="$preload"
             perfbench_run_rep "$results_tsv" "$run_dir" "$variant" "$threads" "$run_idx" \
                 '(?<=#Mops )[0-9.]+' 1000000 -- \
-                numactl -i 0 taskset -c "0-$((threads - 1))" \
+                "${placement[@]}" \
                 "./bin/${binary_name}" -i "$initial" -r "$range" -n "$threads" -u "$update" -d "$duration_ms"
         )
     done

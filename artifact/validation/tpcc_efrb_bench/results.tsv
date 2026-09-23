@@ -1,0 +1,6 @@
+variant	threads	run	throughput_ops_s	cache_misses_raw	page_faults_raw	l1d_misses_raw	llc_load_misses_raw	llc_store_misses_raw	context_switches_raw	dtlb_misses_raw
+a_jemalloc	2	0	9422.0508	NA	NA	NA	NA	NA	NA	NA
+b_mimalloc	2	0	13873.2744	NA	NA	NA	NA	NA	NA	NA
+c_mimalloc_fixed	2	0	9882.5444	NA	NA	NA	NA	NA	NA	NA
+d_single_recmgr	2	0	10931.4302	NA	NA	NA	NA	NA	NA	NA
+e_single_recmgr_mimalloc_fixed	2	0	20901.1595	NA	NA	NA	NA	NA	NA	NA

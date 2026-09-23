@@ -1,0 +1,8 @@
+{
+  "flags": [
+    "REORDER_FIELDS=1",
+    "NO_PADDING_NODE=1"
+  ],
+  "sha256": "76c36d026482b96db97b4258c52a9ec0e608b8299454300d8c803f2059462861",
+  "source_revision": "19e4aba3db75bd6add7177164c892ab6cdfd50b3 + rocksdb-historical.patch"
+}

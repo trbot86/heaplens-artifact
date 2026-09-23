@@ -1,0 +1,8 @@
+ASCYLIB EFRB tree: default -> +obj segregation / +MT prefill / +both (paper Section 6.2 / Figure 5 / Table 1 row 1)
+a_default                    threads=2 n=1 mean=21186000.00 ops/s SD=NA change=+0.00%
+b_obj_seg                    threads=2 n=1 mean=22812000.00 ops/s SD=NA change=+7.67%
+c_mt_prefill                 threads=2 n=1 mean=22127000.00 ops/s SD=NA change=+4.44%
+d_both                       threads=2 n=1 mean=22652000.00 ops/s SD=NA change=+6.92%
+Counter columns are RAW whole-process totals, including initialization/prefill.
+They are NOT the paper's measurement-window events/operation. Unavailable/disabled events are NA.
+Per-run results and logs: /root/sifter/artifact/experiments/ascylib_efrb_bench/results.tsv

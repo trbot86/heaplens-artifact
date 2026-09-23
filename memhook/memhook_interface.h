@@ -80,6 +80,7 @@ using namespace std;
         unit_log.size = sz; \
         unit_log.addr = ptr; \
         unit_log.typeofop = true; \
+        unit_log.file = fname; \
         unit_log.tindex_name = tid; \
         unit_log.line = line; \
         memhookCollector.copy(unit_log);

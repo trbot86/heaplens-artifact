@@ -1,265 +1,208 @@
-# HeapLENS Artifact (ATC '26)
+# HeapLENS — ACM ATC 2026 artifact
 
-This is the artifact accompanying "HeapLENS: Heap Layout Evaluation &
-Navigation Suite" (ATC '26, paper #483). HeapLENS instruments C/C++
-applications to log memory (de)allocations with full type information,
-samples and clusters the resulting event log, and visualizes it
-interactively to help find memory-layout issues such as cache set
-underutilization, field scattering, and false sharing.
+**Paper:** *HeapLENS: Heap Layout Evaluation & Navigation Suite*, ACM ATC 2026,
+paper 483. This artifact supplies the C/C++ instrumentation, allocation logger,
+trace reconstruction and sampling, interactive GUI, text exporter, retained
+application inputs/results, and before/after experiment drivers.
 
-The system itself (instrumentation, logging, sampling, visualization) lives
-at the root of this repository, not under `artifact/`. This directory adds
-only what's specific to artifact evaluation: pinned copies of the external
-benchmark applications used in the paper's case studies, and scripts that
-drive the existing pipeline against them end-to-end.
+Start with the small verified paths below. See [VALIDATION.md](VALIDATION.md)
+for the exact tested scope; packaging a driver does not imply its full paper
+experiment has been rerun. [PROVENANCE.md](PROVENANCE.md) distinguishes upstream
+source, authors' experimental modifications, retained results, and new runs.
 
-There are two kinds of experiments here:
+## 1. Requirements and installation
 
-- **Visualization experiments** (`experiments/<name>/run.sh`): instrument a
-  stock, unmodified target data structure with HeapLENS and produce a
-  sampled `.sqlite` database to open in the visualizer, reproducing the data
-  behind the paper's figures.
-- **Performance experiments** (`experiments/<name>_bench/run.sh`): build the
-  target's own (un-instrumented) benchmark binaries in each of the paper's
-  described configurations -- stock and with each fix applied -- and measure
-  throughput/hardware-counter deltas with `perf stat`, reproducing the
-  percentages in Table 1/3/4.
+Use x86-64 Linux with Docker Engine, or Docker Desktop with WSL2 for the
+functionality checks. Run commands in a Linux/WSL shell from the repository
+root. Prefer a native Linux filesystem over `/mnt/c` for compilation speed.
+No LaTeX installation is needed. Avoid a native Windows checkout: some upstream filenames/symlinks
+are not representable on NTFS.
 
-## What's reproduced
+Allow roughly 20 GB of free disk space for the dependency image and small
+builds, and 8–16 GB RAM for basic checks; use at least 32 GB RAM and more
+scratch disk for the full application experiments. These are planning
+estimates, not measured peak guarantees. Full TPC-C/large trace generation
+can require substantially more memory/disk. Build with four jobs by default;
+reduce `--jobs` if memory is limited.
 
-| Paper claim | Script | Reproduces |
+The source archive includes vendor content. For a Git checkout, initialize
+the pinned submodules **before** building:
+
+```bash
+git submodule update --init artifact/vendor/ascylib artifact/vendor/setbench artifact/vendor/rocksdb
+git -C artifact/vendor/setbench submodule update --init common/recordmgr tools
+bash artifact/run.sh build
+```
+
+The container uses Ubuntu 22.04, LLVM/Clang 14.0.6, Python 3.10, Node 18.18.2,
+and pinned direct Python/npm dependencies. Its first build needs Internet
+access to package registries. Typical first-build time is several minutes,
+but depends on download speed. No privileged container or host sysctl change
+is required for the quick start. The image is a dependency environment;
+the runner mounts this artifact at `/root/sifter`.
+
+## 2. Kick the tires
+
+```bash
+bash artifact/run.sh smoke
+bash artifact/run.sh gui
+```
+
+`smoke` checks dependencies and SQLite integrity, recomputes summaries of
+saved results, and regenerates the LLM text export. It does not run large
+benchmarks. Expected output includes `Python imports OK`, ten saved runs per
+Valkey/HNSW variant, `Export OK`, and a new results directory. With the image
+built, this path normally finishes in under a minute on the submission host.
+
+For the GUI, open <http://localhost:3000>, choose `valkey-artifact.sqlite`,
+and follow [GUIDED_WALKTHROUGH.md](GUIDED_WALKTHROUGH.md). Move the timeline
+away from its initially empty time. The servers bind only to the host's
+loopback interface. Ctrl-C stops them. No remote usage telemetry is enabled.
+
+Optional bounded application checks:
+
+```bash
+bash artifact/run.sh hnsw --profile smoke
+bash artifact/run.sh valkey --profile smoke
+bash artifact/run.sh legacy ascylib_efrb_bench --profile smoke
+bash artifact/run.sh legacy ascylib_efrb --profile smoke
+```
+
+The first two compile separate baseline/candidate copies. Valkey uses 10,000
+synthetic keys, two server/client threads, three timed seconds per variant;
+HNSW uses 10,000 128-D vectors and 1,000 queries. EFRB uses two threads and
+4,096 keys. Builds take minutes. **Smoke speedups are not paper evidence.**
+
+New application output goes to `artifact/results/<command>-<UTC timestamp>/`:
+configuration/environment, build logs, per-run data, summary, and pass/fail
+status. `--out /root/sifter/artifact/results/NEW_NAME` chooses a new directory;
+existing directories are rejected. Legacy paths write under
+`artifact/experiments/<name>/`; the entry point refuses to overwrite a prior
+working tree/result. Use a fresh checkout for another legacy run.
+
+The GUI also lists `efrb-smoke.sqlite`, a newly generated small teaching trace.
+It avoids rebuilding the instrumentation toolchain just to try the interface.
+
+## 3. Experiment-to-paper map
+
+Section/figure references below use the accepted submission, before
+camera-ready renumbering. The scripts and configurations are the durable IDs.
+
+| Paper result / capability | Entry point after `bash artifact/run.sh` | Inputs / expected comparison |
 |---|---|---|
-| §6.2/Fig. 4-5: EFRB tree cache-set underutilization | `experiments/ascylib_efrb/run.sh` | Visualization data |
-| Appendix B: DVY tree | `experiments/ascylib_dvy/run.sh` | Visualization data |
-| Appendix B: HJ tree | `experiments/ascylib_hj/run.sh` | Visualization data |
-| §6.3/Fig. 6-7: TPC-C with BCCO tree index | `experiments/tpcc_bcco/run.sh` | Visualization data |
-| §6.3: TPC-C with EFRB tree index | `experiments/tpcc_efrb/run.sh` | Visualization data |
-| §6.4: RocksDB HashSkipList memtable | `experiments/rocksdb_hsl/run.sh` | Visualization data |
-| §6.2/Fig. 5/Table 1 row 1: EFRB tree fixes (prefill / arenas) | `experiments/ascylib_efrb_bench/run.sh` | Performance experiment |
-| Appendix B.1/Table 3: DVY tree padding (96B/72B/128B/192B) | `experiments/ascylib_dvy_bench/run.sh` | Performance experiment |
-| Appendix B.2/Table 4: HJ tree allocator (glibc vs jemalloc) | `experiments/ascylib_hj_bench/run.sh` | Performance experiment |
-| §6.3/Table 1 row 4: TPC-C/BCCO fixes (arenas + row-lock) | `experiments/tpcc_bcco_bench/run.sh` | Performance experiment |
-| §6.3/Table 1 row 5: TPC-C/EFRB fixes (single-recmgr + row padding) | `experiments/tpcc_efrb_bench/run.sh` | Performance experiment |
-| §6.4/Table 1: RocksDB prefix hash memtable fix (reorder + drop padding) | `experiments/rocksdb_hsl_bench/run.sh` | Performance experiment |
-| §6.4/Table 1: RocksDB inline skiplist memtable fix (align + segregate tall nodes) | `experiments/rocksdb_isl_bench/run.sh` | Performance experiment |
-| Appendix D: LLM-friendly data export | `export_llm_data.sh` (host-side, see below) | LLM export demo (see below) |
-| §6.5, Appendix D: Valkey / HNSWLib | not scripted | LLM-driven case study; not reproducible as a script (see below) |
+| Representative-page GUI and text export (§§4–5, §6.5) | `gui`, `export` | Retained Valkey SQLite, compact text, allocation types |
+| EFRB (§6.2, Fig. 5, Table 1) | `legacy ascylib_efrb_bench` | Baseline, object segregation, parallel prefill, both |
+| DVY (Appendix B, Table 3) | `legacy ascylib_dvy_bench` | 96/72/128/192-byte node-layout variants |
+| HJ (Appendix B, Table 4) | `legacy ascylib_hj_bench` | glibc malloc / jemalloc backing the suballocator |
+| TPC-C/BCCO (§6.3) | `legacy tpcc_bcco_bench` | Baseline / node segregation / segregation + packed row lock |
+| TPC-C/EFRB (§6.3) | `legacy tpcc_efrb_bench` | Allocator, row-padding, and reclamation variants; see caveat below |
+| RocksDB HashSkipList (§6.4) | `rocksdb --memtable prefix_hash` | Historical baseline / field reorder + node-alignment reduction |
+| RocksDB InlineSkipList (§6.4) | `rocksdb --memtable skip_list` | Historical baseline / align and separate tall nodes |
+| Valkey (§6.5 / Appendix D) | `valkey` | Saved baseline / B1C1_64 small-object placement patch |
+| HNSWLib (Appendix D) | `hnsw` | Original packed layout / separate aligned vector slab + huge-page advice |
+| HNSW rebuttal factorization | `hnsw-factorization --factors hugepage` | Four cells, corrected advice-before-first-touch source; ten blocks in paper mode |
+| HNSW separation/alignment follow-up | `hnsw-factorization --factors alignment` | Packed / separate +32-byte offset / separate aligned; six blocks in paper mode |
+| Fresh trace generation | `legacy NAME` | NAME = `ascylib_efrb`, `ascylib_dvy`, `ascylib_hj`, `tpcc_bcco`, `tpcc_efrb`, `rocksdb_hsl` |
+| Optional model-assisted exploration | See [LLM_EXAMPLE.md](LLM_EXAMPLE.md) | Saved inputs; fresh prompts optional and nondeterministic |
 
-None of the visualization experiments apply the paper's follow-up code
-fixes -- for the quantitative Table 1/3/4 percentages, see each experiment's
-`_bench` counterpart instead.
+## 4. Paper-size reruns
 
-Valkey and HNSWLib (§6.5, Appendix D) aren't scripted: those case studies
-used a nondeterministic LLM agent on specific hardware to discover the
-optimizations, which isn't reproducible as a script. The command-line
-exporter that *fed* HeapLENS data to that LLM agent is scripted, though --
-see "LLM-friendly data export" below.
+Explicitly select `--profile paper`; the default is smoke. The application
+drivers default to ten repetitions per variant in paper mode; `--reps N`
+overrides this and is recorded. This is the **new driver's setting**, not a
+claim that every historical auxiliary experiment had ten repetitions.
 
-## TPC-C notes
-
-Both TPC-C experiments (visualization and performance) default to
-`THREADS=2` rather than the paper's own thread/warehouse count, since the
-point of the TPC-C experiments here is to demonstrate the pipeline working
-on the paper's actual case study, not to reproduce Table 1's exact numbers
-at scale. Pass `THREADS=24` (and, for the visualization experiments,
-`RUN_SECONDS=30`) for something closer to the paper's configuration. If
-`THREADS` exceeds your machine's core count you'll see harmless
-`could not bind thread N to cpuset` warnings.
-
-## RocksDB notes
-
-`rocksdb_hsl` instruments `db_bench` against the pre-fix HashSkipList
-memtable (`artifact/vendor/rocksdb` is pinned to the commit immediately
-before the paper's fix). RocksDB's build is heavier than ASCYLIB/setbench's,
-so a few things differ:
-
-- `make ... -j$(nproc)` has been observed to freeze the Docker host;
-  `BUILD_JOBS` (default 4) caps parallelism for both the instrumentation
-  build and the final link.
-- `fillrandom` keeps generating keys for the full `RUN_SECONDS` rather than
-  stopping at `NUM_KEYS`, so `SAMPLE_PROPORTION` defaults much lower here
-  (0.05) than for the other experiments to keep the output `.sqlite` in the
-  same few-hundred-MB range.
-- RocksDB's own `Allocate`-named methods on several unrelated classes, a
-  few template-instantiation edge cases in its allocation logging, and
-  header sharing across translation units all need extra handling beyond
-  what ASCYLIB/setbench required; see `artifact/lib/rocksdb_experiment.sh`
-  and its companion `dedupe_fixes_yaml.py` / `fixup_anon_namespace_casts.py`
-  / `fixup_malformed_insertions.py` / `patch_allocate_overloads.py` for the
-  specifics.
-
-`rocksdb_hsl_bench`/`rocksdb_isl_bench` (the performance experiments) are
-simpler: no HeapLENS instrumentation at all, just RocksDB's own `db_bench`
-built and run directly, mirroring the paper's own
-`run_experiment_asplos.sh`. Both default to `THREADS=18` (the smaller of
-the paper's two thread counts, which were tied to its specific dual-socket
-hardware) and simplify the reference script's per-thread-count compaction
-tuning to a single `--disable_auto_compactions=true` config that works at
-any `THREADS`.
-
-## Performance experiments
-
-**Cache/TLB/LLC-miss columns need hardware performance-counter (PMU) access,**
-which most Type-2 hypervisors don't expose to containers (including Docker
-Desktop's WSL2/Hyper-V backend on Windows). On such hosts `perf stat` prints
-`<not supported>` for every hardware event; these scripts detect that and
-print `NA (no PMU)` instead of fabricating a number. Throughput and
-page-fault/context-switch numbers are unaffected. Run on bare-metal Linux
-(or a VM with PMU passthrough) to get the hardware-counter columns.
-
-## Hardware / software requirements
-
-Any modern multi-core x86-64 Linux machine works; the paper's own numbers
-were collected on 2x24-core Intel Xeon Gold 5220R CPUs (§6.1). ASCYLIB
-experiments default to `THREADS=24`; TPC-C defaults to `THREADS=2` (see
-above). Each visualization experiment takes a few minutes to run except
-TPC-C (10-20 min, mostly toolchain/build time) and RocksDB (heaviest build).
-Each performance experiment takes roughly 5-15 minutes at default settings.
-Budget a few GB of free disk space for build artifacts and output databases.
-
-Software dependencies are exactly what's in
-`docker/ubuntu_22_04/Dockerfile` at the repository root (clang/LLVM 14, a
-source build of `perf`, gflags, tbb, sqlite3, Python 3 +
-scikit-learn/pandas, `numactl`, etc.). **Use that Docker image** rather than
-assembling the toolchain manually.
-
-## Setup
-
-```sh
-cd docker/ubuntu_22_04
-sudo ./build_image_and_launch.sh --name sifter-artifact
-# inside the container:
-cd /root/sifter
-artifact/setup.sh
+```bash
+HEAPLENS_NUMA=1 bash artifact/run.sh valkey --profile paper
+HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh legacy tpcc_bcco_bench --profile paper
+HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable prefix_hash --profile paper
 ```
 
-`artifact/setup.sh` initializes the three pinned vendor submodules
-(`artifact/vendor/ascylib`, `artifact/vendor/setbench` plus its own nested
-submodules, `artifact/vendor/rocksdb`) and sanity-checks the toolchain is on
-`PATH`.
+Valkey needs two NUMA nodes with 24 available physical cores each, 4M keys,
+128-byte values, 20% SET/80% GET, pipeline 16, four clients/thread, and 30-second
+measurements after preload. Server and client nodes default to 0 and 1;
+`--server-node` / `--client-node` select them. Persistence is off; networking
+is loopback, so a physical NIC is not required for this experiment.
 
-## Running experiments
+HNSW needs 1M 768-D vectors, 100k indexed queries, 24 build/query threads,
+M=16, ef_construction=200, ef=64, k=10, 10k warmup, and five timed iterations.
+Allow hours for repeated fresh graph constructions. Report recall alongside
+QPS: multithreaded construction is nondeterministic even with a fixed seed.
 
-Kick-the-tires (all 6 visualization experiments, shortened workloads):
+The two later HNSW analyses have separate commands and source snapshots:
 
-```sh
-artifact/run_all.sh --quick
+```bash
+HEAPLENS_NUMA=1 bash artifact/run.sh hnsw-factorization --factors hugepage --profile paper
+HEAPLENS_NUMA=1 bash artifact/run.sh hnsw-factorization --factors alignment --profile paper
 ```
 
-Full run (paper-scale thread counts for ASCYLIB; TPC-C stays at `THREADS=2`
-by default -- see "TPC-C notes" above):
+Retained 40-trial and 18-trial data are in `historical/hnsw-factorization/` and
+`historical/hnsw-alignment/`. These were collected on Pyke with GCC 13.3 and
+Ubuntu 24.04, unlike the artifact container. The new commands preserve the
+source/workload/factor structure, not an identical historical software stack.
+For huge-page mechanism claims inspect live mappings/THP backing on the target
+host; neither a successful `madvise` nor a tiny smoke run establishes backing.
 
-```sh
-artifact/run_all.sh
+RocksDB's paper profile follows the retained 18-thread protocol (17 reader
+threads plus background writer), 10M keys, 64-byte keys, 256-byte values,
+128 MiB write buffers, disabled WAL, and 10-second measured phase. Disk and
+allocator effects matter; exact performance is not guaranteed on a different
+machine. Fresh databases live only inside the new results directory.
+
+**Protocol discrepancy to resolve:** the retained RocksDB script specifies
+64/256-byte keys/values, but Section 6.4's prose says 32/128. The default
+replays the script; `--rocks-key-size 32 --rocks-value-size 128` selects the
+prose sizes. Do not describe either as reconciled historical ground truth.
+
+One umbrella command runs all nine available before/after experiment groups:
+
+```bash
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh all-performance --profile paper
 ```
 
-Or run one experiment directly, e.g. `artifact/experiments/ascylib_efrb/run.sh`.
-Each leaves a `<name>.sqlite` database at
-`artifact/experiments/<name>/<name>.sqlite`.
+Run individual groups first. The umbrella stops on failure, and is not a
+claim to cover every figure, sampling study, overhead measurement, or LLM
+control in the paper. It can take many hours and substantial disk space.
 
-Performance experiments are separate (see above) and not included in
-`run_all.sh`:
+`HEAPLENS_NUMA=1` relaxes the container's seccomp filter for NUMA placement;
+`HEAPLENS_PERF=1` grants PERFMON, not blanket privileged mode. Use these only
+on an appropriate dedicated evaluation host. Host PMU policy may still deny
+access. Scripts do not change it; request administrator help if needed.
+VM/WSL results are functionality checks, not substitutes for bare-metal PMU
+measurements. For throughput-only legacy paper runs, prefix the wrapper with
+`PERFBENCH_PERF=off`. Missing counters must remain `NA`, never zero.
 
-```sh
-artifact/run_perfbench.sh
-```
+## 5. Scope, interpretation, and extension
 
-## Visualizing results
+- `history` summarizes retained original data; it does not rerun experiments.
+  Raw configurations and records are distributed for independent analysis.
+- The legacy performance helper reports whole-process counter **totals**,
+  including prefill. It does not reproduce measurement-window per-operation
+  counters. Full counter fidelity remains a validation task.
+- The historical TPC-C/EFRB mimalloc comparison also changes the segregation
+  flag in one variant; do not present it as a pure one-factor padding study.
+- Original HNSW huge-page advice is not proof of huge-page backing. The later
+  rebuttal factorization used corrected first-touch placement and a different
+  environment; do not reinterpret the original replay as that factorization.
+- Fresh trace generation is separate from timing uninstrumented optimized
+  applications. An instrumented run's throughput is not an optimization result.
+- For another C/C++ application, follow the root README's instrumentation
+  procedure, add custom allocation APIs where needed, and preserve lifetimes
+  of nested regions. Use new output folders and inspect nonempty type/allocation
+  records before opening the GUI. Source instrumentation is not a one-command
+  guarantee for arbitrary custom allocators.
 
-The visualizer lives outside `artifact/`, at the repository root, and runs
-on the **host**, not inside `docker/ubuntu_22_04` (that image is for the
-C++ instrumentation toolchain only and doesn't include `sifter_vis_d3/`).
-See the root `README.md`'s "Step 3: Visualization" for full manual setup
-(backend in `sifter_vis_d3/server/`, frontend in `sifter_vis_d3/sifter/`),
-or just run `sifter_vis_d3/setup_and_launch.sh`, which automates all of
-it -- creates/reuses a Python virtual environment, installs the backend
-and frontend dependencies, and starts both servers. Specifics for this
-artifact's output:
+See [VALIDATION.md](VALIDATION.md) for verified paths and remaining gaps.
 
-1. Run `sifter_vis_d3/setup_and_launch.sh` (or start the backend/frontend
-   manually per the root README) and leave it running.
-2. Copy the database out of the container (the container's filesystem is a
-   `COPY`'d, independent copy, not a bind mount -- plain `cp` on the host
-   can't see it) and into `sifter_vis_d3/` itself (not either subdirectory):
-   ```sh
-   sudo docker cp sifter-artifact:/root/sifter/artifact/experiments/tpcc_efrb/tpcc_efrb.sqlite sifter_vis_d3/
-   ```
-   (`sifter-artifact` is the container name from "Setup" above.) Any
-   filename works -- the backend lists every `*.sqlite` file it finds there.
-3. Open `http://localhost:3000` and select the file by name.
-4. Filter by type name to match a paper figure. TPC-C: `node_t<...>` is the
-   tree's node type, `row_t`/`Row_lock`/`LockEntry` are the row/lock
-   structures, `block`/`blockpool`/`blockbag` are SetBench's
-   epoch-based-reclamation internals. ASCYLIB: filter to the tree's own node
-   type to see the cache-set pattern from Fig. 4-5.
-5. Large databases can take a few minutes to load; lower `SAMPLE_PROPORTION`
-   and re-run if that's a problem.
+Sean's latest additions are retained: `data/paper_data.xlsx` with its own
+[sheet guide](data/README.md), the RocksDB instrumentation-repair helpers,
+`export_llm_data.sh`, and the optional native GUI launcher
+`sifter_vis_d3/setup_and_launch.sh`. The documented primary entry point is
+`artifact/run.sh`; the two older `rocksdb_*_bench/run.sh` names now delegate
+to the restored historical-source driver (default smoke, explicit paper
+profile). The new source snapshot and patch are essential: the upstream
+diagnostic tree alone does not implement these experimental flags.
 
-## LLM-friendly data export
-
-`artifact/export_llm_data.sh` runs `sifter_vis_d3/server/export_page_
-snapshots.py` against a HeapLENS `.sqlite` database, writing a
-`llm_export/` directory next to it. This is the exact command-line
-exporter the paper's Valkey/HNSWLib LLM case studies (§6.5, Appendix D)
-used to turn a HeapLENS database into LLM-prompt-sized text -- demonstrated
-here on `ascylib_efrb`'s database (its default target) instead, since
-Valkey/HNSWLib themselves aren't scripted (see above). Any other
-experiment's `.sqlite` works with it identically; pass it as an argument.
-
-Like the visualizer above, **run this on the host, not inside
-docker/ubuntu_22_04**: the exporter imports `sampler.py` (the same
-page-clustering code the visualizer backend uses for its own sampling), so
-it needs the same Python virtual environment -- run
-`sifter_vis_d3/setup_and_launch.sh` once first (Ctrl+C after it says
-"ready" if you only want the environment, not the running servers), or set
-one up manually per the root README's "Step 3: Visualization". Then:
-
-```sh
-# inside docker/ubuntu_22_04, if not already run:
-artifact/experiments/ascylib_efrb/run.sh
-
-# on the host, with the venv above activated (container's filesystem isn't
-# bind-mounted, so this needs `docker cp`, not a plain `cp`):
-sudo docker cp sifter-artifact:/root/sifter/artifact/experiments/ascylib_efrb/ascylib_efrb.sqlite .
-artifact/export_llm_data.sh ascylib_efrb.sqlite
-```
-
-Output:
-
-- `heaplens_pages_v2.txt`: the full, human-readable raw dump (every sampled
-  page's objects, per snapshot).
-- `heaplens_analysis.txt`: an aggregate summary (per-snapshot and overall
-  counts of cache-line crossings, page fragmentation, containers, same-line/
-  adjacent-line type mixes, field-crossing fields) -- this is the file an
-  LLM prompt would actually be built from.
-- `compact/heaplens_types.txt` and `compact/heaplens_fields.txt`: short
-  alias tables (`A, B, C, ...`) for type names and struct fields, so the
-  compact snapshots below don't have to repeat full (sometimes very long,
-  templated) C++ type names.
-- `compact/heaplens_output<N>.txt` (one per sampled time snapshot): the
-  compact, alias-keyed per-page object dumps.
-
-## Vendored dependencies
-
-| Path | Upstream | Pinned commit |
-|---|---|---|
-| `artifact/vendor/ascylib` | https://github.com/LPD-EPFL/ASCYLIB | `3c2d1a2` |
-| `artifact/vendor/setbench` | https://gitlab.com/trbot86/setbench | `5b574d4` |
-| `artifact/vendor/rocksdb` | https://github.com/facebook/rocksdb | `7e272d2` (parent of `0c7e5bd`, the paper's HashSkipList fix / [PR #13424](https://github.com/facebook/rocksdb/pull/13424)) |
-
-These are tracked as git submodules; see the `!/artifact/vendor/` exception
-in `.gitignore`.
-
-`artifact/vendor/setbench` additionally needs the local patches in
-`artifact/patches/setbench-tpcc/` (fixes to schema data files and
-macrobench source, plus a `common/recordmgr/allocator_new.h` node-arena
-fix) to run TPC-C correctly. These are a plain directory tracked by this
-repository rather than changes committed inside the submodule, since a
-submodule only tracks a commit SHA, not working-tree state.
-`tpcc_experiment.sh`/`tpcc_perfbench.sh` copy this directory onto each fresh
-working copy of the vendor source before building.
-
-## Known gaps
-
-- Valkey and HNSWLib (§6.5, Appendix D) are intentionally unscripted (see
-  above).
+Questions during evaluation should use the conference's anonymous discussion
+channel. No reviewer accounts, identities, or activity need be reported to us.

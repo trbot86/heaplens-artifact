@@ -1,0 +1,17 @@
+{
+  "date": "2026-09-23",
+  "scope": "Integrated launcher and HTTP/data path; not a fresh visual inspection",
+  "frontend_http_status": 200,
+  "listed_traces": ["efrb-smoke.sqlite", "valkey-artifact.sqlite"],
+  "initialization": {
+    "trace": "efrb-smoke.sqlite",
+    "page_size": 4096,
+    "cache_line_size": 64,
+    "time_buckets": 2000,
+    "clustering": "mbkmeans",
+    "types": 7,
+    "cache_sets": 64,
+    "cache_time_rows": 2002,
+    "page_data_fields": ["clusters", "features", "num_clusters", "page_num_events", "sum_cluster_sizes"]
+  }
+}

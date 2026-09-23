@@ -1,0 +1,169 @@
+#!/bin/bash
+
+UPDATE=0
+expLabel=""
+
+while [ $# -gt 0 ]; do
+    case $1 in
+        -u | --update)
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Must specify an update percentage with option -u/--update." >&2
+                exit 1
+            fi
+            UPDATE=$2
+            shift
+        ;;
+        -l | --label)
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Must specify a label with option -l/--label." >&2
+                exit 1
+            fi
+            expLabel=$2
+            shift
+        ;;
+    esac
+    shift
+done
+
+echo "Setting LD_LIBRARY_PATH..."
+LD_LIBRARY_PATH=./external/lib/
+export LD_LIBRARY_PATH
+
+dirLabels=("throughput" "cache-miss-rate" "page-faults" "L1-dcache-load-miss-rate" "LLC-load-miss-rate" "LLC-store-miss-rate" "context-switch-rate" "dTLB-load-miss-rate")
+
+for label in "${dirLabels[@]}"
+do
+    if [ ! -d exp_"$label"_u"$UPDATE"_"$expLabel" ]; then
+        echo "Making directory for $label"
+        mkdir exp_"$label"_u"$UPDATE"_"$expLabel"
+    fi
+    # rm exp_"$label"_u"$UPDATE"_"$expLabel"/*
+done
+
+dataStructures=("ellen" "drachsler" "howley")
+
+THRU_REGEX="#Mops ([\.0-9]+).*"
+PERF_REGEX="\s*([0-9]+)\s+([-a-zA-Z0-9]+).*"
+
+processLine() {
+    line="$1"
+    line="${line//,/}"
+    # echo $line
+    if [[ $line =~ $THRU_REGEX ]]
+    then
+        # touch exp_throughput/u"$UPDATE".txt
+        NUM_OPS=$(echo "${BASH_REMATCH[1]}" | awk '{printf "%d", $1 * 1000000}')
+        echo "$EXP_TYPE $NUM_THREADS $NUM_OPS" >> exp_throughput_u"$UPDATE"_"$expLabel"/n"$numNodes".txt
+    elif [[ $line =~ $PERF_REGEX ]]
+    then
+        case "${BASH_REMATCH[2]}" in
+            cache-misses)
+                CACHE_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "$EXP_TYPE $NUM_THREADS $CACHE_MISS_RATE" >> exp_cache-miss-rate_u"$UPDATE"_"$expLabel"/n"$numNodes".txt
+            ;;
+            L1-dcache-load-misses)
+                L1_DCACHE_LOAD_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "$EXP_TYPE $NUM_THREADS $L1_DCACHE_LOAD_MISS_RATE" >> exp_L1-dcache-load-miss-rate_u"$UPDATE"_"$expLabel"/n"$numNodes".txt
+            ;;
+            LLC-load-misses)
+                LLC_LOAD_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "$EXP_TYPE $NUM_THREADS $LLC_LOAD_MISS_RATE" >> exp_LLC-load-miss-rate_u"$UPDATE"_"$expLabel"/n"$numNodes".txt
+            ;;
+            LLC-store-misses)
+                LLC_STORE_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "$EXP_TYPE $NUM_THREADS $LLC_STORE_MISS_RATE" >> exp_LLC-store-miss-rate_u"$UPDATE"_"$expLabel"/n"$numNodes".txt
+            ;;
+            page-faults)
+                echo "$EXP_TYPE $NUM_THREADS ${BASH_REMATCH[1]}" >> exp_page-faults_u"$UPDATE"_"$expLabel"/n"$numNodes".txt
+            ;;
+            context-switches)
+                CONTEXT_SWITCH_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "$EXP_TYPE $NUM_THREADS $CONTEXT_SWITCH_RATE" >> exp_context-switch-rate_u"$UPDATE"_"$expLabel"/n"$numNodes".txt
+            ;;
+            dTLB-load-misses)
+                TLB_LOAD_MISS_RATE=$(echo "${BASH_REMATCH[1]} $NUM_OPS" | awk '{printf "%.4f", $1 / $2}')
+                echo "$EXP_TYPE $NUM_THREADS $TLB_LOAD_MISS_RATE" >> exp_dTLB-load-miss-rate_u"$UPDATE"_"$expLabel"/n"$numNodes".txt
+            ;;
+        esac
+    fi
+}
+
+preload="./external/lib/libssmem_x86_64.so"
+for DATA_STRUCTURE in "${dataStructures[@]}"
+do
+    case $DATA_STRUCTURE in
+        ellen)
+            expNames=("Default_ellen" "Obj_seg_ellen" "MTprefill_ellen" "Both_ellen")
+            binName="./bin/lf-bst_ellen"
+        ;;
+        drachsler) 
+            expNames=("Default_pad_drachsler" "No_pad_drachsler" "128B_pad_drachsler" "192B_pad_drachsler")
+            binName="./bin/lb-bst-drachsler"
+        ;;
+        howley)
+            expNames=("glibc_malloc_howley" "jemalloc_howley")
+            cd src/bst-howley
+            make SET_CPU=0
+            cd ../..
+            binName="./bin/lf-bst-howley"
+        ;;
+    esac
+    for EXP_TYPE in "${expNames[@]}"
+    do
+        case $EXP_TYPE in
+            Default_ellen)
+                make bst_ellen SET_CPU=0
+            ;;
+            Obj_seg_ellen)
+                make bst_ellen SET_CPU=0 SEG_OBJS=1
+            ;;
+            MTPrefill_ellen)
+                make bst_ellen SET_CPU=0 INIT=all
+            ;;
+            Both_ellen)
+                make bst_ellen SET_CPU=0 SEG_OBJS=1 INIT=all
+            ;;
+            Default_pad_drachsler)
+                make bst_drachsler SET_CPU=0 VERSION=O2
+            ;;
+            No_pad_drachsler)
+                make bst_drachsler SET_CPU=0 DRACHSLER_PAD=0 VERSION=O2
+            ;;
+            128B_pad_drachsler)
+                make bst_drachsler SET_CPU=0 DRACHSLER_PAD=128 VERSION=O2
+            ;;
+            192B_pad_drachsler)
+                make bst_drachsler SET_CPU=0 DRACHSLER_PAD=192 VERSION=O2
+            ;;
+            jemalloc_howley)
+                preload="./external/lib/libssmem_x86_64.so:../jemalloc/lib/libjemalloc.so"
+            ;;
+        esac
+
+        echo "Starting experiment: $EXP_TYPE"
+        for numNodes in 200000 500000 1000000
+        do
+            echo "  Update percentage: $UPDATE"
+            for RUN in {0..9}
+            do
+                echo "    Run: $RUN"
+                for NUM_THREADS in 4 8
+                do
+                    echo "      Number of threads: $NUM_THREADS"
+                    case $NUM_THREADS in
+                        4)
+                            LD_PRELOAD=$preload numactl -i 0 taskset -c 0-3 perf stat -e cache-misses,page-faults,L1-dcache-load-misses,LLC-load-misses,LLC-store-misses,context-switches,dTLB-load-misses $binName -d 3000 -i $numNodes -n $NUM_THREADS --update-rate $UPDATE 2>&1 | while read line; do
+                                processLine "$line"
+                            done
+                        ;;
+                        8)
+                            LD_PRELOAD=$preload numactl -i 0 taskset -c 0-7 perf stat -e cache-misses,page-faults,L1-dcache-load-misses,LLC-load-misses,LLC-store-misses,context-switches,dTLB-load-misses $binName -d 3000 -i $numNodes -n $NUM_THREADS --update-rate $UPDATE 2>&1 | while read line; do
+                                processLine "$line"
+                            done
+                        ;;
+                    esac
+                done
+            done
+        done
+    done
+done

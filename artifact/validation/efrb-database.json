@@ -1,0 +1,42 @@
+{
+  "quick_check": "ok",
+  "records": 16414,
+  "allocations_by_source_and_type": [
+    [
+      "NULL",
+      "NULL",
+      3
+    ],
+    [
+      "bst_ellen.c",
+      "info_t",
+      4096
+    ],
+    [
+      "bst_ellen.c",
+      "node_t",
+      12291
+    ],
+    [
+      "bst_ellen.c",
+      "search_result_t",
+      2
+    ],
+    [
+      "test_simple.c",
+      "ssmem_allocator_t",
+      2
+    ],
+    [
+      "test_simple.c",
+      "thread_data_t",
+      1
+    ],
+    [
+      "test_simple.c",
+      "ticks",
+      12
+    ]
+  ],
+  "sha256": "643b7a5a0992d2b3a9cec219e205b49539e5ddd174e09dda4a04a433e2bda7e4"
+}

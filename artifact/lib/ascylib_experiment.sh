@@ -44,12 +44,16 @@ run_ascylib_experiment() {
     local UPDATE_PCT="${UPDATE_PCT:-0}"  # search-only
 
     local SAMPLE_PROPORTION="${SAMPLE_PROPORTION:-1.0}"
-    local PAGES_PER_TYPE="${PAGES_PER_TYPE:-4}"
+    local PAGES_PER_TYPE="${PAGES_PER_TYPE:-1}"
 
     echo "=== [$out_name] 1/7: fresh working copy of ASCYLIB ==="
     rm -rf "$WORK"
     mkdir -p "$WORK"
     cp -r "$ASCYLIB_SRC" "$SRC_COPY"
+    source "$SIFTER_ROOT/artifact/lib/prepare_ascylib.sh"
+    prepare_ascylib "$SIFTER_ROOT" "$SRC_COPY"
+    # Clang rejects GCC's legacy cast-as-lvalue assembly output operands.
+    patch --batch --directory "$SRC_COPY" -p1 -i "$SIFTER_ROOT/artifact/patches/ascylib-clang14.patch"
 
     echo "=== [$out_name] 2/7: build instrumentation toolchain + generate fixes.yaml ==="
     # ASCYLIB is plain C -- no -t/--template flag (that's for C++ typeid-based
@@ -74,6 +78,8 @@ run_ascylib_experiment() {
 
     echo "=== [$out_name] 3/7: apply clang-tidy fixes ==="
     (cd "$INSTRUMENTED" && clang-apply-replacements-14 ./)
+    test -s "$INSTRUMENTED/$tree_src_dir/typeset_dump.txt"
+    test -s "$INSTRUMENTED/$tree_src_dir/fileset_dump.txt"
 
     echo "=== [$out_name] 4/7: add memhook_interface.h includes ==="
     ./sifter.sh "$INSTRUMENTED" --includes-only
@@ -116,6 +122,7 @@ run_ascylib_experiment() {
 
     local RESULT_DB="$SIFTER_ROOT/artifact/experiments/${out_name}/${out_name}.sqlite"
     cp "$SIFTER_ROOT/type_analysis/allocs.sqlite" "$RESULT_DB"
+    python3 "$SIFTER_ROOT/artifact/check_database.py" "$RESULT_DB"
     echo "=== [$out_name] done. Database: $RESULT_DB ==="
     echo "    Open it in the visualizer (sifter_vis_d3/sifter) to inspect cache-set"
     echo "    occupancy / page layout and compare qualitatively against the paper's figures."

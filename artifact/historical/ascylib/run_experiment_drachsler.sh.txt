@@ -1,0 +1,90 @@
+#!/bin/bash
+
+dirLabels=("throughput_drachsler" "cache-miss-rate_drachsler" "page-faults_drachsler" "L1-dcache-load-miss-rate_drachsler" "LLC-load-miss-rate_drachsler" "LLC-store-miss-rate_drachsler")
+
+for label in "${dirLabels[@]}"
+do
+    if [ ! -d exp_"$label" ]; then
+        echo "Making directory for $label"
+        mkdir exp_"$label"
+    fi
+    rm exp_"$label"/*
+done
+
+expNames=("Pad" "No_pad")
+THRU_REGEX="#Mops ([\.0-9]+).*"
+PERF_REGEX="\s*([0-9]+)\s+([-a-zA-Z0-9]+).*"
+
+for EXP_TYPE in 0 1
+do
+    echo "Starting experiment: ${expNames[$EXP_TYPE]}"
+    if [[ "$EXP_TYPE" -eq 0 ]]; then
+        make bst_drachsler
+    else
+        make bst_drachsler DRACHSLER_NOPAD=1
+    fi
+    for UPDATE in 0 10 50 100
+    do
+        echo "  Update percentage: $UPDATE"
+        for RUN in {0..9}
+        do
+            echo "    Run: $RUN"
+            for NUM_THREADS in 1 8 16 32 48 64 144
+            do
+                echo "      Number of threads: $NUM_THREADS"
+                perf stat -e cache-references,cache-misses,page-faults,L1-dcache-loads,L1-dcache-stores,L1-dcache-load-misses,LLC-loads,LLC-stores,LLC-load-misses,LLC-store-misses ./bin/lb-bst-drachsler -d 1000 -i 1000000 -n $NUM_THREADS -u $UPDATE 2>&1 | while read line; do
+                    line="${line//,/}"
+                    if [[ $line =~ $THRU_REGEX ]]
+                    then
+                        touch exp_throughput/u"$UPDATE".txt
+                        echo "${expNames[$EXP_TYPE]} $NUM_THREADS ${BASH_REMATCH[1]}" >> exp_throughput_drachsler/u"$UPDATE".txt
+                    elif [[ $line =~ $PERF_REGEX ]]
+                    then
+                        case "${BASH_REMATCH[2]}" in
+                            cache-references)
+                                CACHE_REFS="${BASH_REMATCH[1]}"
+                            ;;
+                            cache-misses)
+                                CACHE_MISS_RATE=$(echo "scale=4; ${BASH_REMATCH[1]} / $CACHE_REFS" | bc)
+                                echo "${expNames[$EXP_TYPE]} $NUM_THREADS 0$CACHE_MISS_RATE" >> exp_cache-miss-rate_drachsler/u"$UPDATE".txt
+                            ;;
+                            L1-dcache-loads)
+                                L1_DCACHE_LOADS="${BASH_REMATCH[1]}"
+                            ;;
+                            L1-dcache-load-misses)
+                                L1_DCACHE_LOAD_MISS_RATE=$(echo "scale=4; ${BASH_REMATCH[1]} / $L1_DCACHE_LOADS" | bc)
+                                echo "${expNames[$EXP_TYPE]} $NUM_THREADS 0$L1_DCACHE_LOAD_MISS_RATE" >> exp_L1-dcache-load-miss-rate_drachsler/u"$UPDATE".txt
+                            ;;
+                            LLC-loads)
+                                LLC_LOADS="${BASH_REMATCH[1]}"
+                            ;;
+                            LLC-load-misses)
+                                LLC_LOAD_MISS_RATE=$(echo "scale=4; ${BASH_REMATCH[1]} / $LLC_LOADS" | bc)
+                                echo "${expNames[$EXP_TYPE]} $NUM_THREADS 0$LLC_LOAD_MISS_RATE" >> exp_LLC-load-miss-rate_drachsler/u"$UPDATE".txt
+                            ;;
+                            LLC-stores)
+                                LLC_STORES="${BASH_REMATCH[1]}"
+                            ;;
+                            LLC-store-misses)
+                                LLC_STORE_MISS_RATE=$(echo "scale=4; ${BASH_REMATCH[1]} / $LLC_STORES" | bc)
+                                echo "${expNames[$EXP_TYPE]} $NUM_THREADS 0$LLC_STORE_MISS_RATE" >> exp_LLC-store-miss-rate_drachsler/u"$UPDATE".txt
+                            ;;
+                            page-faults)
+                                echo "${expNames[$EXP_TYPE]} $NUM_THREADS ${BASH_REMATCH[1]}" >> exp_page-faults_drachsler/u"$UPDATE".txt
+                            ;;
+                        esac
+                    fi
+                done
+            done
+        done
+    done
+done
+
+cd /home/s2ovens/tools
+for label in "${dirLabels[@]}"
+do
+    for UPDATE in 0 10 50 100
+    do
+        ./plot -i /home/s2ovens/sifter/ASCYLIB/exp_"$label"/u"$UPDATE".txt -o /home/s2ovens/sifter/ASCYLIB/exp_"$label"/plot_u"$UPDATE".png --x-title threads --legend-include
+    done
+done

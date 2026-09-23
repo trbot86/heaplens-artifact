@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eo pipefail
 
 indir=""
 outdir=""
@@ -185,7 +186,7 @@ elif [ "$database" = true ]; then
     fi
 
     cd type_analysis
-    rm allocs.sqlite
+    rm -f allocs.sqlite
     make bin/convert_to_db
     echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran"
     ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran
@@ -196,8 +197,7 @@ elif [ "$includesOnly" = true ]; then
 fi
 
 cd clang-tidy-standalone
-rm -rf build
-mkdir build
+mkdir -p build
 cd build
 
 cmakeOptions=""
@@ -243,7 +243,11 @@ cd ..
 if [ "$?" -ne 0 ]; then echo "ERROR building type analysis tool" ; exit 1 ; fi
 
 ## copy the project
-rm -r $outdir ; cp -r $indir $outdir
+if [[ -e "$outdir" ]]; then
+    echo "ERROR: output directory already exists: $outdir (use a fresh directory)" >&2
+    exit 1
+fi
+cp -r "$indir" "$outdir"
 
 echo ""
 echo "codebase copied to $outdir"

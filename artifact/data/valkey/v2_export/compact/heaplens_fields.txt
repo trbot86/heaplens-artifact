@@ -1,0 +1,201 @@
+# heaplens field lookup v2
+# alias, offset, size, name, subtype
+A, 0, 4, state, PrefetchState
+A, 8, 40, hashtab_state, hashtableIncrementalFindState
+C, 0, 8, cur_idx, size_t
+C, 8, 8, keys_done, size_t
+C, 16, 8, key_count, size_t
+C, 24, 8, client_count, size_t
+C, 32, 8, max_prefetch_size, size_t
+C, 40, 8, executed_commands, size_t
+C, 48, 8, slots, int *
+C, 56, 8, keys, void **
+C, 64, 8, clients, client **
+C, 72, 8, keys_tables, hashtable **
+C, 80, 8, prefetch_info, KeyPrefetchInfo *
+F, 0, 4, epfd, int
+F, 8, 8, events, struct epoll_event *
+G, 0, 4, maxfd, int
+G, 4, 4, setsize, int
+G, 8, 8, timeEventNextId, long long
+G, 16, 8, events, aeFileEvent *
+G, 24, 8, fired, aeFiredEvent *
+G, 32, 8, timeEventHead, aeTimeEvent *
+G, 40, 4, stop, int
+G, 48, 8, apidata, void *
+G, 56, 8, beforesleep, aeBeforeSleepProc *
+G, 64, 8, aftersleep, aeAfterSleepProc *
+G, 72, 8, custompoll, aeCustomPollProc *
+G, 80, 40, poll_mutex, pthread_mutex_t
+G, 120, 4, flags, int
+H, 0, 4, mask, int
+H, 8, 8, rfileProc, aeFileProc *
+H, 16, 8, wfileProc, aeFileProc *
+H, 24, 8, clientData, void *
+I, 0, 4, fd, int
+I, 4, 4, mask, int
+J, 0, 8, id, long long
+J, 8, 8, when, monotime
+J, 16, 8, timeProc, aeTimeProc *
+J, 24, 8, finalizerProc, aeEventFinalizerProc *
+J, 32, 8, clientData, void *
+J, 40, 8, prev, struct aeTimeEvent *
+J, 48, 8, next, struct aeTimeEvent *
+J, 56, 4, refcount, int
+L, 0, 4, btype, blocking_type
+L, 8, 8, timeout, mstime_t
+L, 16, 4, unblock_on_nokey, int
+L, 24, 8, (anonymous), union blockingState::(anonymous at ./server.h:966:5)
+L, 32, 8, keys, dict *
+L, 40, 4, numreplicas, int
+L, 44, 4, numlocal, int
+L, 48, 8, reploffset, long long
+L, 56, 8, module_blocked_handle, void *
+L, 64, 8, async_rm_call_handle, void *
+O, 0, 8, id, uint64_t
+O, 8, 8, conn, connection *
+O, 16, 8, querybuf, sds
+O, 24, 8, qb_pos, size_t
+O, 32, 8, argv, robj **
+O, 40, 4, argc, int
+O, 44, 4, argv_len, int
+O, 48, 8, argv_len_sum, size_t
+O, 56, 4, reqtype, int
+O, 60, 4, multibulklen, int
+O, 64, 8, bulklen, long
+O, 72, 8, woff, long long
+O, 80, 16, cmd_queue, cmdQueue
+O, 96, 8, cmd, struct serverCommand *
+O, 104, 8, lastcmd, struct serverCommand *
+O, 112, 8, realcmd, struct serverCommand *
+O, 120, 8, parsed_cmd, struct serverCommand *
+O, 128, 8, last_interaction, time_t
+O, 136, 8, db, serverDb *
+O, 144, 8, pubsub_data, ClientPubSubData *
+O, 152, 8, repl_data, ClientReplicationData *
+O, 160, 8, module_data, ClientModuleData *
+O, 168, 8, mstate, multiState *
+O, 176, 8, bstate, blockingState *
+O, 184, 8, duration, long
+O, 192, 8, buf, char *
+O, 200, 8, buf_usable_size, size_t
+O, 208, 8, reply, list *
+O, 216, 8, io_last_reply_block, listNode *
+O, 224, 8, io_last_bufpos, size_t
+O, 232, 24, io_last_written, LastWrittenBuf
+O, 256, 8, reply_bytes, unsigned long long
+O, 264, 24, clients_pending_write_node, listNode
+O, 288, 8, bufpos, size_t
+O, 296, 8, last_header, payloadHeader *
+O, 304, 4, original_argc, int
+O, 312, 8, original_argv, robj **
+O, 320, 4, redact_arg_bitmap, uint32_t
+O, 328, 16, (anonymous), union client::(anonymous at ./server.h:1343:5)
+O, 344, 8, slot_migration_job, slotMigrationJob *
+O, 352, 2, write_flags, uint16_t
+O, 354, 1, io_read_state, volatile uint8_t
+O, 355, 1, io_write_state, volatile uint8_t
+O, 356, 1, resp, uint8_t
+O, 357, 1, cur_tid, uint8_t
+O, 358, 1, last_memory_type, uint8_t
+O, 359, 1, capa, uint8_t
+O, 360, 8, net_input_bytes, unsigned long long
+O, 368, 8, net_input_bytes_curr_cmd, unsigned long long
+O, 376, 8, net_output_bytes, unsigned long long
+O, 384, 8, commands_processed, unsigned long long
+O, 392, 8, net_output_bytes_curr_cmd, unsigned long long
+O, 400, 8, io_tracked_reply_len, _Atomic(size_t)
+O, 408, 8, buf_peak, size_t
+O, 416, 4, nwritten, int
+O, 420, 4, nread, int
+O, 424, 4, read_flags, int
+O, 428, 4, slot, int
+O, 432, 8, mem_usage_bucket_node, listNode *
+O, 440, 8, mem_usage_bucket, clientMemUsageBucket *
+O, 448, 8, last_memory_usage, size_t
+O, 456, 8, client_list_node, listNode *
+O, 464, 8, buf_peak_last_reset_time, mstime_t
+O, 472, 8, querybuf_peak, size_t
+O, 480, 8, cur_script, dictEntry *
+O, 488, 8, user, user *
+O, 496, 8, obuf_soft_limit_reached_time, time_t
+O, 504, 8, deferred_reply_errors, list *
+O, 512, 8, name, robj *
+O, 520, 8, lib_name, robj *
+O, 528, 8, lib_ver, robj *
+O, 536, 8, peerid, sds
+O, 544, 8, sockname, sds
+O, 552, 8, ctime, time_t
+O, 560, 8, deferred_reply, list *
+O, 568, 8, deferred_reply_bytes, unsigned long long
+Q, 0, 8, type, ConnectionType *
+Q, 8, 4, state, ConnectionState
+Q, 12, 4, last_errno, int
+Q, 16, 4, fd, int
+Q, 20, 2, flags, short
+Q, 22, 2, refs, short
+Q, 24, 2, iovcnt, unsigned short
+Q, 32, 8, private_data, void *
+Q, 40, 8, conn_handler, ConnectionCallbackFunc
+Q, 48, 8, write_handler, ConnectionCallbackFunc
+Q, 56, 8, read_handler, ConnectionCallbackFunc
+S, 0, 8, length, long
+S, 8, 8, first, fifoBlock *
+S, 16, 8, last, fifoBlock *
+T, 0, 8, libraries, dict *
+T, 8, 8, functions, dict *
+T, 16, 8, cache_memory, size_t
+T, 24, 8, engines_stats, dict *
+W, 0, 4, encoding, uint32_t
+W, 4, 4, length, uint32_t
+W, 8, 0, contents, int8_t[]
+X, 0, 8, reg_size, size_t
+X, 8, 4, nregs, uint32_t
+X, 16, 168, info_keys, jeBinInfoKeys
+Y, 0, 8, curr_slabs, size_t
+Y, 8, 8, curr_nonfull_slabs, size_t
+Y, 16, 8, curr_regs, size_t
+AA, 0, 8, prev, struct listNode *
+AA, 8, 8, next, struct listNode *
+AA, 16, 8, value, void *
+AB, 0, 8, priority_fifo, fifo *
+AB, 8, 8, normal_fifo, fifo *
+AB, 16, 40, mutex, pthread_mutex_t
+AB, 56, 48, notify_cv, pthread_cond_t
+AC, 0, 8, head, raxNode *
+AC, 8, 8, numele, uint64_t
+AC, 16, 8, numnodes, uint64_t
+AC, 24, 8, alloc_size, size_t
+AD, 0, 4, iscompr, uint32_t
+AD, 0, 4, iskey, uint32_t
+AD, 0, 4, isnull, uint32_t
+AD, 0, 4, size, uint32_t
+AD, 4, 0, data, unsigned char[]
+AE, 0, 8, ref_repl_buf_node, listNode *
+AE, 8, 8, unindexed_count, size_t
+AE, 16, 8, blocks_index, rax *
+AE, 24, 8, histlen, long long
+AE, 32, 8, offset, long long
+AH, 0, 8, keys, kvstore *
+AH, 8, 8, expires, kvstore *
+AH, 16, 8, keys_with_volatile_items, kvstore *
+AH, 24, 8, blocking_keys, dict *
+AH, 32, 8, blocking_keys_unblock_on_nokey, dict *
+AH, 40, 8, ready_keys, dict *
+AH, 48, 8, watched_keys, dict *
+AH, 56, 4, id, int
+AH, 64, 32, expiry, struct (unnamed struct at ./server.h:908:5)[2]
+AJ, 0, 8, sequence, _Atomic(size_t)
+AJ, 8, 8, data, void *
+AK, 0, 8, name, const char *
+AK, 8, 8, alias, const char *
+AK, 16, 4, flags, unsigned int
+AK, 24, 40, interface, typeInterface
+AK, 64, 48, data, typeData
+AK, 112, 4, type, configType
+AK, 120, 8, privdata, void *
+AS, 0, 8, name, sds
+AS, 8, 4, flags, uint32_t
+AS, 16, 8, passwords, list *
+AS, 24, 8, selectors, list *
+AS, 32, 8, acl_string, robj *

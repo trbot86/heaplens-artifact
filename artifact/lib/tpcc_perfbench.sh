@@ -28,6 +28,10 @@ tpcc_perfbench_cap_threads() {
     local requested="$1" ncpu
     ncpu="$(nproc)"
     if [ "$requested" -gt "$ncpu" ]; then
+        if [[ "${ARTIFACT_PROFILE:-smoke}" == paper ]]; then
+            echo "Paper profile requires $requested CPUs; only $ncpu available. Use smoke on this host." >&2
+            return 1
+        fi
         echo "WARNING: THREADS=$requested exceeds this machine's $ncpu CPUs;" >&2
         echo "         TPC-C's macrobench binaries don't degrade gracefully" >&2
         echo "         when oversubscribed this way. Capping to $ncpu." >&2
@@ -69,7 +73,7 @@ tpcc_perfbench_build() {
         cd "$TPCC_MACROBENCH"
         make clean workload=TPCC data_structure_name="$ds_name" data_structure_opts="$opts" \
             > /tmp/tpcc_perfbench_build.log 2>&1
-        make -j THREAD_CNT="$threads" workload=TPCC data_structure_name="$ds_name" data_structure_opts="$opts" \
+        make -j"${JOBS:-4}" THREAD_CNT="$threads" workload=TPCC data_structure_name="$ds_name" data_structure_opts="$opts" \
             >> /tmp/tpcc_perfbench_build.log 2>&1 || {
             echo "    !!! build failed for $ds_name threads=$threads opts=$opts -- see /tmp/tpcc_perfbench_build.log" >&2
             tail -60 /tmp/tpcc_perfbench_build.log >&2
@@ -87,6 +91,9 @@ tpcc_perfbench_build() {
 tpcc_perfbench_variant() {
     local results_tsv="$1" run_dir="$2" variant="$3" ds_name="$4"
     local threads="$5" reps="$6" preload="${7:-}"
+    local placement=(numactl -i 0)
+    local pin=(-pin "0-$((threads - 1))")
+    if [[ "${ARTIFACT_NO_NUMA:-0}" == 1 ]]; then placement=(); pin=(); fi
 
     echo "  variant: $variant (threads=$threads)"
     for run_idx in $(seq 0 $((reps - 1))); do
@@ -102,7 +109,7 @@ tpcc_perfbench_variant() {
             export GLIBC_TUNABLES="glibc.rtld.optional_static_tls=4194304"
             perfbench_run_rep "$results_tsv" "$run_dir" "$variant" "$threads" "$run_idx" \
                 '(?<=throughput=)[0-9.]+' 1 -- \
-                numactl -i 0 "./bin/rundb_TPCC_${ds_name}" -pin "0-$((threads - 1))"
+                "${placement[@]}" "./bin/rundb_TPCC_${ds_name}" "${pin[@]}"
         )
     done
 }

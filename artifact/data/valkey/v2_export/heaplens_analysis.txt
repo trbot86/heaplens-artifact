@@ -1,0 +1,164 @@
+HEAPLENS ANALYSIS V2
+source_db: valkey_bench_heaplens_pyke/heaplens_runs/jemalloc_docker_20260608/allocs.sqlite
+generated_at: 2026-06-08T21:32:48.772Z
+selected_pages: 58
+clustered_pages: 1078
+num_clusters: 28
+
+ALIASES
+  A: KeyPrefetchInfo
+  B: NULL
+  C: PrefetchCommandsBatch
+  D: _Atomic(void *)
+  E: aclSelector
+  F: aeApiState
+  G: aeEventLoop
+  H: aeFileEvent
+  I: aeFiredEvent
+  J: aeTimeEvent
+  K: aofManifest
+  L: blockingState
+  M: char
+  N: char *
+  O: client
+  P: client *
+  Q: connection
+  R: double
+  S: fifo
+  T: functionsLibCtx
+  U: hashtable *
+  V: int
+  W: intset
+  X: jeBinInfo
+  Y: jemallocBinUsageData
+  Z: kvstore
+  AA: listNode
+  AB: mutexQueue
+  AC: rax
+  AD: raxNode
+  AE: replBacklog
+  AF: robj
+  AG: sds
+  AH: serverDb
+  AI: serverDb *
+  AJ: spmcCell
+  AK: standardConfig
+  AL: struct (unnamed struct at ./server.h:1585:5)
+  AM: struct ACLCategoryItem
+  AN: struct epoll_event
+  AO: struct evictionPoolEntry
+  AP: struct list
+  AQ: struct saveparam
+  AR: struct serverMemOverhead
+  AS: user
+  AT: void
+  AU: void *
+FIELDS_ALIASES: A, C, F, G, H, I, J, L, O, Q, S, T, W, X, Y, AA, AB, AC, AD, AE, AH, AJ, AK, AS
+
+SNAPSHOT 0: objects=1 pages=1 time=41494148277035936
+  counts: Y:1
+  extra_crossings: none
+  page_fragments: none
+  containers: none
+  same_line_mixes: none
+  adjacent_mixes: none
+  field_crossings: none
+  l1_start_sets: Y:1sets top 0:1
+  l1_cover_sets: Y:15sets
+
+SNAPSHOT 1: objects=1743 pages=35 time=41494148878600488
+  counts: AF:1305, AD:158, AT:116, AK:61, AA:60, M:15, AC:7, AU:4, H:3, I:3, AJ:3, Y:1
+  extra_crossings: AF:102, AT:31, AD:25, AA:14
+  page_fragments: M:6, AU:3, AT:3, H:3, I:3, AJ:3, AF:2
+  containers: M:1, AT:1
+  same_line_mixes: ('AD', 'AT'):53, ('AF', 'M'):2, ('AC', 'AF'):1, ('AC', 'M'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  adjacent_mixes: ('AD', 'AT'):33, ('AF', 'M'):3, ('AC', 'AD'):2, ('AC', 'M'):1, ('AC', 'AF'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  field_crossings: none
+  l1_start_sets: AA:22sets top 12:4, 10:3, 6:3, 5:3; AC:5sets top 57:2, 59:2, 60:1, 32:1; AD:57sets top 39:6, 36:6, 12:5, 49:5; AF:64sets top 61:23, 62:23, 35:23, 60:23; AI:1sets top 4:1; AJ:1sets top 0:3; AK:32sets top 44:2, 52:2, 54:2, 56:2; AR:1sets top 8:1; AT:45sets top 63:5, 51:5, 60:5, 48:5; AU:2sets top 0:3, 8:1; G:1sets top 2:1; H:1sets top 0:3; I:1sets top 0:3; M:6sets top 0:7, 14:3, 15:2, 33:1; P:1sets top 6:1; R:1sets top 35:1; T:1sets top 3:1; U:1sets top 10:1; Y:1sets top 0:1
+  l1_cover_sets: AA:22sets; AC:5sets; AD:58sets; AF:64sets; AI:2sets; AJ:64sets; AK:64sets; AR:4sets; AT:47sets; AU:64sets; G:2sets; H:64sets; I:64sets; M:64sets; P:2sets; R:1sets; T:1sets; U:2sets; Y:15sets
+
+SNAPSHOT 2: objects=1949 pages=37 time=41494149480165032
+  counts: AF:1511, AD:158, AT:116, AK:61, AA:60, M:15, AC:7, AU:4, H:3, I:3, AJ:3, Y:1
+  extra_crossings: AF:203, AT:31, AD:25, AA:14
+  page_fragments: M:6, AF:5, AU:3, AT:3, H:3, I:3, AJ:3
+  containers: M:1, AT:1
+  same_line_mixes: ('AD', 'AT'):53, ('AF', 'M'):2, ('AC', 'AF'):1, ('AC', 'M'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  adjacent_mixes: ('AD', 'AT'):33, ('AF', 'M'):3, ('AC', 'AD'):2, ('AC', 'M'):1, ('AC', 'AF'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  field_crossings: none
+  l1_start_sets: AA:22sets top 12:4, 10:3, 6:3, 5:3; AC:5sets top 57:2, 59:2, 60:1, 32:1; AD:57sets top 39:6, 36:6, 12:5, 49:5; AF:64sets top 61:27, 63:27, 36:26, 38:26; AI:1sets top 4:1; AJ:1sets top 0:3; AK:32sets top 44:2, 52:2, 54:2, 56:2; AR:1sets top 8:1; AT:45sets top 63:5, 51:5, 60:5, 48:5; AU:2sets top 0:3, 8:1; G:1sets top 2:1; H:1sets top 0:3; I:1sets top 0:3; M:6sets top 0:7, 14:3, 15:2, 33:1; P:1sets top 6:1; R:1sets top 35:1; T:1sets top 3:1; U:1sets top 10:1; Y:1sets top 0:1
+  l1_cover_sets: AA:22sets; AC:5sets; AD:58sets; AF:64sets; AI:2sets; AJ:64sets; AK:64sets; AR:4sets; AT:47sets; AU:64sets; G:2sets; H:64sets; I:64sets; M:64sets; P:2sets; R:1sets; T:1sets; U:2sets; Y:15sets
+
+SNAPSHOT 3: objects=1950 pages=37 time=41494150081729584
+  counts: AF:1511, AD:158, AT:116, AA:61, AK:61, M:15, AC:7, AU:4, H:3, I:3, AJ:3, Y:1
+  extra_crossings: AF:203, AT:31, AD:25, AA:14
+  page_fragments: M:6, AF:5, AU:3, AT:3, H:3, I:3, AJ:3
+  containers: M:1, AT:1
+  same_line_mixes: ('AD', 'AT'):53, ('AF', 'M'):2, ('AC', 'AF'):1, ('AC', 'M'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  adjacent_mixes: ('AD', 'AT'):33, ('AF', 'M'):3, ('AC', 'AD'):2, ('AC', 'M'):1, ('AC', 'AF'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  field_crossings: none
+  l1_start_sets: AA:22sets top 12:4, 10:3, 6:3, 5:3; AC:5sets top 57:2, 59:2, 60:1, 32:1; AD:57sets top 39:6, 36:6, 12:5, 49:5; AF:64sets top 61:27, 63:27, 36:26, 38:26; AI:1sets top 4:1; AJ:1sets top 0:3; AK:32sets top 44:2, 52:2, 54:2, 56:2; AR:1sets top 8:1; AT:45sets top 63:5, 51:5, 60:5, 48:5; AU:2sets top 0:3, 8:1; G:1sets top 2:1; H:1sets top 0:3; I:1sets top 0:3; M:6sets top 0:7, 14:3, 15:2, 33:1; P:1sets top 6:1; R:1sets top 35:1; T:1sets top 3:1; U:1sets top 10:1; Y:1sets top 0:1
+  l1_cover_sets: AA:22sets; AC:5sets; AD:58sets; AF:64sets; AI:2sets; AJ:64sets; AK:64sets; AR:4sets; AT:47sets; AU:64sets; G:2sets; H:64sets; I:64sets; M:64sets; P:2sets; R:1sets; T:1sets; U:2sets; Y:15sets
+
+SNAPSHOT 4: objects=2159 pages=39 time=41494150683294128
+  counts: AF:1717, AD:158, AT:116, AA:61, AK:61, M:18, AC:7, AU:4, H:3, I:3, AJ:3, Y:1
+  extra_crossings: AF:303, AT:31, AD:25, AA:14
+  page_fragments: AF:9, M:6, AU:3, AT:3, H:3, I:3, AJ:3
+  containers: M:1, AT:1
+  same_line_mixes: ('AD', 'AT'):53, ('AF', 'M'):2, ('AC', 'AF'):1, ('AC', 'M'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  adjacent_mixes: ('AD', 'AT'):33, ('AF', 'M'):3, ('AC', 'AD'):2, ('AC', 'M'):1, ('AC', 'AF'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  field_crossings: none
+  l1_start_sets: AA:22sets top 12:4, 10:3, 6:3, 5:3; AC:5sets top 57:2, 59:2, 60:1, 32:1; AD:57sets top 39:6, 36:6, 12:5, 49:5; AF:64sets top 61:31, 63:31, 36:30, 38:30; AI:1sets top 4:1; AJ:1sets top 0:3; AK:32sets top 44:2, 52:2, 54:2, 56:2; AR:1sets top 8:1; AT:45sets top 63:5, 51:5, 60:5, 48:5; AU:2sets top 0:3, 8:1; G:1sets top 2:1; H:1sets top 0:3; I:1sets top 0:3; M:8sets top 0:7, 14:3, 16:2, 15:2; P:1sets top 6:1; R:1sets top 35:1; T:1sets top 3:1; U:1sets top 10:1; Y:1sets top 0:1
+  l1_cover_sets: AA:22sets; AC:5sets; AD:58sets; AF:64sets; AI:2sets; AJ:64sets; AK:64sets; AR:4sets; AT:47sets; AU:64sets; G:2sets; H:64sets; I:64sets; M:64sets; P:2sets; R:1sets; T:1sets; U:2sets; Y:15sets
+
+SNAPSHOT 5: objects=2262 pages=40 time=41494151284858680
+  counts: AF:1820, AD:158, AT:116, AA:61, AK:61, M:18, AC:7, AU:4, H:3, I:3, AJ:3, Y:1
+  extra_crossings: AF:354, AT:31, AD:25, AA:14
+  page_fragments: AF:10, M:6, AU:3, AT:3, H:3, I:3, AJ:3
+  containers: M:1, AT:1
+  same_line_mixes: ('AD', 'AT'):53, ('AF', 'M'):2, ('AC', 'AF'):1, ('AC', 'M'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  adjacent_mixes: ('AD', 'AT'):33, ('AF', 'M'):3, ('AC', 'AD'):2, ('AC', 'M'):1, ('AC', 'AF'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  field_crossings: none
+  l1_start_sets: AA:22sets top 12:4, 10:3, 6:3, 21:3; AC:5sets top 57:2, 59:2, 60:1, 32:1; AD:57sets top 39:6, 36:6, 12:5, 49:5; AF:64sets top 63:33, 61:33, 36:32, 38:32; AI:1sets top 4:1; AJ:1sets top 0:3; AK:32sets top 44:2, 52:2, 54:2, 56:2; AR:1sets top 8:1; AT:45sets top 63:5, 51:5, 60:5, 48:5; AU:2sets top 0:3, 8:1; G:1sets top 2:1; H:1sets top 0:3; I:1sets top 0:3; M:8sets top 0:7, 14:3, 16:2, 15:2; P:1sets top 6:1; R:1sets top 35:1; T:1sets top 3:1; U:1sets top 10:1; Y:1sets top 0:1
+  l1_cover_sets: AA:22sets; AC:5sets; AD:58sets; AF:64sets; AI:2sets; AJ:64sets; AK:64sets; AR:4sets; AT:47sets; AU:64sets; G:2sets; H:64sets; I:64sets; M:64sets; P:2sets; R:1sets; T:1sets; U:2sets; Y:15sets
+
+SNAPSHOT 6: objects=2678 pages=41 time=41494151886423224
+  counts: AF:2233, AD:158, AT:116, AA:66, AK:61, M:16, AC:7, AU:4, H:3, I:3, AJ:3, Y:1
+  extra_crossings: AF:556, AT:31, AD:25, AA:15
+  page_fragments: AF:16, M:4, AU:3, AT:3, H:3, I:3, AJ:3
+  containers: M:1, AT:1
+  same_line_mixes: ('AD', 'AT'):53, ('AF', 'M'):2, ('AC', 'AF'):1, ('AC', 'M'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  adjacent_mixes: ('AD', 'AT'):33, ('AF', 'M'):3, ('AC', 'AD'):2, ('AC', 'M'):1, ('AC', 'AF'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  field_crossings: none
+  l1_start_sets: AA:22sets top 21:4, 10:4, 1:4, 4:4; AC:5sets top 57:2, 59:2, 60:1, 32:1; AD:57sets top 39:6, 36:6, 12:5, 49:5; AF:64sets top 63:40, 38:39, 61:39, 0:39; AI:1sets top 4:1; AJ:1sets top 0:3; AK:32sets top 44:2, 52:2, 54:2, 56:2; AR:1sets top 8:1; AT:45sets top 63:5, 51:5, 60:5, 48:5; AU:2sets top 0:3, 8:1; G:1sets top 2:1; H:1sets top 0:3; I:1sets top 0:3; M:8sets top 0:5, 14:3, 16:2, 15:2; P:1sets top 6:1; R:1sets top 35:1; T:1sets top 3:1; U:1sets top 10:1; Y:1sets top 0:1
+  l1_cover_sets: AA:22sets; AC:5sets; AD:58sets; AF:64sets; AI:2sets; AJ:64sets; AK:64sets; AR:4sets; AT:47sets; AU:64sets; G:2sets; H:64sets; I:64sets; M:64sets; P:2sets; R:1sets; T:1sets; U:2sets; Y:15sets
+
+SNAPSHOT 7: objects=2678 pages=41 time=41494152487987776
+  counts: AF:2233, AD:158, AT:116, AA:66, AK:61, M:16, AC:7, AU:4, H:3, I:3, AJ:3, Y:1
+  extra_crossings: AF:556, AT:31, AD:25, AA:15
+  page_fragments: AF:16, M:4, AU:3, AT:3, H:3, I:3, AJ:3
+  containers: M:1, AT:1
+  same_line_mixes: ('AD', 'AT'):53, ('AF', 'M'):2, ('AC', 'AF'):1, ('AC', 'M'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  adjacent_mixes: ('AD', 'AT'):33, ('AF', 'M'):3, ('AC', 'AD'):2, ('AC', 'M'):1, ('AC', 'AF'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  field_crossings: none
+  l1_start_sets: AA:22sets top 21:4, 10:4, 1:4, 4:4; AC:5sets top 57:2, 59:2, 60:1, 32:1; AD:57sets top 39:6, 36:6, 12:5, 49:5; AF:64sets top 63:40, 38:39, 61:39, 0:39; AI:1sets top 4:1; AJ:1sets top 0:3; AK:32sets top 44:2, 52:2, 54:2, 56:2; AR:1sets top 8:1; AT:45sets top 63:5, 51:5, 60:5, 48:5; AU:2sets top 0:3, 8:1; G:1sets top 2:1; H:1sets top 0:3; I:1sets top 0:3; M:8sets top 0:5, 14:3, 16:2, 15:2; P:1sets top 6:1; R:1sets top 35:1; T:1sets top 3:1; U:1sets top 10:1; Y:1sets top 0:1
+  l1_cover_sets: AA:22sets; AC:5sets; AD:58sets; AF:64sets; AI:2sets; AJ:64sets; AK:64sets; AR:4sets; AT:47sets; AU:64sets; G:2sets; H:64sets; I:64sets; M:64sets; P:2sets; R:1sets; T:1sets; U:2sets; Y:15sets
+
+SNAPSHOT 8: objects=2681 pages=41 time=41494153089552320
+  counts: AF:2233, AD:158, AT:116, AA:67, AK:61, M:16, AC:7, AU:4, H:3, I:3, AJ:3, AR:2
+  extra_crossings: AF:556, AT:31, AD:25, AA:16
+  page_fragments: AF:16, M:4, AU:3, AT:3, H:3, I:3, AJ:3
+  containers: M:1, AT:1
+  same_line_mixes: ('AD', 'AT'):53, ('AF', 'M'):2, ('AC', 'AF'):1, ('AC', 'M'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  adjacent_mixes: ('AD', 'AT'):33, ('AF', 'M'):3, ('AC', 'AD'):2, ('AC', 'M'):1, ('AC', 'AF'):1, ('AA', 'AD'):1, ('AF', 'T'):1
+  field_crossings: none
+  l1_start_sets: AA:22sets top 15:4, 21:4, 10:4, 1:4; AC:5sets top 57:2, 59:2, 60:1, 32:1; AD:57sets top 39:6, 36:6, 12:5, 49:5; AF:64sets top 63:40, 38:39, 61:39, 0:39; AI:1sets top 4:1; AJ:1sets top 0:3; AK:32sets top 44:2, 52:2, 54:2, 56:2; AR:2sets top 8:1, 4:1; AT:45sets top 63:5, 51:5, 60:5, 48:5; AU:2sets top 0:3, 8:1; G:1sets top 2:1; H:1sets top 0:3; I:1sets top 0:3; L:1sets top 60:1; M:8sets top 0:5, 14:3, 16:2, 15:2; P:1sets top 6:1; R:1sets top 35:1; T:1sets top 3:1; U:1sets top 10:1; Y:1sets top 0:1
+  l1_cover_sets: AA:22sets; AC:5sets; AD:58sets; AF:64sets; AI:2sets; AJ:64sets; AK:64sets; AR:8sets; AT:47sets; AU:64sets; G:2sets; H:64sets; I:64sets; L:2sets; M:64sets; P:2sets; R:1sets; T:1sets; U:2sets; Y:15sets
+
+AGGREGATE
+  counts: AF:14563, AD:1264, AT:928, AA:502, AK:488, M:129, AC:56, AU:32, H:24, I:24, AJ:24, Y:9, AR:9, R:8, T:8, P:8, AI:8, G:8, U:8, L:1
+  extra_crossings: AF:2833, AT:248, AD:200, AA:116
+  page_fragments: AF:79, M:42, AU:24, AT:24, H:24, I:24, AJ:24
+  containers: M:8, AT:8
+  same_line_mixes: ('AD', 'AT'):424, ('AF', 'M'):16, ('AC', 'AF'):8, ('AC', 'M'):8, ('AA', 'AD'):8, ('AF', 'T'):8
+  adjacent_mixes: ('AD', 'AT'):264, ('AF', 'M'):24, ('AC', 'AD'):16, ('AC', 'M'):8, ('AC', 'AF'):8, ('AA', 'AD'):8, ('AF', 'T'):8
+  field_crossings: none

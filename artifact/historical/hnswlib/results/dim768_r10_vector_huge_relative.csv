@@ -1,0 +1,2 @@
+variant,runs,qps_mean_delta_pct,qps_median_delta_pct,us_per_query_mean_delta_pct,build_seconds_mean_delta_pct,recall_mean_delta,query_rss_mib_mean_delta_pct,index_file_mib_mean_delta_pct
+vector_huge_vs_baseline,10,6.174114356093208,6.956670182770952,-5.765709696439725,-1.0677092199265936,0.0008079999999999754,0.007047872675136624,-2.956045841440158e-06

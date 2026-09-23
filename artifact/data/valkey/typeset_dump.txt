@@ -1,0 +1,192 @@
+17|aclSelector
+127|client
+10|aeFileEvent
+3|struct list
+148|ValkeyAeEvents
+102|EventLoopData
+90|ValkeyModule
+39|uint16_t
+132|struct quicklist
+119|multiCmd
+100|moduleClusterReceiver
+11|aeFiredEvent
+191|datasetRecord
+131|rax
+29|slotRange
+176|bcastState
+47|apply_fn
+179|spmcCell
+28|CallReply
+173|zskiplistNode
+183|CommandArgument
+35|clusterLink
+87|const char
+168|serverDb
+8|struct epoll_event
+58|functionInfo
+106|ValkeyModuleDictIter
+112|ModuleConfig
+151|instanceLink
+91|struct AutoMemEntry
+149|sentinelAddr
+65|hashtableStats
+42|commandlogEntry
+153|sentinelAddr *
+53|evalScript
+13|aeTimeEvent
+130|raxNode
+98|ValkeyModuleKeyspaceSubscriber
+178|_Atomic(void *)
+135|quicklistIter
+34|clusterMsgSendBlock
+51|double
+7|readyList
+128|connection
+104|ValkeyModuleUser
+159|streamID
+122|zset
+41|unsigned char
+115|PrefetchCommandsBatch
+78|rand_pick
+126|clientReplyBlock
+80|ValkeyModulePoolAllocBlock
+187|ErrorEntry
+138|replBufBlock
+46|const char *
+137|replBacklog
+83|client *
+166|uint32_t
+103|EventLoopOneShot
+4|listNode
+107|struct ValkeyModuleServerInfoData
+63|hashtable
+70|fifoBlock
+68|double[2]
+43|void
+9|aeApiState
+52|standardConfig
+40|char *
+170|serverOp
+110|ValkeyModuleScanCursor
+15|struct ACLCategoryItem
+174|zskiplist
+169|serverDb *
+147|serverSortObject
+163|listTypeIterator
+97|ValkeyModuleAuthCtx
+77|struct pick
+50|struct rewriteConfigState
+37|clusterNode *
+141|ClientPubSubData
+36|clusterNode
+171|struct serverError
+23|robj *
+19|sds
+134|quicklistLZF
+59|functionLibInfo
+139|ClientReplicationData
+136|quicklist
+62|bucket
+30|ValkeyModuleSlotRange
+73|unsigned long long
+54|keyReference
+185|FuzzerContext
+157|stream
+81|ClientModuleData
+84|ValkeyModuleCommand
+182|struct CommandArgument
+116|KeyPrefetchInfo
+32|migrateCachedSocket
+49|struct (unnamed struct at config.c:1007:5)
+14|char
+5|listIter
+31|slotMigrationJob
+22|aofManifest
+93|streamIterator
+18|user
+129|parsedCommand
+16|keyPattern
+101|ValkeyModuleTimer
+61|intset
+99|ValkeyModulePostExecUnitJob
+188|pthread_t
+71|struct latencyTimeSeries
+0|dictEntry
+25|unsigned long
+161|streamNACK
+105|struct ValkeyModuleDict
+95|moduleType
+118|multiState
+85|struct serverCommand
+184|CommandEntry
+154|struct sentinelConfig
+88|commandHistory
+6|blockingState
+167|clientMemUsageBucket
+64|iter
+20|sds *
+160|streamCG *
+94|ValkeyModuleAsyncRMCallPromise
+1|jeBinInfo
+45|standardConfig *
+145|listpackEntry
+76|kvstoreHashtableIterator
+109|ValkeyModuleCommandFilter
+111|ValkeyModuleEventListener
+92|ValkeyModuleKey
+117|mutexQueue
+108|ValkeyModuleSharedAPI
+189|ThreadData
+156|sentinelValkeyInstance *
+48|int
+113|configEnum
+158|streamConsumer
+57|functionsLibCtx
+143|connection *
+144|setTypeIterator
+114|ValkeyModuleRdbStream
+75|kvstoreIterator
+146|serverSortOperation
+164|struct sequence
+96|ValkeyModuleCtx
+66|StageDescriptor
+175|zsetopsrc
+162|streamCG
+89|struct serverCommandArg
+150|sentinelScriptJob
+60|stringRef
+72|hashtable *
+142|rdbAuxFieldCodec
+44|struct saveparam
+12|aeEventLoop
+67|struct geoPoint
+140|replDataBufBlock
+172|scriptingEngine
+124|struct serverMemOverhead
+38|void *
+26|struct bitfieldOp
+86|keySpec
+177|pVector
+56|functionsLibEngineStats
+33|struct clusterState
+24|unsigned char *
+55|struct evictionPoolEntry
+2|jemallocBinUsageData
+74|kvstore
+165|struct sample
+21|struct ACLLogEntry
+120|watchedKey
+121|robj
+82|struct moduleLoadQueueEntry
+125|struct (unnamed struct at ./server.h:1585:5)
+180|FuzzerCommand
+79|lwCanvas
+181|ConfigEntry
+190|dataset
+186|FuzzerClientCtx
+155|struct sentinelLoadQueueEntry
+123|moduleValue
+69|fifo
+133|quicklistNode
+152|sentinelValkeyInstance
+27|struct CallReply

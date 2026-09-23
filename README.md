@@ -1,3 +1,10 @@
+# HeapLENS: Heap Layout Evaluation & Navigation Suite
+
+**ACM ATC 2026 artifact (paper 483): start with [artifact/README.md](artifact/README.md).**
+It contains the container quick start, experiment-to-paper map, guided example,
+optional LLM workflow, and explicit verification status. The older developer
+instructions below are retained for reference; use the artifact entry point for evaluation.
+
 There are three main steps: modify target application source code to add logging (then compile & run the modified application), sample the output logs and put into sqlite database, and visualize the sampled allocations.
 
 ## Step 0: Build and launch Docker image
