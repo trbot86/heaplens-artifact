@@ -10,7 +10,7 @@
 # benchmark binaries directly under `perf stat`, exactly as the paper's own
 # experiments did, and print a human-readable summary table of the results.
 #
-# IMPORTANT CAVEAT ABOUT PERF HARDWARE COUNTERS: cache-misses, LLC-*-misses,
+# One caveat about the hardware counters: cache-misses, LLC-*-misses,
 # L1-dcache-load-misses, and dTLB-load-misses all require the host CPU's
 # hardware performance-monitoring unit (PMU) to be exposed to the container.
 # This is a genuinely different resource than the CAP_SYS_ADMIN / ptrace

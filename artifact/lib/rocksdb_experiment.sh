@@ -4,73 +4,40 @@
 # SkipList "bucket" node from 56B to 48B, upstreamed as
 # https://github.com/facebook/rocksdb/pull/13424, commit 0c7e5bd).
 #
-# SCOPE: like the ASCYLIB/TPC-C experiments (see ascylib_experiment.sh /
+# Like the ASCYLIB/TPC-C experiments (see ascylib_experiment.sh /
 # tpcc_experiment.sh for the same caveat), this reproduces the *diagnostic
 # finding* -- the HeapLENS-sampled database showing the pre-fix HashSkipList
 # bucket's cache/page layout -- for the stock, unmodified data structure. It
-# does NOT apply the paper's fix (the prev_/prev_height_ field swap from PR
-# #13424) or reproduce a specific before/after size delta; it only produces
-# the sampled data the "before" side of that finding was computed from.
-# artifact/vendor/rocksdb is pinned to 7e272d20 (0c7e5bd's PARENT commit),
-# i.e. the commit immediately BEFORE the fix landed, deliberately -- that's
-# what makes this the "before" (unfixed) diagnostic case.
+# does NOT apply the paper's fix or reproduce a specific before/after size
+# delta (see rocksdb_hsl_bench for that); it only produces the sampled data
+# the "before" side of that finding was computed from. artifact/vendor/
+# rocksdb is pinned to 7e272d20 (0c7e5bd's PARENT commit), i.e. the commit
+# immediately BEFORE the fix landed, deliberately -- that's what makes this
+# the "before" (unfixed) diagnostic case.
 #
-# STATUS: written from the documented sifter.sh pipeline and RocksDB's
-# db_bench source (tools/db_bench_tool.cc, memtable/hash_skiplist_rep.cc,
-# memtable/skiplist.h) at the pinned commit, but NOT yet exercised
-# end-to-end -- this was authored in an environment without a working
-# clang-14/LLVM/Docker toolchain. Run inside docker/ubuntu_22_04 and expect
-# to debug, same as the other experiments' initial passes did (see
-# artifact/README.md's bug list). In particular:
-#   - The "SkipList" PR #13424 shrank (memtable/skiplist.h, the class whose
-#     prev_/prev_height_ fields were reordered -- one per non-empty hash
-#     bucket in HashSkipListRep, NOT the public InlineSkipList used by the
-#     default "skip_list" memtablerep) is allocated as
-#     `auto addr = allocator_->AllocateAligned(sizeof(Bucket));` immediately
-#     followed by `new (addr) Bucket(...)` (memtable/hash_skiplist_rep.cc,
-#     GetInitializedBucket) -- i.e. raw-buffer-then-placement-new, RocksDB's
-#     usual C++ idiom. sifter.sh's placement-new logging (CPP_PLACEMENT_NEW,
-#     controlled by --no-pnew, ON by default -- unlike the ASCYLIB/TPC-C
-#     experiments this is not something we had to opt into) captures the
-#     *real* allocated type (the SkipList<...> bucket, or the per-key Node
-#     in skiplist.h's NewNode, likewise placement-new'd) straight from each
-#     `new (mem) T(...)` expression, regardless of the raw buffer pointer's
-#     own (uninformative `char*`) declared type.
-#   - Arena::Allocate/AllocateAligned are plain (non-template) *virtual*
-#     member functions already targeted by AllocationLoggingCheck's
-#     MATCH_FUNCTIONS list (see clang-tidy-standalone/misc/
-#     AllocationLoggingCheck.cpp), same as setbench's mem_alloc::alloc --
-#     so, like tpcc_experiment.sh step 4.5, a template overload has to be
-#     patched into memory/arena.h by hand before the final build (step 5
-#     below) or the rewritten call sites (`Allocate<T,line,file>(bytes)`)
-#     won't compile. UNLIKE mem_alloc::alloc (which tpcc_experiment.sh
-#     redirects straight to memhook_malloc) this patch is a pure passthrough
-#     to the real Allocate()/AllocateAligned() override with no logging of
-#     its own: every Allocate/AllocateAligned call site found here is
-#     immediately placement-new'd (see above), so logging here too would
-#     double-log (and mislabel as generic `char`) the same address that the
-#     placement-new path already logs correctly-typed.
-#   - IMPORTANT, and different in kind from ASCYLIB/setbench: db_bench links
-#     essentially the entire RocksDB library, and MATCH_FUNCTIONS matches
-#     `Allocate` by bare name across ALL of it, not just Arena. Grepping the
-#     pinned tree turns up several other unrelated classes with their own
-#     `Allocate` method that clang-tidy will equally try to rewrite call
-#     sites for -- e.g. MemTableRep::Allocate(size_t, char**) -> KeyHandle
-#     (db/memtable.cc), AllocTracker::Allocate(size_t) -> void
-#     (memtable/alloc_tracker.cc, but only ever called as a bare statement,
-#     which the var-decl/assignment-only matchers don't touch, so probably
-#     safe), and RandomAccessFile/WritableFile::Allocate(offset, len, ...)
-#     -> Status/IOStatus (env.cc and friends, an fallocate()-style disk
-#     preallocation call with nothing to do with memory allocation at all).
-#     Only the Arena overload above is patched here since it's the one the
-#     paper's finding is actually about; if the build fails on an
-#     unresolved `<T, line, file>` reference against one of these other
-#     classes, add a same-shaped passthrough template overload to that
-#     class too (or, if it's unused by the fillrandom/HashSkipList path
-#     specifically, consider trimming db_bench's build inputs instead of
-#     patching every colliding class). This is the kind of iterative
-#     compile-fix-recompile work the ASCYLIB/TPC-C bug list documents --
-#     expect more of it here given RocksDB's much larger surface area.
+# RocksDB needed considerably more iteration than ASCYLIB/TPC-C to bring up
+# (it's a much larger, more interconnected codebase), captured in four
+# helper scripts this driver calls in sequence below -- see each one's own
+# docstring for the specific mechanism and why it's needed:
+#   - dedupe_fixes_yaml.py (step 2.5): some headers are #included by dozens
+#     of translation units, each analyzed by clang-tidy independently, so
+#     two can propose conflicting MemStamp(...) insertions at the same
+#     (file, offset) -- which clang-apply-replacements-14 refuses to
+#     resolve on its own.
+#   - fixup_anon_namespace_casts.py and fixup_malformed_insertions.py
+#     (step 3.5): a handful of insertions the checker produces are outright
+#     malformed or the wrong type at RocksDB's scale (anonymous-namespace
+#     types, template instantiation edge cases, a couple of identifiers it
+#     corrupts outright).
+#   - patch_allocate_overloads.py (step 4.5): AllocationLoggingCheck matches
+#     `Allocate`/`AllocateAligned` by bare name across the whole codebase,
+#     which also catches several classes unrelated to memory allocation;
+#     each needs a passthrough template overload to compile.
+# Two more RocksDB-specific build flags (see step 2/5 below): -Werror trips
+# on a pre-existing warning unrelated to instrumentation
+# (DISABLE_WARNING_AS_ERROR works around it, RocksDB's own escape hatch),
+# and memhook_interface.h's typeid(T) needs RTTI, which RocksDB disables by
+# default at DEBUG_LEVEL=0 (USE_RTTI=1, also RocksDB's own flag).
 #
 # Usage: run_rocksdb_experiment
 # (single entry point: HashSkipList is the only memtable in scope here)
@@ -87,12 +54,19 @@ run_rocksdb_experiment() {
     local SRC_COPY="${WORK}/src"
     local INSTRUMENTED="${WORK}/instrumented"
     local MEMHOOK_DIR="$SIFTER_ROOT/memhook"
+    local LIB_DIR="$SIFTER_ROOT/artifact/lib"
 
     # HashSkipList == db_bench's "prefix_hash" memtablerep (memtable/
     # hash_skiplist_rep.cc, NewHashSkipListRepFactory). It requires a
     # prefix extractor, which db_bench only installs when -prefix_size > 0
     # (tools/db_bench_tool.cc: prefix_extractor_ is null otherwise, and
     # HashSkipListRep asserts on a null prefix extractor).
+    #
+    # NUM_KEYS should stay comfortably above HASH_BUCKET_COUNT (a few keys
+    # per bucket on average) -- HashSkipListRep only allocates a bucket's
+    # SkipList once a hash prefix collides with an existing entry, so too
+    # few keys per bucket produces almost no SkipList<Bucket> allocations
+    # at all, i.e. nothing to see for the paper's own finding.
     local THREADS="${THREADS:-24}"
     local NUM_KEYS="${NUM_KEYS:-2000000}"
     local VALUE_SIZE="${VALUE_SIZE:-100}"
@@ -102,8 +76,22 @@ run_rocksdb_experiment() {
     # env var, since artifact/run_all.sh --quick shortens runs via RUN_SECONDS=10.
     local RUN_SECONDS="${RUN_SECONDS:-30}"
     local BENCHMARKS="${BENCHMARKS:-fillrandom}"
+    # `make benchmarks -j$(nproc)` has been observed to freeze the Docker
+    # host (RocksDB's build is heavy, and clang-tidy's own analysis pass on
+    # top of that multiplies memory pressure per parallel job). Default to
+    # a small, safe job count; override via BUILD_JOBS if your host can
+    # handle more.
+    local BUILD_JOBS="${BUILD_JOBS:-4}"
 
-    local SAMPLE_PROPORTION="${SAMPLE_PROPORTION:-0.2}"
+    # fillrandom ignores --num once --duration is set (it keeps generating
+    # keys for the full duration, cycling through the key space repeatedly
+    # rather than stopping at NUM_KEYS) -- so RUN_SECONDS, not NUM_KEYS, is
+    # what actually drives event-log size here. At the defaults above this
+    # produces tens of millions of sampled allocation events; a much lower
+    # SAMPLE_PROPORTION than the ASCYLIB/TPC-C experiments' is needed to
+    # keep the resulting .sqlite in the "few hundred MB" range the root
+    # README recommends for the visualizer.
+    local SAMPLE_PROPORTION="${SAMPLE_PROPORTION:-0.05}"
     local PAGES_PER_TYPE="${PAGES_PER_TYPE:-4}"
 
     echo "=== [$out_name] 1/7: fresh working copy of RocksDB ==="
@@ -144,61 +132,38 @@ run_rocksdb_experiment() {
     # DEBUG_LEVEL=0 gives an optimized (non-debug-asserts) build, since
     # db_bench's own assertions on hot allocation paths would otherwise
     # dominate the runtime. db_bench needs gflags (libgflags-dev, already in
-    # docker/ubuntu_22_04/Dockerfile).
+    # docker/ubuntu_22_04/Dockerfile). DISABLE_WARNING_AS_ERROR and
+    # USE_RTTI=1: see the file-header comment above.
+    #
+    # Build the `db_bench` target specifically, not the aggregate
+    # `benchmarks` target (which also builds 6 other tools): one of them,
+    # table_reader_bench, pulls in db/db_test_util.o, which fails to
+    # compile at this pinned commit with DEBUG_LEVEL=0 (it calls
+    # TEST_-prefixed DBImpl methods that only exist when NDEBUG is
+    # undefined) -- unrelated to instrumentation, and avoided entirely by
+    # not needing that object file. RocksDB's own Makefile builds db_bench
+    # the same way for its `release` target.
     cd "$SIFTER_ROOT"
     ./sifter.sh "$SRC_COPY" "$INSTRUMENTED" \
         -t \
         --skip-refactor \
-        --build "bear -- make PORTABLE=1 DEBUG_LEVEL=0 db_bench -j$(nproc)"
+        --build "bear -- make PORTABLE=1 DEBUG_LEVEL=0 DISABLE_WARNING_AS_ERROR=1 USE_RTTI=1 db_bench -j${BUILD_JOBS}"
+
+    echo "=== [$out_name] 2.5/7: deduplicate colliding insertions in fixes.yaml ==="
+    python3 "$LIB_DIR/dedupe_fixes_yaml.py" "$INSTRUMENTED/fixes.yaml"
 
     echo "=== [$out_name] 3/7: apply clang-tidy fixes ==="
     (cd "$INSTRUMENTED" && clang-apply-replacements-14 ./)
 
+    echo "=== [$out_name] 3.5/7: fix up malformed/incorrect insertions ==="
+    python3 "$LIB_DIR/fixup_anon_namespace_casts.py" "$INSTRUMENTED"
+    python3 "$LIB_DIR/fixup_malformed_insertions.py" "$INSTRUMENTED"
+
     echo "=== [$out_name] 4/7: add memhook_interface.h includes ==="
     ./sifter.sh "$INSTRUMENTED" --includes-only
 
-    echo "=== [$out_name] 4.5/7: patch Arena::Allocate/AllocateAligned with template overloads ==="
-    # Pure passthrough to the real (non-template) override -- see the
-    # file-header comment above for why this must not log anything itself.
-    local ARENA_H="$INSTRUMENTED/memory/arena.h"
-    if ! grep -q 'template <typename T, int line, uint16_t filename>' "$ARENA_H"; then
-        python3 - "$ARENA_H" <<'PYEOF'
-import re, sys
-
-path = sys.argv[1]
-with open(path) as f:
-    src = f.read()
-
-allocate_decl = "  char* Allocate(size_t bytes) override;\n"
-allocate_patch = allocate_decl + '''
-  template <typename T, int line, uint16_t filename>
-  char* Allocate(size_t bytes) {
-    return Allocate(bytes);
-  }
-'''
-assert src.count(allocate_decl) == 1, "Arena::Allocate declaration not found or not unique"
-src = src.replace(allocate_decl, allocate_patch, 1)
-
-aligned_decl_re = re.compile(
-    r"  char\* AllocateAligned\(size_t bytes, size_t huge_page_size = 0,\n"
-    r"\s*Logger\* logger = nullptr\) override;\n"
-)
-m = aligned_decl_re.search(src)
-assert m, "Arena::AllocateAligned declaration not found"
-aligned_decl = m.group(0)
-aligned_patch = aligned_decl + '''
-  template <typename T, int line, uint16_t filename>
-  char* AllocateAligned(size_t bytes, size_t huge_page_size = 0,
-                        Logger* logger = nullptr) {
-    return AllocateAligned(bytes, huge_page_size, logger);
-  }
-'''
-src = src[:m.start()] + aligned_patch + src[m.end():]
-
-with open(path, "w") as f:
-    f.write(src)
-PYEOF
-    fi
+    echo "=== [$out_name] 4.5/7: patch Allocate-collision classes with passthrough template overloads ==="
+    python3 "$LIB_DIR/patch_allocate_overloads.py" "$INSTRUMENTED"
 
     echo "=== [$out_name] 5/7: rebuild db_bench linked against memhook ==="
     (
@@ -206,11 +171,19 @@ PYEOF
         make clean || true
         CXXFLAGS="-I${MEMHOOK_DIR}" \
         LDFLAGS="-L${MEMHOOK_DIR} -Wl,-rpath=${MEMHOOK_DIR} -lmemhook -ldl" \
-        make PORTABLE=1 DEBUG_LEVEL=0 db_bench -j"$(nproc)"
+        make PORTABLE=1 DEBUG_LEVEL=0 DISABLE_WARNING_AS_ERROR=1 USE_RTTI=1 db_bench -j"${BUILD_JOBS}"
     )
 
     echo "=== [$out_name] 6/7: run instrumented db_bench (HashSkipList memtable) ==="
     echo "    threads=$THREADS num=$NUM_KEYS value_size=$VALUE_SIZE prefix_size=$PREFIX_SIZE hash_bucket_count=$HASH_BUCKET_COUNT duration=${RUN_SECONDS}s"
+    # --compression_type=none: this PORTABLE=1 build isn't linked against
+    # Snappy (db_bench's own default compressor), so db_bench refuses to
+    # open a db with the default settings -- irrelevant to what we're
+    # measuring (allocation/layout, not on-disk compression).
+    # --allow_concurrent_memtable_write=false: HashSkipListRep doesn't
+    # support concurrent memtable writes at all (unlike the default
+    # skip_list memtablerep); db_bench's own default of true makes it
+    # refuse to open with more than one thread otherwise.
     (
         cd "$INSTRUMENTED"
         rm -rf /tmp/rocksdb_hsl_bench_db
@@ -223,6 +196,8 @@ PYEOF
             --num="$NUM_KEYS" \
             --value_size="$VALUE_SIZE" \
             --duration="$RUN_SECONDS" \
+            --compression_type=none \
+            --allow_concurrent_memtable_write=false \
             --db=/tmp/rocksdb_hsl_bench_db
     )
     # Expected outputs in $INSTRUMENTED: binary_dump.txt, fileset_dump.txt,

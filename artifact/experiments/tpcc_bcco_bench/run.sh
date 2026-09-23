@@ -23,7 +23,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SIFTER_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 source "$SIFTER_ROOT/artifact/lib/tpcc_perfbench.sh"
 
-THREADS="${THREADS:-24}"
+THREADS="$(tpcc_perfbench_cap_threads "${THREADS:-24}")"
 REPS="${REPS:-3}"   # paper used 10; override for full fidelity
 
 OUT_NAME="tpcc_bcco_bench"

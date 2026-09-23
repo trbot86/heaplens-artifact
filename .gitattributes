@@ -5,3 +5,13 @@
 *.sh text eol=lf
 *.py text eol=lf
 Dockerfile text eol=lf
+
+# setbench's TPC-C schema files are parsed with a plain C++ getline() loop
+# that does not strip \r -- a CRLF line ending corrupts the parsed table/
+# index names, which std::map::operator[] "resolves" by silently inserting
+# a null-valued entry instead of failing, crashing the first thread that
+# reads it (not necessarily at schema-parse time, so this can look like an
+# unrelated, thread-count-dependent segfault deep into the workload run).
+# This bit us once already from a Windows checkout with core.autocrlf=true;
+# force LF so it can't recur.
+artifact/patches/setbench-tpcc/macrobench/benchmarks/*.txt text eol=lf

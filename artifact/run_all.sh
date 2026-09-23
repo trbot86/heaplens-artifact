@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Runs every Tier-1 (fully scripted, diagnostic-reproduction) experiment for
-# the HeapLENS ATC'26 artifact. Each one takes roughly a few minutes, except
+# Runs every visualization (diagnostic-reproduction) experiment for the
+# HeapLENS ATC'26 artifact -- not the performance experiments, see
+# run_perfbench.sh for those. Each one takes roughly a few minutes, except
 # the two TPC-C experiments and the RocksDB experiment, which additionally
 # rebuild the instrumentation toolchain in C++/template mode -- RocksDB's
 # own build is also the heaviest of the three targets (it compiles most of

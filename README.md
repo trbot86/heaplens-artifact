@@ -1,8 +1,8 @@
 There are three main steps: modify target application source code to add logging (then compile & run the modified application), sample the output logs and put into sqlite database, and visualize the sampled allocations.
 
-## Step 0: Build and lauch Docker image
+## Step 0: Build and launch Docker image
 
-Step 1 below relies on a specific version of clang and LLVM (version 14), which in turn requires Ubuntu 22 or higher, so it may be simpler to get things working inside a Docker container. To build and lauch a Docker image, do the following:
+Step 1 below relies on a specific version of clang and LLVM (version 14), which in turn requires Ubuntu 22 or higher, so it may be simpler to get things working inside a Docker container. To build and launch a Docker image, do the following:
 
 1. Navigate to the directory containing the Dockerfile
 
@@ -10,7 +10,7 @@ Step 1 below relies on a specific version of clang and LLVM (version 14), which 
 
 2. Run the script to build and launch the Docker image
 
-		sudo ./build_image_and_lauch.sh --name sifter
+		sudo ./build_image_and_launch.sh --name sifter
 		
 3. Copy target application source code to Docker container
 
@@ -59,6 +59,7 @@ This step uses clang-tidy to add logging instructions to the target application.
 7. Compile your target application.
 
 8. Run your target application. This will produce a few files: binary_dump.txt, fileset_dump.txt, and typeset_dump.txt.
+
 ## Step 2: Sample output logs
 
 This step samples a set of memory pages from binary_dump.txt.
@@ -76,6 +77,8 @@ This step samples a set of memory pages from binary_dump.txt.
 ## Step 3: Visualization
 
 This step allows you to visualize the database produced in the previous step. You can either run the backend (with Flask) and frontend (with node.js) servers directly on your local machine, or you may build a virtual environment in Python using the included requirements.txt. This section will cover the latter approach.
+
+**Shortcut:** `sifter_vis_d3/setup_and_launch.sh` automates all of steps 1-6 below (creating/reusing the virtual environment, installing the Python and node dependencies, and starting both servers) -- run it, then skip to step 7. Run it on your host machine, not inside the Docker container from Step 0, which doesn't include `sifter_vis_d3/` at all.
 
 You will need Python 3 along with the venv module (which you should already have if you have Python >= 3.3).
 
@@ -115,6 +118,8 @@ You will need Python 3 along with the venv module (which you should already have
 		npm install
 		npm run dev
 
-7. Copy 'allocs.sqlite' from the previous step into the 'sifter_vis_d3' directory.
+7. Copy 'allocs.sqlite' from the previous step into the 'sifter_vis_d3' directory. If steps 1-2 ran inside the Docker container from Step 0 and this step is running on the host, the container's filesystem isn't bind-mounted, so use `docker cp` rather than a plain `cp`, e.g.:
+
+		sudo docker cp sifter:/root/sifter/[new-dir-name]/type_analysis/allocs.sqlite sifter_vis_d3/
 
 8. Open 'localhost:3000' in your web browser. Note that it can take a few minutes to load a database in the visualization app. If it takes too long, you may want to choose a lower sampling proportion value in the sampling step.

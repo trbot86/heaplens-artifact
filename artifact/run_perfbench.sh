@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Runs the HeapLENS paper's quantitative "before/after" ablation experiments:
-# these reproduce Table 1 (rows 1, 4, 5), Table 3, and Table 4 by building
-# ASCYLIB's and setbench's own (un-instrumented) benchmark binaries and
-# driving them with `perf stat`, exactly as the paper's own
-# run_experiment_asplos*.sh scripts did. Each one prints a human-readable
-# summary table (mean throughput + mean hardware-counter rates per variant)
-# at the end, and writes the full per-run data to
-# artifact/experiments/<name>/results.tsv.
+# these reproduce Table 1 (rows 1, 4, 5, and the two RocksDB rows), Table 3,
+# and Table 4 by building ASCYLIB's, setbench's, and RocksDB's own
+# (un-instrumented) benchmark binaries and driving them with `perf stat`,
+# exactly as the paper's own run_experiment_asplos*.sh scripts did. Each one
+# prints a human-readable summary table (mean throughput + mean
+# hardware-counter rates per variant) at the end, and writes the full
+# per-run data to artifact/experiments/<name>/results.tsv.
 #
 # This is DIFFERENT from artifact/run_all.sh, which drives HeapLENS's own
 # instrumentation/sampling/visualization pipeline (memhook + sifter.sh) to
@@ -15,12 +15,12 @@
 # "stock" and "fixed" configurations. See artifact/README.md's "Quantitative
 # ablation experiments" section for the full list and paper cross-references.
 #
-# IMPORTANT: hardware-counter columns (cache-miss/TLB-miss/LLC-miss rates)
-# require the host CPU's performance-monitoring unit (PMU) to be exposed to
-# the container; this is NOT available under most Type-2 hypervisors
-# (including Docker Desktop's WSL2/Hyper-V backend). See
-# artifact/lib/perfstat_common.sh's header comment for details. Throughput
-# numbers are unaffected and always meaningful.
+# Hardware-counter columns (cache-miss/TLB-miss/LLC-miss rates) require the
+# host CPU's performance-monitoring unit (PMU) to be exposed to the
+# container; this is not available under most Type-2 hypervisors (including
+# Docker Desktop's WSL2/Hyper-V backend). See artifact/lib/perfstat_common.sh's
+# header comment for details. Throughput numbers are unaffected and always
+# meaningful.
 #
 # Usage: artifact/run_perfbench.sh [--quick]
 #   --quick   uses small thread counts / node counts / a single repetition,
@@ -32,11 +32,13 @@ if [ "${1:-}" = "--quick" ]; then
     export REPS=1
     export THREADS=4
     export DURATION_MS=1000
+    export DURATION_SECONDS=5
+    export NUM_KEYS=200000
 fi
 
 "$SCRIPT_DIR/setup.sh"
 
-EXPERIMENTS=(ascylib_efrb_bench ascylib_dvy_bench ascylib_hj_bench tpcc_bcco_bench tpcc_efrb_bench)
+EXPERIMENTS=(ascylib_efrb_bench ascylib_dvy_bench ascylib_hj_bench tpcc_bcco_bench tpcc_efrb_bench rocksdb_hsl_bench rocksdb_isl_bench)
 FAILED=()
 
 for exp in "${EXPERIMENTS[@]}"; do

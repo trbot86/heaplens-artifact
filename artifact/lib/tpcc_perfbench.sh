@@ -16,6 +16,27 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/perfstat_common.sh"
 
+# tpcc_perfbench_cap_threads <requested_threads>
+# Prints the thread count to actually use. THREAD_CNT is compiled in and
+# drives -pin's range 1:1 (see tpcc_perfbench_build/tpcc_perfbench_variant),
+# so asking for more threads than the machine has real CPUs doesn't degrade
+# gracefully -- it's been observed to abort (setbench's own "could not bind
+# thread N to cpuset" path) or even segfault under contention. Cap to
+# nproc and warn, rather than let the paper-scale default (24) silently
+# fail on smaller dev machines.
+tpcc_perfbench_cap_threads() {
+    local requested="$1" ncpu
+    ncpu="$(nproc)"
+    if [ "$requested" -gt "$ncpu" ]; then
+        echo "WARNING: THREADS=$requested exceeds this machine's $ncpu CPUs;" >&2
+        echo "         TPC-C's macrobench binaries don't degrade gracefully" >&2
+        echo "         when oversubscribed this way. Capping to $ncpu." >&2
+        echo "$ncpu"
+    else
+        echo "$requested"
+    fi
+}
+
 # tpcc_perfbench_setup <out_name>
 # Fresh copy of vendored setbench, overlaid with artifact/patches/
 # setbench-tpcc (the same fixed schema files, macrobench source fixes, and

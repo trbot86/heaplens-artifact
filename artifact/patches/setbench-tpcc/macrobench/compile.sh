@@ -40,22 +40,14 @@ workloads="TPCC"
 ##
 ## NOTE (HeapLENS artifact): bronson_pext_bst_occ (BCCO tree) and
 ## ellen_ext_bst_lf (EFRB tree) are both active here for §6.3/Table 1 rows
-## 4-5, matching the paper's two TPC-C index data structures. They compile
-## in SEPARATE `make clean && make` invocations below (make_workload_dict is
-## called once per algs entry, sequentially, never combined into one `make`
-## call) -- this matters if this script is ever used as sifter.sh's --build
-## driver: `bear` records whatever `make` invocation(s) it wraps into ONE
-## compile_commands.json, and if both data structures' builds ended up in
-## the same one, clang-tidy would see macrobench's shared files (wl.cpp,
-## tpcc_wl.cpp, etc.) compiled twice with different `-I../ds/<name>` flags,
-## producing conflicting fixit replacements at the same source locations
-## for anything both builds touch (the same failure mode diagnosed for
-## RocksDB's shared headers when building all of it in one pass -- see
-## rocksdb_experiment.sh). artifact/lib/tpcc_experiment.sh doesn't invoke
-## this script directly (it calls `make` itself, once per data structure,
-## in fully separate script invocations with separate output directories)
-## and so isn't exposed to this either way, but keep it in mind if that
-## ever changes.
+## 4-5, matching the paper's two TPC-C index data structures. They must
+## compile in SEPARATE `make clean && make` invocations (never combined into
+## one) if this script is ever used as sifter.sh's --build driver -- see
+## dedupe_fixes_yaml.py's docstring for why combining translation units that
+## way produces conflicting clang-tidy fixits. Not currently a risk:
+## artifact/lib/tpcc_experiment.sh doesn't invoke this script directly, it
+## calls `make` itself once per data structure in separate script
+## invocations -- but keep it in mind if that changes.
 algs=( \
     # "aksenov_splaylist_64:" \ DO NOT USE WITH TOO HIGH KEY COUNT (DOES NOT RECLAIM MEM)
     "bronson_pext_bst_occ:$options" \

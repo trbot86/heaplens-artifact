@@ -2,18 +2,14 @@
 # Shared driver for the ASCYLIB diagnostic experiments (EFRB / DVY / HJ trees,
 # HeapLENS paper Section 6.2 and Appendix B / Table 1 rows 1-3).
 #
-# SCOPE: this reproduces the *diagnostic finding* (the HeapLENS-sampled
-# database + cache-set-occupancy data that shows e.g. cache set
-# underutilization by tree nodes) for the stock, unmodified data structure. It
-# does NOT apply the paper's follow-up code fix (separate memory arenas +
-# multithreaded prefill) and therefore does NOT reproduce the claimed
-# throughput/cache-miss percentages in Table 1 -- only the underlying pattern
-# those numbers were computed from.
-#
-# STATUS: written from the documented sifter.sh pipeline (see /README.md) and
-# the vendored ASCYLIB source, but not yet exercised end-to-end (this
-# checkout has no working clang-14/LLVM toolchain outside the project's own
-# Docker image). Run inside docker/ubuntu_22_04 and expect to debug.
+# This reproduces the *diagnostic finding* (the HeapLENS-sampled database +
+# cache-set-occupancy data that shows e.g. cache set underutilization by
+# tree nodes) for the stock, unmodified data structure. It does NOT apply
+# the paper's follow-up code fix (separate memory arenas + multithreaded
+# prefill) and therefore does NOT reproduce the claimed throughput/
+# cache-miss percentages in Table 1 -- only the underlying pattern those
+# numbers were computed from. For that, see the corresponding *_bench
+# experiment (e.g. ascylib_efrb_bench).
 #
 # Usage: run_ascylib_experiment <tree-src-dir> <binary-name> <out-name> [make-args...]
 #   tree-src-dir : path under artifact/vendor/ascylib, e.g. src/bst-ellen
