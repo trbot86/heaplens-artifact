@@ -77,8 +77,9 @@ have their own repetition schedules.
 ### Run an individual experiment
 
 Each command below builds and runs all variants for the named experiment
-and prints a throughput comparison. `experiment NAME` selects one of the
-ASCYLIB or TPC-C experiments; names ending in `_bench` measure performance.
+and prints a throughput comparison. For `experiment NAME`, names ending in
+`_bench` measure performance. The other names instrument the application and
+generate allocation-trace databases for the HeapLENS GUI (see Section 6).
 
 ```bash
 # ASCYLIB trees: EFRB (§6.2), DVY and HJ (Appendix B)
@@ -232,7 +233,8 @@ bash artifact/run.sh history
 
 ## 6. Generate traces and try model-assisted analysis
 
-Names without `_bench` generate instrumented allocation traces for the GUI.
+For `experiment NAME`, names without `_bench` generate instrumented allocation
+traces for the GUI.
 For example, to generate a small EFRB trace:
 
 ```bash

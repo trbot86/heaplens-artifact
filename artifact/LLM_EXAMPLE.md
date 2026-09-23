@@ -74,8 +74,7 @@ codex -c features.memories=false \
 ```
 
 These are per-invocation overrides; use them again when starting each fresh
-session. See the official [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)
-and [CLI reference](https://learn.chatgpt.com/docs/developer-commands?surface=cli).
+session.
 
 ## Prompts from the paper
 
