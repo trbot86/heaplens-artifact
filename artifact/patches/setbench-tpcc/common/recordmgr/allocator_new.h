@@ -14,30 +14,22 @@
 #include <cassert>
 #include <iostream>
 
-// HeapLENS artifact addition: -DMEMHOOK_SEG_DS makes this allocator dlopen
-// its OWN private instance of a malloc implementation (jemalloc by default,
-// or mimalloc with -DUSE_MIMALLOC) and route every allocation of T through
-// it, instead of through the process's normal `new`/`malloc`. Because each
-// dlopen() of a shared malloc library gets its own independent set of
-// arenas, this gives objects allocated via this allocator_new<T> a heap
-// region that's disjoint from everything else the application allocates
-// (including anything from the SAME malloc implementation reached via the
-// process's normal allocation path, e.g. via LD_PRELOAD) -- reproducing the
-// "separate memory arenas" / node-segregation fix described in the
-// HeapLENS paper's Section 6.2 (ASCYLIB EFRB tree) and Section 6.3
-// (TPC-C/BCCO and TPC-C/EFRB trees). See
-// artifact/experiments/{ascylib_efrb_bench,tpcc_bcco_bench,tpcc_efrb_bench}.
+// MEMHOOK_SEG_DS routes record-managed tree objects through a separately
+// loaded allocator rather than the process-wide allocation path. The TPC-C
+// drivers stage the retained jemalloc library under a distinct filename.
+// Repeated dlopen calls for that file SHARE one instance across tables/types;
+// reopening the process-wide library would NOT create a separate instance.
+// This implements tree-vs-database segregation, not a private heap per table.
 //
 // MEMHOOK_SEG_DS_LIB overrides the library path (must be resolvable via
 // dlopen(), so either absolute or relative to the *process's* cwd at
-// startup -- not to this header). The default matches where setbench's own
-// vendored allocators live relative to macrobench/'s build output
-// (setbench/lib/lib{jemalloc,mimalloc}.so), since these binaries are always
-// run with macrobench/ as the working directory (see e.g.
-// artifact/lib/tpcc_perfbench.sh).
+// startup -- not to this header). The default jemalloc file is staged in the
+// source copy's lib/ directory, with macrobench/ as the working directory.
+// The optional USE_MIMALLOC path must also differ from the global allocator;
+// the paper's configurations do not use that selector.
 #ifdef MEMHOOK_SEG_DS
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE // for dlmopen()/LM_ID_NEWLM
+#define _GNU_SOURCE // for RTLD_DEFAULT
 #endif
 #include <dlfcn.h>
 
@@ -48,7 +40,7 @@ typedef void (*free_fn_t)(void*);
 #ifdef USE_MIMALLOC
 #define MEMHOOK_SEG_DS_LIB "../lib/libmimalloc.so"
 #else
-#define MEMHOOK_SEG_DS_LIB "../lib/libjemalloc.so"
+#define MEMHOOK_SEG_DS_LIB "../lib/libjemalloc-heaplens.so"
 #endif
 #endif
 #endif
@@ -146,22 +138,9 @@ public:
             : allocator_interface<T>(numProcesses, _debug) {
         VERBOSE DEBUG std::cout<<"constructor allocator_new"<<std::endl;
         #ifdef MEMHOOK_SEG_DS
-        // HeapLENS artifact note: dlopen() here can fail with "cannot
-        // allocate memory in static TLS block" whenever the library being
-        // dlopen'd (or the process's own LD_PRELOAD'd allocator) uses
-        // initial-exec TLS -- a well-known glibc limitation once the
-        // process's static TLS surplus is exhausted, which is common with
-        // modern jemalloc/mimalloc builds. dlmopen(LM_ID_NEWLM, ...) does
-        // NOT fix this (initial-exec TLS is tied to the process's single
-        // static TLS region regardless of link-map namespace) and further
-        // exhausts glibc's small, fixed namespace limit (DL_NNS, typically
-        // 16) since a fresh allocator_new<T> -- and therefore a fresh
-        // dlopen -- is created per database table. The actual fix is to
-        // give the *process* a bigger static TLS surplus up front via the
-        // glibc.rtld.optional_static_tls tunable, e.g.:
-        //   GLIBC_TUNABLES=glibc.rtld.optional_static_tls=4194304 ./rundb_...
-        // (supported since glibc 2.35; see artifact/lib/tpcc_perfbench.sh,
-        // which sets this for every run of these benchmarks).
+        // A distinct allocator using initial-exec TLS may need additional
+        // static-TLS space. The performance driver sets GLIBC_TUNABLES before
+        // startup. Loading the same file repeatedly does not create new heaps.
         void* malloc_copy = dlopen(MEMHOOK_SEG_DS_LIB, RTLD_LAZY);
         if (!malloc_copy) {
             std::cout << "ERROR: failed to dlopen malloc library " << MEMHOOK_SEG_DS_LIB << std::endl;
@@ -177,6 +156,11 @@ public:
         }
         else if (!ds_free) {
             std::cout << "ERROR: failed to resolve free" << std::endl;
+            exit(-1);
+        }
+        if (reinterpret_cast<void*>(ds_malloc) == dlsym(RTLD_DEFAULT, "malloc")) {
+            std::cerr << "ERROR: MEMHOOK_SEG_DS resolved to the process-wide allocator; "
+                      << "use the separately staged HeapLENS allocator library." << std::endl;
             exit(-1);
         }
         #endif

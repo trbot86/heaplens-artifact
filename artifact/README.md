@@ -256,6 +256,14 @@ bash artifact/run.sh export
 
 ## Errata
 
+**TPC-C artifact packaging.** The initial artifact inadvertently pointed the
+tree-segregation allocation path at the process-wide jemalloc library. Loading
+that same library again did not provide a separate allocator. The corrected
+drivers restore the distinct jemalloc library used by the retained experiments
+and reject accidental reuse of the global allocator. This was introduced during
+artifact preparation; the retained paper results are unchanged. See
+[allocator provenance](vendor/heaplens-allocators/README.md).
+
 **Counter normalization.** The original ASCYLIB (EFRB, DVY, HJ) and TPC-C
 (BCCO, EFRB) scripts inadvertently divided cache/TLB miss and context-switch
 counts by throughput rather than operation/transaction counts. This artifact

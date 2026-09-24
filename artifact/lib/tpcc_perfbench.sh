@@ -15,6 +15,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/perfstat_common.sh"
+source "$SCRIPT_DIR/tpcc_allocators.sh"
 
 # tpcc_perfbench_cap_threads <requested_threads>
 # Prints the thread count to actually use. THREAD_CNT is compiled in and
@@ -60,6 +61,7 @@ tpcc_perfbench_setup() {
     mkdir -p "$TPCC_PERFBENCH_WORK"
     cp -r "$SIFTER_ROOT/artifact/vendor/setbench" "$TPCC_SRC_COPY"
     cp -r "$SIFTER_ROOT/artifact/patches/setbench-tpcc/." "$TPCC_SRC_COPY/"
+    tpcc_stage_allocators "$SIFTER_ROOT" "$TPCC_SRC_COPY"
 }
 
 # tpcc_perfbench_build <ds_name> <threads> [data_structure_opts]
@@ -101,10 +103,9 @@ tpcc_perfbench_variant() {
             cd "$TPCC_MACROBENCH"
             [ -n "$preload" ] && export LD_PRELOAD="$preload"
             # See artifact/patches/setbench-tpcc/common/recordmgr/
-            # allocator_new.h: -DMEMHOOK_SEG_DS variants dlopen a second
-            # copy of an allocator library per database table, which
-            # exhausts glibc's small default static-TLS surplus on modern
-            # jemalloc/mimalloc builds. This is harmless to set even for
+            # allocator_new.h: -DMEMHOOK_SEG_DS variants load a distinct
+            # allocator library shared by the tree indexes. This may exceed
+            # glibc's default static-TLS surplus. This is harmless to set even for
             # variants that don't use MEMHOOK_SEG_DS.
             export GLIBC_TUNABLES="glibc.rtld.optional_static_tls=4194304"
             perfbench_run_rep "$results_tsv" "$run_dir" "$variant" "$threads" "$run_idx" \

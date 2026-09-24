@@ -32,6 +32,21 @@ vendor tree; HeapLENS's root license is GPLv3. Vendored allocator binaries in
 SetBench are retained from the pinned upstream tree; `lib/versions.txt` records
 available version information (not every binary has a recorded version).
 
+### TPC-C allocator packaging correction
+
+Artifact preparation inadvertently changed the `MEMHOOK_SEG_DS` library path
+to the same jemalloc library used by process-wide `LD_PRELOAD`. Reopening that
+library did not create a separate allocator, removing the intended separation
+between tree objects and other database allocations in the jemalloc runs.
+The retained experiment code instead selected a distinct jemalloc library.
+
+The corrected drivers stage that retained jemalloc 5.3.0 binary from
+`vendor/heaplens-allocators/` separately from SetBench's process-wide jemalloc
+5.0.1 or mimalloc 1.6.3. Its checksum and license accompany the binary. The
+allocator now rejects a configuration that resolves both paths to the same
+`malloc` function. This corrects an error introduced during artifact packaging;
+it is not a new optimization or a change to the retained paper results.
+
 ## Saved inputs and measurements
 
 Sean's `data/paper_data.xlsx` and its accompanying README are retained from

@@ -15,8 +15,10 @@
 #      posix_memalign implementation wastes space aligning 48B row_t
 #      objects to 64B (rounding up to 112B blocks); c_mimalloc_fixed
 #      allocates 64B row_t objects instead (-DMACROBENCH_PAD_ROW_TO_ALIGN).
-#      This is Table 1 row 5 (+20% throughput, -35% cache misses, -92% TLB
-#      misses).
+#      This historical comparison also removes MEMHOOK_SEG_DS, so it does
+#      not isolate row padding. Table 1's approximately +20% throughput is
+#      e_single_recmgr_mimalloc_fixed versus b_mimalloc: the combined
+#      reclamation and row-padding changes with segregation retained.
 #
 # Contrast with artifact/experiments/tpcc_efrb, which runs the HeapLENS
 # instrumentation/sampling pipeline on the stock tree to produce a .sqlite

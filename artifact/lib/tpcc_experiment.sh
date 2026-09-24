@@ -84,6 +84,8 @@ run_tpcc_experiment() {
     # vendor source -- see the file-header comment above for why this lives
     # in the superproject rather than committed inside the submodule.
     cp -r "$SIFTER_ROOT/artifact/patches/setbench-tpcc/." "$SRC_COPY/"
+    source "$SIFTER_ROOT/artifact/lib/tpcc_allocators.sh"
+    tpcc_stage_allocators "$SIFTER_ROOT" "$SRC_COPY"
 
     echo "=== [$out_name] 2/7: build instrumentation toolchain + generate fixes.yaml ==="
     # setbench's macrobench is C++ (-std=c++17) -- use -t/--template so type
