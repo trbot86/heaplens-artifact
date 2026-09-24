@@ -41,7 +41,8 @@ run_variant() {
     echo "=== [$OUT_NAME] $label ==="
     # bst-drachsler's default build takes no STM=... flag, unlike
     # bst-ellen/bst-howley. VERSION=O2 matches the paper's own experiments.
-    ascylib_perfbench_build "src/bst-drachsler" VERSION=O2 "$@"
+    # Use the driver's host-specific CPU set instead of ASCYLIB's static mapping.
+    ascylib_perfbench_build "src/bst-drachsler" VERSION=O2 SET_CPU=0 "$@"
     ascylib_perfbench_variant "$RESULTS_TSV" "$RUN_DIR" "$label" "lb-bst-drachsler" \
         "$THREADS" "$INITIAL" "$RANGE" "$UPDATE_PCT" "$DURATION_MS" "$REPS"
 }
@@ -50,6 +51,8 @@ run_variant "a_96B_default"
 run_variant "b_72B_no_pad" DRACHSLER_PAD=0
 run_variant "c_128B_pad" DRACHSLER_PAD=128
 run_variant "d_192B_pad" DRACHSLER_PAD=192
+
+perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
 
 perfbench_print_summary "$RESULTS_TSV" "ASCYLIB DVY tree: node padding 96B/72B/128B/192B (paper Appendix B.1 / Table 3)" \
     "$SIFTER_ROOT/artifact/experiments/$OUT_NAME/summary.txt"

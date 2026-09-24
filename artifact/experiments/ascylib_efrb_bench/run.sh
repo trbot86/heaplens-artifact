@@ -54,5 +54,7 @@ run_variant "b_obj_seg" SEG_OBJS=1
 run_variant "c_mt_prefill" INIT=all
 run_variant "d_both" SEG_OBJS=1 INIT=all
 
+perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
+
 perfbench_print_summary "$RESULTS_TSV" "ASCYLIB EFRB tree: default -> +obj segregation / +MT prefill / +both (paper Section 6.2 / Figure 5 / Table 1 row 1)" \
     "$SIFTER_ROOT/artifact/experiments/$OUT_NAME/summary.txt"

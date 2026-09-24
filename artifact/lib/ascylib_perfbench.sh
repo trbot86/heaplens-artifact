@@ -27,6 +27,7 @@ ascylib_perfbench_setup() {
     ASCYLIB_PERFBENCH_ROOT="$SIFTER_ROOT"
     ASCYLIB_PERFBENCH_WORK="$SIFTER_ROOT/artifact/experiments/${out_name}/work"
     ASCYLIB_SRC_COPY="$ASCYLIB_PERFBENCH_WORK/src"
+    ASCYLIB_PERFBENCH_BUILD_LOG="$ASCYLIB_PERFBENCH_WORK/build.log"
     rm -rf "$ASCYLIB_PERFBENCH_WORK"
     mkdir -p "$ASCYLIB_PERFBENCH_WORK"
     cp -r "$SIFTER_ROOT/artifact/vendor/ascylib" "$ASCYLIB_SRC_COPY"
@@ -49,10 +50,10 @@ ascylib_perfbench_build() {
         # lib predates that and isn't position-independent (see the same fix
         # in artifact/lib/ascylib_experiment.sh).
         export CFLAGS=-fno-pie LDFLAGS=-no-pie
-        make clean "$@" > /tmp/ascylib_perfbench_build.log 2>&1
-        make "$@" >> /tmp/ascylib_perfbench_build.log 2>&1 || {
-            echo "    !!! build failed for $tree_src_dir $* -- see /tmp/ascylib_perfbench_build.log" >&2
-            tail -40 /tmp/ascylib_perfbench_build.log >&2
+        make clean "$@" > "$ASCYLIB_PERFBENCH_BUILD_LOG" 2>&1
+        make "$@" >> "$ASCYLIB_PERFBENCH_BUILD_LOG" 2>&1 || {
+            echo "    !!! build failed for $tree_src_dir $* -- see $ASCYLIB_PERFBENCH_BUILD_LOG" >&2
+            tail -40 "$ASCYLIB_PERFBENCH_BUILD_LOG" >&2
             return 1
         }
     )
@@ -62,8 +63,8 @@ ascylib_perfbench_build() {
 #     <binary_name> <threads> <initial> <range> <update_pct> <duration_ms> \
 #     <reps> [preload_lib]
 #
-# Runs the already-built binary <reps> times under perf stat, recording
-# throughput (#Mops -> ops/sec) and hardware-counter rates. [preload_lib] is
+# Saves the already-built binary and registers its trials for the campaign.
+# The campaign records throughput and hardware counters. [preload_lib] is
 # empty by default: ASCYLIB's build already links its ssmem sub-allocator
 # in statically (see common/Makefile.common's LDFLAGS), so no LD_PRELOAD is
 # needed for the normal/glibc-malloc variants -- only pass one to swap in a
@@ -74,20 +75,17 @@ ascylib_perfbench_variant() {
     local threads="$5" initial="$6" range="$7" update="$8" duration_ms="$9"
     local reps="${10}"
     local preload="${11:-}"
-    local placement=(numactl -i 0 taskset -c "0-$((threads - 1))")
+    local cpus="${PERFBENCH_CPUS:-0-$((threads - 1))}"
+    local placement=(numactl "--physcpubind=$cpus" "--${PERFBENCH_MEMORY:-membind}=${PERFBENCH_NODE:-0}")
     if [[ "${ARTIFACT_NO_NUMA:-0}" == 1 ]]; then placement=(); fi
     sha256sum "$ASCYLIB_SRC_COPY/bin/$binary_name" | sed "s|$ASCYLIB_SRC_COPY/bin/$binary_name|$variant|" >> "${results_tsv}.binaries.sha256"
 
-    echo "  variant: $variant (threads=$threads initial=$initial update=$update%)"
-    for run_idx in $(seq 0 $((reps - 1))); do
-        (
-            cd "$ASCYLIB_SRC_COPY"
-            export LD_LIBRARY_PATH="./external/lib/"
-            [ -n "$preload" ] && export LD_PRELOAD="$preload"
-            perfbench_run_rep "$results_tsv" "$run_dir" "$variant" "$threads" "$run_idx" \
-                ascylib -- \
-                "${placement[@]}" \
-                "./bin/${binary_name}" -i "$initial" -r "$range" -n "$threads" -u "$update" -d "$duration_ms"
-        )
-    done
+    echo "  save variant: $variant (threads=$threads initial=$initial update=$update%)"
+    python3 "$PERFBENCH_CAMPAIGN_PY" add --plan "$run_dir/campaign.json" \
+        --variant "$variant" --benchmark ascylib --threads "$threads" --reps "$reps" \
+        --binary "$ASCYLIB_SRC_COPY/bin/$binary_name" --cwd "$ASCYLIB_SRC_COPY" \
+        --preload "$preload" --library-path "$ASCYLIB_SRC_COPY/external/lib" \
+        --build-log "$ASCYLIB_PERFBENCH_BUILD_LOG" -- \
+        "${placement[@]}" "$ASCYLIB_SRC_COPY/bin/$binary_name" \
+        -i "$initial" -r "$range" -n "$threads" -u "$update" -d "$duration_ms"
 }

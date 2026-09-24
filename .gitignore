@@ -52,6 +52,7 @@ clang_parser.out
 libmemhook.so
 bin
 clang-tidy-standalone/build
+clang-tidy-standalone/build-heaplens/
 .vscode
 .vscode/
 malloc_type_dump.txt
@@ -102,6 +103,7 @@ sifter_vis_d3/server/venv
 /artifact/experiments/*/runs/
 /artifact/experiments/*/results.tsv*
 /artifact/experiments/*/summary.txt
+/artifact/experiments/*/protocol.json
 
 # Packaging-check records are author-side material, not distributed datasets.
 /artifact/validation/

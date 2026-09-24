@@ -45,5 +45,7 @@ ascylib_perfbench_variant "$RESULTS_TSV" "$RUN_DIR" "jemalloc" "lf-bst-howley" \
     "$THREADS" "$INITIAL" "$RANGE" "$UPDATE_PCT" "$DURATION_MS" "$REPS" \
     "$JEMALLOC_LIB"
 
+perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
+
 perfbench_print_summary "$RESULTS_TSV" "ASCYLIB HJ tree: glibc malloc vs jemalloc (paper Appendix B.2 / Table 4)" \
     "$SIFTER_ROOT/artifact/experiments/$OUT_NAME/summary.txt"

@@ -20,7 +20,8 @@ RUN curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key -o /tmp/llvm.key \
     && apt-get update && apt-get install -y --no-install-recommends \
        clang-14 clang-tools-14 clang-tidy-14 llvm-14-dev libclang-14-dev libclang-cpp14-dev \
     && rm -rf /var/lib/apt/lists/*
-RUN find /usr/lib/linux-tools -type f -name perf -exec ln -sf '{}' /usr/local/bin/perf \; \
+RUN find -L /usr/lib/linux-tools -type f -name perf -exec ln -sf '{}' /usr/local/bin/perf \; \
+    && test -x /usr/local/bin/perf && /usr/local/bin/perf --version \
     && python3 -m venv /opt/heaplens-python
 ENV PATH="/opt/heaplens-python/bin:${PATH}"
 RUN python3 -m pip install --no-cache-dir pip==24.2 setuptools==75.1.0 wheel==0.44.0 pybind11==2.13.6
@@ -33,7 +34,7 @@ RUN python3 -m pip install --no-cache-dir -r /tmp/heaplens-requirements.txt
 COPY sifter_vis_d3/sifter/package.json sifter_vis_d3/sifter/package-lock.json /opt/heaplens-ui/
 RUN cd /opt/heaplens-ui && npm ci --no-audit --no-fund
 RUN python3 -m pip install --no-cache-dir PyYAML==6.0.2 \
-    && apt-get update && apt-get install -y --no-install-recommends bc \
+    && apt-get update && apt-get install -y --no-install-recommends bc autoconf-archive libomp-14-dev \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /root/sifter
 CMD ["bash"]

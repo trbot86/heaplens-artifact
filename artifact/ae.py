@@ -16,6 +16,7 @@ import statistics
 import subprocess
 import sys
 import time
+from lib.perfstat_campaign import schedule
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "artifact"
@@ -121,16 +122,48 @@ def hnsw(args, out):
     save(out / "summary.json", summary)
     print(json.dumps(summary, indent=2))
 
-def node_cpus(node, needed):
+def node_cpus(node, needed, requested=None):
     text = subprocess.check_output(["lscpu", "-p=CPU,NODE,CORE,ONLINE"], text=True)
-    result, seen = [], set()
+    available = {}
+    affinity = os.sched_getaffinity(0)
     for line in text.splitlines():
-        if line.startswith("#"): continue
+        if not line or line.startswith("#"): continue
         cpu, numa, core, online = line.split(",")
-        if numa == str(node) and online == "Y" and core not in seen and int(cpu) in os.sched_getaffinity(0):
-            result.append(int(cpu)); seen.add(core)
+        if numa == str(node) and online == "Y" and int(cpu) in affinity:
+            available[int(cpu)] = core
+    if requested is not None:
+        result = []
+        for part in requested.split(","):
+            if not re.fullmatch(r"[0-9]+(?:-[0-9]+)?", part):
+                raise ValueError("--cpus requires CPU IDs/ranges, such as 0-7 or 0,2,4,6")
+            bounds = list(map(int, part.split("-")))
+            start, end = bounds[0], bounds[-1]
+            if start > end or end > max(available, default=-1):
+                raise ValueError("CPU range is outside the selected node's available CPUs")
+            result.extend(range(start, end + 1))
+        if len(result) != needed or len(set(result)) != needed:
+            raise ValueError("--cpus must contain exactly --threads distinct CPU IDs")
+        if any(cpu not in available for cpu in result):
+            raise ValueError("Every selected CPU must be online, allowed, and on --server-node")
+        if len({available[cpu] for cpu in result}) != needed:
+            raise ValueError("Select one hardware thread per physical core, not SMT siblings")
+        return result
+    result, seen = [], set()
+    for cpu, core in available.items():
+        if core not in seen:
+            result.append(cpu); seen.add(core)
     if len(result) < needed: raise RuntimeError(f"NUMA node {node}: need {needed} available physical cores, found {len(result)}; use smoke on smaller hosts")
     return result[:needed]
+
+def memory_option(args):
+    return "membind" if (args.memory_policy or "bind") == "bind" else "interleave"
+
+def build_valkey(work, jobs, log):
+    # Generate the omitted configure; keep Valkey's original allocator options.
+    if not (work / "deps/jemalloc/configure").is_file():
+        run(["autoconf"], cwd=work / "deps/jemalloc", log=log)
+    run(["make", f"-j{jobs}", "MALLOC=jemalloc", "BUILD_TLS=no", "BUILD_RDMA=no", "BUILD_LUA=no", "USE_SYSTEMD=no"],
+        cwd=work, log=log)
 
 def valkey(args, out):
     paper = args.profile == "paper"
@@ -159,8 +192,7 @@ def valkey(args, out):
         shutil.copytree(VENDOR / "valkey", work, ignore=IGNORE)
         if variant != "baseline":
             run(["patch", "--batch", "-p1", "-i", ART / "patches/valkey-B1C1_64.patch"], cwd=work, log=out / "patch.log")
-        run(["make", f"-j{args.jobs}", "MALLOC=jemalloc", "BUILD_TLS=no", "BUILD_RDMA=no", "BUILD_LUA=no", "USE_SYSTEMD=no"],
-            cwd=work, log=out / f"{variant}-build.log")
+        build_valkey(work, args.jobs, out / f"{variant}-build.log")
     values = {"baseline": [], "B1C1_64": []}
     for rep in range(reps):
         variants = ["baseline", "B1C1_64"] if rep % 2 == 0 else ["B1C1_64", "baseline"]
@@ -240,11 +272,12 @@ def gui():
 def rocksdb(args, out):
     paper = args.profile == "paper"
     threads, keys, duration = (18, 10000000, 10) if paper else (2, 10000, 2)
+    threads = args.threads or threads
     reps = args.reps or (10 if paper else 1)
     placement = []
-    if paper:
-        ids = node_cpus(args.server_node, threads)
-        placement = ["numactl", "--physcpubind=" + ",".join(map(str, ids)), f"--interleave={args.server_node}"]
+    if paper or args.cpus or args.memory_policy:
+        ids = node_cpus(args.server_node, threads, args.cpus)
+        placement = ["numactl", "--physcpubind=" + ",".join(map(str, ids)), f"--{memory_option(args)}={args.server_node}"]
     flags = ["REORDER_FIELDS=1", "NO_PADDING_NODE=1"] if args.memtable == "prefix_hash" else ["ALIGN_TALL_NODE=4", "SEG_TALL_NODE=4"]
     values = {}
     for variant, extra in (("baseline", []), ("optimized", flags)):
@@ -264,30 +297,34 @@ def rocksdb(args, out):
         save(out / f"{variant}-binary.json", {"sha256": hashlib.sha256((work / "db_bench").read_bytes()).hexdigest(),
              "flags": extra, "source_revision": "19e4aba3db75bd6add7177164c892ab6cdfd50b3 + rocksdb-historical.patch"})
         values[variant] = []
-        for rep in range(reps):
-            trial = out / f"{variant}-rep{rep+1}"
-            trial.mkdir()
-            cmd = placement + [str(work / "db_bench"), f"--db={trial / 'db'}", "--use_existing_db=0",
-                "--benchmarks=filluniquerandom,waitforcompaction,readwhilewriting", f"--key_size={args.rocks_key_size}", f"--prefix_size={args.rocks_key_size}",
-                f"--value_size={args.rocks_value_size}", "--compression_type=none", f"--use_plain_table={int(args.memtable == 'prefix_hash')}",
-                f"--memtablerep={args.memtable}", "--max_write_buffer_number=2", "--write_buffer_size=134217728",
-                f"--max_background_jobs={max(1, threads // 4)}", "--compaction_pri=3", "--compaction_style=0",
-                "--bloom_bits=10", "--bloom_locality=1", f"--num={keys}", f"--threads={threads-1}",
-                "--allow_concurrent_memtable_write=false", "--disable_wal=1", "--sync=0", f"--duration={duration}"]
-            env = os.environ.copy()
-            env["LD_PRELOAD"] = str(VENDOR / "setbench/lib/libjemalloc.so")
-            save(trial / "config.json", {"command": cmd, "build_flags": extra, "allocator": env["LD_PRELOAD"], "profile": args.profile})
-            run(cmd, cwd=work, log=trial / "benchmark.log", env=env, timeout=7200 if paper else 180)
-            matches = re.findall(r"readwhilewriting\s*:\s*[\d.]+\s+micros/op\s+([\d.]+)\s+ops/sec", (trial / "benchmark.log").read_text())
-            if not matches: raise RuntimeError(f"No throughput in {trial / 'benchmark.log'}")
-            values[variant].append(float(matches[-1]))
+    order = schedule(list(values), reps, args.trial_order or "interleaved")
+    save(out / "execution.json", {"sequence": order, "order": args.trial_order or "interleaved"})
+    for variant, rep in order:
+        work = out / variant
+        extra = flags if variant == "optimized" else []
+        trial = out / f"{variant}-rep{rep+1}"
+        trial.mkdir()
+        cmd = placement + [str(work / "db_bench"), f"--db={trial / 'db'}", "--use_existing_db=0",
+            "--benchmarks=filluniquerandom,waitforcompaction,readwhilewriting", f"--key_size={args.rocks_key_size}", f"--prefix_size={args.rocks_key_size}",
+            f"--value_size={args.rocks_value_size}", "--compression_type=none", f"--use_plain_table={int(args.memtable == 'prefix_hash')}",
+            f"--memtablerep={args.memtable}", "--max_write_buffer_number=2", "--write_buffer_size=134217728",
+            f"--max_background_jobs={max(1, threads // 4)}", "--compaction_pri=3", "--compaction_style=0",
+            "--bloom_bits=10", "--bloom_locality=1", f"--num={keys}", f"--threads={threads-1}",
+            "--allow_concurrent_memtable_write=false", "--disable_wal=1", "--sync=0", f"--duration={duration}"]
+        env = os.environ.copy()
+        env["LD_PRELOAD"] = str(VENDOR / "setbench/lib/libjemalloc.so")
+        save(trial / "config.json", {"command": cmd, "build_flags": extra, "allocator": env["LD_PRELOAD"], "profile": args.profile})
+        run(cmd, cwd=work, log=trial / "benchmark.log", env=env, timeout=7200 if paper else 180)
+        matches = re.findall(r"readwhilewriting\s*:\s*[\d.]+\s+micros/op\s+([\d.]+)\s+ops/sec", (trial / "benchmark.log").read_text())
+        if not matches: raise RuntimeError(f"No throughput in {trial / 'benchmark.log'}")
+        values[variant].append(float(matches[-1]))
     summary = compare(values); summary["profile"] = args.profile; summary["memtable"] = args.memtable
     save(out / "summary.json", summary)
     print(json.dumps(summary, indent=2))
 
 def experiment(args):
     work = ART / "experiments" / args.name
-    if (work / "work").exists() or (work / "results.tsv").exists():
+    if any((work / name).exists() for name in ("work", "results.tsv", "protocol.json")):
         raise RuntimeError(f"This experiment already has build files or results at {work}. Keep this copy and repeat the experiment in a fresh artifact extraction or checkout; the Docker image can be reused.")
     env = os.environ.copy()
     env["JOBS"] = str(args.jobs)
@@ -296,6 +333,32 @@ def experiment(args):
     env["REPS"] = str(args.reps or (10 if args.profile == "paper" else 1))
     if args.profile == "smoke":
         env.update(THREADS="2", INITIAL="4096", RANGE="8192", DURATION_MS="1000", RUN_SECONDS="3", PERFBENCH_PERF="off", ARTIFACT_NO_NUMA="1")
+    if args.name.endswith("_bench"):
+        smoke = args.profile == "smoke"
+        default_threads = 8 if args.name in {"ascylib_dvy_bench", "ascylib_hj_bench"} else 24
+        threads = args.threads or (min(2, len(os.sched_getaffinity(0))) if smoke else default_threads)
+        env.update(THREADS=str(threads), PERFBENCH_NODE=str(args.server_node),
+                   PERFBENCH_MEMORY=memory_option(args), PERFBENCH_ORDER=args.trial_order or "interleaved",
+                   ARTIFACT_NO_NUMA="1" if smoke and not (args.cpus or args.memory_policy) else "0")
+        if env["ARTIFACT_NO_NUMA"] == "0":
+            env["PERFBENCH_CPUS"] = ",".join(map(str, node_cpus(args.server_node, threads, args.cpus)))
+        else:
+            env.pop("PERFBENCH_CPUS", None)
+        if args.name.startswith("ascylib_"):
+            initial = args.initial or (4096 if smoke else (262144 if args.name == "ascylib_efrb_bench" else 1048576))
+            rounded = 1 << (initial - 1).bit_length()
+            key_range = args.range or 2 * rounded
+            if key_range < rounded:
+                raise ValueError("--range must cover --initial rounded up to a power of two")
+            env.update(INITIAL=str(initial), RANGE=str(key_range),
+                       DURATION_MS=str(args.duration_ms or (1000 if smoke else 5000)),
+                       UPDATE_PCT=str(args.update_pct if args.update_pct is not None else 0))
+        fields = ("THREADS", "REPS", "INITIAL", "RANGE", "DURATION_MS", "UPDATE_PCT",
+                  "PERFBENCH_NODE", "PERFBENCH_CPUS", "PERFBENCH_MEMORY", "PERFBENCH_ORDER",
+                  "PERFBENCH_PERF", "ARTIFACT_NO_NUMA")
+        save(work / "protocol.json", {"arguments": vars(args), "platform": platform.platform(),
+             "allowed_cpus": sorted(os.sched_getaffinity(0)),
+             "settings": {key: env[key] for key in fields if key in env}})
     run(["bash", work / "run.sh"], env=env)
 
 def factorization(args, out):
@@ -334,7 +397,7 @@ def factorization(args, out):
         run([sys.executable, ART / "lib" / summarizer, out])
     else: print("Trials completed; the retained paper summarizer requires exactly 6 alignment or 10 huge-page blocks. Raw CSVs are available.")
 
-def main():
+def parse_args(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("command", choices=["doctor", "history", "export", "smoke", "hnsw", "hnsw-factorization", "valkey", "rocksdb", "gui", "experiment", "legacy", "all-performance"],
                    help="Select an action; legacy is a compatibility alias for experiment")
@@ -343,20 +406,43 @@ def main():
     p.add_argument("--out", help="NEW result directory; never overwrite existing results")
     p.add_argument("--jobs", type=int, default=4)
     p.add_argument("--reps", type=int)
+    p.add_argument("--threads", type=int, help="ASCYLIB/TPC-C worker count; RocksDB readers plus writer")
+    p.add_argument("--cpus", help="ASCYLIB/TPC-C/RocksDB CPU list, one physical core per thread (e.g. 0-7)")
+    p.add_argument("--memory-policy", choices=["bind", "interleave"], help="ASCYLIB/TPC-C/RocksDB memory placement (default: bind)")
+    p.add_argument("--trial-order", choices=["interleaved", "blocked"], help="ASCYLIB/TPC-C/RocksDB repetition order (default: interleaved)")
+    p.add_argument("--initial", type=int, help="ASCYLIB requested initial keys; rounded up to a power of two")
+    p.add_argument("--range", type=int, help="ASCYLIB key range (default: twice the rounded initial size)")
+    p.add_argument("--duration-ms", type=int, help="ASCYLIB measurement duration in milliseconds")
+    p.add_argument("--update-pct", type=int, help="ASCYLIB percentage of update operations (default: 0)")
     p.add_argument("--server-node", type=int, default=0)
     p.add_argument("--client-node", type=int, default=1)
     p.add_argument("--memtable", choices=["prefix_hash", "skip_list"], default="prefix_hash")
     p.add_argument("--rocks-key-size", type=int, default=64, help="Retained script default; paper prose says 32")
     p.add_argument("--rocks-value-size", type=int, default=256, help="Retained script default; paper prose says 128")
     p.add_argument("--factors", choices=["hugepage", "alignment"], default="hugepage")
-    args = p.parse_args()
+    args = p.parse_args(argv)
+    if args.command in {"experiment", "legacy"} and not args.name: p.error("experiment requires a name")
     if args.jobs < 1 or (args.reps is not None and args.reps < 1): p.error("jobs/reps must be positive")
     if min(args.rocks_key_size, args.rocks_value_size) < 1: p.error("RocksDB sizes must be positive")
+    if any(value is not None and value < 1 for value in (args.threads, args.initial, args.range, args.duration_ms)):
+        p.error("threads/initial/range/duration-ms must be positive")
+    if args.update_pct is not None and not 0 <= args.update_pct <= 100: p.error("update-pct must be 0..100")
+    bench = args.command in {"experiment", "legacy"} and args.name and args.name.endswith("_bench")
+    if (args.threads is not None or args.cpus is not None) and not (bench or args.command == "rocksdb"):
+        p.error("threads/cpus apply to an individual ASCYLIB/TPC-C benchmark or RocksDB")
+    if (args.memory_policy or args.trial_order) and not (bench or args.command in {"rocksdb", "all-performance"}):
+        p.error("memory-policy/trial-order apply to ASCYLIB/TPC-C/RocksDB performance experiments")
+    if any(v is not None for v in (args.initial, args.range, args.duration_ms, args.update_pct)) and not (bench and args.name.startswith("ascylib_")):
+        p.error("initial/range/duration-ms/update-pct apply only to ASCYLIB performance experiments")
+    if args.command == "rocksdb" and args.threads == 1: p.error("RocksDB requires a reader and a writer (at least 2 threads)")
+    return args
+
+def main():
+    args = parse_args()
     if args.command == "doctor": doctor()
     elif args.command == "history": history()
     elif args.command == "gui": gui()
     elif args.command in {"experiment", "legacy"}:
-        if not args.name: p.error(f"{args.command} requires an experiment name")
         experiment(args)
     elif args.command == "all-performance":
         for name in [x for x in EXPERIMENTS if x.endswith("_bench")]:

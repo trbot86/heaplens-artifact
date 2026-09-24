@@ -23,11 +23,12 @@ source "$SCRIPT_DIR/tpcc_allocators.sh"
 # so asking for more threads than the machine has real CPUs doesn't degrade
 # gracefully -- it's been observed to abort (setbench's own "could not bind
 # thread N to cpuset" path) or even segfault under contention. Cap to
-# nproc and warn, rather than let the paper-scale default (24) silently
+# the available CPU affinity and warn, rather than let the paper-scale default (24) silently
 # fail on smaller dev machines.
 tpcc_perfbench_cap_threads() {
     local requested="$1" ncpu
-    ncpu="$(nproc)"
+    # OpenMP limits affect nproc, but not this pthread-based benchmark.
+    ncpu="$(python3 -c 'import os; print(len(os.sched_getaffinity(0)))')"
     if [ "$requested" -gt "$ncpu" ]; then
         if [[ "${ARTIFACT_PROFILE:-smoke}" == paper ]]; then
             echo "Paper profile requires $requested CPUs; only $ncpu available. Use smoke on this host." >&2
@@ -57,6 +58,7 @@ tpcc_perfbench_setup() {
     TPCC_PERFBENCH_WORK="$SIFTER_ROOT/artifact/experiments/${out_name}/work"
     TPCC_SRC_COPY="$TPCC_PERFBENCH_WORK/src"
     TPCC_MACROBENCH="$TPCC_SRC_COPY/macrobench"
+    TPCC_PERFBENCH_BUILD_LOG="$TPCC_PERFBENCH_WORK/build.log"
     rm -rf "$TPCC_PERFBENCH_WORK"
     mkdir -p "$TPCC_PERFBENCH_WORK"
     cp -r "$SIFTER_ROOT/artifact/vendor/setbench" "$TPCC_SRC_COPY"
@@ -74,11 +76,11 @@ tpcc_perfbench_build() {
     (
         cd "$TPCC_MACROBENCH"
         make clean workload=TPCC data_structure_name="$ds_name" data_structure_opts="$opts" \
-            > /tmp/tpcc_perfbench_build.log 2>&1
+            > "$TPCC_PERFBENCH_BUILD_LOG" 2>&1
         make -j"${JOBS:-4}" THREAD_CNT="$threads" workload=TPCC data_structure_name="$ds_name" data_structure_opts="$opts" \
-            >> /tmp/tpcc_perfbench_build.log 2>&1 || {
-            echo "    !!! build failed for $ds_name threads=$threads opts=$opts -- see /tmp/tpcc_perfbench_build.log" >&2
-            tail -60 /tmp/tpcc_perfbench_build.log >&2
+            >> "$TPCC_PERFBENCH_BUILD_LOG" 2>&1 || {
+            echo "    !!! build failed for $ds_name threads=$threads opts=$opts -- see $TPCC_PERFBENCH_BUILD_LOG" >&2
+            tail -60 "$TPCC_PERFBENCH_BUILD_LOG" >&2
             return 1
         }
     )
@@ -87,30 +89,21 @@ tpcc_perfbench_build() {
 # tpcc_perfbench_variant <results_tsv> <run_dir> <variant_label> <ds_name> \
 #     <threads> <reps> [preload_lib]
 #
-# Runs the already-built binary <reps> times under perf stat, recording
-# throughput (setbench's own `throughput=` field, txns/sec) and
-# hardware-counter rates.
+# Saves the already-built binary and registers its trials for the campaign.
+# The campaign records throughput (txns/sec) and hardware counters.
 tpcc_perfbench_variant() {
     local results_tsv="$1" run_dir="$2" variant="$3" ds_name="$4"
     local threads="$5" reps="$6" preload="${7:-}"
-    local placement=(numactl -i 0)
-    local pin=(-pin "0-$((threads - 1))")
+    local cpus="${PERFBENCH_CPUS:-0-$((threads - 1))}"
+    local placement=(numactl "--physcpubind=$cpus" "--${PERFBENCH_MEMORY:-membind}=${PERFBENCH_NODE:-0}")
+    # SetBench accepts ranges and period-separated lists, not comma-separated lists.
+    local pin=(-pin "${cpus//,/.}")
     if [[ "${ARTIFACT_NO_NUMA:-0}" == 1 ]]; then placement=(); pin=(); fi
 
-    echo "  variant: $variant (threads=$threads)"
-    for run_idx in $(seq 0 $((reps - 1))); do
-        (
-            cd "$TPCC_MACROBENCH"
-            [ -n "$preload" ] && export LD_PRELOAD="$preload"
-            # See artifact/patches/setbench-tpcc/common/recordmgr/
-            # allocator_new.h: -DMEMHOOK_SEG_DS variants load a distinct
-            # allocator library shared by the tree indexes. This may exceed
-            # glibc's default static-TLS surplus. This is harmless to set even for
-            # variants that don't use MEMHOOK_SEG_DS.
-            export GLIBC_TUNABLES="glibc.rtld.optional_static_tls=4194304"
-            perfbench_run_rep "$results_tsv" "$run_dir" "$variant" "$threads" "$run_idx" \
-                tpcc -- \
-                "${placement[@]}" "./bin/rundb_TPCC_${ds_name}" "${pin[@]}"
-        )
-    done
+    echo "  save variant: $variant (threads=$threads)"
+    python3 "$PERFBENCH_CAMPAIGN_PY" add --plan "$run_dir/campaign.json" \
+        --variant "$variant" --benchmark tpcc --threads "$threads" --reps "$reps" \
+        --binary "$TPCC_MACROBENCH/bin/rundb_TPCC_${ds_name}" --cwd "$TPCC_MACROBENCH" \
+        --preload "$preload" --build-log "$TPCC_PERFBENCH_BUILD_LOG" -- \
+        "${placement[@]}" "$TPCC_MACROBENCH/bin/rundb_TPCC_${ds_name}" "${pin[@]}"
 }

@@ -70,5 +70,7 @@ echo "=== [$OUT_NAME] e_single_recmgr_mimalloc_fixed (threads=$THREADS) ==="
 tpcc_perfbench_build "$DS_NAME" "$THREADS" "-DDEBRA_ORIGINAL_FREE -DMEMHOOK_SEG_DS -DMACROBENCH_PAD_ROW_TO_ALIGN -DMACROBENCH_SINGLE_RECMGR -DBST_ELLEN"
 tpcc_perfbench_variant "$RESULTS_TSV" "$RUN_DIR" "e_single_recmgr_mimalloc_fixed" "$DS_NAME" "$THREADS" "$REPS" "$MIMALLOC_LIB"
 
+perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
+
 perfbench_print_summary "$RESULTS_TSV" "TPC-C/EFRB tree: allocator swap + single-recmgr + row-padding ablations (paper Section 6.3 / Table 1 row 5)" \
     "$SIFTER_ROOT/artifact/experiments/$OUT_NAME/summary.txt"

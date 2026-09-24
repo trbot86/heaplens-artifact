@@ -197,8 +197,9 @@ elif [ "$includesOnly" = true ]; then
 fi
 
 cd clang-tidy-standalone
-mkdir -p build
-cd build
+# Do not reuse the distributed cache, which embeds its author's absolute paths.
+mkdir -p build-heaplens
+cd build-heaplens
 
 cmakeOptions=""
 if [ "$template" = true ]; then
@@ -272,10 +273,10 @@ else
     echo "replacing malloc with malloc_s..."
 fi
 if [ "$skipRefactor" = true ]; then
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -export-fixes=fixes.yaml
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build-heaplens/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -export-fixes=fixes.yaml
     echo "skipped refactoring step - fixes written to fixes.yaml"
 else
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -fix
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build-heaplens/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -fix
     echo "performed refactoring with clang-tidy"
     add_includes $outdir
 fi

@@ -49,5 +49,7 @@ echo "=== [$OUT_NAME] c_bronson_pack_lock (threads=$THREADS) ==="
 tpcc_perfbench_build "$DS_NAME" "$THREADS" "-DMEMHOOK_SEG_DS -DMACROBENCH_PACK_LOCK"
 tpcc_perfbench_variant "$RESULTS_TSV" "$RUN_DIR" "c_seg_ds_pack_lock" "$DS_NAME" "$THREADS" "$REPS" "$JEMALLOC_LIB"
 
+perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
+
 perfbench_print_summary "$RESULTS_TSV" "TPC-C/BCCO tree: default -> node segregation -> +row-lock fix (paper Section 6.3 / Table 1 row 4)" \
     "$SIFTER_ROOT/artifact/experiments/$OUT_NAME/summary.txt"

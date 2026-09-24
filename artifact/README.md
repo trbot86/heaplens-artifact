@@ -102,6 +102,12 @@ HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
 
 The section references use the accepted submission's numbering.
 
+ASCYLIB and TPC-C build and save all variant binaries before measuring them.
+Repetitions are interleaved, with one run of each variant per round and rotating
+run order. RocksDB likewise builds both variants first and alternates their
+order. `--trial-order blocked` instead runs all repetitions of each variant
+together.
+
 | Experiment | Variants compared |
 |---|---|
 | ASCYLIB EFRB | Baseline, object segregation, parallel prefill, both |
@@ -145,6 +151,51 @@ keys, 256-byte values, 128 MiB write buffers, disabled WAL, and a 10-second
 measurement phase. `--rocks-key-size` and `--rocks-value-size` override the
 key and value sizes. Each trial creates a fresh database in its results
 directory.
+
+For ASCYLIB, TPC-C, and RocksDB, paper-mode runs select one available hardware
+thread per physical core on `--server-node` (default 0), and bind memory to
+that node. CPU IDs are discovered from the host's topology and allowed CPU set;
+they are not assumed to match the paper's machine. `--threads N` changes the
+worker count (readers plus writer for RocksDB). `--cpus 0-7` or
+`--cpus 0,2,4,6` explicitly selects that many distinct physical cores on the
+chosen node. TPC-C pins individual workers; ASCYLIB and RocksDB run within the
+selected CPU set. `--memory-policy interleave` selects the earlier single-node
+interleave policy instead of strict binding. Small smoke runs omit NUMA
+placement unless `--cpus` or `--memory-policy` is supplied.
+
+ASCYLIB also accepts `--initial`, `--range`, `--duration-ms`, and `--update-pct`.
+Use these command-line options rather than outer-shell `THREADS=...` or
+`INITIAL=...` assignments: the options pass through the Docker wrapper.
+For example, run the additional eight-thread EFRB configuration used in our
+reproduction checks:
+
+```bash
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_efrb_bench \
+  --profile paper --threads 8 --initial 200000 --range 524288 \
+  --duration-ms 3000 --reps 10 --server-node 0 --memory-policy bind
+```
+
+ASCYLIB rounds 200,000 initial keys up to 262,144. The default EFRB command
+above remains 24 threads, 262,144 initial keys, and 5,000 ms. DVY and HJ default
+to eight threads, 1,048,576 initial keys, and 5,000 ms. All three default to
+search-only workloads; the default key range is twice the rounded initial size.
+
+Section 6.3 already describes the TPC-C/EFRB reclamation fix: use one EBR
+instance shared across the database tables, instead of a separate instance
+for each table, to address the observed accumulation of retired-object blocks.
+The artifact's existing `MACROBENCH_SINGLE_RECMGR` option selects this fix.
+TPC-C/EFRB's combined improvement is `e_single_recmgr_mimalloc_fixed` versus
+`b_mimalloc`: shared reclamation plus row padding, with mimalloc and separate
+tree allocation held fixed. `d_single_recmgr` versus `a_jemalloc` isolates
+shared reclamation with jemalloc. The historical `c_mimalloc_fixed` versus
+`b_mimalloc` comparison also removes tree segregation, so it does not isolate
+row padding. The summary identifies these comparisons explicitly.
+
+The allocator choices are retained: TPC-C uses the bundled process-wide
+jemalloc or mimalloc, plus a distinct jemalloc library for segregated tree
+allocations. HJ's allocator comparison and RocksDB use SetBench's bundled
+process-wide jemalloc. Process-wide allocator paths and hashes are recorded
+for ASCYLIB and TPC-C trials; see [allocator provenance](vendor/heaplens-allocators/README.md).
 
 `HEAPLENS_NUMA=1` permits NUMA placement by relaxing the container's seccomp
 filter. `HEAPLENS_PERF=1` grants the PERFMON capability for hardware counters;
@@ -191,8 +242,13 @@ configuration/environment records, build logs, per-run data, and summaries.
 `--out /root/sifter/artifact/results/NEW_NAME` selects a specific new directory.
 
 ASCYLIB and TPC-C runs write `results.tsv`, `summary.txt`, and per-run logs
-under `artifact/experiments/<name>/`. The summary reports mean throughput,
-standard deviation, and percentage change from baseline. The `*_raw` columns
+under `artifact/experiments/<name>/`. `protocol.json` records the selected
+workload and placement; `runs/campaign.json` records commands, saved binary
+hashes, and allocator paths/hashes. `runs/execution.json` records trial order.
+Saved executables and build logs are in `runs/binaries/`; each trial also has
+a command/environment record and raw stdout/perf logs. The summary reports
+mean throughput, standard deviation, and percentage changes for the named
+comparisons. The `*_raw` columns
 in `results.tsv` are whole-process performance-counter totals, including
 initialization/prefill and teardown. The `*_per_op` columns divide these totals
 by `operation_count`: measured tree operations for ASCYLIB, or committed

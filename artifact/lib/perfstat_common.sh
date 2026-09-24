@@ -4,10 +4,17 @@
 set -euo pipefail
 PERFBENCH_EVENTS="${PERFBENCH_EVENTS:-cache-misses,page-faults,L1-dcache-load-misses,LLC-load-misses,LLC-store-misses,context-switches,dTLB-load-misses}"
 PERFBENCH_RESULTS_PY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/perfstat_results.py"
+PERFBENCH_CAMPAIGN_PY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/perfstat_campaign.py"
 
 perfbench_init_results() {
     mkdir -p "$(dirname "$1")"
     python3 "$PERFBENCH_RESULTS_PY" header > "$1"
+}
+
+perfbench_run_campaign() {
+    python3 "$PERFBENCH_CAMPAIGN_PY" run --plan "$2/campaign.json" --results "$1" \
+        --order "${PERFBENCH_ORDER:-interleaved}" --perf "${PERFBENCH_PERF:-on}" \
+        --events "$PERFBENCH_EVENTS" --pause-seconds "${PERFBENCH_PAUSE_SECONDS:-2}"
 }
 
 perfbench_run_rep() {
@@ -38,19 +45,7 @@ perfbench_print_summary() {
     local results="$1" title="$2" summary="${3:-/dev/null}"
     {
         echo "$title"
-        python3 - "$results" <<'PY'
-import csv, statistics, sys
-groups = {}
-with open(sys.argv[1]) as f:
-    for row in csv.DictReader(f, delimiter='\t'):
-        groups.setdefault((row['variant'], row['threads']), []).append(float(row['throughput_ops_s']))
-baselines = {}
-for (variant, threads), xs in groups.items():
-    mean = statistics.mean(xs)
-    baseline = baselines.setdefault(threads, mean)
-    sd = f'{statistics.stdev(xs):.2f}' if len(xs) > 1 else 'NA'
-    print(f'{variant:28s} threads={threads} n={len(xs)} mean={mean:.2f} ops/s SD={sd} change={100*(mean/baseline-1):+.2f}%')
-PY
+        python3 "$PERFBENCH_CAMPAIGN_PY" summary --results "$results"
         echo "Counters include initialization/prefill: *_raw are totals; *_per_op divide by operation_count."
         echo "operation_unit identifies tree operations or committed transactions. Unavailable/disabled events are NA."
         echo "Per-run results and logs: $results"

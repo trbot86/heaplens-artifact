@@ -70,7 +70,7 @@ memtier_benchmark_LDADD = \
 	$(LIBSSL_LIBS)
 
 
-@CODE_COVERAGE_RULES@
+include $(top_srcdir)/aminclude_static.am
 memtier_benchmark_LDFLAGS = $(CODE_COVERAGE_LDFLAGS)
 
 dist_man1_MANS = memtier_benchmark.1
