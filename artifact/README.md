@@ -102,11 +102,19 @@ HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
 
 The section references use the accepted submission's numbering.
 
+For the confirmed eight-thread EFRB, 24-thread HJ, and 128-D/1536-D HNSW
+configurations, see [Reproduction configurations](REPRODUCTION_CONFIGURATIONS.md).
+That guide gives complete commands, measured improvements and the corresponding
+machines. These additional recipes do not replace the stored paper data.
+
 ASCYLIB and TPC-C build and save all variant binaries before measuring them.
 Repetitions are interleaved, with one run of each variant per round and rotating
 run order. RocksDB likewise builds both variants first and alternates their
 order. `--trial-order blocked` instead runs all repetitions of each variant
 together.
+
+HNSW likewise builds separate variant modules before timing, then interleaves
+fresh processes. Its factorization commands use the fixed orders in Section 4.
 
 | Experiment | Variants compared |
 |---|---|
@@ -144,7 +152,11 @@ networking is loopback, so a physical NIC is not required.
 HNSW uses 1M 768-D vectors, 100k indexed queries, 24 build/query threads,
 M=16, ef_construction=200, ef=64, k=10, 10k warmup queries, and five timed
 iterations. Allow hours for repeated fresh graph constructions. The output
-includes recall alongside QPS.
+includes QPS and `recall_mean`. The latter measures indexed queries finding
+their own label; it is not ground-truth top-k ANN recall. `--dim` changes the
+dimension; `--threads` changes both construction and query threads. `hnsw`
+defaults to the original source snapshot; `--hnsw-source corrected` selects
+the existing snapshot that issues huge-page advice before first touch.
 
 RocksDB uses 17 reader threads plus a background writer, 10M keys, 64-byte
 keys, 256-byte values, 128 MiB write buffers, disabled WAL, and a 10-second
@@ -152,13 +164,13 @@ measurement phase. `--rocks-key-size` and `--rocks-value-size` override the
 key and value sizes. Each trial creates a fresh database in its results
 directory.
 
-For ASCYLIB, TPC-C, and RocksDB, paper-mode runs select one available hardware
+For ASCYLIB, TPC-C, RocksDB, and HNSW, paper-mode runs select one available hardware
 thread per physical core on `--server-node` (default 0), and bind memory to
 that node. CPU IDs are discovered from the host's topology and allowed CPU set;
 they are not assumed to match the paper's machine. `--threads N` changes the
-worker count (readers plus writer for RocksDB). `--cpus 0-7` or
+worker count (readers plus writer for RocksDB; build/query threads for HNSW). `--cpus 0-7` or
 `--cpus 0,2,4,6` explicitly selects that many distinct physical cores on the
-chosen node. TPC-C pins individual workers; ASCYLIB and RocksDB run within the
+chosen node. TPC-C pins individual workers; ASCYLIB, RocksDB and HNSW run within the
 selected CPU set. `--memory-policy interleave` selects the earlier single-node
 interleave policy instead of strict binding. Small smoke runs omit NUMA
 placement unless `--cpus` or `--memory-policy` is supplied.
@@ -171,11 +183,11 @@ reproduction checks:
 
 ```bash
 HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_efrb_bench \
-  --profile paper --threads 8 --initial 200000 --range 524288 \
-  --duration-ms 3000 --reps 10 --server-node 0 --memory-policy bind
+  --profile paper --threads 8 --initial 262144 --range 524288 \
+  --duration-ms 5000 --reps 10 --server-node 0 --memory-policy bind
 ```
 
-ASCYLIB rounds 200,000 initial keys up to 262,144. The default EFRB command
+ASCYLIB rounds non-power-of-two initial sizes upward. The default EFRB command
 above remains 24 threads, 262,144 initial keys, and 5,000 ms. DVY and HJ default
 to eight threads, 1,048,576 initial keys, and 5,000 ms. All three default to
 search-only workloads; the default key range is twice the rounded initial size.
@@ -193,8 +205,10 @@ row padding. The summary identifies these comparisons explicitly.
 
 The allocator choices are retained: TPC-C uses the bundled process-wide
 jemalloc or mimalloc, plus a distinct jemalloc library for segregated tree
-allocations. HJ's allocator comparison and RocksDB use SetBench's bundled
-process-wide jemalloc. Process-wide allocator paths and hashes are recorded
+allocations. HJ defaults to the retained jemalloc 5.3 library;
+`--hj-jemalloc 5.0` selects SetBench's bundled version for comparison.
+RocksDB continues to use SetBench's bundled process-wide jemalloc.
+Process-wide allocator paths and hashes are recorded
 for ASCYLIB and TPC-C trials; see [allocator provenance](vendor/heaplens-allocators/README.md).
 
 `HEAPLENS_NUMA=1` permits NUMA placement by relaxing the container's seccomp

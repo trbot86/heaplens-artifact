@@ -1,9 +1,13 @@
-# Retained TPC-C segregation allocator
+# Retained HeapLENS allocator
 
 `libjemalloc-heaplens.so` is the Linux x86-64 jemalloc 5.3.0 library retained
 from the authors' HeapLENS experiment tree (`sifter/jemalloc/lib/libjemalloc.so`).
 SHA-256: `c516606efbdb708f503bc0f249061e492df04010a7292056281a0e9df6cbb3da`.
 Its license is in `COPYING`.
+
+The HJ allocator comparison uses this library as its process-wide jemalloc
+by default. `--hj-jemalloc 5.0` instead selects SetBench's jemalloc 5.0.1.
+This choice is independent of the TPC-C segregation arrangement below.
 
 The TPC-C drivers copy this file into each experiment's `src/lib/` directory.
 `MEMHOOK_SEG_DS` routes record-managed tree objects through this library;

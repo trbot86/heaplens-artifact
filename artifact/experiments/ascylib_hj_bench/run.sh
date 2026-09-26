@@ -26,7 +26,12 @@ REPS="${REPS:-3}"                  # paper used 10; override for full fidelity
 OUT_NAME="ascylib_hj_bench"
 RESULTS_TSV="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/results.tsv"
 RUN_DIR="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/runs"
-JEMALLOC_LIB="$SIFTER_ROOT/artifact/vendor/setbench/lib/libjemalloc.so"
+case "${HJ_JEMALLOC:-5.3}" in
+    5.3) JEMALLOC_LIB="$SIFTER_ROOT/artifact/vendor/heaplens-allocators/libjemalloc-heaplens.so" ;;
+    5.0) JEMALLOC_LIB="$SIFTER_ROOT/artifact/vendor/setbench/lib/libjemalloc.so" ;;
+    *) echo "HJ_JEMALLOC must be 5.3 or 5.0" >&2; exit 2 ;;
+esac
+test -s "$JEMALLOC_LIB"
 
 echo "=== [$OUT_NAME] fresh working copy of ASCYLIB ==="
 ascylib_perfbench_setup "$OUT_NAME"

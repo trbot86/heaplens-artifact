@@ -67,7 +67,7 @@ class CpuAndOptions(unittest.TestCase):
 
     def test_rejects_invalid_or_inapplicable_options(self):
         cases = [['experiment', 'tpcc_efrb_bench', '--initial', '10'],
-                 ['hnsw', '--threads', '8'], ['experiment', 'ascylib_efrb', '--cpus', '0-1'],
+                 ['valkey', '--threads', '8'], ['experiment', 'ascylib_efrb', '--cpus', '0-1'],
                  ['all-performance', '--threads', '8'], ['rocksdb', '--threads', '1'],
                  ['experiment', 'ascylib_efrb_bench', '--update-pct', '101'],
                  ['experiment', 'ascylib_efrb_bench', '--duration-ms', '0']]

@@ -17,6 +17,7 @@ import subprocess
 import sys
 import time
 from lib.perfstat_campaign import schedule
+from lib import hnsw_campaign
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "artifact"
@@ -100,25 +101,15 @@ def export(out):
 
 def hnsw(args, out):
     paper = args.profile == "paper"
-    n, dim, queries, threads = (1000000, 768, 100000, 24) if paper else (10000, 128, 1000, 2)
     repeats = args.reps or (10 if paper else 1)
-    values = {}
-    for variant, defines in (("baseline", ""), ("vector_huge", "HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1")):
-        work = out / variant
-        shutil.copytree(VENDOR / "hnswlib", work, ignore=IGNORE)
-        cmd = [sys.executable, "benchmark.py", f"--variant-label={variant}", f"--variant-defines={defines}",
-               "--dims", dim, "--threads", threads, "--build-threads", threads, "--elements", n,
-               "--queries", queries, "--m", 16, "--ef-construction", 200, "--ef", 64, "--k", 10,
-               "--warmup", 10000 if paper else 100, "--iterations", 5 if paper else 1,
-               "--query-mode", "indexed", "--seed", 1, "--repeats", repeats, "--output", out / f"{variant}.csv"]
-        if paper: cmd += ["--numa-node", args.server_node]
-        run(cmd, cwd=work, log=out / f"{variant}.log")
-        with (out / f"{variant}.csv").open() as f:
-            rows = list(csv.DictReader(f))
-        values[variant] = [float(row["qps_mean"]) for row in rows]
+    cells = {"baseline":"", "vector_huge":"HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1"}
+    source = VENDOR / ("hnswlib-corrected" if args.hnsw_source == "corrected" else "hnswlib")
+    execution = [(label, block+1) for label,block in schedule(list(cells), repeats, args.trial_order or "interleaved")]
+    values = hnsw_campaign.execute(args,out,source,cells,execution,sys.modules[__name__])
     summary = compare(values)
     summary["profile"] = args.profile
-    summary["scope"] = "Saved original-patch replay. Huge-page advice is not proof of huge-page backing."
+    summary["source"] = source.name
+    summary["scope"] = "Huge-page advice is not proof of huge-page backing; source and exact workload are in protocol.json."
     save(out / "summary.json", summary)
     print(json.dumps(summary, indent=2))
 
@@ -353,9 +344,12 @@ def experiment(args):
             env.update(INITIAL=str(initial), RANGE=str(key_range),
                        DURATION_MS=str(args.duration_ms or (1000 if smoke else 5000)),
                        UPDATE_PCT=str(args.update_pct if args.update_pct is not None else 0))
+        if args.name == "ascylib_hj_bench":
+            version = args.hj_jemalloc or "5.3"
+            env["HJ_JEMALLOC"] = version
         fields = ("THREADS", "REPS", "INITIAL", "RANGE", "DURATION_MS", "UPDATE_PCT",
                   "PERFBENCH_NODE", "PERFBENCH_CPUS", "PERFBENCH_MEMORY", "PERFBENCH_ORDER",
-                  "PERFBENCH_PERF", "ARTIFACT_NO_NUMA")
+                  "PERFBENCH_PERF", "ARTIFACT_NO_NUMA", "HJ_JEMALLOC")
         save(work / "protocol.json", {"arguments": vars(args), "platform": platform.platform(),
              "allowed_cpus": sorted(os.sched_getaffinity(0)),
              "settings": {key: env[key] for key in fields if key in env}})
@@ -378,20 +372,13 @@ def factorization(args, out):
                   ("hugepage", "baseline", "both", "vector_soa64"), ("both", "hugepage", "vector_soa64", "baseline")]
         blocks = args.reps or (10 if paper else 1)
         source = VENDOR / "hnswlib-corrected"
-    work = out / "source"
-    shutil.copytree(source, work, ignore=IGNORE)
     save(out / "design.json", {"cells": cells, "orders": orders, "blocks": blocks, "profile": args.profile,
                                "source": str(source), "note": "Fresh index per cell; compiler/environment recorded separately."})
-    for block in range(1, blocks + 1):
-        for label in orders[(block - 1) % len(orders)]:
-            cmd = [sys.executable, "benchmark.py", "--variant-label", label, f"--variant-defines={cells[label]}",
-                   "--dims", 768, "--threads", 24 if paper else 2, "--elements", 1000000 if paper else 2000,
-                   "--queries", 100000 if paper else 200, "--m", 16, "--ef-construction", 200, "--ef", 64, "--k", 10,
-                   "--build-threads", 24 if paper else 2, "--repeats", 1, "--warmup", 10000 if paper else 100,
-                   "--iterations", 5 if paper else 1, "--query-mode", "indexed", "--seed", 1,
-                   "--output", out / f"block{block:02d}_{label}.csv"]
-            if paper: cmd += ["--numa-node", args.server_node]
-            run(cmd, cwd=work, log=out / f"block{block:02d}_{label}.log")
+    execution = [(label,block) for block in range(1,blocks+1) for label in orders[(block-1)%len(orders)]]
+    values = hnsw_campaign.execute(args,out,source,cells,execution,sys.modules[__name__])
+    baseline = "packed" if alignment else "baseline"
+    summary = compare({"baseline":values[baseline], **{k:v for k,v in values.items() if k!=baseline}})
+    save(out / "summary.json", summary)
     if blocks == (6 if alignment else 10):
         summarizer = "summarize_hnsw_alignment.py" if alignment else "summarize_hnsw_factorization.py"
         run([sys.executable, ART / "lib" / summarizer, out])
@@ -406,14 +393,17 @@ def parse_args(argv=None):
     p.add_argument("--out", help="NEW result directory; never overwrite existing results")
     p.add_argument("--jobs", type=int, default=4)
     p.add_argument("--reps", type=int)
-    p.add_argument("--threads", type=int, help="ASCYLIB/TPC-C worker count; RocksDB readers plus writer")
-    p.add_argument("--cpus", help="ASCYLIB/TPC-C/RocksDB CPU list, one physical core per thread (e.g. 0-7)")
-    p.add_argument("--memory-policy", choices=["bind", "interleave"], help="ASCYLIB/TPC-C/RocksDB memory placement (default: bind)")
-    p.add_argument("--trial-order", choices=["interleaved", "blocked"], help="ASCYLIB/TPC-C/RocksDB repetition order (default: interleaved)")
+    p.add_argument("--threads", type=int, help="ASCYLIB/TPC-C workers; RocksDB readers plus writer; HNSW build/query threads")
+    p.add_argument("--cpus", help="Performance-run CPU list, one physical core per thread (e.g. 0-7)")
+    p.add_argument("--memory-policy", choices=["bind", "interleave"], help="ASCYLIB/TPC-C/RocksDB/HNSW memory placement (default: bind)")
+    p.add_argument("--trial-order", choices=["interleaved", "blocked"], help="ASCYLIB/TPC-C/RocksDB/HNSW repetition order (default: interleaved)")
     p.add_argument("--initial", type=int, help="ASCYLIB requested initial keys; rounded up to a power of two")
     p.add_argument("--range", type=int, help="ASCYLIB key range (default: twice the rounded initial size)")
     p.add_argument("--duration-ms", type=int, help="ASCYLIB measurement duration in milliseconds")
     p.add_argument("--update-pct", type=int, help="ASCYLIB percentage of update operations (default: 0)")
+    p.add_argument("--hj-jemalloc", choices=["5.3", "5.0"], help="HJ comparison allocator (default: retained jemalloc 5.3)")
+    p.add_argument("--dim", type=int, help="HNSW vector dimensions (paper default: 768)")
+    p.add_argument("--hnsw-source", choices=["original", "corrected"], help="HNSW before/after source (default: original); corrected advises before first touch")
     p.add_argument("--server-node", type=int, default=0)
     p.add_argument("--client-node", type=int, default=1)
     p.add_argument("--memtable", choices=["prefix_hash", "skip_list"], default="prefix_hash")
@@ -424,14 +414,21 @@ def parse_args(argv=None):
     if args.command in {"experiment", "legacy"} and not args.name: p.error("experiment requires a name")
     if args.jobs < 1 or (args.reps is not None and args.reps < 1): p.error("jobs/reps must be positive")
     if min(args.rocks_key_size, args.rocks_value_size) < 1: p.error("RocksDB sizes must be positive")
-    if any(value is not None and value < 1 for value in (args.threads, args.initial, args.range, args.duration_ms)):
-        p.error("threads/initial/range/duration-ms must be positive")
+    if any(value is not None and value < 1 for value in (args.threads, args.initial, args.range, args.duration_ms, args.dim)):
+        p.error("threads/initial/range/duration-ms/dim must be positive")
     if args.update_pct is not None and not 0 <= args.update_pct <= 100: p.error("update-pct must be 0..100")
     bench = args.command in {"experiment", "legacy"} and args.name and args.name.endswith("_bench")
-    if (args.threads is not None or args.cpus is not None) and not (bench or args.command == "rocksdb"):
-        p.error("threads/cpus apply to an individual ASCYLIB/TPC-C benchmark or RocksDB")
-    if (args.memory_policy or args.trial_order) and not (bench or args.command in {"rocksdb", "all-performance"}):
-        p.error("memory-policy/trial-order apply to ASCYLIB/TPC-C/RocksDB performance experiments")
+    hnsw_command = args.command in {"hnsw", "hnsw-factorization"}
+    if (args.threads is not None or args.cpus is not None) and not (bench or args.command == "rocksdb" or hnsw_command):
+        p.error("threads/cpus apply to individual ASCYLIB/TPC-C/RocksDB/HNSW performance experiments")
+    if args.memory_policy and not (bench or args.command in {"rocksdb", "all-performance"} or hnsw_command):
+        p.error("memory-policy applies to performance experiments")
+    if args.trial_order and not (bench or args.command in {"rocksdb", "all-performance", "hnsw"}):
+        p.error("trial-order applies to ASCYLIB/TPC-C/RocksDB/HNSW; factorization uses its fixed design")
+    if args.dim is not None and not hnsw_command: p.error("dim applies only to HNSW commands")
+    if args.hnsw_source is not None and args.command != "hnsw": p.error("hnsw-source applies only to hnsw; factorization selects its source")
+    if args.hj_jemalloc is not None and not (bench and args.name == "ascylib_hj_bench"):
+        p.error("hj-jemalloc applies only to ascylib_hj_bench")
     if any(v is not None for v in (args.initial, args.range, args.duration_ms, args.update_pct)) and not (bench and args.name.startswith("ascylib_")):
         p.error("initial/range/duration-ms/update-pct apply only to ASCYLIB performance experiments")
     if args.command == "rocksdb" and args.threads == 1: p.error("RocksDB requires a reader and a writer (at least 2 threads)")
