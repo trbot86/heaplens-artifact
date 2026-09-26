@@ -103,10 +103,17 @@ def hnsw(args, out):
     paper = args.profile == "paper"
     repeats = args.reps or (10 if paper else 1)
     cells = {"baseline":"", "vector_huge":"HNSWLIB_LAYOUT_VECTOR_SOA64=1,HNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1"}
-    source = VENDOR / ("hnswlib-corrected" if args.hnsw_source == "corrected" else "hnswlib")
-    execution = [(label, block+1) for label,block in schedule(list(cells), repeats, args.trial_order or "interleaved")]
+    source = VENDOR / ("hnswlib" if args.hnsw_source == "original" else "hnswlib-corrected")
+    if args.trial_order == "blocked":
+        execution = [(label, block+1) for label,block in schedule(list(cells), repeats, "blocked")]
+    else:
+        execution = [(label,block) for block in range(1,repeats+1)
+                     for label in (list(cells) if block%2 else list(cells)[::-1])]
     values = hnsw_campaign.execute(args,out,source,cells,execution,sys.modules[__name__])
-    summary = compare(values)
+    dims = hnsw_campaign.dimensions(args)
+    summary = ({"by_dimension":{str(dim):compare(values[dim]) for dim in dims}}
+               if len(dims)>1 else compare(values))
+    summary["dimensions"] = dims
     summary["profile"] = args.profile
     summary["source"] = source.name
     summary["scope"] = "Huge-page advice is not proof of huge-page backing; source and exact workload are in protocol.json."
@@ -402,8 +409,8 @@ def parse_args(argv=None):
     p.add_argument("--duration-ms", type=int, help="ASCYLIB measurement duration in milliseconds")
     p.add_argument("--update-pct", type=int, help="ASCYLIB percentage of update operations (default: 0)")
     p.add_argument("--hj-jemalloc", choices=["5.3", "5.0"], help="HJ comparison allocator (default: retained jemalloc 5.3)")
-    p.add_argument("--dim", type=int, help="HNSW vector dimensions (paper default: 768)")
-    p.add_argument("--hnsw-source", choices=["original", "corrected"], help="HNSW before/after source (default: original); corrected advises before first touch")
+    p.add_argument("--dim", type=int, help="Run one HNSW dimension (hnsw paper default: both 128 and 1536; smoke: 128; factorization: 768)")
+    p.add_argument("--hnsw-source", choices=["original", "corrected"], help="HNSW before/after source (default: corrected, advises before first touch); original preserves the earlier implementation")
     p.add_argument("--server-node", type=int, default=0)
     p.add_argument("--client-node", type=int, default=1)
     p.add_argument("--memtable", choices=["prefix_hash", "skip_list"], default="prefix_hash")

@@ -39,28 +39,35 @@ Allocator paths and hashes are recorded in `runs/campaign.json`.
 
 ## HNSW: dimension and huge-page placement
 
-The 128-D and 1536-D confirmations used 24 physical cores on one NUMA node of
-a four-socket Xeon Platinum 8160 machine (host kernel 5.8.0-55-generic), rather
-than the dual Xeon Gold 5220R machine. They used system libc, one million vectors,
+The 128-D and 1536-D before/after comparisons were confirmed on both the
+dual Xeon Gold 5220R machine (kernel 6.8.0-137-generic) and a four-socket Xeon
+Platinum 8160 machine (kernel 5.8.0-55-generic). Each uses 24 physical cores
+and memory from one NUMA node, system libc, one million vectors,
 100,000 indexed queries, 24 construction/query threads, M=16, ef_construction=200,
 ef=64, k=10, 10,000 warmup queries, and five timed iterations (500,000 queries).
 
-Run the before/after comparison at either dimension:
+Run both dimensions with the default paper command:
 
 ```bash
-HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper \
-  --hnsw-source corrected --dim 128 --threads 24 --reps 10 \
-  --server-node 0 --memory-policy bind
-
-HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper \
-  --hnsw-source corrected --dim 1536 --threads 24 --reps 10 \
-  --server-node 0 --memory-policy bind
+HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
 ```
 
 The corrected snapshot is already part of the artifact. Its vector-slab
 huge-page advice precedes first touch. Both variants use that same snapshot,
-with the layout/huge-page macros disabled for baseline. The default `hnsw`
-command still selects the original source and 768 dimensions.
+with the layout/huge-page macros disabled for baseline. Ten blocks each contain
+baseline and combined trials at both dimensions (40 processes total), alternating
+dimension and variant order. Results remain separate by dimension. Add
+`--dim 128` or `--dim 1536` to run just one. The original snapshot and 768-D
+workload remain accessible with `--hnsw-source original --dim 768`.
+
+| Dimension | Xeon Gold 5220R combined gain | 95% interval | Xeon Platinum 8160 combined gain | 95% interval |
+|---:|---:|---:|---:|---:|
+| 128 | +9.51% | 9.41–9.59% | +7.15% | 7.03–7.25% |
+| 1536 | +6.56% | 6.44–6.68% | +6.17% | 6.05–6.29% |
+
+All ten before/after pairs were positive at each dimension on both machines.
+On the Xeon Gold 5220R, mean baseline/combined QPS were 66,340/72,650 at 128D
+and 7,156/7,626 at 1536D, with within-variant coefficients of variation below 0.16%.
 
 To measure all four combinations of layout changes and huge-page advice:
 
@@ -72,6 +79,9 @@ HEAPLENS_NUMA=1 bash artifact/run.sh hnsw-factorization --factors hugepage \
   --profile paper --dim 1536 --threads 24 --reps 10 --server-node 0 --memory-policy bind
 ```
 
+The four-variant factor analysis below was measured on the Xeon Platinum 8160;
+it does not decompose the Xeon Gold 5220R gains.
+
 | Dimension | Layout alone | Huge pages alone | Combined | Combined 95% interval |
 |---:|---:|---:|---:|---:|
 | 128 | +0.73% | +2.35% | +7.15% | 7.03–7.25% |
@@ -81,7 +91,7 @@ Layout here groups vector separation and 64-byte alignment. Separate mapping
 diagnostics found more than 99.9% huge-page backing for the combined variant's
 vector slabs and zero for baseline/layout-only index allocations. The timing
 processes themselves were uninstrumented. These dimension-specific gains do
-not establish the same gain at 768 dimensions: that machine's fixed 768-D
+not establish the same gain at 768 dimensions: the Xeon Platinum 8160's fixed 768-D
 comparison gave 1.87%. Multithreaded graph construction is nondeterministic.
 
 ## Reading these comparisons

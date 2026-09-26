@@ -24,9 +24,17 @@ def runtime_environment():
     return env
 
 
-def configuration(args, api):
+def dimensions(args):
+    if args.dim is not None:
+        return [args.dim]
+    if args.command == 'hnsw':
+        return [128, 1536] if args.profile == 'paper' else [128]
+    return [768 if args.profile == 'paper' or args.command == 'hnsw-factorization' else 128]
+
+
+def configuration(args, api, dim=None):
     paper = args.profile == 'paper'
-    dim = args.dim or (768 if paper or args.command == 'hnsw-factorization' else 128)
+    dim = dimensions(args)[0] if dim is None else dim
     threads = args.threads or (24 if paper else 2)
     cpus = api.node_cpus(args.server_node, threads, args.cpus) if paper or args.cpus or args.memory_policy else None
     return dict(dim=dim, threads=threads, build_threads=threads,
@@ -66,8 +74,20 @@ def read_result(log, config, label, defines, block):
     return row
 
 
+def dimensional_execution(execution, dims, blocked=False):
+    if blocked:
+        return [(dim, label, block) for dim in dims for label, block in execution]
+    # Each block contains every dimension/variant pair. Reverse dimension order
+    # on even blocks, just as in the two-dimension confirmation experiment.
+    return [(dim, label, block) for block in dict.fromkeys(b for _, b in execution)
+            for dim in (dims if block % 2 else dims[::-1])
+            for label, b in execution if b == block]
+
+
 def execute(args, out, source, cells, execution, api):
-    config = configuration(args, api)
+    dims = dimensions(args)
+    configs = {dim:configuration(args, api, dim) for dim in dims}
+    trials = dimensional_execution(execution, dims, args.trial_order == 'blocked')
     env = runtime_environment()
     sources = {str(p.relative_to(source)):sha(p) for p in sorted(source.rglob('*'))
                if p.is_file() and not any(x in {'.git', 'build', '__pycache__'} for x in p.relative_to(source).parts)
@@ -78,10 +98,16 @@ def execute(args, out, source, cells, execution, api):
     policies = {key:Path(path).read_text() if Path(path).exists() else None for key,path in (
         ('thp','/sys/kernel/mm/transparent_hugepage/enabled'),
         ('defrag','/sys/kernel/mm/transparent_hugepage/defrag'))}
-    api.save(out/'protocol.json', {'configuration':config, 'source':str(source), 'cells':cells,
+    protocol = {'source':str(source), 'cells':cells,
         'execution':execution, 'runtime_environment':settings, 'policies':policies,
+        'dimensions':dims, 'trial_sequence':[dict(dim=d, variant=v, block=b) for d,v,b in trials],
         'allocator':'system libc, LD_PRELOAD unset',
-        'quality_metric':'Indexed self-label hit fraction; not ground-truth top-k ANN recall.'})
+        'quality_metric':'Indexed self-label hit fraction; not ground-truth top-k ANN recall.'}
+    if len(dims) == 1:
+        protocol['configuration'] = configs[dims[0]]
+    else:
+        protocol['configurations'] = {str(dim):config for dim,config in configs.items()}
+    api.save(out/'protocol.json', protocol)
     binaries = {}
     for label,defines in cells.items():
         work = out/label
@@ -93,11 +119,12 @@ def execute(args, out, source, cells, execution, api):
         if len(modules)!=1:raise RuntimeError(f'Expected one built module for {label}')
         binaries[label]={'path':str(modules[0]),'sha256':sha(modules[0]),'defines':defines}
     api.save(out/'binaries.json',binaries)
-    values={label:[] for label in cells}
-    for label,block in execution:
+    values={dim:{label:[] for label in cells} for dim in dims}
+    for dim,label,block in trials:
+        config=configs[dim]
         binary=binaries[label]
         if sha(binary['path'])!=binary['sha256']:raise RuntimeError('HNSW module changed during campaign')
-        stem=f'block{block:02d}_{label}'
+        stem=f'block{block:02d}_'+(f'd{dim}_' if len(dims)>1 else '')+label
         cmd=command(config,label,cells[label],block)
         api.save(out/(stem+'-command.json'),{'command':cmd,'cwd':str(out/label),'environment':settings,
                  'started_utc':datetime.now(timezone.utc).isoformat()})
@@ -106,6 +133,6 @@ def execute(args, out, source, cells, execution, api):
         row=read_result(out/(stem+'.log'),config,label,cells[label],block)
         with (out/(stem+'.csv')).open('x',newline='') as f:
             writer=csv.DictWriter(f,fieldnames=sorted(row));writer.writeheader();writer.writerow(row)
-        values[label].append(row['qps_mean'])
+        values[dim][label].append(row['qps_mean'])
         if args.profile=='paper':time.sleep(15)
-    return values
+    return values if len(dims)>1 else values[dims[0]]

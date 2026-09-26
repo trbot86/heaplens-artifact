@@ -76,9 +76,12 @@ performance run or silently relabel its settings.
 HNSWLib: ten baseline and ten combined trials from the original 768-D campaign.
 The ratio of QPS means is about +6.17%; averaging trial-wise ratios is a
 different statistic. The original implementation issued huge-page advice
-after touching the vector slab. This replay deliberately preserves that
-implementation, and does **not** establish actual huge-page backing or
-reproduce the later corrected factorization by substitution.
+after touching the vector slab. These retained data and source remain unchanged;
+`hnsw --profile paper --hnsw-source original --dim 768` selects that implementation
+and workload. The default `hnsw --profile paper` instead uses the existing
+corrected snapshot (advice before first touch) at both 128 and 1536 dimensions,
+matching the revised paper configurations. Results for these configurations
+are listed separately in [Reproduction configurations](REPRODUCTION_CONFIGURATIONS.md).
 
 Historical scripts stored as `.txt` are evidence only. They may contain
 machine-specific paths or administrative commands; do not execute them.

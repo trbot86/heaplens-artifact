@@ -114,7 +114,9 @@ order. `--trial-order blocked` instead runs all repetitions of each variant
 together.
 
 HNSW likewise builds separate variant modules before timing, then interleaves
-fresh processes. Its factorization commands use the fixed orders in Section 4.
+fresh processes. Its paper profile runs both 128-D and 1536-D workloads, with
+ten baseline/optimized pairs per dimension and alternating dimension/variant
+order (40 trials total). Its factorization commands use the fixed orders in Section 4.
 
 | Experiment | Variants compared |
 |---|---|
@@ -149,14 +151,16 @@ Valkey uses two NUMA nodes with 24 available physical cores each, 4M keys,
 0 and 1; `--server-node` and `--client-node` select them. Persistence is off;
 networking is loopback, so a physical NIC is not required.
 
-HNSW uses 1M 768-D vectors, 100k indexed queries, 24 build/query threads,
-M=16, ef_construction=200, ef=64, k=10, 10k warmup queries, and five timed
+HNSW uses 1M vectors at each of 128 and 1536 dimensions, 100k indexed queries,
+24 build/query threads, M=16, ef_construction=200, ef=64, k=10, 10k warmup queries, and five timed
 iterations. Allow hours for repeated fresh graph constructions. The output
 includes QPS and `recall_mean`. The latter measures indexed queries finding
-their own label; it is not ground-truth top-k ANN recall. `--dim` changes the
-dimension; `--threads` changes both construction and query threads. `hnsw`
-defaults to the original source snapshot; `--hnsw-source corrected` selects
-the existing snapshot that issues huge-page advice before first touch.
+their own label; it is not ground-truth top-k ANN recall. `--dim N` selects a
+single dimension; `--threads` changes both construction and query threads.
+`hnsw` defaults to the existing corrected source snapshot, which issues
+huge-page advice before first touch. `--hnsw-source original --dim 768`
+selects the original implementation and workload. The smoke profile remains
+a small 128-D check. The paper profile of `all-performance` also runs both dimensions.
 
 RocksDB uses 17 reader threads plus a background writer, 10M keys, 64-byte
 keys, 256-byte values, 128 MiB write buffers, disabled WAL, and a 10-second
@@ -241,6 +245,8 @@ HEAPLENS_NUMA=1 bash artifact/run.sh hnsw-factorization --factors alignment --pr
 These commands use separate source snapshots. The huge-page experiment
 issues advice before first touch. Check live mappings for transparent
 huge-page backing when interpreting this comparison.
+Both attribution commands retain their 768-D default; add `--dim 128` or
+`--dim 1536` to attribute the effects at either headline workload dimension.
 
 The recorded 40-trial and 18-trial datasets are in
 `artifact/historical/hnsw-factorization/` and
@@ -254,6 +260,9 @@ Valkey, HNSWLib, RocksDB, and HNSW attribution runs write to
 `artifact/results/<command>-<UTC timestamp>/`. Each directory contains
 configuration/environment records, build logs, per-run data, and summaries.
 `--out /root/sifter/artifact/results/NEW_NAME` selects a specific new directory.
+The two-dimension HNSW run records separate configurations and dimension-labelled
+trial files; `summary.json` reports each dimension under `by_dimension`, without
+pooling their throughputs.
 
 ASCYLIB and TPC-C runs write `results.tsv`, `summary.txt`, and per-run logs
 under `artifact/experiments/<name>/`. `protocol.json` records the selected
