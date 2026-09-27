@@ -99,6 +99,12 @@ def execute(args):
         preload = variant['environment']['LD_PRELOAD']
         if preload and digest(preload) != variant['preload_sha256']:
             raise ValueError('Allocator changed')
+    if 'dvy_runtime' in plan:
+        try:
+            from . import dvy_runtime
+        except ImportError:
+            import dvy_runtime
+        dvy_runtime.diagnose(plan, run_dir)
     for name, repetition in runs:
         v = variants[name]
         stem = '{}.t{}.r{}'.format(name, v['threads'], repetition)
@@ -134,6 +140,10 @@ def execute(args):
 
 
 def summarize(args):
+    dvy_check = Path(args.results).parent / 'runs/dvy-page-checks/summary.json'
+    if dvy_check.exists():
+        check = json.loads(dvy_check.read_text())
+        print('DVY huge-page advice mode={}; page backing: {} (separate diagnostics)'.format(check['mode'], check['status']))
     groups = {}
     with open(args.results) as f:
         for row in csv.DictReader(f, delimiter='\t'):

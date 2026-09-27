@@ -36,6 +36,11 @@ and pinned direct Python/npm dependencies. Its first build needs Internet
 access to package registries and normally takes several minutes. The runner
 mounts this repository at `/root/sifter` inside the container.
 
+DVY additionally includes an isolated Ubuntu 24.04 libc/loader in that same
+image; it needs no corresponding installation on the host. Only DVY uses
+this runtime. Rebuild the image after updating these scripts. Other experiments
+retain their existing runtime, allocator and huge-page settings.
+
 ## 2. Try HeapLENS
 
 ```bash
@@ -69,7 +74,11 @@ Smoke speedups are not paper evidence.
 
 ## 3. Run the performance experiments
 
-Use `--profile paper` for the full workloads; the default is `smoke`.
+The commands in this section are the standard way to reproduce the paper's
+performance comparisons. `--profile paper` selects the workload, allocator,
+placement, and variants described below; no additional benchmark-specific
+tuning flags or environment settings are needed beyond the commands shown.
+Without `--profile paper`, commands default to small `smoke` workloads.
 Paper-mode runs use ten repetitions per variant by default; `--reps N`
 changes the repetition count. The HNSW attribution experiments in Section 4
 have their own repetition schedules.
@@ -102,11 +111,31 @@ HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
 
 The section references use the accepted submission's numbering.
 
-For the confirmed four-thread EFRB, 24-thread HJ, and 128-D/1536-D HNSW
-configurations, see [Reproduction configurations](REPRODUCTION_CONFIGURATIONS.md).
-That guide gives complete commands, measured improvements and the corresponding
-machines. These are the default paper-profile configurations; stored historical
-paper data are unchanged.
+The [reproduction configuration guide](REPRODUCTION_CONFIGURATIONS.md) expands
+these defaults into explicit commands and gives confirmed improvements on the
+named machines. Its extra flags spell out defaults, not additional tuning
+required to reproduce those comparisons. Alternative configurations are labelled
+separately; stored historical paper data are unchanged.
+
+DVY's default `--dvy-hugepages auto` requests transparent huge pages for all four
+layouts and records separate mapping checks before the timed runs. The driver
+sets `GLIBC_TUNABLES=glibc.malloc.hugetlb=1` for each DVY benchmark process;
+no manual runtime configuration is required. If backing is unavailable, it
+warns and continues with the host's available pages. `--dvy-hugepages require`
+instead stops before timing unless backing is observed for every layout;
+`--dvy-hugepages off` disables allocator advice (not the host's THP policy).
+Small smoke runs skip the full-size mapping checks. No host settings are changed.
+Runtime versions, hashes and fallback warnings are in `runs/campaign.json`;
+mapping evidence is in `runs/dvy-page-checks/`. A missing bundle in an older
+image or native installation falls back to the installed runtime with a warning.
+
+CPU IDs are discovered from the host topology and allowed CPU set. Paper
+profiles retain their stated thread counts rather than silently downsizing:
+use `--threads`, `--server-node`, and where applicable `--rocks-nodes` for a
+different topology, or use smoke on a smaller machine. Retained allocator
+libraries are included in the repository, not looked up in host-specific
+installation paths. A missing or altered retained library requires restoring
+the artifact files, not substituting another allocator into the comparison.
 
 ASCYLIB and TPC-C build and save all variant binaries before measuring them.
 Repetitions are interleaved, with one run of each variant per round and rotating
@@ -137,7 +166,8 @@ order (40 trials total). Its factorization commands use the fixed orders in Sect
 HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh all-performance --profile paper
 ```
 
-This runs the nine groups listed above sequentially. Allow many hours and
+This runs the nine groups listed above sequentially, using the same standard
+parameters as the individual paper-profile commands. Allow many hours and
 substantial scratch disk space. To include the two HNSW attribution
 experiments, also run the commands in Section 4.
 
@@ -190,8 +220,8 @@ for the HashSkipList 7.51% and InlineSkipList 8.61% confirmations.
 
 For ASCYLIB, TPC-C, InlineSkipList, and HNSW, paper-mode runs select one available hardware
 thread per physical core on `--server-node` (default 0). Memory is bound to
-that node except for standalone EFRB, which requests single-node interleaving
-to match its confirmed protocol. CPU IDs are discovered from the host's topology and allowed CPU set;
+that node except for standalone EFRB and DVY, which request single-node
+interleaving to match their confirmed protocols. CPU IDs are discovered from the host's topology and allowed CPU set;
 they are not assumed to match the paper's machine. `--threads N` changes the
 worker count (readers plus writer for RocksDB; build/query threads for HNSW). `--cpus 0-7` or
 `--cpus 0,2,4,6` explicitly selects that many distinct physical cores on the
@@ -221,6 +251,12 @@ these same defaults. All three default to
 search-only workloads; the default key range is twice the rounded initial size.
 EFRB's earlier eight-thread comparison is available with
 `--threads 8 --memory-policy bind`; HJ's earlier setting with `--threads 8`.
+
+Both TPC-C commands use 24 workers and 24 warehouses, the full schema,
+50% Payment/50% NewOrder transactions, and no warmup transactions. They use
+the benchmark's transaction-count stopping rule (`MAX_TXN_PER_PART=100000`),
+not a fixed-duration window. Throughput is calculated from the actual committed
+transactions and elapsed time reported by each run.
 
 Section 6.3 already describes the TPC-C/EFRB reclamation fix: use one EBR
 instance shared across the database tables, instead of a separate instance

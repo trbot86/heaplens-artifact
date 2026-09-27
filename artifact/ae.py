@@ -362,7 +362,7 @@ def experiment(args):
     if args.name.endswith("_bench"):
         smoke = args.profile == "smoke"
         default_threads = {"ascylib_efrb_bench": 4, "ascylib_dvy_bench": 8}.get(args.name, 24)
-        default_memory = "interleave" if args.name == "ascylib_efrb_bench" else "bind"
+        default_memory = "interleave" if args.name in {"ascylib_efrb_bench", "ascylib_dvy_bench"} else "bind"
         threads = args.threads or (min(2, len(os.sched_getaffinity(0))) if smoke else default_threads)
         env.update(THREADS=str(threads), PERFBENCH_NODE=str(args.server_node),
                    PERFBENCH_MEMORY=memory_option(args, default_memory), PERFBENCH_ORDER=args.trial_order or "interleaved",
@@ -383,9 +383,11 @@ def experiment(args):
         if args.name == "ascylib_hj_bench":
             version = args.hj_jemalloc or "5.3"
             env["HJ_JEMALLOC"] = version
+        if args.name == "ascylib_dvy_bench":
+            env["DVY_HUGEPAGES"] = args.dvy_hugepages or "auto"
         fields = ("THREADS", "REPS", "INITIAL", "RANGE", "DURATION_MS", "UPDATE_PCT",
                   "PERFBENCH_NODE", "PERFBENCH_CPUS", "PERFBENCH_MEMORY", "PERFBENCH_ORDER",
-                  "PERFBENCH_PERF", "ARTIFACT_NO_NUMA", "HJ_JEMALLOC")
+                  "PERFBENCH_PERF", "ARTIFACT_NO_NUMA", "HJ_JEMALLOC", "DVY_HUGEPAGES")
         save(work / "protocol.json", {"arguments": vars(args), "platform": platform.platform(),
              "allowed_cpus": sorted(os.sched_getaffinity(0)),
              "settings": {key: env[key] for key in fields if key in env}})
@@ -431,13 +433,15 @@ def parse_args(argv=None):
     p.add_argument("--reps", type=int)
     p.add_argument("--threads", type=int, help="ASCYLIB/TPC-C workers; RocksDB readers plus writer; HNSW build/query threads")
     p.add_argument("--cpus", help="Performance-run CPU list (e.g. 0-7); HashSkipList allows SMT across two nodes; other benchmarks use distinct physical cores")
-    p.add_argument("--memory-policy", choices=["bind", "interleave"], help="Memory placement (default: bind; standalone EFRB: interleave on --server-node; HashSkipList: interleave across --rocks-nodes)")
+    p.add_argument("--memory-policy", choices=["bind", "interleave"], help="Memory placement (default: bind; standalone EFRB/DVY: interleave on --server-node; HashSkipList: interleave across --rocks-nodes)")
     p.add_argument("--trial-order", choices=["interleaved", "blocked"], help="ASCYLIB/TPC-C/RocksDB/HNSW repetition order (default: interleaved)")
     p.add_argument("--initial", type=int, help="ASCYLIB requested initial keys; rounded up to a power of two")
     p.add_argument("--range", type=int, help="ASCYLIB key range (default: twice the rounded initial size)")
     p.add_argument("--duration-ms", type=int, help="ASCYLIB measurement duration in milliseconds")
     p.add_argument("--update-pct", type=int, help="ASCYLIB percentage of update operations (default: 0)")
     p.add_argument("--hj-jemalloc", choices=["5.3", "5.0"], help="HJ comparison allocator (default: retained jemalloc 5.3)")
+    p.add_argument("--dvy-hugepages", choices=["auto", "require", "off"],
+                   help="DVY only: request huge pages for every layout (auto, default); require verified backing before timing; or turn allocator advice off")
     p.add_argument("--dim", type=int, help="Run one HNSW dimension (hnsw paper default: both 128 and 1536; smoke: 128; factorization: 768)")
     p.add_argument("--hnsw-source", choices=["original", "corrected"], help="HNSW before/after source (default: corrected, advises before first touch); original preserves the earlier implementation")
     p.add_argument("--server-node", type=int, default=0)
@@ -472,6 +476,8 @@ def parse_args(argv=None):
     if args.hnsw_source is not None and args.command != "hnsw": p.error("hnsw-source applies only to hnsw; factorization selects its source")
     if args.hj_jemalloc is not None and not (bench and args.name == "ascylib_hj_bench"):
         p.error("hj-jemalloc applies only to ascylib_hj_bench")
+    if args.dvy_hugepages is not None and not (bench and args.name == "ascylib_dvy_bench"):
+        p.error("dvy-hugepages applies only to ascylib_dvy_bench")
     if any(v is not None for v in (args.initial, args.range, args.duration_ms, args.update_pct)) and not (bench and args.name.startswith("ascylib_")):
         p.error("initial/range/duration-ms/update-pct apply only to ASCYLIB performance experiments")
     if args.command == "rocksdb" and args.threads == 1: p.error("RocksDB requires a reader and a writer (at least 2 threads)")

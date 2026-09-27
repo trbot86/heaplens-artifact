@@ -81,7 +81,7 @@ class Campaign(unittest.TestCase):
         for name, threads, initial, memory in (
             ('ascylib_efrb_bench', 4, 262144, 'interleave'),
             ('ascylib_hj_bench', 24, 1048576, 'membind'),
-            ('ascylib_dvy_bench', 8, 1048576, 'membind')):
+            ('ascylib_dvy_bench', 8, 1048576, 'interleave')):
             with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp, \
                  patch.object(ae, 'ART', Path(tmp)), patch.object(ae, 'run') as run, \
                  patch.object(ae, 'node_cpus', return_value=list(range(threads))) as cpus:

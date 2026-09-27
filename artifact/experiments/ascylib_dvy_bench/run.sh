@@ -52,6 +52,9 @@ run_variant "b_72B_no_pad" DRACHSLER_PAD=0
 run_variant "c_128B_pad" DRACHSLER_PAD=128
 run_variant "d_192B_pad" DRACHSLER_PAD=192
 
+# Apply one runtime/advice policy to every DVY layout, never other experiments.
+python3 "$SIFTER_ROOT/artifact/lib/dvy_runtime.py" --plan "$RUN_DIR/campaign.json" \
+    --mode "${DVY_HUGEPAGES:-auto}" --profile "${ARTIFACT_PROFILE:-smoke}"
 perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
 
 perfbench_print_summary "$RESULTS_TSV" "ASCYLIB DVY tree: node padding 96B/72B/128B/192B (paper Appendix B.1 / Table 3)" \

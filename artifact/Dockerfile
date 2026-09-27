@@ -1,3 +1,13 @@
+FROM ubuntu:24.04 AS dvy-runtime
+# DVY alone uses this corrected THP-policy parser. Never replace the main
+# image's libc: other experiments retain their validated Ubuntu 22.04 runtime.
+RUN mkdir -p /opt/heaplens-dvy-runtime \
+    && cp -L /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 \
+       /usr/lib/x86_64-linux-gnu/libc.so.6 /usr/lib/x86_64-linux-gnu/libpthread.so.0 \
+       /usr/lib/x86_64-linux-gnu/libm.so.6 /usr/lib/x86_64-linux-gnu/libdl.so.2 \
+       /usr/lib/x86_64-linux-gnu/librt.so.1 /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 \
+       /opt/heaplens-dvy-runtime/ \
+    && dpkg-query -W libc6 libgcc-s1 > /opt/heaplens-dvy-runtime/packages.txt
 FROM node:18.18.2-bullseye-slim AS node
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive NEXT_TELEMETRY_DISABLED=1 \
@@ -36,5 +46,6 @@ RUN cd /opt/heaplens-ui && npm ci --no-audit --no-fund
 RUN python3 -m pip install --no-cache-dir PyYAML==6.0.2 \
     && apt-get update && apt-get install -y --no-install-recommends bc autoconf-archive libomp-14-dev \
     && rm -rf /var/lib/apt/lists/*
+COPY --from=dvy-runtime /opt/heaplens-dvy-runtime /opt/heaplens-dvy-runtime
 WORKDIR /root/sifter
 CMD ["bash"]

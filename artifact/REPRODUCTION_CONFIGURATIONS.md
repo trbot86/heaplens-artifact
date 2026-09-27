@@ -1,8 +1,11 @@
 # Reproduction configurations
 
-These recipes expose confirmed configurations, with repetition counts stated
-below (ten per variant unless specified). Run from the repository root after
-building the Docker image.
+These are the standard paper-profile configurations selected by the main
+README's commands and `all-performance --profile paper`. Flags written out
+in the primary recipes make the defaults explicit; they are not extra tuning
+steps. Alternative workloads and factorization commands are labelled separately.
+Repetition counts are stated below (ten per variant unless specified).
+Run from the repository root after building the Docker image.
 Use a fresh checkout for each ASCYLIB campaign, as described in the main README.
 HNSW automatically creates a new output directory for each command.
 
@@ -29,6 +32,38 @@ The earlier eight-thread, five-second, strictly bound comparison remains
 available with `--threads 8 --memory-policy bind`. It gave 27.24%
 (26.61–27.89%), versus the historical eight-thread 25.38% result. Diagnostic
 trace and instrumentation-overhead thread counts are separate experiments.
+
+## DVY: equal huge-page advice for all node layouts
+
+```bash
+HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_dvy_bench \
+  --profile paper --threads 8 --initial 1048576 --range 2097152 \
+  --duration-ms 5000 --update-pct 0 --reps 10 \
+  --server-node 0 --memory-policy interleave
+```
+
+The default requests transparent huge pages for **every** layout using a
+corrected libc bundled in the Docker image, without upgrading the host or
+changing any other benchmark's runtime. Both baseline and optimized nodes use
+the same allocator/advice policy. Four separate full-workload diagnostic
+processes record `smaps`; the following timing processes are unprobed.
+
+`--dvy-hugepages require` makes the page-backing check mandatory. The default
+`auto` warns and continues if the host cannot supply huge pages, or if an older
+image lacks the runtime bundle. `--dvy-hugepages off` compares layouts with
+allocator advice off under the same selected runtime; global THP `always`
+can still supply huge pages. Runtime selection, versions and library hashes
+are recorded in `runs/campaign.json`, and the backing check in
+`runs/dvy-page-checks/summary.json`. Rebuild the image to obtain the supplied
+runtime; no exact libc/compiler package version is required on the host.
+
+On Pyke (dual Xeon Gold 5220R), this command's default configuration gave
+17,467,000 ops/s for 96-B nodes and 20,683,600 ops/s for 192-B nodes:
+**18.42%** improvement (paired-block bootstrap 95% interval **17.14–19.82%**),
+compared with the historical 17.54%. All 40 trials were retained. These were
+source builds using the artifact's GCC 11.4/O2, non-PIE and static SSMEM,
+with the isolated libc 2.39 runtime. Separate mapping checks observed huge-page
+backing for all four layouts. Hardware/kernel differences can change the gain.
 
 ## HJ: allocator comparison at 24 threads
 
@@ -190,7 +225,7 @@ the workbook; they have not been relabelled with these configurations.
 
 Except for HashSkipList's two-node SMT configuration, the commands select
 physical cores from the actual topology. Memory is bound locally except for
-standalone EFRB's single-node interleaving.
+standalone EFRB and DVY's single-node interleaving.
 All HNSW modules build before timing; separate processes use
 the saved modules in interleaved order. `protocol.json`, source and binary
 manifests, per-block commands/logs/CSVs and `summary.json` record the run.
