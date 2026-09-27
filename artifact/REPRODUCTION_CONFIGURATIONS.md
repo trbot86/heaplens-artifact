@@ -94,6 +94,45 @@ processes themselves were uninstrumented. These dimension-specific gains do
 not establish the same gain at 768 dimensions: the Xeon Platinum 8160's fixed 768-D
 comparison gave 1.87%. Multithreaded graph construction is nondeterministic.
 
+## RocksDB inline skiplist: memory-only
+
+```bash
+HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable skip_list --profile paper
+```
+
+This default selects 20 physical cores and memory from NUMA node 0, 19 readers
+plus one writer, 10M initial keys, 32-byte keys, 128-byte values, 60-second
+read windows, retained jemalloc 5.3, and ten interleaved repetitions per
+variant. `--threads` and `--server-node` select another core count or node.
+Both variants use the same source snapshot; the modified binary enables the
+existing `ALIGN_TALL_NODE=3 SEG_TALL_NODE=3` implementation.
+
+The memtable has a 46.5-GiB write buffer, with WAL, automatic compaction, and
+shutdown flushing disabled. There is no initial compaction wait. These
+settings keep user data in the memtable throughout prefill, measurement, and
+shutdown; the driver verifies this in every trial. Metadata and diagnostic
+log writes remain. Full runs require at least 64 GiB available memory.
+
+On the dual Xeon Gold 5220R machine, baseline/modified mean read throughput
+was 5,810,938.5 / 6,311,177.9 operations/s: **+8.61%**, with a paired-block
+95% interval of **8.32–8.92%**. Each variant's throughput CV was below 0.31%.
+The confirmation retained all ten pairs and separately passed six small
+smokes and three full-size baseline preflights across the tested topologies.
+
+The same 20 software threads on ten physical cores with SMT gave +9.09%
+(8.41–9.79%). That is a topology comparison, not a worker-count sweep;
+the default artifact command uses the 20-physical-core configuration above.
+The memory-only workload differs from a small-buffer run that flushes data
+to SSTs; do not pool the two configurations.
+
+`rocksdb-options.ini` and `protocol.json` capture the requested configuration.
+Each trial saves its command, allocator checksum, effective RocksDB options,
+DB log, and `persistence.json` verification. If a custom workload exhausts
+the buffer and causes data flushing, the driver fails the check instead of
+reporting it as a memory-only result. The same persistence controls apply to
+the HashSkipList command; the InlineSkipList gain above does not describe
+that different data structure and patch.
+
 ## Reading these comparisons
 
 The measurements above are fresh confirmations after a configuration screen,

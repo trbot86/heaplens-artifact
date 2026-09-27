@@ -57,10 +57,17 @@ native GUI/export launchers from his update are also retained.
 
 RocksDB workload discrepancy: the retained `run_experiment_asplos.sh.txt` uses
 64-byte keys and 256-byte values, whereas accepted-paper Section 6.4 says
-32-byte keys and 128-byte values. New runs default to the retained script;
-`--rocks-key-size 32 --rocks-value-size 128` selects the sizes in the prose.
-Both are explicit, recorded configurations, not an assertion that this
-discrepancy has been resolved. The restored patch implements `REORDER_FIELDS`,
+32-byte keys and 128-byte values. The driver now defaults to the prose sizes
+and the verified memory-only setup documented in
+[reproduction configurations](REPRODUCTION_CONFIGURATIONS.md#rocksdb-inline-skiplist-memory-only).
+The previous driver disabled WAL but still allowed memtable flushing and
+compaction. The memory-only driver also disables automatic compaction and
+shutdown flushing, enlarges the write buffer, and verifies no user-data
+persistence throughout every process. Metadata and diagnostic writes remain.
+Its InlineSkipList defaults match the confirmed 20-physical-core, 60-second,
+jemalloc 5.3, threshold-3 configuration. Historical data are unchanged; the
+confirmation is not a claim that conflicting historical settings have been
+resolved. The restored patch implements `REORDER_FIELDS`,
 `NO_PADDING_NODE`, `ALIGN_TALL_NODE`, and `SEG_TALL_NODE`; passing these names
 to the unpatched diagnostic-source revision would not enable the optimizations.
 

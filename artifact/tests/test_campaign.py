@@ -160,6 +160,8 @@ class Campaign(unittest.TestCase):
             (source / 'memtable').mkdir(parents=True)
             for path in (source / 'Makefile', source / 'memtable/skiplist.h'):
                 path.write_text('REORDER_FIELDS NO_PADDING_NODE\n')
+            allocator = vendor / 'heaplens-allocators/libjemalloc-heaplens.so'
+            allocator.parent.mkdir(); allocator.write_bytes(b'allocator fixture')
             out = root / 'results'; out.mkdir()
             args = ae.parse_args(['rocksdb', '--profile', 'paper', '--reps', '2', '--threads', '18'])
             built, observed = [], []
@@ -172,14 +174,24 @@ class Campaign(unittest.TestCase):
                     self.assertEqual(built, ['baseline', 'optimized'])
                     self.assertEqual(cmd[:3], ['numactl', '--physcpubind=' + ','.join(map(str, range(18))), '--membind=0'])
                     self.assertIn('--threads=17', cmd)
-                    self.assertTrue(kwargs['env']['LD_PRELOAD'].endswith('setbench/lib/libjemalloc.so'))
+                    self.assertTrue(kwargs['env']['LD_PRELOAD'].endswith('heaplens-allocators/libjemalloc-heaplens.so'))
+                    self.assertIn('--benchmarks=filluniquerandom,readwhilewriting', cmd)
+                    self.assertIn('--duration=60', cmd)
+                    self.assertIn('--key_size=32', cmd)
+                    self.assertIn('--value_size=128', cmd)
+                    self.assertTrue(any(str(item).startswith('--options_file=') for item in cmd))
                     observed.append(cwd.name)
                     log.write_text('readwhilewriting : 1 micros/op 100 ops/sec\n')
 
             with patch.object(ae, 'VENDOR', vendor), patch.object(ae, 'run', side_effect=fake_run), \
-                 patch.object(ae, 'node_cpus', return_value=list(range(18))), redirect_stdout(io.StringIO()):
+                 patch.object(ae, 'node_cpus', return_value=list(range(18))), \
+                 patch.object(ae.rocksdb_memoryonly, 'environment', return_value={'LD_PRELOAD': str(allocator)}), \
+                 patch.object(ae.rocksdb_memoryonly, 'check_memory', return_value=128*1024**3), \
+                 patch.object(ae.rocksdb_memoryonly, 'validate', return_value={'status': 'passed'}) as validation, \
+                 patch.object(ae.time, 'sleep'), redirect_stdout(io.StringIO()):
                 ae.rocksdb(args, out)
             self.assertEqual(observed, ['baseline', 'optimized', 'optimized', 'baseline'])
+            self.assertEqual(validation.call_count, 4)
 
 
 @unittest.skipUnless(sys.platform.startswith('linux'), 'Linux shell tests')

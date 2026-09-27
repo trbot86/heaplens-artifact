@@ -18,6 +18,7 @@ import sys
 import time
 from lib.perfstat_campaign import schedule
 from lib import hnsw_campaign
+from lib import rocksdb_memoryonly
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "artifact"
@@ -269,14 +270,26 @@ def gui():
 
 def rocksdb(args, out):
     paper = args.profile == "paper"
-    threads, keys, duration = (18, 10000000, 10) if paper else (2, 10000, 2)
+    threads, keys, duration = ((20 if args.memtable == "skip_list" else 18), 10000000, 60) if paper else (2, 10000, 2)
     threads = args.threads or threads
     reps = args.reps or (10 if paper else 1)
     placement = []
     if paper or args.cpus or args.memory_policy:
         ids = node_cpus(args.server_node, threads, args.cpus)
         placement = ["numactl", "--physcpubind=" + ",".join(map(str, ids)), f"--{memory_option(args)}={args.server_node}"]
-    flags = ["REORDER_FIELDS=1", "NO_PADDING_NODE=1"] if args.memtable == "prefix_hash" else ["ALIGN_TALL_NODE=4", "SEG_TALL_NODE=4"]
+    flags = ["REORDER_FIELDS=1", "NO_PADDING_NODE=1"] if args.memtable == "prefix_hash" else ["ALIGN_TALL_NODE=3", "SEG_TALL_NODE=3"]
+    allocator = VENDOR / "heaplens-allocators/libjemalloc-heaplens.so"
+    env = rocksdb_memoryonly.environment(allocator)
+    available = rocksdb_memoryonly.check_memory() if paper else None
+    options_file = out / "rocksdb-options.ini"
+    options_hash = rocksdb_memoryonly.write_options(
+        ART / "config/rocksdb-memoryonly" / f"{args.memtable}.ini", options_file, threads, args.rocks_key_size)
+    save(out / "protocol.json", {"persistence": "memory-only", "threads": threads, "keys": keys,
+         "key_size": args.rocks_key_size, "value_size": args.rocks_value_size, "duration_seconds": duration,
+         "write_buffer_bytes": rocksdb_memoryonly.WRITE_BUFFER_BYTES, "placement": placement,
+         "allocator": str(allocator), "allocator_sha256": rocksdb_memoryonly.sha(allocator),
+         "available_memory_bytes": available, "options_sha256": options_hash,
+         "pause_seconds": 15 if paper else 0, "optimized_flags": flags})
     values = {}
     for variant, extra in (("baseline", []), ("optimized", flags)):
         work = out / variant
@@ -303,20 +316,21 @@ def rocksdb(args, out):
         trial = out / f"{variant}-rep{rep+1}"
         trial.mkdir()
         cmd = placement + [str(work / "db_bench"), f"--db={trial / 'db'}", "--use_existing_db=0",
-            "--benchmarks=filluniquerandom,waitforcompaction,readwhilewriting", f"--key_size={args.rocks_key_size}", f"--prefix_size={args.rocks_key_size}",
-            f"--value_size={args.rocks_value_size}", "--compression_type=none", f"--use_plain_table={int(args.memtable == 'prefix_hash')}",
-            f"--memtablerep={args.memtable}", "--max_write_buffer_number=2", "--write_buffer_size=134217728",
-            f"--max_background_jobs={max(1, threads // 4)}", "--compaction_pri=3", "--compaction_style=0",
-            "--bloom_bits=10", "--bloom_locality=1", f"--num={keys}", f"--threads={threads-1}",
-            "--allow_concurrent_memtable_write=false", "--disable_wal=1", "--sync=0", f"--duration={duration}"]
-        env = os.environ.copy()
-        env["LD_PRELOAD"] = str(VENDOR / "setbench/lib/libjemalloc.so")
-        save(trial / "config.json", {"command": cmd, "build_flags": extra, "allocator": env["LD_PRELOAD"], "profile": args.profile})
+            "--benchmarks=filluniquerandom,readwhilewriting", f"--key_size={args.rocks_key_size}", f"--prefix_size={args.rocks_key_size}",
+            f"--value_size={args.rocks_value_size}", f"--num={keys}", f"--threads={threads-1}",
+            "--disable_wal=1", "--sync=0", f"--duration={duration}", f"--options_file={options_file}"]
+        save(trial / "config.json", {"command": cmd, "build_flags": extra, "allocator": env["LD_PRELOAD"],
+             "allocator_sha256": rocksdb_memoryonly.sha(allocator), "options_sha256": options_hash,
+             "environment": {key: env.get(key) for key in ("LD_PRELOAD", "LD_LIBRARY_PATH", "GLIBC_TUNABLES", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS")},
+             "profile": args.profile})
         run(cmd, cwd=work, log=trial / "benchmark.log", env=env, timeout=7200 if paper else 180)
+        save(trial / "persistence.json", rocksdb_memoryonly.validate(trial, options_file))
         matches = re.findall(r"readwhilewriting\s*:\s*[\d.]+\s+micros/op\s+([\d.]+)\s+ops/sec", (trial / "benchmark.log").read_text())
         if not matches: raise RuntimeError(f"No throughput in {trial / 'benchmark.log'}")
         values[variant].append(float(matches[-1]))
+        if paper: time.sleep(15)
     summary = compare(values); summary["profile"] = args.profile; summary["memtable"] = args.memtable
+    summary["persistence"] = "memory-only; every trial passed no-flush/no-compaction/no-table/no-WAL-payload checks"
     save(out / "summary.json", summary)
     print(json.dumps(summary, indent=2))
 
@@ -414,8 +428,8 @@ def parse_args(argv=None):
     p.add_argument("--server-node", type=int, default=0)
     p.add_argument("--client-node", type=int, default=1)
     p.add_argument("--memtable", choices=["prefix_hash", "skip_list"], default="prefix_hash")
-    p.add_argument("--rocks-key-size", type=int, default=64, help="Retained script default; paper prose says 32")
-    p.add_argument("--rocks-value-size", type=int, default=256, help="Retained script default; paper prose says 128")
+    p.add_argument("--rocks-key-size", type=int, default=32, help="RocksDB key and prefix bytes (default: 32)")
+    p.add_argument("--rocks-value-size", type=int, default=128, help="RocksDB value bytes (default: 128)")
     p.add_argument("--factors", choices=["hugepage", "alignment"], default="hugepage")
     args = p.parse_args(argv)
     if args.command in {"experiment", "legacy"} and not args.name: p.error("experiment requires a name")

@@ -9,6 +9,10 @@ The HJ allocator comparison uses this library as its process-wide jemalloc
 by default. `--hj-jemalloc 5.0` instead selects SetBench's jemalloc 5.0.1.
 This choice is independent of the TPC-C segregation arrangement below.
 
+The RocksDB performance driver also uses this library process-wide for both
+variants in its memory-only comparison. Its path and checksum are recorded
+in the run's `protocol.json` and per-trial `config.json`.
+
 The TPC-C drivers copy this file into each experiment's `src/lib/` directory.
 `MEMHOOK_SEG_DS` routes record-managed tree objects through this library;
 ordinary allocations use the process-wide allocator selected by the experiment

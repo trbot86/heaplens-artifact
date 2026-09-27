@@ -162,11 +162,23 @@ huge-page advice before first touch. `--hnsw-source original --dim 768`
 selects the original implementation and workload. The smoke profile remains
 a small 128-D check. The paper profile of `all-performance` also runs both dimensions.
 
-RocksDB uses 17 reader threads plus a background writer, 10M keys, 64-byte
-keys, 256-byte values, 128 MiB write buffers, disabled WAL, and a 10-second
-measurement phase. `--rocks-key-size` and `--rocks-value-size` override the
-key and value sizes. Each trial creates a fresh database in its results
-directory.
+RocksDB measures memory-resident memtables with 10M keys, 32-byte keys,
+128-byte values, and a 60-second measurement phase. InlineSkipList uses
+19 reader threads plus one writer, with alignment and segregation thresholds
+both set to 3; HashSkipList uses 17 readers plus one writer and retains its
+field-reorder/node-alignment comparison. `--threads`, `--rocks-key-size`, and
+`--rocks-value-size` override those settings.
+
+WAL, automatic compaction, and shutdown flushing are disabled. A 46.5-GiB
+write buffer keeps prefill and subsequent writes in memory; the driver does
+not wait for compaction. Each trial uses a fresh database and is checked for
+zero flush/compaction events, no SST/blob files, and no WAL payload, including
+at shutdown. Small metadata and diagnostic log writes remain. The paper
+profile requires at least 64 GiB available host/container memory; the smoke
+profile uses only 10,000 initial keys and two-second measurements. Effective
+options and persistence checks are saved with every run. See the
+[confirmed InlineSkipList configuration](REPRODUCTION_CONFIGURATIONS.md#rocksdb-inline-skiplist-memory-only)
+for the 8.61% result on the dual Xeon Gold 5220R machine.
 
 For ASCYLIB, TPC-C, RocksDB, and HNSW, paper-mode runs select one available hardware
 thread per physical core on `--server-node` (default 0), and bind memory to
@@ -211,7 +223,9 @@ The allocator choices are retained: TPC-C uses the bundled process-wide
 jemalloc or mimalloc, plus a distinct jemalloc library for segregated tree
 allocations. HJ defaults to the retained jemalloc 5.3 library;
 `--hj-jemalloc 5.0` selects SetBench's bundled version for comparison.
-RocksDB continues to use SetBench's bundled process-wide jemalloc.
+RocksDB uses the retained process-wide jemalloc 5.3 library, matching the
+memory-only confirmation. Its path and checksum are recorded in `protocol.json`
+and each trial's `config.json`.
 Process-wide allocator paths and hashes are recorded
 for ASCYLIB and TPC-C trials; see [allocator provenance](vendor/heaplens-allocators/README.md).
 
