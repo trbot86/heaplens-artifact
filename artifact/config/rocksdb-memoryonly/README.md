@@ -1,10 +1,16 @@
 # Memory-only RocksDB options
 
+The performance driver uses `skip_list.ini` for InlineSkipList. The
+`prefix_hash.ini` file retains the separate memory-only HashSkipList
+configuration for reference; the default HashSkipList experiment instead
+uses a 256-MiB write buffer with flushing and compaction enabled, as described
+in the [reproduction configurations](../../REPRODUCTION_CONFIGURATIONS.md#rocksdb-hashskiplist-field-reordering).
+
 These complete options files preserve the effective settings used in the
 memory-only verification on the dual Xeon Gold 5220R machine, including the
 1-MiB arena block size and HashSkipList's 1,048,576 hash buckets. Loading only
 a bare hash-factory name would instead select the library's 1,000,000-bucket
-default. The runner changes only the prefix/plain-table key lengths and
+default. The memory-only options helper changes only the prefix/plain-table key lengths and
 background-job limit to match the requested key size and thread count, and
 saves the resulting file beside the run's protocol.
 

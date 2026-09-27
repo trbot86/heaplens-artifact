@@ -125,7 +125,7 @@ order (40 trials total). Its factorization commands use the fixed orders in Sect
 | ASCYLIB HJ | glibc malloc / jemalloc backing the suballocator |
 | TPC-C/BCCO | Baseline, node segregation, segregation + packed row lock |
 | TPC-C/EFRB | Allocator, row-padding, and reclamation variants |
-| RocksDB HashSkipList (`prefix_hash`) | Baseline / field reorder + node-alignment reduction |
+| RocksDB HashSkipList (`prefix_hash`) | Baseline / field reordering |
 | RocksDB InlineSkipList (`skip_list`) | Baseline / alignment and separation of tall nodes |
 | Valkey | Baseline / B1C1_64 small-object placement patch |
 | HNSWLib | Packed layout / separate aligned vector slab + huge-page advice |
@@ -162,34 +162,44 @@ huge-page advice before first touch. `--hnsw-source original --dim 768`
 selects the original implementation and workload. The smoke profile remains
 a small 128-D check. The paper profile of `all-performance` also runs both dimensions.
 
-RocksDB measures memory-resident memtables with 10M keys, 32-byte keys,
-128-byte values, and a 60-second measurement phase. InlineSkipList uses
-19 reader threads plus one writer, with alignment and segregation thresholds
-both set to 3; HashSkipList uses 17 readers plus one writer and retains its
-field-reorder/node-alignment comparison. `--threads`, `--rocks-key-size`, and
-`--rocks-value-size` override those settings.
+Both RocksDB experiments use 10M initial keys, 32-byte keys, 128-byte values,
+and disabled WAL/synchronous writes. They use different memtable configurations:
 
-WAL, automatic compaction, and shutdown flushing are disabled. A 46.5-GiB
-write buffer keeps prefill and subsequent writes in memory; the driver does
-not wait for compaction. Each trial uses a fresh database and is checked for
-zero flush/compaction events, no SST/blob files, and no WAL payload, including
-at shutdown. Small metadata and diagnostic log writes remain. The paper
-profile requires at least 64 GiB available host/container memory; the smoke
-profile uses only 10,000 initial keys and two-second measurements. Effective
-options and persistence checks are saved with every run. See the
-[confirmed InlineSkipList configuration](REPRODUCTION_CONFIGURATIONS.md#rocksdb-inline-skiplist-memory-only)
-for the 8.61% result on the dual Xeon Gold 5220R machine.
+- HashSkipList uses 95 readers plus one writer, a 256-MiB write buffer, and a
+  10-second read window after `filluniquerandom,waitforcompaction`. Flushing,
+  automatic compaction, and shutdown flushing are enabled. The optimized
+  variant enables only `REORDER_FIELDS=1`. The process uses 96 logical CPUs
+  across two NUMA nodes, including SMT siblings, with memory interleaved across
+  those nodes. `--rocks-nodes 0 1` selects the nodes (also the default).
+  Each run retains its database, including SST files; allow tens of GiB of
+  scratch storage for a full campaign.
+- InlineSkipList uses 19 readers plus one writer and a 60-second read window,
+  with alignment and segregation thresholds both set to 3. A 46.5-GiB write
+  buffer keeps prefill and subsequent writes in memory. Automatic compaction
+  and shutdown flushing are disabled, and there is no initial compaction wait.
+  Every trial is checked for zero flush/compaction events, no SST/blob files,
+  and no WAL payload, including at shutdown. Metadata and diagnostic writes
+  remain. The paper profile requires at least 64 GiB available memory.
 
-For ASCYLIB, TPC-C, RocksDB, and HNSW, paper-mode runs select one available hardware
+`--threads`, `--rocks-key-size`, and `--rocks-value-size` override the counts
+and sizes. Both smoke profiles use two total threads, 10,000 initial keys,
+and two-second measurements. Effective options and persistence checks are
+saved with every run. See the [reproduction configurations](REPRODUCTION_CONFIGURATIONS.md#rocksdb-hashskiplist-field-reordering)
+for the HashSkipList 7.51% and InlineSkipList 8.61% confirmations.
+
+For ASCYLIB, TPC-C, InlineSkipList, and HNSW, paper-mode runs select one available hardware
 thread per physical core on `--server-node` (default 0), and bind memory to
 that node. CPU IDs are discovered from the host's topology and allowed CPU set;
 they are not assumed to match the paper's machine. `--threads N` changes the
 worker count (readers plus writer for RocksDB; build/query threads for HNSW). `--cpus 0-7` or
 `--cpus 0,2,4,6` explicitly selects that many distinct physical cores on the
 chosen node. TPC-C pins individual workers; ASCYLIB, RocksDB and HNSW run within the
-selected CPU set. `--memory-policy interleave` selects the earlier single-node
-interleave policy instead of strict binding. Small smoke runs omit NUMA
-placement unless `--cpus` or `--memory-policy` is supplied.
+selected CPU set. `--memory-policy interleave` selects single-node interleaving
+instead of strict binding. HashSkipList is the exception: its CPU selection
+uses equal logical CPU counts on `--rocks-nodes`, including SMT, and defaults
+to two-node interleaving; `--cpus` can supply an explicit balanced mask.
+Small smoke runs omit NUMA placement unless `--cpus`, `--memory-policy`, or
+`--rocks-nodes` is supplied.
 
 ASCYLIB also accepts `--initial`, `--range`, `--duration-ms`, and `--update-pct`.
 Use these command-line options rather than outer-shell `THREADS=...` or
@@ -223,8 +233,8 @@ The allocator choices are retained: TPC-C uses the bundled process-wide
 jemalloc or mimalloc, plus a distinct jemalloc library for segregated tree
 allocations. HJ defaults to the retained jemalloc 5.3 library;
 `--hj-jemalloc 5.0` selects SetBench's bundled version for comparison.
-RocksDB uses the retained process-wide jemalloc 5.3 library, matching the
-memory-only confirmation. Its path and checksum are recorded in `protocol.json`
+Both RocksDB configurations use the retained process-wide jemalloc 5.3 library.
+Its path and checksum are recorded in `protocol.json`
 and each trial's `config.json`.
 Process-wide allocator paths and hashes are recorded
 for ASCYLIB and TPC-C trials; see [allocator provenance](vendor/heaplens-allocators/README.md).

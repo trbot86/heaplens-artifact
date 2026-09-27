@@ -51,23 +51,33 @@ it is not a new optimization or a change to the retained paper results.
 
 Sean's `data/paper_data.xlsx` and its accompanying README are retained from
 commit `5de2274`. They cover ASCYLIB, TPC-C, RocksDB, and overhead measurements;
-the workbook's numerical contents were not independently audited during this
-integration. The four RocksDB instrumentation-repair helpers and optional
+the HashSkipList sheet was subsequently checked as described below.
+The four RocksDB instrumentation-repair helpers and optional
 native GUI/export launchers from his update are also retained.
 
-RocksDB workload discrepancy: the retained `run_experiment_asplos.sh.txt` uses
-64-byte keys and 256-byte values, whereas accepted-paper Section 6.4 says
-32-byte keys and 128-byte values. The driver now defaults to the prose sizes
-and the verified memory-only setup documented in
-[reproduction configurations](REPRODUCTION_CONFIGURATIONS.md#rocksdb-inline-skiplist-memory-only).
-The previous driver disabled WAL but still allowed memtable flushing and
-compaction. The memory-only driver also disables automatic compaction and
-shutdown flushing, enlarges the write buffer, and verifies no user-data
-persistence throughout every process. Metadata and diagnostic writes remain.
-Its InlineSkipList defaults match the confirmed 20-physical-core, 60-second,
-jemalloc 5.3, threshold-3 configuration. Historical data are unchanged; the
-confirmation is not a claim that conflicting historical settings have been
-resolved. The restored patch implements `REORDER_FIELDS`,
+RocksDB uses 32-byte keys and 128-byte values, as in accepted-paper Section 6.4
+and the `pyke RocksDB HSL` workbook labels. The surviving
+`run_experiment_asplos.sh.txt` instead selects 64/256-byte sizes and is not
+the launch record for those workbook rows.
+
+HashSkipList's artifact defaults are corrected to the workbook's 96-thread,
+10M-key, 256-MiB configuration and `b_reorder_fields` versus `a_default`
+comparison: field reordering only, without the separate `NO_PADDING_NODE`
+change. The verified protocol uses 95 readers plus one writer, both sockets
+with SMT and interleaved memory, a 10-second read window after initial
+compaction completes, and disabled WAL but enabled flushing/compaction.
+The release/portable build and retained jemalloc 5.3 allocator are unchanged.
+This corrects artifact configuration; it adds no optimization to RocksDB.
+The workbook gives +8.28%; a five-pair release-build confirmation gives +7.51%.
+The complete historical build/launch environment has not been recovered; see
+[configurations and batch variability](REPRODUCTION_CONFIGURATIONS.md#rocksdb-hashskiplist-field-reordering).
+
+InlineSkipList retains its separately confirmed 20-physical-core, 60-second,
+jemalloc 5.3, threshold-3 memory-only configuration. Its 46.5-GiB write buffer,
+disabled WAL/automatic compaction/shutdown flushing, and per-trial checks
+ensure no user-data persistence; metadata and diagnostic writes remain.
+The two experiments do not share a persistence policy. Historical data are
+unchanged. The restored patch implements `REORDER_FIELDS`,
 `NO_PADDING_NODE`, `ALIGN_TALL_NODE`, and `SEG_TALL_NODE`; passing these names
 to the unpatched diagnostic-source revision would not enable the optimizations.
 

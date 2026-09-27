@@ -18,7 +18,7 @@ import sys
 import time
 from lib.perfstat_campaign import schedule
 from lib import hnsw_campaign
-from lib import rocksdb_memoryonly
+from lib import rocksdb_memoryonly, rocksdb_hashskiplist
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "artifact"
@@ -270,23 +270,36 @@ def gui():
 
 def rocksdb(args, out):
     paper = args.profile == "paper"
-    threads, keys, duration = ((20 if args.memtable == "skip_list" else 18), 10000000, 60) if paper else (2, 10000, 2)
+    memory_only = args.memtable == "skip_list"
+    threads, keys, duration = ((20, 10000000, 60) if memory_only else (96, 10000000, 10)) if paper else (2, 10000, 2)
     threads = args.threads or threads
     reps = args.reps or (10 if paper else 1)
     placement = []
-    if paper or args.cpus or args.memory_policy:
-        ids = node_cpus(args.server_node, threads, args.cpus)
-        placement = ["numactl", "--physcpubind=" + ",".join(map(str, ids)), f"--{memory_option(args)}={args.server_node}"]
-    flags = ["REORDER_FIELDS=1", "NO_PADDING_NODE=1"] if args.memtable == "prefix_hash" else ["ALIGN_TALL_NODE=3", "SEG_TALL_NODE=3"]
+    if paper or args.cpus or args.memory_policy or (not memory_only and args.rocks_nodes):
+        if memory_only:
+            ids = node_cpus(args.server_node, threads, args.cpus)
+            placement = ["numactl", "--physcpubind=" + ",".join(map(str, ids)), f"--{memory_option(args)}={args.server_node}"]
+        else:
+            nodes = args.rocks_nodes or [0, 1]
+            ids = rocksdb_hashskiplist.cpus(nodes, threads, args.cpus)
+            policy = "membind" if args.memory_policy == "bind" else "interleave"
+            placement = ["numactl", "--physcpubind=" + ",".join(map(str, ids)), f"--{policy}=" + ",".join(map(str, nodes))]
+    flags = ["ALIGN_TALL_NODE=3", "SEG_TALL_NODE=3"] if memory_only else ["REORDER_FIELDS=1"]
     allocator = VENDOR / "heaplens-allocators/libjemalloc-heaplens.so"
     env = rocksdb_memoryonly.environment(allocator)
-    available = rocksdb_memoryonly.check_memory() if paper else None
+    available = rocksdb_memoryonly.check_memory() if paper and memory_only else None
     options_file = out / "rocksdb-options.ini"
-    options_hash = rocksdb_memoryonly.write_options(
-        ART / "config/rocksdb-memoryonly" / f"{args.memtable}.ini", options_file, threads, args.rocks_key_size)
-    save(out / "protocol.json", {"persistence": "memory-only", "threads": threads, "keys": keys,
+    options_hash = None
+    if memory_only:
+        options_hash = rocksdb_memoryonly.write_options(
+            ART / "config/rocksdb-memoryonly" / f"{args.memtable}.ini", options_file, threads, args.rocks_key_size)
+    persistence = "memory-only" if memory_only else "flushing and compaction enabled; WAL disabled"
+    benchmarks = "filluniquerandom,readwhilewriting" if memory_only else "filluniquerandom,waitforcompaction,readwhilewriting"
+    workload_options = [f"--options_file={options_file}"] if memory_only else rocksdb_hashskiplist.workload_args(threads)
+    save(out / "protocol.json", {"persistence": persistence, "threads": threads, "keys": keys,
          "key_size": args.rocks_key_size, "value_size": args.rocks_value_size, "duration_seconds": duration,
-         "write_buffer_bytes": rocksdb_memoryonly.WRITE_BUFFER_BYTES, "placement": placement,
+         "write_buffer_bytes": rocksdb_memoryonly.WRITE_BUFFER_BYTES if memory_only else rocksdb_hashskiplist.WRITE_BUFFER_BYTES,
+         "benchmarks": benchmarks, "workload_options": workload_options, "placement": placement,
          "allocator": str(allocator), "allocator_sha256": rocksdb_memoryonly.sha(allocator),
          "available_memory_bytes": available, "options_sha256": options_hash,
          "pause_seconds": 15 if paper else 0, "optimized_flags": flags})
@@ -316,21 +329,22 @@ def rocksdb(args, out):
         trial = out / f"{variant}-rep{rep+1}"
         trial.mkdir()
         cmd = placement + [str(work / "db_bench"), f"--db={trial / 'db'}", "--use_existing_db=0",
-            "--benchmarks=filluniquerandom,readwhilewriting", f"--key_size={args.rocks_key_size}", f"--prefix_size={args.rocks_key_size}",
+            f"--benchmarks={benchmarks}", f"--key_size={args.rocks_key_size}", f"--prefix_size={args.rocks_key_size}",
             f"--value_size={args.rocks_value_size}", f"--num={keys}", f"--threads={threads-1}",
-            "--disable_wal=1", "--sync=0", f"--duration={duration}", f"--options_file={options_file}"]
+            "--disable_wal=1", "--sync=0", f"--duration={duration}", *workload_options]
         save(trial / "config.json", {"command": cmd, "build_flags": extra, "allocator": env["LD_PRELOAD"],
              "allocator_sha256": rocksdb_memoryonly.sha(allocator), "options_sha256": options_hash,
              "environment": {key: env.get(key) for key in ("LD_PRELOAD", "LD_LIBRARY_PATH", "GLIBC_TUNABLES", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS")},
              "profile": args.profile})
         run(cmd, cwd=work, log=trial / "benchmark.log", env=env, timeout=7200 if paper else 180)
-        save(trial / "persistence.json", rocksdb_memoryonly.validate(trial, options_file))
+        validation = rocksdb_memoryonly.validate(trial, options_file) if memory_only else rocksdb_hashskiplist.validate(trial, threads, args.rocks_key_size)
+        save(trial / "persistence.json", validation)
         matches = re.findall(r"readwhilewriting\s*:\s*[\d.]+\s+micros/op\s+([\d.]+)\s+ops/sec", (trial / "benchmark.log").read_text())
         if not matches: raise RuntimeError(f"No throughput in {trial / 'benchmark.log'}")
         values[variant].append(float(matches[-1]))
         if paper: time.sleep(15)
     summary = compare(values); summary["profile"] = args.profile; summary["memtable"] = args.memtable
-    summary["persistence"] = "memory-only; every trial passed no-flush/no-compaction/no-table/no-WAL-payload checks"
+    summary["persistence"] = persistence
     save(out / "summary.json", summary)
     print(json.dumps(summary, indent=2))
 
@@ -415,8 +429,8 @@ def parse_args(argv=None):
     p.add_argument("--jobs", type=int, default=4)
     p.add_argument("--reps", type=int)
     p.add_argument("--threads", type=int, help="ASCYLIB/TPC-C workers; RocksDB readers plus writer; HNSW build/query threads")
-    p.add_argument("--cpus", help="Performance-run CPU list, one physical core per thread (e.g. 0-7)")
-    p.add_argument("--memory-policy", choices=["bind", "interleave"], help="ASCYLIB/TPC-C/RocksDB/HNSW memory placement (default: bind)")
+    p.add_argument("--cpus", help="Performance-run CPU list (e.g. 0-7); HashSkipList allows SMT across two nodes; other benchmarks use distinct physical cores")
+    p.add_argument("--memory-policy", choices=["bind", "interleave"], help="Memory placement (default: bind; HashSkipList: interleave across --rocks-nodes)")
     p.add_argument("--trial-order", choices=["interleaved", "blocked"], help="ASCYLIB/TPC-C/RocksDB/HNSW repetition order (default: interleaved)")
     p.add_argument("--initial", type=int, help="ASCYLIB requested initial keys; rounded up to a power of two")
     p.add_argument("--range", type=int, help="ASCYLIB key range (default: twice the rounded initial size)")
@@ -430,11 +444,18 @@ def parse_args(argv=None):
     p.add_argument("--memtable", choices=["prefix_hash", "skip_list"], default="prefix_hash")
     p.add_argument("--rocks-key-size", type=int, default=32, help="RocksDB key and prefix bytes (default: 32)")
     p.add_argument("--rocks-value-size", type=int, default=128, help="RocksDB value bytes (default: 128)")
+    p.add_argument("--rocks-nodes", type=int, nargs=2, metavar=("NODE_A", "NODE_B"),
+                   help="HashSkipList NUMA nodes (default: 0 1); equal logical CPU counts, including SMT, on each")
     p.add_argument("--factors", choices=["hugepage", "alignment"], default="hugepage")
     args = p.parse_args(argv)
     if args.command in {"experiment", "legacy"} and not args.name: p.error("experiment requires a name")
     if args.jobs < 1 or (args.reps is not None and args.reps < 1): p.error("jobs/reps must be positive")
     if min(args.rocks_key_size, args.rocks_value_size) < 1: p.error("RocksDB sizes must be positive")
+    if args.rocks_nodes is not None:
+        if args.command != "all-performance" and not (args.command == "rocksdb" and args.memtable == "prefix_hash"):
+            p.error("rocks-nodes applies only to HashSkipList or all-performance")
+        if min(args.rocks_nodes) < 0 or args.rocks_nodes[0] == args.rocks_nodes[1]:
+            p.error("rocks-nodes requires two distinct nonnegative NUMA nodes")
     if any(value is not None and value < 1 for value in (args.threads, args.initial, args.range, args.duration_ms, args.dim)):
         p.error("threads/initial/range/duration-ms/dim must be positive")
     if args.update_pct is not None and not 0 <= args.update_pct <= 100: p.error("update-pct must be 0..100")

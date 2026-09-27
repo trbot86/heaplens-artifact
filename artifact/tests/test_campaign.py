@@ -172,22 +172,21 @@ class Campaign(unittest.TestCase):
                     built.append(cwd.name)
                 elif cmd[0] == 'numactl':
                     self.assertEqual(built, ['baseline', 'optimized'])
-                    self.assertEqual(cmd[:3], ['numactl', '--physcpubind=' + ','.join(map(str, range(18))), '--membind=0'])
+                    self.assertEqual(cmd[:3], ['numactl', '--physcpubind=' + ','.join(map(str, range(18))), '--interleave=0,1'])
                     self.assertIn('--threads=17', cmd)
                     self.assertTrue(kwargs['env']['LD_PRELOAD'].endswith('heaplens-allocators/libjemalloc-heaplens.so'))
-                    self.assertIn('--benchmarks=filluniquerandom,readwhilewriting', cmd)
-                    self.assertIn('--duration=60', cmd)
+                    self.assertIn('--benchmarks=filluniquerandom,waitforcompaction,readwhilewriting', cmd)
+                    self.assertIn('--duration=10', cmd)
                     self.assertIn('--key_size=32', cmd)
                     self.assertIn('--value_size=128', cmd)
-                    self.assertTrue(any(str(item).startswith('--options_file=') for item in cmd))
+                    self.assertIn('--write_buffer_size=268435456', cmd)
                     observed.append(cwd.name)
                     log.write_text('readwhilewriting : 1 micros/op 100 ops/sec\n')
 
             with patch.object(ae, 'VENDOR', vendor), patch.object(ae, 'run', side_effect=fake_run), \
-                 patch.object(ae, 'node_cpus', return_value=list(range(18))), \
+                 patch.object(ae.rocksdb_hashskiplist, 'cpus', return_value=list(range(18))), \
                  patch.object(ae.rocksdb_memoryonly, 'environment', return_value={'LD_PRELOAD': str(allocator)}), \
-                 patch.object(ae.rocksdb_memoryonly, 'check_memory', return_value=128*1024**3), \
-                 patch.object(ae.rocksdb_memoryonly, 'validate', return_value={'status': 'passed'}) as validation, \
+                 patch.object(ae.rocksdb_hashskiplist, 'validate', return_value={'status': 'passed'}) as validation, \
                  patch.object(ae.time, 'sleep'), redirect_stdout(io.StringIO()):
                 ae.rocksdb(args, out)
             self.assertEqual(observed, ['baseline', 'optimized', 'optimized', 'baseline'])

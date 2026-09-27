@@ -1,7 +1,8 @@
 # Reproduction configurations
 
-These recipes expose configurations confirmed with ten fresh repetitions per
-variant. Run from the repository root after building the Docker image.
+These recipes expose confirmed configurations, with repetition counts stated
+below (ten per variant unless specified). Run from the repository root after
+building the Docker image.
 Use a fresh checkout for each ASCYLIB campaign, as described in the main README.
 HNSW automatically creates a new output directory for each command.
 
@@ -94,6 +95,43 @@ processes themselves were uninstrumented. These dimension-specific gains do
 not establish the same gain at 768 dimensions: the Xeon Platinum 8160's fixed 768-D
 comparison gave 1.87%. Multithreaded graph construction is nondeterministic.
 
+## RocksDB HashSkipList: field reordering
+
+```bash
+HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable prefix_hash --profile paper
+```
+
+The default uses 96 logical CPUs across NUMA nodes 0 and 1, including SMT,
+with memory interleaved across the two nodes. There are 95 readers plus one
+writer, 10M initial keys, 32-byte keys, 128-byte values, a 256-MiB write buffer,
+and a 10-second read window after `filluniquerandom,waitforcompaction`.
+WAL and synchronous writes are disabled; ordinary flushing, automatic
+compaction, and shutdown flushing are enabled. The retained jemalloc 5.3
+library and release/portable build are identical between variants; only the
+existing `REORDER_FIELDS=1` option differs. `NO_PADDING_NODE` is not enabled.
+
+`--rocks-nodes 2 3` selects another pair of NUMA nodes. CPU IDs are discovered
+from the topology and allowed CPU set; `--threads` selects an even total count
+distributed equally across the two nodes. Placement constrains the process's
+CPU set, rather than pinning individual workers. Full runs save their SST files
+and require tens of GiB of scratch storage.
+
+On the dual Xeon Gold 5220R, five interleaved before/after pairs gave mean
+read throughput of 14,658,378.2 / 15,759,045.6 operations/s: **+7.51%**, with
+a paired-block 95% interval of **5.72–9.34%**. A separate ten-pair batch with
+the same binaries and workload gave +5.17% (2.37–7.82%); the batches are not
+pooled. The historical workbook's ten trials per variant give +8.28%
+(6,223,092.0 / 6,738,584.1 operations/s). Thus the relative gain is comparable,
+while absolute throughput differs. The artifact command defaults to ten
+interleaved repetitions per variant.
+
+The workload's 96-thread, 10M-key, 32/128-byte, 256-MiB settings and field-reordering
+comparison match the historical workbook labels. The complete historical build
+and launch command have not been recovered; the command above uses the verified
+release-build configuration. The driver records commands, effective options,
+allocator/binary checksums, and checks disabled WAL and the memtable settings
+for every trial. Historical measurements remain unchanged.
+
 ## RocksDB inline skiplist: memory-only
 
 ```bash
@@ -129,9 +167,8 @@ to SSTs; do not pool the two configurations.
 Each trial saves its command, allocator checksum, effective RocksDB options,
 DB log, and `persistence.json` verification. If a custom workload exhausts
 the buffer and causes data flushing, the driver fails the check instead of
-reporting it as a memory-only result. The same persistence controls apply to
-the HashSkipList command; the InlineSkipList gain above does not describe
-that different data structure and patch.
+reporting it as a memory-only result. These persistence controls are specific
+to InlineSkipList; HashSkipList uses the 256-MiB configuration above.
 
 ## Reading these comparisons
 
@@ -141,8 +178,9 @@ are paired-block bootstrap intervals describing within-session variability.
 Raw historical paper measurements remain under `artifact/historical/` and in
 the workbook; they have not been relabelled with these configurations.
 
-The commands select physical cores from the actual machine topology and bind
-memory locally. All HNSW modules build before timing; separate processes use
+Except for HashSkipList's two-node SMT configuration, the commands select
+physical cores from the actual topology and bind memory locally.
+All HNSW modules build before timing; separate processes use
 the saved modules in interleaved order. `protocol.json`, source and binary
 manifests, per-block commands/logs/CSVs and `summary.json` record the run.
 `summary.json` uses ratios of means; the additional factorization reports also
