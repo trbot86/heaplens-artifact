@@ -52,7 +52,7 @@ class CpuAndOptions(unittest.TestCase):
             env = run.call_args.kwargs['env']
             expected = {'THREADS': '2', 'INITIAL': '200000', 'RANGE': '524288', 'DURATION_MS': '3000',
                         'UPDATE_PCT': '10', 'REPS': '10', 'PERFBENCH_CPUS': '2,4',
-                        'PERFBENCH_MEMORY': 'membind', 'PERFBENCH_ORDER': 'interleaved', 'ARTIFACT_NO_NUMA': '0'}
+                        'PERFBENCH_MEMORY': 'interleave', 'PERFBENCH_ORDER': 'interleaved', 'ARTIFACT_NO_NUMA': '0'}
             for key, value in expected.items(): self.assertEqual(env[key], value, key)
             protocol = json.loads((work / 'protocol.json').read_text())
             self.assertEqual(protocol['settings']['THREADS'], '2')
@@ -77,6 +77,33 @@ class CpuAndOptions(unittest.TestCase):
 
 
 class Campaign(unittest.TestCase):
+    def test_paper_defaults_match_confirmed_efrb_and_hj(self):
+        for name, threads, initial, memory in (
+            ('ascylib_efrb_bench', 4, 262144, 'interleave'),
+            ('ascylib_hj_bench', 24, 1048576, 'membind'),
+            ('ascylib_dvy_bench', 8, 1048576, 'membind')):
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp, \
+                 patch.object(ae, 'ART', Path(tmp)), patch.object(ae, 'run') as run, \
+                 patch.object(ae, 'node_cpus', return_value=list(range(threads))) as cpus:
+                work = Path(tmp) / 'experiments' / name; work.mkdir(parents=True)
+                ae.experiment(ae.parse_args(['experiment', name, '--profile', 'paper']))
+                env = run.call_args.kwargs['env']
+                cpus.assert_called_once_with(0, threads, None)
+                for key, value in {'THREADS': str(threads), 'INITIAL': str(initial),
+                                   'RANGE': str(2*initial), 'DURATION_MS': '5000', 'UPDATE_PCT': '0',
+                                   'REPS': '10', 'PERFBENCH_MEMORY': memory, 'ARTIFACT_NO_NUMA': '0'}.items():
+                    self.assertEqual(env[key], value, key)
+                if name == 'ascylib_hj_bench': self.assertEqual(env['HJ_JEMALLOC'], '5.3')
+
+    def test_efrb_explicit_memory_policy_overrides_default(self):
+        with tempfile.TemporaryDirectory() as tmp, patch.object(ae, 'ART', Path(tmp)), \
+             patch.object(ae, 'run') as run, patch.object(ae, 'node_cpus', return_value=list(range(8))):
+            name = 'ascylib_efrb_bench'
+            (Path(tmp) / 'experiments' / name).mkdir(parents=True)
+            ae.experiment(ae.parse_args(['experiment', name, '--profile', 'paper', '--threads', '8', '--memory-policy', 'bind']))
+            self.assertEqual(run.call_args.kwargs['env']['PERFBENCH_MEMORY'], 'membind')
+            self.assertEqual(run.call_args.kwargs['env']['THREADS'], '8')
+
     def test_ascylib_does_not_inherit_tpcc_tls_override(self):
         with tempfile.TemporaryDirectory() as tmp, patch.dict(os.environ, {}, clear=True):
             root = Path(tmp).resolve()

@@ -6,20 +6,29 @@ building the Docker image.
 Use a fresh checkout for each ASCYLIB campaign, as described in the main README.
 HNSW automatically creates a new output directory for each command.
 
-## Standalone EFRB: eight threads
+## Standalone EFRB: four threads
 
 ```bash
 HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_efrb_bench \
-  --profile paper --threads 8 --initial 262144 --range 524288 \
+  --profile paper --threads 4 --initial 262144 --range 524288 \
   --duration-ms 5000 --update-pct 0 --reps 10 \
-  --server-node 0 --memory-policy bind
+  --server-node 0 --memory-policy interleave
 ```
 
-This uses eight physical cores on one socket, glibc backing, and the four
+This default uses four physical cores on one socket, glibc backing, and the four
 existing baseline/segregation/parallel-prefill/combined variants. On the
-dual Xeon Gold 5220R machine, the combined gain was 27.24% (95% interval
-26.61–27.89%); segregation alone gave 20.05% and parallel prefill 19.04%.
-The unchanged default remains 24 threads; this command explicitly selects eight.
+dual Xeon Gold 5220R machine, ten repetitions per variant gave a combined
+gain of 29.62% (95% interval 28.45–31.13%); segregation alone gave 19.76%
+and parallel prefill 21.83%. A separate duration comparison confirmed
+29.82% at five seconds and 29.69% at ten seconds. Those batches are not pooled.
+The historical four-thread result is 35.14%; the remaining gap is not erased
+by this configuration correction. The retained script uses three-second
+windows, whereas the paper describes five seconds; the default uses five.
+
+The earlier eight-thread, five-second, strictly bound comparison remains
+available with `--threads 8 --memory-policy bind`. It gave 27.24%
+(26.61–27.89%), versus the historical eight-thread 25.38% result. Diagnostic
+trace and instrumentation-overhead thread counts are separate experiments.
 
 ## HJ: allocator comparison at 24 threads
 
@@ -34,7 +43,8 @@ This compares glibc against retained jemalloc 5.3.0 with otherwise identical
 settings. The dual Xeon Gold 5220R result was 5.46% higher mean throughput with
 glibc (95% interval 2.19–9.02%). Variation is substantial: individual paired
 changes ranged from -0.70% to +13.89%; all runs were retained. The default worker
-count remains eight. The comparison now defaults to jemalloc 5.3;
+count is 24, so the command without overrides and `all-performance` use this
+configuration. The comparison defaults to jemalloc 5.3;
 `--hj-jemalloc 5.0` preserves access to the initial artifact's jemalloc 5.0.1.
 Allocator paths and hashes are recorded in `runs/campaign.json`.
 
@@ -179,7 +189,8 @@ Raw historical paper measurements remain under `artifact/historical/` and in
 the workbook; they have not been relabelled with these configurations.
 
 Except for HashSkipList's two-node SMT configuration, the commands select
-physical cores from the actual topology and bind memory locally.
+physical cores from the actual topology. Memory is bound locally except for
+standalone EFRB's single-node interleaving.
 All HNSW modules build before timing; separate processes use
 the saved modules in interleaved order. `protocol.json`, source and binary
 manifests, per-block commands/logs/CSVs and `summary.json` record the run.

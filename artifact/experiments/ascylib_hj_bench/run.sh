@@ -14,9 +14,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SIFTER_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 source "$SIFTER_ROOT/artifact/lib/ascylib_perfbench.sh"
 
-# Appendix B methodology: 8 threads, search-only workload, tree initially
-# containing 2^20 keys.
-THREADS="${THREADS:-8}"
+# Confirmed revised-paper setting: 24 physical cores, search-only workload,
+# 2^20 initial keys. The earlier eight-thread setting remains selectable.
+THREADS="${THREADS:-24}"
 INITIAL="${INITIAL:-1048576}"      # 2^20
 RANGE="${RANGE:-2097152}"          # ASCYLIB convention: 2x initial
 DURATION_MS="${DURATION_MS:-5000}"

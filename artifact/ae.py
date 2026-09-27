@@ -154,8 +154,8 @@ def node_cpus(node, needed, requested=None):
     if len(result) < needed: raise RuntimeError(f"NUMA node {node}: need {needed} available physical cores, found {len(result)}; use smoke on smaller hosts")
     return result[:needed]
 
-def memory_option(args):
-    return "membind" if (args.memory_policy or "bind") == "bind" else "interleave"
+def memory_option(args, default="bind"):
+    return "membind" if (args.memory_policy or default) == "bind" else "interleave"
 
 def build_valkey(work, jobs, log):
     # Generate the omitted configure; keep Valkey's original allocator options.
@@ -361,10 +361,11 @@ def experiment(args):
         env.update(THREADS="2", INITIAL="4096", RANGE="8192", DURATION_MS="1000", RUN_SECONDS="3", PERFBENCH_PERF="off", ARTIFACT_NO_NUMA="1")
     if args.name.endswith("_bench"):
         smoke = args.profile == "smoke"
-        default_threads = 8 if args.name in {"ascylib_dvy_bench", "ascylib_hj_bench"} else 24
+        default_threads = {"ascylib_efrb_bench": 4, "ascylib_dvy_bench": 8}.get(args.name, 24)
+        default_memory = "interleave" if args.name == "ascylib_efrb_bench" else "bind"
         threads = args.threads or (min(2, len(os.sched_getaffinity(0))) if smoke else default_threads)
         env.update(THREADS=str(threads), PERFBENCH_NODE=str(args.server_node),
-                   PERFBENCH_MEMORY=memory_option(args), PERFBENCH_ORDER=args.trial_order or "interleaved",
+                   PERFBENCH_MEMORY=memory_option(args, default_memory), PERFBENCH_ORDER=args.trial_order or "interleaved",
                    ARTIFACT_NO_NUMA="1" if smoke and not (args.cpus or args.memory_policy) else "0")
         if env["ARTIFACT_NO_NUMA"] == "0":
             env["PERFBENCH_CPUS"] = ",".join(map(str, node_cpus(args.server_node, threads, args.cpus)))
@@ -430,7 +431,7 @@ def parse_args(argv=None):
     p.add_argument("--reps", type=int)
     p.add_argument("--threads", type=int, help="ASCYLIB/TPC-C workers; RocksDB readers plus writer; HNSW build/query threads")
     p.add_argument("--cpus", help="Performance-run CPU list (e.g. 0-7); HashSkipList allows SMT across two nodes; other benchmarks use distinct physical cores")
-    p.add_argument("--memory-policy", choices=["bind", "interleave"], help="Memory placement (default: bind; HashSkipList: interleave across --rocks-nodes)")
+    p.add_argument("--memory-policy", choices=["bind", "interleave"], help="Memory placement (default: bind; standalone EFRB: interleave on --server-node; HashSkipList: interleave across --rocks-nodes)")
     p.add_argument("--trial-order", choices=["interleaved", "blocked"], help="ASCYLIB/TPC-C/RocksDB/HNSW repetition order (default: interleaved)")
     p.add_argument("--initial", type=int, help="ASCYLIB requested initial keys; rounded up to a power of two")
     p.add_argument("--range", type=int, help="ASCYLIB key range (default: twice the rounded initial size)")

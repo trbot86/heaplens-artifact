@@ -20,12 +20,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SIFTER_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 source "$SIFTER_ROOT/artifact/lib/ascylib_perfbench.sh"
 
-# Section 6.2 methodology: search-only workload lasting 5 seconds, tree
-# initially containing 2^18 keys. Thread count isn't pinned down precisely
-# in the paper's main text; 24 matches this artifact's other EFRB
-# experiment (artifact/lib/ascylib_experiment.sh) and Appendix C's overhead
-# methodology.
-THREADS="${THREADS:-24}"
+# Confirmed revised-paper setting: four physical cores, search-only for
+# five seconds, 2^18 initial keys, and node-local interleave as in the
+# retained historical script. Diagnostic/overhead trace settings are separate.
+THREADS="${THREADS:-4}"
+export PERFBENCH_MEMORY="${PERFBENCH_MEMORY:-interleave}"
 INITIAL="${INITIAL:-262144}"   # 2^18
 RANGE="${RANGE:-524288}"       # ASCYLIB convention: 2x initial
 DURATION_MS="${DURATION_MS:-5000}"

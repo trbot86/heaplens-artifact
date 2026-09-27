@@ -102,10 +102,11 @@ HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
 
 The section references use the accepted submission's numbering.
 
-For the confirmed eight-thread EFRB, 24-thread HJ, and 128-D/1536-D HNSW
+For the confirmed four-thread EFRB, 24-thread HJ, and 128-D/1536-D HNSW
 configurations, see [Reproduction configurations](REPRODUCTION_CONFIGURATIONS.md).
 That guide gives complete commands, measured improvements and the corresponding
-machines. These additional recipes do not replace the stored paper data.
+machines. These are the default paper-profile configurations; stored historical
+paper data are unchanged.
 
 ASCYLIB and TPC-C build and save all variant binaries before measuring them.
 Repetitions are interleaved, with one run of each variant per round and rotating
@@ -188,8 +189,9 @@ saved with every run. See the [reproduction configurations](REPRODUCTION_CONFIGU
 for the HashSkipList 7.51% and InlineSkipList 8.61% confirmations.
 
 For ASCYLIB, TPC-C, InlineSkipList, and HNSW, paper-mode runs select one available hardware
-thread per physical core on `--server-node` (default 0), and bind memory to
-that node. CPU IDs are discovered from the host's topology and allowed CPU set;
+thread per physical core on `--server-node` (default 0). Memory is bound to
+that node except for standalone EFRB, which requests single-node interleaving
+to match its confirmed protocol. CPU IDs are discovered from the host's topology and allowed CPU set;
 they are not assumed to match the paper's machine. `--threads N` changes the
 worker count (readers plus writer for RocksDB; build/query threads for HNSW). `--cpus 0-7` or
 `--cpus 0,2,4,6` explicitly selects that many distinct physical cores on the
@@ -204,19 +206,21 @@ Small smoke runs omit NUMA placement unless `--cpus`, `--memory-policy`, or
 ASCYLIB also accepts `--initial`, `--range`, `--duration-ms`, and `--update-pct`.
 Use these command-line options rather than outer-shell `THREADS=...` or
 `INITIAL=...` assignments: the options pass through the Docker wrapper.
-For example, run the additional eight-thread EFRB configuration used in our
-reproduction checks:
+For example, run the default four-thread EFRB configuration explicitly:
 
 ```bash
 HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_efrb_bench \
-  --profile paper --threads 8 --initial 262144 --range 524288 \
-  --duration-ms 5000 --reps 10 --server-node 0 --memory-policy bind
+  --profile paper --threads 4 --initial 262144 --range 524288 \
+  --duration-ms 5000 --reps 10 --server-node 0 --memory-policy interleave
 ```
 
-ASCYLIB rounds non-power-of-two initial sizes upward. The default EFRB command
-above remains 24 threads, 262,144 initial keys, and 5,000 ms. DVY and HJ default
-to eight threads, 1,048,576 initial keys, and 5,000 ms. All three default to
+ASCYLIB rounds non-power-of-two initial sizes upward. EFRB defaults to four
+threads, 262,144 initial keys, and 5,000 ms. DVY defaults to eight threads and
+HJ to 24; both use 1,048,576 initial keys and 5,000 ms. `all-performance` uses
+these same defaults. All three default to
 search-only workloads; the default key range is twice the rounded initial size.
+EFRB's earlier eight-thread comparison is available with
+`--threads 8 --memory-policy bind`; HJ's earlier setting with `--threads 8`.
 
 Section 6.3 already describes the TPC-C/EFRB reclamation fix: use one EBR
 instance shared across the database tables, instead of a separate instance

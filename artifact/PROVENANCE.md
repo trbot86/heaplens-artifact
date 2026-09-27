@@ -49,6 +49,16 @@ it is not a new optimization or a change to the retained paper results.
 
 ## Saved inputs and measurements
 
+The default standalone EFRB comparison uses four physical cores, five-second
+windows, and node-0 interleaving: 29.62% combined gain in the four-variant
+confirmation, versus the retained four-thread 35.14% headline. HJ defaults
+to the confirmed 24-core, locally bound glibc/jemalloc-5.3 comparison (5.46%).
+These configurations apply to both individual commands and `all-performance`.
+HJ's 24-core setting differs from the earlier eight-thread paper setting;
+revised-paper workload descriptions must change with the measurements.
+No tree optimization, diagnostic-trace setting, or historical measurement was
+changed. Previous thread counts and memory policies remain selectable.
+
 Sean's `data/paper_data.xlsx` and its accompanying README are retained from
 commit `5de2274`. They cover ASCYLIB, TPC-C, RocksDB, and overhead measurements;
 the HashSkipList sheet was subsequently checked as described below.
