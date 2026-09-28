@@ -1,5 +1,9 @@
-# .dockerignore
+# Keep artifact dependency manifests available to builders that use only this
+# root ignore file. GUI source, databases, node_modules and caches stay excluded.
 sifter_vis_d3
+!sifter_vis_d3/server/requirements.txt
+!sifter_vis_d3/sifter/package.json
+!sifter_vis_d3/sifter/package-lock.json
 docker
 .git
 leanstore
