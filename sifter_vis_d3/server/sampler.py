@@ -12,6 +12,7 @@ import sys
 import math
 import os
 from random import randint, shuffle
+from cache_limits import validate_cache_geometry, check_cache_budget
 
 MAX_PAGE_PROP = 7560
 MAX_OBJ_STATS = 1000000
@@ -559,7 +560,8 @@ class Sampler:
         print("start of get_cache_data")
         sys.stdout.flush()
         pd.options.display.float_format = '{:.0f}'.format
-        num_cache_sets = size // (assoc * self.cache_line_size)
+        num_cache_sets = validate_cache_geometry(self.page_size, self.cache_line_size,
+                                                self.num_buckets, size, assoc)
         all_objs = self.get_objects(self.all_data)
         # free_ts_is_na = all_objs.loc[all_objs["freeTs"].isna()]
         # free_ts_is_not_na = all_objs.loc[all_objs["freeTs"].notna()]
@@ -585,6 +587,7 @@ class Sampler:
                     tp_and_st_to_idx[get_sub_tname(tp, st["subtype"])] = i
                     i += 1
 
+        check_cache_budget(self.num_buckets, num_cache_sets, len(tp_and_st_in_order))
         data = np.empty(shape=(self.num_buckets + 2, num_cache_sets, len(tp_and_st_in_order)))
         data.fill(0)
 

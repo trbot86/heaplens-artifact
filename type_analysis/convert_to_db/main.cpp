@@ -1,5 +1,6 @@
 #include "CLI11.hpp"
 #include "sampler.hpp"
+#include <random>
 
 int main(int argc, char* argv[]) {
     CLI::App app{"Samples a set of pages from the memory events " \
@@ -16,6 +17,9 @@ int main(int argc, char* argv[]) {
     size_t num_buckets = 3000;
     size_t frag_gran = 0;
     size_t num_threads = 1;
+    unsigned int seed = 0;
+    auto seed_option = app.add_option("--seed", seed,
+        "Optional page-sampling seed (default: initialize from system entropy)");
 
     app.add_option("-p,--perf-file", perf_filename,
         "The name of a file produced by perf c2c");
@@ -25,7 +29,7 @@ int main(int argc, char* argv[]) {
         "A lower bound on the hitm value of a record in the perf file " \
         "(default 0.0)");
     app.add_option("-s,--sample", sample_portion,
-        "Portion of memory pages sampled from log (default 1.0)");
+        "Portion of memory pages sampled from log (default 1.0)")->check(CLI::Range(0.0, 1.0));
     app.add_option("--page-size", page_size,
         "Size of a memory page in bytes (default 4096)");
     app.add_option("--cacheline-size", cache_line_size,
@@ -46,6 +50,18 @@ int main(int argc, char* argv[]) {
         "currently implemented)");
 
     CLI11_PARSE(app, argc, argv);
+
+    if (seed_option->count() == 0) {
+        try {
+            seed = std::random_device{}();
+        } catch (const std::exception& error) {
+            std::cerr << "Cannot initialize page-sampling randomness: " << error.what()
+                      << ". Supply --seed explicitly to continue.\n";
+            return 1;
+        }
+    }
+    std::srand(seed);
+    std::cerr << "Page-sampling seed: " << seed << '\n';
 
     Sampler s{};
     if (!perf_filename.empty())

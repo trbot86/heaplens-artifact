@@ -37,7 +37,7 @@ void Sampler::sample_page_and_add_event(std::unordered_map<uintptr_t, page_info_
             seen_perf_pages.insert(page_num);
             pages[page_num].sampled = PageSample::Yes;
         }
-        else if (rand() < sample_prop*RAND_MAX) {
+        else if (sample_prop >= 1.0 || rand() < sample_prop*(RAND_MAX + 1.0)) {
             pages[page_num].sampled = PageSample::Yes;
         }
         else {
@@ -100,9 +100,6 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
                                             size_t cache_line_size, size_t num_buckets,
                                             double sample_prop) {
     std::unordered_map<uintptr_t, page_info_t> pages{};
-    std::unordered_map<uint16_t, size_t> tp_to_num_pages_taken{};
-    std::unordered_map<uint16_t, std::unordered_set<uintptr_t>> 
-        tp_to_untaken_containing_pages{};
     std::unordered_map<uint16_t, std::vector<int64_t>> buckets{};
     uint64_t min_ts = all_events[0].timestamp;
     uint64_t max_ts = all_events[num_events - 1].timestamp;
@@ -158,18 +155,8 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
 
             event_and_actual_addr* new_event = new event_and_actual_addr{sp_ev, event_addr};
             sample_page_and_add_event(pages, new_event, page_num, sample_prop);
-            if (tp_to_num_pages_taken.find(event.tindex_name)
-                == tp_to_num_pages_taken.end()) {
-                tp_to_num_pages_taken.insert({event.tindex_name, 0});
-                tp_to_untaken_containing_pages.insert({event.tindex_name, std::unordered_set<uintptr_t>{}});
-            }
-
             if (pages[page_num].sampled == PageSample::Yes) {
                 io.write_event_to_db(stmt, *sp_ev, event_addr);
-                tp_to_num_pages_taken[event.tindex_name]++;
-            }
-            else {
-                tp_to_untaken_containing_pages[event.tindex_name].insert(page_num);
             }
         }
     }
@@ -179,20 +166,26 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
     (i.e. we have taken fewer than num_pages_per_tp pages containing at least one allocation
     of some type T). The following loop takes care of this possibility.
     */
-    std::unordered_set<uintptr_t> backup_pages_taken{};
-    for (auto& tp_and_num_taken : tp_to_num_pages_taken) {
-        auto tp = tp_and_num_taken.first;
-        auto num_taken = tp_and_num_taken.second;
-        auto it = tp_to_untaken_containing_pages[tp].begin();
-        while (num_taken < num_pages_per_tp && it != tp_to_untaken_containing_pages[tp].end()) {
-            if (backup_pages_taken.find(*it) == backup_pages_taken.end()) {
-                for (auto& mem_event : pages[*it].event_ptrs) {
-                    io.write_event_to_db(stmt, *mem_event->first, mem_event->second);
-                }
-                backup_pages_taken.insert(*it);
-                num_taken++;
+    for (const auto& tp_and_stats : tp_stats) {
+        // Statistics already hold distinct pages containing allocations of T.
+        // Count pages, not events, including pages selected for earlier types.
+        const auto& resident_pages = tp_and_stats.second.resident_pages;
+        size_t num_taken = 0;
+        for (auto page_num : resident_pages) {
+            if (pages.at(page_num).sampled == PageSample::Yes)
+                ++num_taken;
+        }
+        for (auto page_num : resident_pages) {
+            if (num_taken >= num_pages_per_tp)
+                break;
+            auto& page = pages.at(page_num);
+            if (page.sampled == PageSample::Yes)
+                continue;
+            page.sampled = PageSample::Yes;
+            for (auto* mem_event : page.event_ptrs) {
+                io.write_event_to_db(stmt, *mem_event->first, mem_event->second);
             }
-            it++;
+            ++num_taken;
         }
     }
     io.end_transaction();

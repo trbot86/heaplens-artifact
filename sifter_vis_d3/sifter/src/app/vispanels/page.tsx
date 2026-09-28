@@ -16,6 +16,7 @@ import { Badge, Divider, FormControl, IconButton, InputLabel, LinearProgress, Me
 import { flushSync } from 'react-dom';
 import { ArrowBack, Cached, Close, EditNote, Settings } from '@mui/icons-material';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
+import { Alert, Snackbar } from '@mui/material';
 
 export interface TypeToColourMap {
     [ tp: string ]: d3.RGBColor | d3.HSLColor | null
@@ -81,7 +82,17 @@ export async function getData(url: string, postBody: {[tp: string]: boolean} | n
         },
         body: postBody ? JSON.stringify(postBody) : null
     });
+    if (!data.ok) {
+        const detail = await data.json().catch(() => null);
+        throw new Error(detail?.error || `The request failed (HTTP ${data.status}). Please try again.`);
+    }
     return data;
+}
+
+export function requestErrorMessage(error: unknown): string {
+    return error instanceof TypeError
+        ? 'Could not reach the HeapLENS backend. Check that it is running, then try again. The previous view is unchanged.'
+        : error instanceof Error ? error.message : 'Could not prepare this view. Please try again.';
 }
 
 export function getSubtypeName(tp: string, st: string) {
@@ -380,6 +391,9 @@ export default function VisPanels() {
     const searchParams = useSearchParams();
     const fname = searchParams.get('fname');
     const [loading, setLoading] = useState(true);
+    const [initialized, setInitialized] = useState(false);
+    const [requestError, setRequestError] = useState<string | null>(null);
+    const [cacheRequestLoading, setCacheRequestLoading] = useState(false);
     const [pageSize, setPageSize] = useState(INIT_PAGE_SIZE);
     const [currTs, setCurrTs] = useState(0);
     const [cacheLineSize, setCacheLineSize] = useState(INIT_CACHELINE_SIZE);
@@ -433,7 +447,7 @@ export default function VisPanels() {
             shouldInitialize.current = false;
             getData(`init-app/${fname}-${pageSize}-${cacheLineSize}-${numBuckets}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${Object.values(INIT_CACHE_INFO)[0].size}-${Object.values(INIT_CACHE_INFO)[0].assoc}`, null)
                     .then((resp) => resp.json())
-                    .then((allData) => {
+                    .then(async (allData) => {
                         // setTypesToSample(allData['types'].reduce((map: {[a: string]: boolean}, tp: string) => {
                         //     map[tp] = true;
                         //     return map;
@@ -460,7 +474,7 @@ export default function VisPanels() {
                             return map;
                         }, {}));
 
-                        getData(`log-data/get-colours/${fname}`, null).then((resp) => resp.json())
+                        await getData(`log-data/get-colours/${fname}`, null).then((resp) => resp.json())
                             .then((json) => {
                                 let newColourMap = null;
                                 if (json.length > 0) {
@@ -477,6 +491,10 @@ export default function VisPanels() {
                                 console.log(newColourMap);
                                 console.log("allData[types] =");
                                 console.log(allData['types']);
+                            })
+                            .catch((error: unknown) => {
+                                setColourOfType(generateColours(allData['types'].concat(allFieldNames)));
+                                setRequestError(requestErrorMessage(error));
                             });
 
                         // const numLinePts = allData['linesAndStats']['pts'].reduce((maxBucket: number, curr: LinePoint) => Math.max(curr['bucket'], maxBucket), 0);
@@ -544,11 +562,12 @@ export default function VisPanels() {
                         setFeaturesData(allData['pagesData']['features']);
 
                         setCacheData(allData['cacheData']);
+                        setInitialized(true);
                         console.log(`cache sets in settings: ${Math.floor(cacheInfoSetting[selCacheName].size / cacheLineSizeSetting)}, cache sets in data: ${allData['cacheData'].numSets}`);
                         console.log(`cache info size: ${cacheInfoSetting[selCacheName].size}, cachelinesize setting: ${cacheLineSizeSetting}`);
 
                         if (fname) {
-                            getNotesForFile(fname)
+                            return getNotesForFile(fname)
                                 .then((resp: string[]) => {
                                     setNotesText(resp[1]);
                                     setLoading(false);
@@ -557,13 +576,21 @@ export default function VisPanels() {
                         else {
                             setLoading(false);
                         }
-                    });
+                    })
+                    .catch((error: unknown) => setRequestError(requestErrorMessage(error)))
+                    .finally(() => setLoading(false));
         }
     }, []);
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
+            <Snackbar open={requestError !== null} anchorOrigin={{vertical: 'top', horizontal: 'center'}}>
+                <Alert severity='error' onClose={initialized ? () => setRequestError(null) : undefined} sx={{maxWidth: 700}}>
+                    {requestError}
+                    {!initialized && <div><a href='/'>Back to database selection</a></div>}
+                </Alert>
+            </Snackbar>
             {
             loading && 
             <Box id='loadingBox' >
@@ -571,7 +598,7 @@ export default function VisPanels() {
             </Box>
             }
             {
-            !loading &&
+            !loading && initialized &&
             <Grid 
                 container 
                 id='visPanelGrid'
@@ -618,6 +645,8 @@ export default function VisPanels() {
                         cacheLineSize={cacheLineSize}
                         numBuckets={numBuckets}
                         expandedTypes={expandedTypes}
+                        busy={resampling}
+                        onBusyChange={setCacheRequestLoading}
                         setCacheData={setCacheData} />
                 </Grid>
 
@@ -684,11 +713,15 @@ export default function VisPanels() {
                         <Tooltip
                             title={resampling ? 'Resampling...' : 'Resample'}
                             placement='top' >
+                            <span>
                             <IconButton
+                                aria-label={resampling ? 'Resampling...' : 'Resample'}
                                 className={resampling ? 'resamplingButtonLoading' : ''}
+                                disabled={resampling || cacheRequestLoading}
                                 onClick={() => {
-                                    if (!resampling) {
+                                    if (!resampling && !cacheRequestLoading) {
                                         const fname = searchParams.get('fname');
+                                        setRequestError(null);
                                         setResampling(true);
                                         getData(`get-pages-and-cache-data/${fname}-${pageSizeSetting}-${cacheLineSizeSetting}-${numBucketsSetting}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${cacheInfoSetting[selCacheName].size}-${cacheInfoSetting[selCacheName].assoc}`, pageVis)
                                                 .then((resp) => resp.json())
@@ -712,8 +745,9 @@ export default function VisPanels() {
                                                     setCacheData(allData['cacheData']);
                                                     console.log(`cache sets in settings: ${Math.floor(cacheInfoSetting[selCacheName].size / cacheLineSizeSetting)}, cache sets in data: ${allData['cacheData'].numSets}`);
 
-                                                    setResampling(false);
-                                                });
+                                                })
+                                                .catch((error: unknown) => setRequestError(requestErrorMessage(error)))
+                                                .finally(() => setResampling(false));
                                     }
                                 }} >
                                 {
@@ -727,6 +761,7 @@ export default function VisPanels() {
                                 </Badge>
                                 }
                             </IconButton>
+                            </span>
                         </Tooltip>
                         <Tooltip
                             title={'Settings'}

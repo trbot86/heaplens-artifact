@@ -77,7 +77,9 @@ This step samples a set of memory pages from binary_dump.txt.
 
 	The argument provided to --sample is a real number between 0 and 1 that largely determines the size of the resulting database. A good rule of thumb is to aim for a database size of around 500MB or less (depending on the power of your machine). For example, if the size of binary_dump.txt is 5GB, then the proportion of events sampled should be around 0.1 or less.
 
-	With --pages-per-type you are specifying, for each type T, how many memory pages the sampler should pick containing at least one allocation of type T. By default this is 1, but you may want to increase this number if you are interested in seeing more pages containing underrepresented types. Note that picking a large number here will also increase the size of the resulting database.
+	With --pages-per-type you are specifying, for each type T, the minimum number of distinct memory pages containing an allocation of T to retain (or all such pages if fewer exist). By default this is 1, but you may want to increase this number to see more pages containing underrepresented types. Pages shared by several types count toward each type's minimum. Each selected page retains its complete event history. Larger minima can increase the database size. When invoking the converter directly, this option is named --num-pages-per-type.
+
+	Sampling uses system entropy by default. Add --seed [integer] to repeat the initial page selection from the same log with the same converter build. The chosen seed is printed to stderr. This does not make the application's execution or the GUI's clustering deterministic.
 
 	This step should produce a file called 'allocs.sqlite' in the 'type_analysis' directory.
 

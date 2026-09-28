@@ -1,11 +1,11 @@
 'use client';
 
 import { Add, Remove } from "@mui/icons-material";
-import { CircularProgress, IconButton, styled, Theme, ToggleButton, ToggleButtonGroup, Tooltip, tooltipClasses, TooltipProps, Typography } from "@mui/material";
+import { Alert, Snackbar, CircularProgress, IconButton, styled, Theme, ToggleButton, ToggleButtonGroup, Tooltip, tooltipClasses, TooltipProps, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import * as d3 from 'd3';
 import { testCacheDataPerBucket, testMinAndMaxOccPerBucket } from "./testdata";
-import { getData, getTypeName } from "../vispanels/page";
+import { getData, getTypeName, requestErrorMessage } from "../vispanels/page";
 import React from "react";
 import { theme } from "../page";
 
@@ -48,7 +48,7 @@ export const HtmlTooltip = styled(({ className, ...props } : TooltipProps) => (
 
 function CacheHeader({ allCacheInfo, selCacheName, setSelCacheName,
                        fname, pageSize, cacheLineSize, numBuckets,
-                       setCacheData, loading, setLoading, setCacheWidth } : 
+                       setCacheData, loading, setLoading, setCacheWidth, busy, onBusyChange } :
     {
         allCacheInfo: CacheInfoMap,
         selCacheName: string,
@@ -60,31 +60,41 @@ function CacheHeader({ allCacheInfo, selCacheName, setSelCacheName,
         setCacheData: (a: {occ: number[][], idxToTpAndSt: string[], numSets: number}) => void,
         loading: boolean,
         setLoading: (a: boolean) => void,
-        setCacheWidth: (a: CacheWidthData) => void
+        setCacheWidth: (a: CacheWidthData) => void,
+        busy: boolean,
+        onBusyChange: (a: boolean) => void
     }) {
+    const [error, setError] = useState<string | null>(null);
     return (
         <div id='cacheHeader' >
+            <Snackbar open={error !== null} anchorOrigin={{vertical: 'top', horizontal: 'center'}}>
+                <Alert severity='error' onClose={() => setError(null)} sx={{maxWidth: 700}}>{error}</Alert>
+            </Snackbar>
             <ToggleButtonGroup 
                 id='cacheSetSelector'
                 exclusive
                 value={selCacheName}
                 size='small'
-                disabled={loading}
+                disabled={loading || busy}
                 onChange={(e, val) => {
+                    if (!val || val === selCacheName || loading || busy) return;
+                    setError(null);
                     setLoading(true);
-                    setSelCacheName(val);
+                    onBusyChange(true);
                     const newCacheInfo = allCacheInfo[val];
-                    getData(`get-cache-data/${fname}-${pageSize}-${cacheLineSize}-${numBuckets}-${val == 'L2' ? 2**17 : val == 'L3' ? 2**18 : newCacheInfo.size}-${newCacheInfo.assoc}`, null)
+                    getData(`get-cache-data/${fname}-${pageSize}-${cacheLineSize}-${numBuckets}-${newCacheInfo.size}-${newCacheInfo.assoc}`, null)
                         .then((resp) => resp.json())
                         .then((cacheData) => {
                             setCacheData(cacheData);
+                            setSelCacheName(val);
                             setCacheWidth({
                                 min: Math.floor(Math.sqrt(cacheData.numSets)),
                                 max: cacheData.numSets,
                                 curr: Math.floor(Math.sqrt(cacheData.numSets))
                             });
-                            setLoading(false);
-                        });
+                        })
+                        .catch((error: unknown) => setError(requestErrorMessage(error)))
+                        .finally(() => { setLoading(false); onBusyChange(false); });
                 }} >
                 {
                     Object.keys(allCacheInfo).map((name) => <ToggleButton 
@@ -276,7 +286,7 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
 export default function CacheSets({ cacheData, cacheInfo, bucketIdx, cacheVis,
                                     selCacheName, setSelCacheName, fname, pageSize,
                                     cacheLineSize, numBuckets, expandedTypes,
-                                    setCacheData } : 
+                                    setCacheData, busy, onBusyChange } :
     {
         cacheData: {occ: number[][], idxToTpAndSt: string[], numSets: number}
         cacheInfo: CacheInfoMap,
@@ -289,7 +299,9 @@ export default function CacheSets({ cacheData, cacheInfo, bucketIdx, cacheVis,
         cacheLineSize: number,
         numBuckets: number,
         expandedTypes: {[tp: string]: boolean},
-        setCacheData: (a: {occ: number[][], idxToTpAndSt: string[], numSets: number}) => void
+        setCacheData: (a: {occ: number[][], idxToTpAndSt: string[], numSets: number}) => void,
+        busy: boolean,
+        onBusyChange: (a: boolean) => void
     }) {
     const [loading, setLoading] = useState<boolean>(false);
     const [cacheWidth, setCacheWidth] = useState<CacheWidthData>({
@@ -346,6 +358,8 @@ export default function CacheSets({ cacheData, cacheInfo, bucketIdx, cacheVis,
                 setCacheData={setCacheData}
                 loading={loading}
                 setLoading={setLoading}
+                busy={busy}
+                onBusyChange={onBusyChange}
                 setCacheWidth={setCacheWidth} />
             <CacheBoxArray
                 selCacheName={selCacheName}

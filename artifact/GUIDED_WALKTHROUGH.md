@@ -18,7 +18,7 @@ Stop with Ctrl-C.
 1. **Choose a populated time.** The timeline initially selects the beginning
    of the trace, when many pages are empty. Drag its small circular time handle
    from the far left toward the right, after the growing allocation curves
-   have flattened. This is a preload trace, approximately 4.3 seconds long.
+   have flattened. This is a preload trace, approximately 4.8 seconds long.
 2. **Identify the dominant allocation stream.** In the lower-right type table,
    `robj` is the dominant type, with roughly one million recorded allocations.
    `raxNode` is another stream relevant to the eventual patch. Colors identify
@@ -29,8 +29,9 @@ Stop with Ctrl-C.
    Repeated object boundaries reveal how objects pack and whether they cross
    cache-line boundaries. Compare pages dominated by the same type rather
    than treating equal fill density as equal layout.
-4. **Connect panels.** The right-hand cache-set heatmap summarizes modeled
-   address-to-set occupancy for the selected objects/time and cache geometry.
+4. **Connect panels.** Use L1 for this walkthrough. The right-hand cache-set
+   heatmap summarizes modeled address-to-set occupancy for the selected
+   objects/time and cache geometry.
    It is not measured cache misses or proof of false sharing. The type table,
    page layout, and time selection supply context for the pattern. The flame
    and HITM controls require corresponding perf data; this trace does not
@@ -54,6 +55,17 @@ bar at its lower edge is not an additional special object or category.
 `Settings` exposes visualization/clustering choices and cache geometry;
 `Resample` selects a new representative view. The supplied SQLite database and exporter allow
 independent inspection of the retained data.
+
+Cache selection uses the cache sizes and associativities in Settings. Larger
+caches can require much more memory: the current cache representation grows
+with time buckets × cache sets × type/field columns. Requests whose estimated
+arrays and response data exceed the default 4-GiB budget display an error and
+leave the previous view intact. The message suggests a smaller bucket count;
+change it in Settings and apply Resample before selecting the larger cache.
+No cache size or bucket count is reduced automatically. This estimate is a
+preflight check, not a bound on total server/browser memory. To deliberately
+change the budget on a suitably provisioned host, launch with, for example,
+`HEAPLENS_CACHE_BUDGET_MB=8192 bash artifact/run.sh gui`.
 
 ## EFRB: a higher-contrast illustrative example
 

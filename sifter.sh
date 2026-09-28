@@ -14,6 +14,7 @@ perffile=""
 fielddump=""
 pagespertype=""
 sample=""
+samplingSeed=()
 cutoff=""
 threads=1
 pageSize="--page-size 4096"
@@ -79,6 +80,14 @@ while [ $# -gt 0 ]; do
                 exit 1
             fi
             pagespertype="-t $2"
+            shift
+        ;;
+        --seed)
+            if ! [[ "$2" =~ ^[0-9]+$ ]]; then
+                echo "Must specify a nonnegative integer with option --seed." >&2
+                exit 1
+            fi
+            samplingSeed=(--seed "$2")
             shift
         ;;
         --sample)
@@ -188,8 +197,8 @@ elif [ "$database" = true ]; then
     cd type_analysis
     rm -f allocs.sqlite
     make bin/convert_to_db
-    echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran"
-    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran
+    echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran ${samplingSeed[*]}"
+    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran "${samplingSeed[@]}"
     exit 0
 elif [ "$includesOnly" = true ]; then
     add_includes $indir
