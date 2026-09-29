@@ -14,6 +14,75 @@ class FirstChoice:
 
 
 class SelectionTests(unittest.TestCase):
+    def test_history_budget_reserves_cluster_coverage(self):
+        clusters = {0: [1, 2, 3], 1: [4]}
+        costs = {1: 2, 2: 30, 3: 40, 4: 25}
+        pages, info = select_pages(clusters, {}, 128, page_records=costs,
+                                  record_budget=27, rng=FirstChoice())
+        self.assertEqual(pages, {1, 4})
+        self.assertEqual(info['selected_records'], 27)
+        self.assertEqual(info['omitted_clusters'], [])
+
+    def test_history_budget_prefers_typical_not_cheapest(self):
+        pages, _ = select_pages({0: [1, 2, 3]}, {}, 1,
+                               page_records={1: 1, 2: 40, 3: 80},
+                               record_budget=100, rng=FirstChoice())
+        self.assertEqual(pages, {2})
+
+    def test_128_dense_huge_pages_do_not_bypass_record_cap(self):
+        costs = {p: 2097152//32 for p in range(128)}
+        pages, info = select_pages({p: [p] for p in costs}, {}, 128,
+                                  page_records=costs, record_budget=100000)
+        self.assertEqual(len(pages), 1)
+        self.assertEqual(info['selected_records'], 65536)
+        self.assertEqual(len(info['omitted_clusters']), 127)
+
+    def test_unaffordable_cluster_and_perf_exception(self):
+        costs = {1: 1000, 2: 5}
+        pages, info = select_pages({0: [1], 1: [2]}, {}, 128,
+                                  page_records=costs, record_budget=10, rng=FirstChoice())
+        self.assertEqual(pages, {2})
+        self.assertEqual(info['omitted_clusters'], [0])
+        self.assertEqual(info['oversized_pages'], 1)
+        pages, info = select_pages({0: [1], 1: [2]}, {}, 128, forced_pages={1},
+                                  page_records=costs, record_budget=10)
+        self.assertEqual(pages, {1})
+        self.assertEqual(info['perf_record_budget_excess'], 990)
+
+    def test_history_extremes_follow_type_coverage(self):
+        costs = {1: 2, 2: 20, 3: 100, 4: 10}
+        pages, info = select_pages({0: [1, 2, 3, 4]}, {4: {'rare'}}, 2,
+                                  page_records=costs, record_budget=200, rng=FirstChoice())
+        self.assertIn(4, pages)
+        self.assertEqual(info['omitted_types'], [])
+        self.assertGreater(len(info['omitted_history_extremes']), 0)
+        pages, info = select_pages({0: [1, 2, 3, 4]}, {4: {'rare'}}, 4,
+                                  page_records=costs, record_budget=200, rng=FirstChoice())
+        self.assertEqual(info['omitted_history_extremes'], [])
+
+    def test_randomized_history_bounds_and_feasible_coverage(self):
+        for seed in range(100):
+            rng = random.Random(seed)
+            clusters = {c: list(range(c*8, c*8+8)) for c in range(20)}
+            costs = {p: rng.randrange(1, 10000) for pages in clusters.values() for p in pages}
+            minimum = sum(min(costs[p] for p in pages) for pages in clusters.values())
+            for cap in (0, minimum-1, minimum, 100000):
+                pages, info = select_pages(clusters, {}, 128, page_records=costs,
+                                          record_budget=cap, rng=random.Random(seed))
+                self.assertLessEqual(sum(costs[p] for p in pages), cap)
+                self.assertLessEqual(len(pages), 128)
+                if cap >= minimum:
+                    self.assertEqual(info['omitted_clusters'], [])
+
+    def test_invalid_record_budget_and_counts(self):
+        for cap in (-1, True, 1.5):
+            with self.assertRaises(ValueError):
+                select_pages({}, {}, 1, page_records={}, record_budget=cap)
+        with self.assertRaises(ValueError):
+            select_pages({}, {}, 1, record_budget=10)
+        with self.assertRaises(ValueError):
+            select_pages({0: [1]}, {}, 1, page_records={1: -1}, record_budget=10)
+
     def test_cluster_pass_precedes_types_and_extra_runs(self):
         clusters={0:[1,2,3],1:[4,5],2:[6]}
         types={1:{'A'},2:{'B'},3:{'C'},4:{'A'},5:{'D'},6:{'A'}}
@@ -88,7 +157,7 @@ class SelectionTests(unittest.TestCase):
 
 
 class SamplerIntegrationTests(unittest.TestCase):
-    def sample(self, budget, forced=()):
+    def sample(self, budget, forced=(), record_budget=None):
         import pandas as pd
         from sampler import Sampler
         from unittest.mock import Mock
@@ -102,7 +171,13 @@ class SamplerIntegrationTests(unittest.TestCase):
                               index=data.index)
         sampler.get_clusters_of_pages=Mock(return_value=(data,features,pd.DataFrame({'page_num':list(forced)})))
         random.seed(47)
-        return sampler.get_sample_of_pages(-1,-1,{'A':True,'B':True},'mbkmeans',5,3,page_budget=budget)
+        return sampler.get_sample_of_pages(-1,-1,{'A':True,'B':True},'mbkmeans',5,3,
+                                          page_budget=budget,record_budget=record_budget)
+
+    def test_record_count_matches_serialized_histories(self):
+        result = self.sample(128, record_budget=2)
+        self.assertEqual(sum(len(p['events']) for p in result['page_num_events'].values()), 2)
+        self.assertEqual(result['selection']['selected_records'], 2)
 
     def test_payload_and_json_compatibility(self):
         from flask import Flask

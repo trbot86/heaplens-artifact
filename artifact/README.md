@@ -397,6 +397,12 @@ fresh model-assisted run. To regenerate the text input from the supplied trace:
 bash artifact/run.sh export
 ```
 
+The GUI also offers **Export 5 snapshots** above its page pane for the currently
+selected representative pages. This is an on-demand export with progress and
+cancellation, separate from the command-line LLM export above. See the root
+[README](../README.md#representative-pages-and-text-export) for export options
+and the GUI's page/history budgets.
+
 ## Errata
 
 **TPC-C artifact packaging.** The initial artifact inadvertently pointed the

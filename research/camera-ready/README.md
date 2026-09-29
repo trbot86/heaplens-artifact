@@ -11,18 +11,33 @@ Keep mandatory perf-directed pages; count them toward the normal page budget,
 and report explicitly if they alone exceed it. Then:
 
 1. In shuffled cluster order, choose a page from each still-unrepresented
-   cluster until the budget is reached.
+   cluster within both budgets. Prefer a page near the cluster's median
+   history size; when full cluster coverage is feasible, reserve enough
+   records for at least the cheapest member of every remaining cluster.
 2. Use remaining slots for requested types not yet represented in the prepared
    page histories. A page may satisfy several missing types.
-3. Use remaining slots for additional page runs, respecting the existing run
+3. If a cluster's largest history has at least four times as many records as
+   its smallest (using one as the denominator for an empty history), try to
+   include both extremes. This is a history-size heuristic, not a peak-live
+   density or churn classification; types and clusters take precedence.
+4. Use remaining slots for additional page runs, respecting the existing run
    controls and checking the distinct-page count after each addition.
 
-The first two passes take precedence over the run controls. The default budget
-formula remains unchanged (52 at 4 KiB, 17 at 2 MiB); an optional backend
-`page_budget` argument supports controlled analysis without editing a constant.
-No new GUI budget control is claimed. Selection metadata reports omitted
-clusters/types and any mandatory-perf exception. Coverage applies to types
-present in prepared histories, not to every type at every timestamp.
+The GUI defaults are now 128 pages and 100,000 prepared history records, with
+both controls in Sample settings. The response and visible status report
+omitted clusters/types, uncovered history extremes, and mandatory-perf
+exceptions to either limit. Coverage applies to types present in prepared
+histories, not to every type at every timestamp. The cap is applied after
+reconstruction/clustering; it cannot bound full-database or cache preparation.
+
+Direct Python callers retain the earlier 52/17 page formula and page-only
+selection unless they pass `page_budget` and `record_budget`. In particular,
+the separate CLI LLM exporter has not adopted the GUI defaults or its new
+five-snapshot protocol. Earlier comparison scripts remain reproducible.
+
+See [HISTORY_BUDGET_RESULTS.md](HISTORY_BUDGET_RESULTS.md) for the coverage sweep,
+stress tests, and remaining limits. The GUI text exporter is now on demand,
+incremental, cancellable, and isolated from page-row progress rerenders.
 
 Perf treatment remains compatible pending the author's choice about whether
 the budget should also cap mandatory perf-directed pages. Sampling-study

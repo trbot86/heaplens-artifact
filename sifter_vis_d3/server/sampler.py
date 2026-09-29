@@ -489,7 +489,7 @@ class Sampler:
 
     def get_sample_of_pages(self, start_ts, end_ts, type_data, cluster_alg='dbscan', 
                             max_run_length=3, max_runs_from_cluster=2, include_all_noise=True,
-                            page_budget=None):
+                            page_budget=None, record_budget=None):
         print("starting to sample pages")
         sys.stdout.flush()
         labeled_data, features, perf_df = self.get_clusters_of_pages(start_ts, end_ts, type_data, alg=cluster_alg)
@@ -505,7 +505,9 @@ class Sampler:
                           if type_data.get(tp, True)}
         sampled_pages, selection_info = select_pages(
             clusters, page_types, max_pages, max_run_length, max_runs_from_cluster,
-            forced_pages=forced_pages, coverage_types=coverage_types)
+            forced_pages=forced_pages, coverage_types=coverage_types,
+            page_records={page: len(events) for page, events in labeled_data[0].items()},
+            record_budget=record_budget)
         # print(sampled_pages)
         print("Done sampling loop")
         sys.stdout.flush()

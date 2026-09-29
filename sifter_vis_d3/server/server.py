@@ -3,6 +3,7 @@ from flask_cors import CORS, cross_origin
 from sampler import Sampler
 from logger import Logger
 from cache_limits import CacheRequestError, CacheBudgetExceeded, validate_cache_geometry
+from page_selection import DEFAULT_PAGE_BUDGET, DEFAULT_RECORD_BUDGET
 import os
 
 app = Flask(__name__)
@@ -24,6 +25,17 @@ def cache_sampler(fname, page_size, cache_line_size, num_buckets, cache_size, as
     return Sampler(f"../{fname}", page_size, cache_line_size, num_buckets)
 
 
+def page_budgets():
+    limits = {}
+    for name, default in (('page_budget', DEFAULT_PAGE_BUDGET),
+                          ('record_budget', DEFAULT_RECORD_BUDGET)):
+        raw = request.args.get(name, str(default))
+        if not raw.isascii() or not raw.isdigit() or int(raw) < 1:
+            raise CacheRequestError(f'{name} must be a positive integer.')
+        limits[name] = int(raw)
+    return limits
+
+
 @app.route("/get-fnames", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
 def get_fnames():
@@ -33,11 +45,12 @@ def get_fnames():
 @app.route("/init-app/<string:fname>-<int:page_size>-<int:cache_line_size>-<int:num_buckets>-<string:cluster_alg>-<int:max_run_length>-<int:max_runs_from_cluster>-<int:cache_size>-<int:assoc>", methods=["GET"])
 @cross_origin(origin='http://localhost:3000')
 def init_app(fname, page_size, cache_line_size, num_buckets, cluster_alg, max_run_length, max_runs_from_cluster, cache_size, assoc):    
+    budgets = page_budgets()
     db_sampler = cache_sampler(fname, page_size, cache_line_size, num_buckets, cache_size, assoc)
     return {
         'types': db_sampler.types(),
         'linesAndStats': db_sampler.get_all_lines_and_stats(),
-        'pagesData': db_sampler.get_sample_of_pages(-1, -1, {tp: True for tp in db_sampler.types()}, cluster_alg, max_run_length, max_runs_from_cluster),
+        'pagesData': db_sampler.get_sample_of_pages(-1, -1, {tp: True for tp in db_sampler.types()}, cluster_alg, max_run_length, max_runs_from_cluster, **budgets),
         'cacheData': db_sampler.get_cache_data(cache_size, assoc)
     }
 
@@ -45,9 +58,10 @@ def init_app(fname, page_size, cache_line_size, num_buckets, cluster_alg, max_ru
 @app.route("/get-pages-and-cache-data/<string:fname>-<int:page_size>-<int:cache_line_size>-<int:num_buckets>-<string:cluster_alg>-<int:max_run_length>-<int:max_runs_from_cluster>-<int:cache_size>-<int:assoc>", methods=["POST"])
 @cross_origin(origin='http://localhost:3000')
 def get_pages_and_cache_data(fname, page_size, cache_line_size, num_buckets, cluster_alg, max_run_length, max_runs_from_cluster, cache_size, assoc):
+    budgets = page_budgets()
     db_sampler = cache_sampler(fname, page_size, cache_line_size, num_buckets, cache_size, assoc)
     return {
-        'pagesData': db_sampler.get_sample_of_pages(-1, -1, request.json, cluster_alg, max_run_length, max_runs_from_cluster),
+        'pagesData': db_sampler.get_sample_of_pages(-1, -1, request.json, cluster_alg, max_run_length, max_runs_from_cluster, **budgets),
         'cacheData': db_sampler.get_cache_data(cache_size, assoc)
     }
 

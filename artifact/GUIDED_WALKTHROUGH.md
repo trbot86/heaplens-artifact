@@ -56,6 +56,19 @@ bar at its lower edge is not an additional special object or category.
 `Resample` selects a new representative view. The supplied SQLite database and exporter allow
 independent inspection of the retained data.
 
+In Sample settings, **Maximum pages** (128 by default) and **Maximum history
+records** (100,000) control the representative view; click **Resample** to apply
+them. The view reports uncovered clusters/types and warns if mandatory
+perf-directed pages exceed these limits. These controls do not alter the
+retained SQLite database.
+
+To export the selected pages, click **Export 5 snapshots** above the page pane.
+The export is on demand, with progress and cancellation; it no longer starts
+when the GUI loads. It samples five times across the selected histories,
+independent of the current slider and visibility settings. See the root
+[README](../README.md#representative-pages-and-text-export) for file-saving
+options and the download fallback's size limit.
+
 Cache selection uses the cache sizes and associativities in Settings. Larger
 caches can require much more memory: the current cache representation grows
 with time buckets × cache sets × type/field columns. Requests whose estimated

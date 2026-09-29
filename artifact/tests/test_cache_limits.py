@@ -13,6 +13,25 @@ import server
 
 
 class CacheLimitsTest(unittest.TestCase):
+    def test_page_history_budget_http_validation_and_forwarding(self):
+        client = server.app.test_client()
+        route = '/init-app/example.sqlite-4096-64-2000-mbkmeans-5-3-32768-8'
+        with patch('server.Sampler') as factory:
+            for query in ('page_budget=0', 'record_budget=-1', 'record_budget=NaN', 'page_budget=2.5'):
+                self.assertEqual(client.get(route+'?'+query).status_code, 400)
+            factory.assert_not_called()
+            sampler = factory.return_value
+            sampler.types.return_value = []
+            sampler.get_all_lines_and_stats.return_value = {}
+            sampler.get_sample_of_pages.return_value = {}
+            sampler.get_cache_data.return_value = {}
+            self.assertEqual(client.get(route+'?page_budget=80&record_budget=12345').status_code, 200)
+            self.assertEqual(sampler.get_sample_of_pages.call_args.kwargs,
+                             dict(page_budget=80, record_budget=12345))
+            self.assertEqual(client.get(route).status_code, 200)
+            self.assertEqual(sampler.get_sample_of_pages.call_args.kwargs,
+                             dict(page_budget=128, record_budget=100000))
+
     def test_geometry_matches_configured_cache(self):
         self.assertEqual(validate_cache_geometry(4096, 64, 2000, 2**21, 8), 4096)
         for args in ((4096, 0, 2000, 32768, 8), (4096, 64, 0, 32768, 8),

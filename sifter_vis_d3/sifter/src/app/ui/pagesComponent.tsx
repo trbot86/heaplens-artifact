@@ -10,6 +10,7 @@ import { HtmlTooltip } from './cacheSetComponent';
 import Grid from '@mui/material/Grid2';
 import { theme } from '../page';
 import { getSlotDataAtBucket } from './currentBucket';
+import SnapshotExportButton from './snapshotExportButton';
 
 interface MemoryObject {
     file: string | null,
@@ -56,146 +57,6 @@ const NUM_SLOTS_HUGEPAGE = 128;
 const SEL_AND_ZOOM_GRANULARITY = 4096;
 const MAX_HITM_ADDRS = 20;
 const PERF_INDICATOR_SIZE = 4;
-
-const SNAPSHOT_INTERVALS = 8; // number of intervals between earliest event and latest event
-const SNAPSHOT_FILE_NAME = 'page_layout_snapshots.txt';
-
-interface SnapshotObject {
-    type: string,
-    start_addr: number,
-    size: number,
-    alloc_ts: number,
-    free_ts: number | null,
-    actual_addr?: number
-}
-
-interface SnapshotPage {
-    page_addr: number,
-    cluster: number,
-    objects: SnapshotObject[]
-}
-
-function getSnapshotTimes(pages: PageMap): number[] {
-    const allEvents = Object.values(pages).flatMap((page) => page.events);
-    if (allEvents.length === 0) {
-        return [0];
-    }
-    const minTs = Math.min(...allEvents.map((e) => e.allocTs));
-    const maxTs = Math.max(...allEvents.map((e) => e.allocTs));
-    const step = (maxTs - minTs) / SNAPSHOT_INTERVALS;
-    return Array.from({ length: SNAPSHOT_INTERVALS + 1 }, (_, i) => Number((minTs + step * i).toFixed(3)));
-}
-
-function serializeFieldsData(fieldsData: { [tp: string]: SubtypeEntry[] }): string {
-    const lines: string[] = ['FIELDS_DATA:'];
-    const types = Object.keys(fieldsData).sort();
-    if (types.length === 0) {
-        lines.push('  NONE');
-        return lines.join('\n');
-    }
-    for (const type of types) {
-        lines.push(`- type: ${type}`);
-        const entries = fieldsData[type];
-        if (!entries || entries.length === 0) {
-            lines.push('  subtypes: []');
-            continue;
-        }
-        lines.push('  subtypes:');
-        for (const entry of entries) {
-            lines.push(`    - name: ${entry.name}`);
-            lines.push(`      subtype: ${entry.subtype}`);
-            lines.push(`      offset: ${entry.offset}`);
-            lines.push(`      size: ${entry.size}`);
-        }
-    }
-    return lines.join('\n');
-}
-
-function serializeClusterData(clustersData: ClustersInfo): string {
-    const lines: string[] = ['CLUSTERS:'];
-    const clusterIds = Object.keys(clustersData).map((k) => parseInt(k)).sort((a, b) => a - b);
-    if (clusterIds.length === 0) {
-        lines.push('  NONE');
-        return lines.join('\n');
-    }
-    for (const clusterId of clusterIds) {
-        const cluster = clustersData[clusterId];
-        const pageEntries = cluster.pages;
-        let pageList: number[] = [];
-        if (Array.isArray(pageEntries)) {
-            pageList = pageEntries;
-        } else if (pageEntries && typeof pageEntries[Symbol.iterator] === 'function') {
-            pageList = Array.from(pageEntries as Iterable<number>);
-        } else if (pageEntries && typeof pageEntries === 'object') {
-            pageList = Object.values(pageEntries as Record<string, number>);
-        }
-        pageList = pageList.sort((a, b) => a - b);
-        lines.push(`- cluster_id: ${clusterId}`);
-        lines.push(`  size: ${cluster.size}`);
-        lines.push(`  page_count: ${pageList.length}`);
-        lines.push(`  pages: [${pageList.join(', ')}]`);
-    }
-    return lines.join('\n');
-}
-
-function buildPageSnapshotText(pages: PageMap, clustersData: ClustersInfo, fieldsData: { [tp: string]: SubtypeEntry[] }, pageSize: number): string {
-    const pageAddrs = Object.keys(pages).map((addr) => parseInt(addr)).sort((a, b) => a - b);
-    const snapshotTimes = getSnapshotTimes(pages);
-    const lines: string[] = [];
-
-    lines.push('MEMORY PAGE LAYOUT SNAPSHOTS');
-    lines.push(`SNAPSHOT_INTERVALS: ${SNAPSHOT_INTERVALS}`);
-    lines.push(`PAGE_SIZE: ${pageSize}`);
-    lines.push(`TOTAL_PAGES: ${pageAddrs.length}`);
-    lines.push(`GENERATED_AT: ${new Date().toISOString()}`);
-    lines.push('');
-    lines.push('');
-    lines.push(serializeFieldsData(fieldsData));
-    lines.push('');
-    lines.push(serializeClusterData(clustersData));
-    lines.push('');
-    lines.push('SNAPSHOTS:');
-
-    for (let i = 0; i < snapshotTimes.length; i++) {
-        const ts = snapshotTimes[i];
-        lines.push(`- snapshot_index: ${i}`);
-        lines.push(`  time: ${ts}`);
-        lines.push('  pages:');
-        for (const pageAddr of pageAddrs) {
-            const page = pages[pageAddr];
-            const visibleObjects = page.events.filter((obj) => obj.allocTs <= ts && (obj.freeTs === null || obj.freeTs >= ts));
-            lines.push(`  - page_addr: ${pageAddr}`);
-            lines.push(`    cluster: ${page.cluster}`);
-            lines.push(`    object_count: ${visibleObjects.length}`);
-            if (visibleObjects.length === 0) {
-                lines.push('    objects: []');
-                continue;
-            }
-            lines.push('    objects:');
-            for (const obj of visibleObjects) {
-                lines.push('      -');
-                lines.push(`        type: ${obj.type ?? 'UNKNOWN'}`);
-                lines.push(`        size: ${obj.size}`);
-                lines.push(`        actual_addr: ${obj.actualAddr ?? obj.addr}`);
-            }
-        }
-    }
-
-    return lines.join('\n');
-}
-
-function downloadTextFile(text: string, fileName: string): void {
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-}
 
 const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize, xScale, yScale,
                                  expanded, viewSize, invisible, ...props } : 
@@ -1159,19 +1020,6 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
     const [zoomedSize, setZoomedSize] = useState<number>(0);
     const [showHot, setShowHot] = useState<boolean>(false);
     const [showHitm, setShowHitm] = useState<boolean>(false);
-    const snapshotSavedRef = useRef(false);
-
-    useEffect(() => {
-        if (snapshotSavedRef.current) {
-            return;
-        }
-        if (!pages || Object.keys(pages).length === 0) {
-            return;
-        }
-        const snapshotText = buildPageSnapshotText(pages, clustersData, fieldsData, pageSize);
-        downloadTextFile(snapshotText, SNAPSHOT_FILE_NAME);
-        snapshotSavedRef.current = true;
-    }, [pages, clustersData, fieldsData, pageSize]);
 
     const maxClusterSize = Object.values(clustersData).reduce((size: number, curr: {'pages': number[], 'size': number}) => Math.max(size, curr['size']), 0);
     const focusData = useMemo(() => {
@@ -1187,6 +1035,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
     return (
         <div id='pageAndObjectVis'>
             <div id='pageVis'>
+                <SnapshotExportButton pages={pages} clustersData={clustersData} fieldsData={fieldsData} pageSize={pageSize} />
                 <PageHeader
                     sortMode={sortMode}
                     setSortMode={setSortMode}
