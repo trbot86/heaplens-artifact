@@ -1,0 +1,1478 @@
+{
+  "date": "2026-09-28",
+  "baseline_commit": "8b67cade6017ac8e3ccff242a208c5dc025380ea",
+  "selection": [
+    {
+      "name": "efrb-illustrative",
+      "database_sha256": "643b7a5a0992d2b3a9cec219e205b49539e5ddd174e09dda4a04a433e2bda7e4",
+      "page_size": 4096,
+      "baseline_sha256": "3e628625456ca4a4d4a76fd950dc04b6b4b7fcbaa985a7c49470b05a6a4738bc",
+      "candidate_sha256": "89253c9d4fd9e5fae420b8dd1b2f06fa45ae9baa1930f0209a4caecf53af9dcd",
+      "selector_sha256": "b8b44b1fa2b18c2a9f90d4ed56e492773f85d3f1c3dc557b6a07bda235e2d348",
+      "all_baseline_default_trials_replayed": true,
+      "summary": [
+        {
+          "policy": "baseline",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            2,
+            4
+          ],
+          "represented_clusters": [
+            2,
+            4
+          ],
+          "available_types": [
+            6,
+            6
+          ],
+          "represented_types": [
+            6,
+            6
+          ],
+          "selected_pages": [
+            12,
+            21
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 5.191080505028367
+        },
+        {
+          "policy": "baseline",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            2,
+            4
+          ],
+          "represented_clusters": [
+            2,
+            4
+          ],
+          "available_types": [
+            6,
+            6
+          ],
+          "represented_types": [
+            6,
+            6
+          ],
+          "selected_pages": [
+            12,
+            21
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 5.17067895270884
+        },
+        {
+          "policy": "baseline",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            2,
+            4
+          ],
+          "represented_clusters": [
+            2,
+            4
+          ],
+          "available_types": [
+            6,
+            6
+          ],
+          "represented_types": [
+            6,
+            6
+          ],
+          "selected_pages": [
+            12,
+            21
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 5.141326924785972
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            2,
+            4
+          ],
+          "represented_clusters": [
+            2,
+            4
+          ],
+          "available_types": [
+            6,
+            6
+          ],
+          "represented_types": [
+            6,
+            6
+          ],
+          "selected_pages": [
+            18,
+            22
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 5.55280689150095
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            2,
+            4
+          ],
+          "represented_clusters": [
+            2,
+            4
+          ],
+          "available_types": [
+            6,
+            6
+          ],
+          "represented_types": [
+            6,
+            6
+          ],
+          "selected_pages": [
+            18,
+            22
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 5.741070723161101
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            2,
+            4
+          ],
+          "represented_clusters": [
+            2,
+            4
+          ],
+          "available_types": [
+            6,
+            6
+          ],
+          "represented_types": [
+            6,
+            6
+          ],
+          "selected_pages": [
+            18,
+            22
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 5.620112176984549
+        }
+      ]
+    },
+    {
+      "name": "hnsw-c2c-retained",
+      "database_sha256": "9a421b98840bebc7f6645515298ee97738f6dc9e61ec10e04fe0df9a2cb00755",
+      "page_size": 4096,
+      "baseline_sha256": "3e628625456ca4a4d4a76fd950dc04b6b4b7fcbaa985a7c49470b05a6a4738bc",
+      "candidate_sha256": "89253c9d4fd9e5fae420b8dd1b2f06fa45ae9baa1930f0209a4caecf53af9dcd",
+      "selector_sha256": "b8b44b1fa2b18c2a9f90d4ed56e492773f85d3f1c3dc557b6a07bda235e2d348",
+      "all_baseline_default_trials_replayed": true,
+      "summary": [
+        {
+          "policy": "baseline",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 1,
+          "available_clusters": [
+            29,
+            34
+          ],
+          "represented_clusters": [
+            13,
+            19
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            13,
+            17
+          ],
+          "selected_pages": [
+            53,
+            57
+          ],
+          "over_budget": 20,
+          "selection_median_ms": 14.296090928837657
+        },
+        {
+          "policy": "baseline",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 2,
+          "available_clusters": [
+            29,
+            34
+          ],
+          "represented_clusters": [
+            17,
+            23
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            13,
+            17
+          ],
+          "selected_pages": [
+            65,
+            69
+          ],
+          "over_budget": 20,
+          "selection_median_ms": 14.292890904471278
+        },
+        {
+          "policy": "baseline",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 4,
+          "available_clusters": [
+            29,
+            34
+          ],
+          "represented_clusters": [
+            29,
+            34
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            15,
+            17
+          ],
+          "selected_pages": [
+            90,
+            115
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 15.702845063060522
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            29,
+            34
+          ],
+          "represented_clusters": [
+            29,
+            34
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            17,
+            17
+          ],
+          "selected_pages": [
+            52,
+            52
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 54.963652743026614
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            29,
+            34
+          ],
+          "represented_clusters": [
+            29,
+            34
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            17,
+            17
+          ],
+          "selected_pages": [
+            64,
+            64
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 55.475092958658934
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            29,
+            34
+          ],
+          "represented_clusters": [
+            29,
+            34
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            17,
+            17
+          ],
+          "selected_pages": [
+            121,
+            128
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 58.443658985197544
+        }
+      ]
+    },
+    {
+      "name": "hnsw-nasus-retained",
+      "database_sha256": "571e79a0162f443ba21db805bae632ee28ba575ff3a04ac3d41d12d71654c730",
+      "page_size": 4096,
+      "baseline_sha256": "3e628625456ca4a4d4a76fd950dc04b6b4b7fcbaa985a7c49470b05a6a4738bc",
+      "candidate_sha256": "89253c9d4fd9e5fae420b8dd1b2f06fa45ae9baa1930f0209a4caecf53af9dcd",
+      "selector_sha256": "b8b44b1fa2b18c2a9f90d4ed56e492773f85d3f1c3dc557b6a07bda235e2d348",
+      "all_baseline_default_trials_replayed": true,
+      "summary": [
+        {
+          "policy": "baseline",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            30,
+            34
+          ],
+          "represented_clusters": [
+            14,
+            18
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            8,
+            16
+          ],
+          "selected_pages": [
+            50,
+            54
+          ],
+          "over_budget": 13,
+          "selection_median_ms": 13.127614045515656
+        },
+        {
+          "policy": "baseline",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            30,
+            34
+          ],
+          "represented_clusters": [
+            18,
+            23
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            11,
+            16
+          ],
+          "selected_pages": [
+            63,
+            66
+          ],
+          "over_budget": 11,
+          "selection_median_ms": 13.102084398269653
+        },
+        {
+          "policy": "baseline",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 3,
+          "available_clusters": [
+            30,
+            34
+          ],
+          "represented_clusters": [
+            30,
+            34
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            13,
+            17
+          ],
+          "selected_pages": [
+            90,
+            113
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 14.735125005245209
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            30,
+            34
+          ],
+          "represented_clusters": [
+            30,
+            34
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            17,
+            17
+          ],
+          "selected_pages": [
+            52,
+            52
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 33.800703240558505
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            30,
+            34
+          ],
+          "represented_clusters": [
+            30,
+            34
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            17,
+            17
+          ],
+          "selected_pages": [
+            64,
+            64
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 34.41979642957449
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            30,
+            34
+          ],
+          "represented_clusters": [
+            30,
+            34
+          ],
+          "available_types": [
+            17,
+            17
+          ],
+          "represented_types": [
+            17,
+            17
+          ],
+          "selected_pages": [
+            120,
+            128
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 37.042591255158186
+        }
+      ]
+    },
+    {
+      "name": "tpcc-bcco-2m",
+      "database_sha256": "efa8373a6cb1d9f6db4b455e23ca436c99965f8dce220596391fe779f06ff100",
+      "page_size": 2097152,
+      "baseline_sha256": "3e628625456ca4a4d4a76fd950dc04b6b4b7fcbaa985a7c49470b05a6a4738bc",
+      "candidate_sha256": "89253c9d4fd9e5fae420b8dd1b2f06fa45ae9baa1930f0209a4caecf53af9dcd",
+      "selector_sha256": "b8b44b1fa2b18c2a9f90d4ed56e492773f85d3f1c3dc557b6a07bda235e2d348",
+      "all_baseline_default_trials_replayed": true,
+      "summary": [
+        {
+          "policy": "baseline",
+          "budget": 17,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            52,
+            64
+          ],
+          "represented_clusters": [
+            3,
+            7
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            3,
+            38
+          ],
+          "selected_pages": [
+            17,
+            25
+          ],
+          "over_budget": 16,
+          "selection_median_ms": 11.435686843469739
+        },
+        {
+          "policy": "baseline",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            52,
+            64
+          ],
+          "represented_clusters": [
+            12,
+            20
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            7,
+            39
+          ],
+          "selected_pages": [
+            62,
+            71
+          ],
+          "over_budget": 13,
+          "selection_median_ms": 16.019623028114438
+        },
+        {
+          "policy": "baseline",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            52,
+            64
+          ],
+          "represented_clusters": [
+            28,
+            38
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            9,
+            44
+          ],
+          "selected_pages": [
+            124,
+            141
+          ],
+          "over_budget": 9,
+          "selection_median_ms": 25.78618749976158
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 17,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            52,
+            64
+          ],
+          "represented_clusters": [
+            17,
+            17
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            8,
+            31
+          ],
+          "selected_pages": [
+            17,
+            17
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 24.00660701096058
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 13,
+          "available_clusters": [
+            52,
+            64
+          ],
+          "represented_clusters": [
+            52,
+            64
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            17,
+            46
+          ],
+          "selected_pages": [
+            64,
+            64
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 28.36532541550696
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            52,
+            64
+          ],
+          "represented_clusters": [
+            52,
+            64
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            46,
+            46
+          ],
+          "selected_pages": [
+            128,
+            128
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 38.56847248971462
+        }
+      ]
+    },
+    {
+      "name": "tpcc-bcco-retained",
+      "database_sha256": "efa8373a6cb1d9f6db4b455e23ca436c99965f8dce220596391fe779f06ff100",
+      "page_size": 4096,
+      "baseline_sha256": "3e628625456ca4a4d4a76fd950dc04b6b4b7fcbaa985a7c49470b05a6a4738bc",
+      "candidate_sha256": "89253c9d4fd9e5fae420b8dd1b2f06fa45ae9baa1930f0209a4caecf53af9dcd",
+      "selector_sha256": "b8b44b1fa2b18c2a9f90d4ed56e492773f85d3f1c3dc557b6a07bda235e2d348",
+      "all_baseline_default_trials_replayed": true,
+      "summary": [
+        {
+          "policy": "baseline",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            43,
+            56
+          ],
+          "represented_clusters": [
+            8,
+            21
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            6,
+            23
+          ],
+          "selected_pages": [
+            50,
+            62
+          ],
+          "over_budget": 13,
+          "selection_median_ms": 9.746484458446503
+        },
+        {
+          "policy": "baseline",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            43,
+            56
+          ],
+          "represented_clusters": [
+            10,
+            24
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            8,
+            23
+          ],
+          "selected_pages": [
+            63,
+            71
+          ],
+          "over_budget": 12,
+          "selection_median_ms": 9.574573021382093
+        },
+        {
+          "policy": "baseline",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 1,
+          "all_types": 0,
+          "available_clusters": [
+            43,
+            56
+          ],
+          "represented_clusters": [
+            21,
+            45
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            16,
+            39
+          ],
+          "selected_pages": [
+            124,
+            135
+          ],
+          "over_budget": 8,
+          "selection_median_ms": 11.913025053218007
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 15,
+          "all_types": 0,
+          "available_clusters": [
+            43,
+            56
+          ],
+          "represented_clusters": [
+            43,
+            52
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            18,
+            41
+          ],
+          "selected_pages": [
+            52,
+            52
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 27.681550942361355
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 13,
+          "available_clusters": [
+            43,
+            56
+          ],
+          "represented_clusters": [
+            43,
+            56
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            39,
+            46
+          ],
+          "selected_pages": [
+            64,
+            64
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 27.918466832488775
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            43,
+            56
+          ],
+          "represented_clusters": [
+            43,
+            56
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            46,
+            46
+          ],
+          "selected_pages": [
+            128,
+            128
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 30.537637416273355
+        }
+      ]
+    },
+    {
+      "name": "valkey-full",
+      "database_sha256": "4681c4512ec88fd90d3e47594f5ec1a1a498ac554a9a144cb21a3d353462b7d7",
+      "page_size": 4096,
+      "baseline_sha256": "3e628625456ca4a4d4a76fd950dc04b6b4b7fcbaa985a7c49470b05a6a4738bc",
+      "candidate_sha256": "89253c9d4fd9e5fae420b8dd1b2f06fa45ae9baa1930f0209a4caecf53af9dcd",
+      "selector_sha256": "b8b44b1fa2b18c2a9f90d4ed56e492773f85d3f1c3dc557b6a07bda235e2d348",
+      "all_baseline_default_trials_replayed": true,
+      "summary": [
+        {
+          "policy": "baseline",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            19,
+            31
+          ],
+          "represented_clusters": [
+            5,
+            13
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            5,
+            27
+          ],
+          "selected_pages": [
+            46,
+            62
+          ],
+          "over_budget": 15,
+          "selection_median_ms": 10.61862544156611,
+          "rax_success_trials": 7,
+          "rax_genuine_objects": [
+            0,
+            46
+          ]
+        },
+        {
+          "policy": "baseline",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            19,
+            31
+          ],
+          "represented_clusters": [
+            6,
+            14
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            6,
+            27
+          ],
+          "selected_pages": [
+            55,
+            74
+          ],
+          "over_budget": 8,
+          "selection_median_ms": 10.498166549950838,
+          "rax_success_trials": 8,
+          "rax_genuine_objects": [
+            0,
+            46
+          ]
+        },
+        {
+          "policy": "baseline",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            19,
+            31
+          ],
+          "represented_clusters": [
+            14,
+            20
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            13,
+            38
+          ],
+          "selected_pages": [
+            114,
+            130
+          ],
+          "over_budget": 5,
+          "selection_median_ms": 12.539416551589966,
+          "rax_success_trials": 15,
+          "rax_genuine_objects": [
+            0,
+            46
+          ]
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            19,
+            31
+          ],
+          "represented_clusters": [
+            19,
+            31
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            46,
+            46
+          ],
+          "selected_pages": [
+            52,
+            52
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 42.750473599880934,
+          "rax_success_trials": 20,
+          "rax_genuine_objects": [
+            24,
+            44
+          ]
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            19,
+            31
+          ],
+          "represented_clusters": [
+            19,
+            31
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            46,
+            46
+          ],
+          "selected_pages": [
+            64,
+            64
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 43.27046521939337,
+          "rax_success_trials": 20,
+          "rax_genuine_objects": [
+            24,
+            46
+          ]
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            19,
+            31
+          ],
+          "represented_clusters": [
+            19,
+            31
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            46,
+            46
+          ],
+          "selected_pages": [
+            128,
+            128
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 45.82889867015183,
+          "rax_success_trials": 20,
+          "rax_genuine_objects": [
+            24,
+            46
+          ]
+        }
+      ]
+    },
+    {
+      "name": "valkey-packaged",
+      "database_sha256": "7b1a0b909f255efc944ec326212cdf68eb58c4afd3a69e4f73c7ca58ad57ec98",
+      "page_size": 4096,
+      "baseline_sha256": "3e628625456ca4a4d4a76fd950dc04b6b4b7fcbaa985a7c49470b05a6a4738bc",
+      "candidate_sha256": "89253c9d4fd9e5fae420b8dd1b2f06fa45ae9baa1930f0209a4caecf53af9dcd",
+      "selector_sha256": "b8b44b1fa2b18c2a9f90d4ed56e492773f85d3f1c3dc557b6a07bda235e2d348",
+      "all_baseline_default_trials_replayed": true,
+      "summary": [
+        {
+          "policy": "baseline",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            25,
+            38
+          ],
+          "represented_clusters": [
+            13,
+            26
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            21,
+            41
+          ],
+          "selected_pages": [
+            52,
+            58
+          ],
+          "over_budget": 13,
+          "selection_median_ms": 10.287903482094407
+        },
+        {
+          "policy": "baseline",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 0,
+          "all_types": 0,
+          "available_clusters": [
+            25,
+            38
+          ],
+          "represented_clusters": [
+            16,
+            31
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            26,
+            45
+          ],
+          "selected_pages": [
+            62,
+            73
+          ],
+          "over_budget": 9,
+          "selection_median_ms": 10.301154339686036
+        },
+        {
+          "policy": "baseline",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 17,
+          "available_clusters": [
+            25,
+            38
+          ],
+          "represented_clusters": [
+            25,
+            38
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            43,
+            46
+          ],
+          "selected_pages": [
+            87,
+            93
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 11.489741271361709
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 52,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            25,
+            38
+          ],
+          "represented_clusters": [
+            25,
+            38
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            46,
+            46
+          ],
+          "selected_pages": [
+            52,
+            52
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 13.435333967208862
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 64,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            25,
+            38
+          ],
+          "represented_clusters": [
+            25,
+            38
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            46,
+            46
+          ],
+          "selected_pages": [
+            64,
+            64
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 13.702303636819124
+        },
+        {
+          "policy": "cluster-first",
+          "budget": 128,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "available_clusters": [
+            25,
+            38
+          ],
+          "represented_clusters": [
+            25,
+            38
+          ],
+          "available_types": [
+            46,
+            46
+          ],
+          "represented_types": [
+            46,
+            46
+          ],
+          "selected_pages": [
+            93,
+            99
+          ],
+          "over_budget": 0,
+          "selection_median_ms": 15.142809599637985
+        }
+      ]
+    }
+  ],
+  "backend_cache_prototypes": [
+    {
+      "name": "valkey-full",
+      "full_output_equal": true,
+      "methodology": "One unprofiled invocation per implementation; identical fresh sampler inputs. Only cache-line delta accumulation changed; no integrated optimization.",
+      "rows": [
+        {
+          "policy": "baseline",
+          "seconds": 7.16419520881027,
+          "buckets": 2002,
+          "columns": 15680
+        },
+        {
+          "policy": "range-updates",
+          "seconds": 3.8110468219965696,
+          "buckets": 2002,
+          "columns": 15680
+        }
+      ]
+    },
+    {
+      "name": "tpcc-bcco-2m",
+      "full_output_equal": true,
+      "methodology": "One unprofiled invocation per implementation; identical fresh sampler inputs. Only cache-line delta accumulation changed; no integrated optimization.",
+      "rows": [
+        {
+          "policy": "baseline",
+          "seconds": 22.9993839552626,
+          "buckets": 2002,
+          "columns": 13632
+        },
+        {
+          "policy": "range-updates",
+          "seconds": 7.272608834784478,
+          "buckets": 2002,
+          "columns": 13632
+        }
+      ]
+    }
+  ],
+  "ui_computation_prototypes": {
+    "node": "v18.18.2",
+    "methodology": "Same JS realm for both implementations. Original TypeScript helper/reduction extracted from main; current-bucket candidates are offline only. Two masks, every bucket, every slot/set checked.",
+    "rows": [
+      {
+        "kind": "huge-page-slots",
+        "case": "tpcc-bcco-2m",
+        "budget": 17,
+        "pages": 19,
+        "checked_cells": 9737728,
+        "old_ms": [
+          29.13456678390503,
+          23.180444717407227,
+          24.082708835601807,
+          22.69951105117798,
+          19.62119197845459,
+          19.239665031433105
+        ],
+        "current_bucket_ms": [
+          0.09700727462768555,
+          0.13690996170043945,
+          0.1563105583190918,
+          0.12230825424194336,
+          0.1018071174621582,
+          0.1464099884033203
+        ],
+        "old_median_ms": 22.939977884292603,
+        "current_bucket_median_ms": 0.1296091079711914
+      },
+      {
+        "kind": "huge-page-slots",
+        "case": "tpcc-bcco-2m",
+        "budget": 256,
+        "pages": 226,
+        "checked_cells": 115827712,
+        "old_ms": [
+          234.19529724121094,
+          230.86555576324463,
+          237.59174299240112,
+          237.98857164382935,
+          245.24639892578125,
+          238.82343339920044
+        ],
+        "current_bucket_ms": [
+          1.4245033264160156,
+          1.5985159873962402,
+          1.3795013427734375,
+          1.4428048133850098,
+          1.381700038909912,
+          1.442805290222168
+        ],
+        "old_median_ms": 237.79015731811523,
+        "current_bucket_median_ms": 1.4336540699005127
+      },
+      {
+        "kind": "cache-visible-type-totals",
+        "case": "tpcc-bcco-2m",
+        "checked_cells": 256256,
+        "old_ms": [
+          61.97959899902344,
+          62.57304096221924,
+          64.59128713607788,
+          63.2055869102478,
+          63.920538902282715,
+          61.686076641082764
+        ],
+        "current_bucket_ms": [
+          0.09070587158203125,
+          0.09900712966918945,
+          0.08810710906982422,
+          0.09670686721801758,
+          0.1045069694519043,
+          0.09900712966918945
+        ],
+        "old_median_ms": 62.88931393623352,
+        "current_bucket_median_ms": 0.09785699844360352
+      },
+      {
+        "kind": "cache-visible-type-totals",
+        "case": "valkey-full",
+        "checked_cells": 256256,
+        "old_ms": [
+          71.84631490707397,
+          71.40818309783936,
+          71.04235601425171,
+          70.54431962966919,
+          69.82096719741821,
+          74.3445954322815
+        ],
+        "current_bucket_ms": [
+          0.10400676727294922,
+          0.11520767211914062,
+          0.10550689697265625,
+          0.115509033203125,
+          0.10390806198120117,
+          0.11240911483764648
+        ],
+        "old_median_ms": 71.22526955604553,
+        "current_bucket_median_ms": 0.10895800590515137
+      }
+    ]
+  },
+  "evidence_paths": [
+    "artifact-tools\\cluster-first-20260928",
+    "artifact-tools\\camera-ready-profiles-20260928"
+  ],
+  "scope": "Retained-trace analysis and offline prototypes, not end-to-end browser speedups."
+}

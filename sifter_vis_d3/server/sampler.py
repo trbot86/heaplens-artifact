@@ -13,6 +13,7 @@ import math
 import os
 from random import randint, shuffle
 from cache_limits import validate_cache_geometry, check_cache_budget
+from page_selection import select_pages
 
 MAX_PAGE_PROP = 7560
 MAX_OBJ_STATS = 1000000
@@ -486,40 +487,24 @@ class Sampler:
         return labeled, merged, perf_df
 
     def get_sample_of_pages(self, start_ts, end_ts, type_data, cluster_alg='dbscan', 
-                            max_run_length=3, max_runs_from_cluster=2, include_all_noise=True):
+                            max_run_length=3, max_runs_from_cluster=2, include_all_noise=True,
+                            page_budget=None):
         print("starting to sample pages")
         sys.stdout.flush()
         labeled_data, features, perf_df = self.get_clusters_of_pages(start_ts, end_ts, type_data, alg=cluster_alg)
         # .reset_index().set_index('cluster')
         clusters = labeled_data.groupby('cluster', sort=False).groups
 
-        max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(self.page_size, 2), 2))
-        # max_pages = 1 # DEBUGGING
-        sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
-        # sampled_pages.add(34127647253)
-        # sampled_pages.add(0x7f028df4e000 // 4096)
-
-        print("about to start sampling loop")
-        sys.stdout.flush()
-
-        taken = 0
-        cluster_keys = list(clusters.keys())
-        shuffle(cluster_keys)
-        for c in cluster_keys:
-            if taken >= max_pages:
-                break
-            if len(clusters[c]) <= max_runs_from_cluster * max_run_length:
-                sampled_pages.update(clusters[c])
-                taken += len(clusters[c])
-            else:
-                for _ in range(max_runs_from_cluster):
-                    start = randint(0, len(clusters[c]) - 1)
-                    sampled_pages.add(clusters[c][start])
-                    num_s = 1
-                    while start + num_s < len(clusters[c]) and clusters[c][start + num_s] == clusters[c][start + num_s - 1] + 1 and num_s < max_run_length:
-                        sampled_pages.add(clusters[c][start + num_s])
-                        num_s += 1
-                    taken += num_s
+        max_pages = (math.floor(MAX_PAGE_PROP / pow(math.log(self.page_size, 2), 2))
+                     if page_budget is None else page_budget)
+        forced_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
+        page_types = {page: {event[TYPE_IND] for event in events if isinstance(event[TYPE_IND], str)}
+                      for page, events in labeled_data[0].items()}
+        coverage_types = {tp for types in page_types.values() for tp in types
+                          if type_data.get(tp, True)}
+        sampled_pages, selection_info = select_pages(
+            clusters, page_types, max_pages, max_run_length, max_runs_from_cluster,
+            forced_pages=forced_pages, coverage_types=coverage_types)
         # print(sampled_pages)
         print("Done sampling loop")
         sys.stdout.flush()
@@ -554,6 +539,7 @@ class Sampler:
                 'clusters': {c: {'pages': cluster_pages[c], 'size': cluster_sizes[c]} for c in cluster_pages.keys()},
                 'sum_cluster_sizes': sum([len(clusters[c]) for c in clusters.keys()]),
                 'num_clusters': len(clusters.keys()),
+                'selection': selection_info,
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()}}
 
     def get_cache_data(self, size, assoc):
