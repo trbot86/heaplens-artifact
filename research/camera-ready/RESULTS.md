@@ -1,5 +1,8 @@
 # Cluster-first selection and loading opportunities
 
+This report preserves the initial selector/prototype study. The subsequent
+integration and browser comparison are in [OPTIMIZATION_RESULTS.md](OPTIMIZATION_RESULTS.md).
+
 Author-side results, September 28, 2026. Work is isolated on
 `codex/camera-ready-sampling`, based on evaluator commit
 `8b67cade6017ac8e3ccff242a208c5dc025380ea`. No changes were pushed to a remote,

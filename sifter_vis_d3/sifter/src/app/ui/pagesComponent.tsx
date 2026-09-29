@@ -9,6 +9,7 @@ import { SubtypeEntry } from './legendComponent';
 import { HtmlTooltip } from './cacheSetComponent';
 import Grid from '@mui/material/Grid2';
 import { theme } from '../page';
+import { getSlotDataAtBucket } from './currentBucket';
 
 interface MemoryObject {
     file: string | null,
@@ -194,36 +195,6 @@ function downloadTextFile(text: string, fileName: string): void {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-}
-
-/*  TODO: Currently, this function just looks at the starting address of each
-    event, without considering events crossing slot/page boundaries. This
-    should be fine to give an approximate overview in most cases. */
-function getSlotDataPerBucket(  events: MemoryObject[], pageAddr: number, pageSize: number, numSlots: number,
-                                numBuckets: number, getBucketIdx: (ts: number) => number,
-                                pageVis: {[tp: string]: boolean}) {
-    const ret: number[][] = Array(numBuckets + 2).fill(undefined).map(() => Array(numSlots).fill(0));
-    const slotSize = Math.floor(pageSize / numSlots);
-
-    events.filter((event) => event.type && pageVis[event.type])
-        .forEach((event) => {
-        const eventAddr = event.actualAddr ? event.actualAddr : event.addr;
-        if (Math.floor(eventAddr / pageSize) == Math.floor(pageAddr / pageSize)) {
-            const eventSlot = Math.floor((eventAddr % pageSize) / slotSize);
-            ret[getBucketIdx(event.allocTs)][eventSlot] += event.size;
-            if (event.freeTs)
-                ret[getBucketIdx(event.freeTs)][eventSlot] -= event.size;
-        }
-    });
-
-    ret.forEach((bucket, i) => {
-        bucket.forEach((slot, j) => {
-            if (i != 0) {
-                ret[i][j] = slot + ret[i-1][j];
-            }
-        });
-    });
-    return ret;
 }
 
 const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize, xScale, yScale,
@@ -1073,9 +1044,11 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
         setZoomedAddr: (a: number) => void
     }) {
     const [currData, setCurrData] = useState(data);
-    const dataPerBucket = useMemo(() => {
-        return getSlotDataPerBucket(data.events, addr, pageSize, NUM_SLOTS_HUGEPAGE, numBuckets, getBucketIdx, pageVis);
-    }, [data, pageVis]);
+    const bucketIdx = getBucketIdx(currTs);
+    const slotData = useMemo(() => {
+        return getSlotDataAtBucket(data.events, addr, pageSize, NUM_SLOTS_HUGEPAGE,
+                                   getBucketIdx, pageVis, bucketIdx);
+    }, [data, addr, pageSize, getBucketIdx, pageVis, bucketIdx]);
 
     useEffect(() => {
         const filtered = {
@@ -1109,7 +1082,7 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
                 selAddr={selAddr}
                 pageSize={pageSize}
                 objData={currData}
-                slotData={dataPerBucket[getBucketIdx(currTs)]}
+                slotData={slotData}
                 setSelPageAddr={setSelPageAddr}
                 colourOfType={colourOfType}
                 zoomedAddr={zoomedAddr}

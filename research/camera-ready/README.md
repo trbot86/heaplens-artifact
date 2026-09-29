@@ -35,9 +35,10 @@ cluster assignments, across the existing 20-seed trace matrix. Score the
 previously verified genuine rare raxNode identities, not a relaxed replacement
 predicate. Keep the separate lifetime-ordering issue unchanged in this study.
 
-Performance work initially profiles and tests candidate computations; it does
-not silently introduce frontend refactors or cache formats. Any acceleration
-needs equal-output tests plus interface validation before integration.
+The narrow cache-range and selected-bucket optimizations are now integrated,
+with equal-output checks and paired browser tests. No backend result cache,
+row virtualization, or cache-format change is included. See
+[OPTIMIZATION_RESULTS.md](OPTIMIZATION_RESULTS.md) for measured gains and limits.
 
 ## Findings and reproduction
 

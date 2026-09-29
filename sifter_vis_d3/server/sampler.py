@@ -14,6 +14,7 @@ import os
 from random import randint, shuffle
 from cache_limits import validate_cache_geometry, check_cache_budget
 from page_selection import select_pages
+from cache_ranges import add_cache_range
 
 MAX_PAGE_PROP = 7560
 MAX_OBJ_STATS = 1000000
@@ -608,23 +609,13 @@ class Sampler:
                 # if entry[TYPE_IND] == "leanstore::storage::btree::BTreeVI::ChainedTuple":
                 #     print("alloc bucket: {}, free bucket: {}".format(alloc_time_bucket, free_time_bucket))
                 try:
-                    cache_sets = (start_set + np.arange(n_sets)) % num_cache_sets
-                    np.add.at(
-                        data,
-                        (np.full(n_sets, alloc_time_bucket),
-                         cache_sets,
-                         np.full(n_sets, tp_and_st_to_idx[entry[TYPE_IND]])),
-                        1
-                    )
+                    type_idx = tp_and_st_to_idx[entry[TYPE_IND]]
+                    add_cache_range(data, alloc_time_bucket, start_set, type_idx,
+                                    n_sets, num_cache_sets, 1)
 
                     if free_time_bucket >= 0:
-                        np.add.at(
-                            data,
-                            (np.full(n_sets, free_time_bucket),
-                             cache_sets,
-                             np.full(n_sets, tp_and_st_to_idx[entry[TYPE_IND]])),
-                            -1
-                        )
+                        add_cache_range(data, free_time_bucket, start_set, type_idx,
+                                        n_sets, num_cache_sets, -1)
 
                 except KeyError:
                     print('KEY ERROR!!!')
