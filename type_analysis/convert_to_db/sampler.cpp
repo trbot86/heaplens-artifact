@@ -153,10 +153,10 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
                     .insert(addr_sz.first / page_size);
             }
 
-            event_and_actual_addr* new_event = new event_and_actual_addr{sp_ev, event_addr};
+            event_and_actual_addr* new_event = new event_and_actual_addr{sp_ev, event_addr, event.size};
             sample_page_and_add_event(pages, new_event, page_num, sample_prop);
             if (pages[page_num].sampled == PageSample::Yes) {
-                io.write_event_to_db(stmt, *sp_ev, event_addr);
+                io.write_event_to_db(stmt, *sp_ev, event_addr, event.size);
             }
         }
     }
@@ -183,7 +183,7 @@ void Sampler::sample_pages_and_record_stats(size_t page_size, size_t num_pages_p
                 continue;
             page.sampled = PageSample::Yes;
             for (auto* mem_event : page.event_ptrs) {
-                io.write_event_to_db(stmt, *mem_event->first, mem_event->second);
+                io.write_event_to_db(stmt, *mem_event->first, mem_event->second, mem_event->actual_size);
             }
             ++num_taken;
         }

@@ -3,7 +3,11 @@
 #include <cstdlib>
 #include <cmath>
 
-using event_and_actual_addr = std::pair<memory_event_t*, uintptr_t>;
+struct event_and_actual_addr {
+    memory_event_t* first;
+    uintptr_t second;
+    size_t actual_size;
+};
 
 class Sampler {
 private:

@@ -50,7 +50,7 @@ class CacheRangesTest(unittest.TestCase):
                 ['test', 64, 4096, 'Node', 70, float('nan'), 1, 4096],
                 ['test', 0, 8192, 'Empty', 10, 10, 2, 8192],
                 ['test', 3, 4100, 'Node', 5, 90, 1, 4090]]
-        s.get_objects = Mock(return_value=pd.DataFrame(rows, columns=event_labels))
+        s.get_objects = Mock(return_value=pd.DataFrame([r + [0] for r in rows], columns=event_labels))
         s.types = Mock(return_value=['Node', 'Empty'])
         s.get_fields = Mock(return_value={'Node': [dict(subtype='field', offset=4, size=64)]})
         actual = s.get_cache_data(32768, 8)

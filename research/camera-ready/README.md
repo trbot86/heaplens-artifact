@@ -1,5 +1,16 @@
 # Camera-ready sampling work
 
+The completed [local pipeline ablation](LOCAL_PIPELINE_ABLATION_RESULTS.md)
+separates native conversion, backend preparation, actual database-to-UI loading,
+and exact 64-KiB detail interactions. It includes both gains and negative results.
+
+The [paper material](PAPER_PROCESSING_OPTIMIZATIONS.md) assembles mechanism
+descriptions and an interface table. Its companion matched backend matrix
+isolates spatial range updates and temporal prefix sums under one configuration.
+See [the completed matrix](BACKEND_MATRIX_RESULTS.md) and copy-ready LaTeX
+tables for [backend preparation](backend-matrix-table.tex) and
+[representative UI interactions](interface-ablation-table.tex).
+
 This work is isolated on `codex/camera-ready-sampling`, based on evaluator
 revision `8b67cade6017ac8e3ccff242a208c5dc025380ea`. The evaluator-facing `main`
 branch and its checkout are unchanged. No native converter or benchmark
@@ -55,6 +66,24 @@ with equal-output checks and paired browser tests. No backend result cache,
 row virtualization, or cache-format change is included. See
 [OPTIMIZATION_RESULTS.md](OPTIMIZATION_RESULTS.md) for measured gains and limits.
 
+The detail renderer also filters histories to the selected address region before
+creating components, preserving enclosing objects, lifetime endpoints, and
+expanded fields. See [DETAIL_OPTIMIZATION_RESULTS.md](DETAIL_OPTIMIZATION_RESULTS.md)
+for paired dense-page timings and visual-equivalence checks. This is not viewport
+virtualization; selecting an entire dense page can still be expensive.
+
+The [staged ablation protocol](STAGED_ABLATION_PROTOCOL.md) contains draft paper
+text for that optimization and a bounded plan for separately evaluating native
+database construction, database-to-UI loading, and individual UI interactions.
+It distinguishes equal-output prefix-sum comparisons from display-history
+reduction, which changes retained detail. Additional measurements in that plan
+are not yet run; [the earlier compact plan](PROCESSING_ABLATION_PLAN.md) is retained.
+
+A [Pyke UI smoke](PYKE_UI_SMOKE.md) confirms that its installed Chromium can run
+the optimized interface headlessly with software rendering. It records the
+graphics difference from the local GPU-backed browser and single-trial latency
+checks; it is not a completed processing ablation or repeated UI comparison.
+
 ## Findings and reproduction
 
 See [RESULTS.md](RESULTS.md) for the selection comparison, remaining capacity
@@ -83,3 +112,7 @@ part of `artifact/run.sh` or a change to the performance-reproduction protocol.
 From the repository root, run the selector and existing cache regressions with
 `python3 -m unittest artifact.tests.test_representative_selection artifact.tests.test_cache_limits`.
 The wider regression command is `python3 -m unittest discover -s artifact/tests`.
+
+The [event-schema comparison](EVENT_SCHEMA_RESULTS.md) records file/type lookup
+normalization, original-size metadata, page-continuation markers, and measured
+join/read costs on retained Valkey and BCCO databases.

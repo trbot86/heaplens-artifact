@@ -1,0 +1,618 @@
+{
+  "cache": [
+    {
+      "case": "valkey",
+      "policy": "prefix",
+      "trials": 3,
+      "total_seconds": {
+        "median": 9.040301950648427,
+        "minimum": 8.868985685054213,
+        "maximum": 9.102839310653508
+      },
+      "peak_rss_kib": {
+        "median": 2178712,
+        "minimum": 2178452,
+        "maximum": 2237020
+      },
+      "payload_bytes": {
+        "median": 70223200,
+        "minimum": 70223200,
+        "maximum": 70223200
+      },
+      "phases": {
+        "database": {
+          "median": 1.4112570188008249,
+          "minimum": 1.3953864397481084,
+          "maximum": 1.4277328387834132
+        },
+        "statistics": {
+          "median": 0.24557392997667193,
+          "minimum": 0.24417087389156222,
+          "maximum": 0.25979189621284604
+        },
+        "pages": {
+          "median": 2.9081417419947684,
+          "minimum": 2.864476873073727,
+          "maximum": 2.9145035231485963
+        },
+        "cache": {
+          "median": 3.599243463948369,
+          "minimum": 3.4996471130289137,
+          "maximum": 3.6458600657060742
+        },
+        "json": {
+          "median": 0.8418900580145419,
+          "minimum": 0.8280443819239736,
+          "maximum": 0.8537223427556455
+        }
+      }
+    },
+    {
+      "case": "valkey",
+      "policy": "direct",
+      "trials": 3,
+      "total_seconds": {
+        "median": 19.092649486847222,
+        "minimum": 19.032601742073894,
+        "maximum": 19.297952911816537
+      },
+      "peak_rss_kib": {
+        "median": 1933656,
+        "minimum": 1932924,
+        "maximum": 1991264
+      },
+      "payload_bytes": {
+        "median": 70223200,
+        "minimum": 70223200,
+        "maximum": 70223200
+      },
+      "phases": {
+        "database": {
+          "median": 1.4134868839755654,
+          "minimum": 1.3956662728451192,
+          "maximum": 1.454830577597022
+        },
+        "statistics": {
+          "median": 0.24670382868498564,
+          "minimum": 0.24397257901728153,
+          "maximum": 0.2502490505576134
+        },
+        "pages": {
+          "median": 2.9128025639802217,
+          "minimum": 2.9017030098475516,
+          "maximum": 2.930754362139851
+        },
+        "cache": {
+          "median": 13.642049091868103,
+          "minimum": 13.631989730987698,
+          "maximum": 13.809521209914237
+        },
+        "json": {
+          "median": 0.8351399572566152,
+          "minimum": 0.8279798533767462,
+          "maximum": 0.8569547021761537
+        }
+      }
+    },
+    {
+      "case": "bcco",
+      "policy": "prefix",
+      "trials": 3,
+      "total_seconds": {
+        "median": 10.96723767509684,
+        "minimum": 10.94184437673539,
+        "maximum": 10.973993695806712
+      },
+      "peak_rss_kib": {
+        "median": 2126968,
+        "minimum": 2126748,
+        "maximum": 2127136
+      },
+      "payload_bytes": {
+        "median": 65839751,
+        "minimum": 65839751,
+        "maximum": 65839751
+      },
+      "phases": {
+        "database": {
+          "median": 1.3330302461981773,
+          "minimum": 1.3248679479584098,
+          "maximum": 1.3794309278018773
+        },
+        "statistics": {
+          "median": 0.24261451978236437,
+          "minimum": 0.24149207910522819,
+          "maximum": 0.24944215780124068
+        },
+        "pages": {
+          "median": 1.4423297811299562,
+          "minimum": 1.409390958957374,
+          "maximum": 1.4475472578778863
+        },
+        "cache": {
+          "median": 7.138115654233843,
+          "minimum": 7.1302139749750495,
+          "maximum": 7.160636255051941
+        },
+        "json": {
+          "median": 0.7729900809936225,
+          "minimum": 0.7680759858340025,
+          "maximum": 0.7773456289432943
+        }
+      }
+    },
+    {
+      "case": "bcco",
+      "policy": "direct",
+      "trials": 3,
+      "total_seconds": {
+        "median": 9.553480044007301,
+        "minimum": 9.476753459777683,
+        "maximum": 9.605691032949835
+      },
+      "peak_rss_kib": {
+        "median": 1914544,
+        "minimum": 1914284,
+        "maximum": 1914608
+      },
+      "payload_bytes": {
+        "median": 65839751,
+        "minimum": 65839751,
+        "maximum": 65839751
+      },
+      "phases": {
+        "database": {
+          "median": 1.3363303788937628,
+          "minimum": 1.3291073963046074,
+          "maximum": 1.3405788261443377
+        },
+        "statistics": {
+          "median": 0.24313516402617097,
+          "minimum": 0.2421831819228828,
+          "maximum": 0.2446412011049688
+        },
+        "pages": {
+          "median": 1.4180530062876642,
+          "minimum": 1.411646672990173,
+          "maximum": 1.4918718189001083
+        },
+        "cache": {
+          "median": 5.743300138041377,
+          "minimum": 5.681129869073629,
+          "maximum": 5.762964956928045
+        },
+        "json": {
+          "median": 0.7782051754184067,
+          "minimum": 0.7635079897008836,
+          "maximum": 0.7832584739662707
+        }
+      }
+    }
+  ],
+  "history": [
+    {
+      "case": "valkey",
+      "policy": "reduced",
+      "trials": 3,
+      "total_seconds": {
+        "median": 8.87488065334037,
+        "minimum": 8.8039759141393,
+        "maximum": 8.900691871996969
+      },
+      "peak_rss_kib": {
+        "median": 2178928,
+        "minimum": 2178804,
+        "maximum": 2237140
+      },
+      "payload_bytes": {
+        "median": 70223198,
+        "minimum": 70223198,
+        "maximum": 70223198
+      },
+      "selected_pages": {
+        "median": 128,
+        "minimum": 128,
+        "maximum": 128
+      },
+      "selected_records": {
+        "median": 7514,
+        "minimum": 7514,
+        "maximum": 7514
+      },
+      "all_prepared_objects": {
+        "median": 1022156,
+        "minimum": 1022156,
+        "maximum": 1022156
+      },
+      "all_display_histories": {
+        "median": 1020954,
+        "minimum": 1020954,
+        "maximum": 1020954
+      },
+      "phases": {
+        "database": {
+          "median": 1.3700525518506765,
+          "minimum": 1.3631127681583166,
+          "maximum": 1.383194563910365
+        },
+        "statistics": {
+          "median": 0.24137852899730206,
+          "minimum": 0.23735580407083035,
+          "maximum": 0.242264318279922
+        },
+        "pages": {
+          "median": 2.7969220569357276,
+          "minimum": 2.7935193297453225,
+          "maximum": 2.864893855061382
+        },
+        "cache": {
+          "median": 3.546719051897526,
+          "minimum": 3.530086816754192,
+          "maximum": 3.5862231431528926
+        },
+        "json": {
+          "median": 0.8496413389220834,
+          "minimum": 0.8412888622842729,
+          "maximum": 0.8629134716466069
+        }
+      }
+    },
+    {
+      "case": "valkey",
+      "policy": "full",
+      "trials": 3,
+      "total_seconds": {
+        "median": 8.437559506855905,
+        "minimum": 8.410110749769956,
+        "maximum": 8.532227683346719
+      },
+      "peak_rss_kib": {
+        "median": 2178944,
+        "minimum": 2178828,
+        "maximum": 2179160
+      },
+      "payload_bytes": {
+        "median": 70384001,
+        "minimum": 70384001,
+        "maximum": 70384001
+      },
+      "selected_pages": {
+        "median": 128,
+        "minimum": 128,
+        "maximum": 128
+      },
+      "selected_records": {
+        "median": 8488,
+        "minimum": 8488,
+        "maximum": 8488
+      },
+      "all_prepared_objects": {
+        "median": 1022156,
+        "minimum": 1022156,
+        "maximum": 1022156
+      },
+      "all_display_histories": {
+        "median": 1022156,
+        "minimum": 1022156,
+        "maximum": 1022156
+      },
+      "phases": {
+        "database": {
+          "median": 1.3739060671068728,
+          "minimum": 1.3722365656867623,
+          "maximum": 1.3864528918638825
+        },
+        "statistics": {
+          "median": 0.2488598572090268,
+          "minimum": 0.2453730907291174,
+          "maximum": 0.2601591730490327
+        },
+        "pages": {
+          "median": 2.337941898033023,
+          "minimum": 2.32216692622751,
+          "maximum": 2.4228019691072404
+        },
+        "cache": {
+          "median": 3.5911477832123637,
+          "minimum": 3.5581741090863943,
+          "maximum": 3.602118459995836
+        },
+        "json": {
+          "median": 0.8529938496649265,
+          "minimum": 0.8499916917644441,
+          "maximum": 0.8872373127378523
+        }
+      }
+    },
+    {
+      "case": "bcco",
+      "policy": "reduced",
+      "trials": 3,
+      "total_seconds": {
+        "median": 10.863722041714936,
+        "minimum": 10.846369084902108,
+        "maximum": 10.985228173900396
+      },
+      "peak_rss_kib": {
+        "median": 2126312,
+        "minimum": 2125804,
+        "maximum": 2127608
+      },
+      "payload_bytes": {
+        "median": 65839749,
+        "minimum": 65839749,
+        "maximum": 65839749
+      },
+      "selected_pages": {
+        "median": 128,
+        "minimum": 128,
+        "maximum": 128
+      },
+      "selected_records": {
+        "median": 42232,
+        "minimum": 42232,
+        "maximum": 42232
+      },
+      "all_prepared_objects": {
+        "median": 469850,
+        "minimum": 469850,
+        "maximum": 469850
+      },
+      "all_display_histories": {
+        "median": 428852,
+        "minimum": 428852,
+        "maximum": 428852
+      },
+      "phases": {
+        "database": {
+          "median": 1.328301090747118,
+          "minimum": 1.3228195048868656,
+          "maximum": 1.3392660738900304
+        },
+        "statistics": {
+          "median": 0.2433626027777791,
+          "minimum": 0.24134695995599031,
+          "maximum": 0.2517681731842458
+        },
+        "pages": {
+          "median": 1.4105617590248585,
+          "minimum": 1.4039963399991393,
+          "maximum": 1.4755438473075628
+        },
+        "cache": {
+          "median": 7.093867791816592,
+          "minimum": 7.0779625326395035,
+          "maximum": 7.111535036936402
+        },
+        "json": {
+          "median": 0.7674029767513275,
+          "minimum": 0.7598903169855475,
+          "maximum": 0.8015896519646049
+        }
+      }
+    },
+    {
+      "case": "bcco",
+      "policy": "full",
+      "trials": 3,
+      "total_seconds": {
+        "median": 10.983653986826539,
+        "minimum": 10.82316771429032,
+        "maximum": 11.022785649169236
+      },
+      "peak_rss_kib": {
+        "median": 2137316,
+        "minimum": 2132356,
+        "maximum": 2138320
+      },
+      "payload_bytes": {
+        "median": 67469283,
+        "minimum": 67469283,
+        "maximum": 67469283
+      },
+      "selected_pages": {
+        "median": 128,
+        "minimum": 128,
+        "maximum": 128
+      },
+      "selected_records": {
+        "median": 51136,
+        "minimum": 51136,
+        "maximum": 51136
+      },
+      "all_prepared_objects": {
+        "median": 469850,
+        "minimum": 469850,
+        "maximum": 469850
+      },
+      "all_display_histories": {
+        "median": 469850,
+        "minimum": 469850,
+        "maximum": 469850
+      },
+      "phases": {
+        "database": {
+          "median": 1.3349353759549558,
+          "minimum": 1.3325397218577564,
+          "maximum": 1.3717209519818425
+        },
+        "statistics": {
+          "median": 0.24811416817829013,
+          "minimum": 0.2403333759866655,
+          "maximum": 0.2574249617755413
+        },
+        "pages": {
+          "median": 1.347456575371325,
+          "minimum": 1.3301774309948087,
+          "maximum": 1.380407189950347
+        },
+        "cache": {
+          "median": 7.133043720852584,
+          "minimum": 7.10683991573751,
+          "maximum": 7.190585335716605
+        },
+        "json": {
+          "median": 0.7992773591540754,
+          "minimum": 0.7812091368250549,
+          "maximum": 0.9081090278923512
+        }
+      }
+    }
+  ],
+  "native": [
+    {
+      "case": "valkey",
+      "policy": "prefix",
+      "trials": 3,
+      "conversion_seconds": {
+        "median": 1.6939770402386785,
+        "minimum": 1.6422998858615756,
+        "maximum": 1.7108220718801022
+      },
+      "peak_native_rss_kib": {
+        "median": 465936,
+        "minimum": 465452,
+        "maximum": 466572
+      },
+      "database_bytes": {
+        "median": 54403072,
+        "minimum": 54403072,
+        "maximum": 54403072
+      },
+      "phases": {
+        "reconstruction": {
+          "median": 0.719124,
+          "minimum": 0.67347,
+          "maximum": 0.734651
+        },
+        "sampling_statistics_sql": {
+          "median": 0.656108,
+          "minimum": 0.649838,
+          "maximum": 0.657507
+        }
+      }
+    },
+    {
+      "case": "valkey",
+      "policy": "direct",
+      "trials": 3,
+      "conversion_seconds": {
+        "median": 2.074430936947465,
+        "minimum": 2.060206830035895,
+        "maximum": 2.126361315138638
+      },
+      "peak_native_rss_kib": {
+        "median": 465536,
+        "minimum": 465376,
+        "maximum": 465560
+      },
+      "database_bytes": {
+        "median": 54403072,
+        "minimum": 54403072,
+        "maximum": 54403072
+      },
+      "phases": {
+        "reconstruction": {
+          "median": 0.740946,
+          "minimum": 0.732681,
+          "maximum": 0.763996
+        },
+        "sampling_statistics_sql": {
+          "median": 1.01692,
+          "minimum": 1.00991,
+          "maximum": 1.02995
+        }
+      }
+    }
+  ],
+  "lifetimes": [
+    {
+      "case": "valkey",
+      "base_objects": 1022156,
+      "buckets": 2000,
+      "no_logged_free": 1020688,
+      "same_bucket": 1386,
+      "reversed_bucket_interval": 0,
+      "fraction_same_bucket": 0.0013559574076755408,
+      "fraction_spanning_at_least_1000_buckets": 0.7461092044658545,
+      "mean_absolute_bucket_span": 1267.5110560423261,
+      "median_absolute_bucket_span": 1237.0,
+      "note": "Before cache field expansion; preserves current object reconstruction and bucket semantics."
+    },
+    {
+      "case": "bcco",
+      "base_objects": 469850,
+      "buckets": 2000,
+      "no_logged_free": 221,
+      "same_bucket": 447058,
+      "reversed_bucket_interval": 0,
+      "fraction_same_bucket": 0.9514909013514952,
+      "fraction_spanning_at_least_1000_buckets": 0.0003703309566883048,
+      "mean_absolute_bucket_span": 1.6230541662232627,
+      "median_absolute_bucket_span": 0.0,
+      "note": "Before cache field expansion; preserves current object reconstruction and bucket semantics."
+    }
+  ],
+  "database_to_ui": [
+    {
+      "case": "valkey",
+      "policy": "reduced",
+      "trials": 3,
+      "ready_ms": {
+        "median": 10433.099999904633,
+        "minimum": 9996,
+        "maximum": 10579.5
+      },
+      "post_ready_heap_bytes": {
+        "median": 197810676,
+        "minimum": 195477240,
+        "maximum": 198320968
+      }
+    },
+    {
+      "case": "valkey",
+      "policy": "full",
+      "trials": 3,
+      "ready_ms": {
+        "median": 9914,
+        "minimum": 9731,
+        "maximum": 10343.900000095367
+      },
+      "post_ready_heap_bytes": {
+        "median": 198874260,
+        "minimum": 197416060,
+        "maximum": 206022988
+      }
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "policy": "reduced",
+      "trials": 3,
+      "ready_ms": {
+        "median": 12700.799999713898,
+        "minimum": 12431.900000095367,
+        "maximum": 12979.39999961853
+      },
+      "post_ready_heap_bytes": {
+        "median": 215388296,
+        "minimum": 204087704,
+        "maximum": 217445856
+      }
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "policy": "full",
+      "trials": 3,
+      "ready_ms": {
+        "median": 12507.5,
+        "minimum": 12097.700000286102,
+        "maximum": 12994
+      },
+      "post_ready_heap_bytes": {
+        "median": 218015664,
+        "minimum": 206092168,
+        "maximum": 218155504
+      }
+    }
+  ]
+}

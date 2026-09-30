@@ -235,6 +235,15 @@ rect.selection {
     stroke: none;
 }
 
+.pageContinuationMark {
+    transform: translateX(calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2));
+    pointer-events: none;
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5px;
+    filter: drop-shadow(0 0 1px white);
+}
+
 // .pagePerfIndicator {
 //     position: absolute;
 //     top: calc($pageCardSVGHeight / 2);
@@ -655,4 +664,3 @@ rect.selection {
     word-wrap: break-word;
     font-size: 10pt;
 }
-

@@ -63,16 +63,37 @@ IOHandler::IOHandler(std::string in_fname, std::string ts_fname, std::string fs_
         exit(-1);
     }
 
-    rc = sqlite3_exec(db, "DROP TABLE IF EXISTS SUPERTABLE;" \
-                            "CREATE TABLE SUPERTABLE(" \
-                            "FILE       CHAR(100)," \
+    // Preserve the public read schema through a view, while storing names once.
+    // A previous conversion may have produced either the old table or this view.
+    sqlite3_stmt* schema_stmt;
+    if (sqlite3_prepare_v2(db, "SELECT type FROM sqlite_master WHERE name='SUPERTABLE'", -1, &schema_stmt, nullptr) != SQLITE_OK) {
+        fprintf(stderr, "Cannot inspect event schema: %s\n", sqlite3_errmsg(db));
+        exit(-1);
+    }
+    bool was_view = sqlite3_step(schema_stmt) == SQLITE_ROW &&
+        std::string(reinterpret_cast<const char*>(sqlite3_column_text(schema_stmt, 0))) == "view";
+    sqlite3_finalize(schema_stmt);
+    if (sqlite3_exec(db, was_view ? "DROP VIEW SUPERTABLE" : "DROP TABLE IF EXISTS SUPERTABLE", nullptr, nullptr, nullptr) != SQLITE_OK) {
+        fprintf(stderr, "Cannot replace event schema: %s\n", sqlite3_errmsg(db));
+        exit(-1);
+    }
+    rc = sqlite3_exec(db, "DROP TABLE IF EXISTS EVENTS; DROP TABLE IF EXISTS FILE_NAMES; DROP TABLE IF EXISTS TYPE_NAMES;"
+                            "CREATE TABLE FILE_NAMES(ID INTEGER PRIMARY KEY, NAME TEXT NOT NULL);"
+                            "CREATE TABLE TYPE_NAMES(ID INTEGER PRIMARY KEY, NAME TEXT NOT NULL);"
+                            "CREATE TABLE EVENTS(" \
+                            "FILE_ID    INT NOT NULL," \
                             "LINE       INT NOT NULL," \
                             "TIMESTAMP  INT NOT NULL," \
                             "SIZE       INT," \
                             "ACTUALADDR INT," \
                             "ADDRESS    INT NOT NULL," \
                             "isNew      INT," \
-                            "TYPE       CHAR(500));", nullptr, 0, &zErrMsg);
+                            "TYPE_ID    INT NOT NULL,"
+                            "ACTUALSIZE INT NOT NULL);"
+                            "CREATE VIEW SUPERTABLE AS SELECT F.NAME AS FILE, E.LINE, E.TIMESTAMP, E.SIZE,"
+                            "E.ACTUALADDR, E.ADDRESS, E.isNew, T.NAME AS TYPE, E.ACTUALSIZE "
+                            "FROM EVENTS E JOIN FILE_NAMES F ON F.ID=E.FILE_ID JOIN TYPE_NAMES T ON T.ID=E.TYPE_ID;",
+                            nullptr, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
         std::cout << "SQL error creating SUPERTABLE: " << zErrMsg << std::endl;
         exit(-1);
@@ -138,6 +159,28 @@ IOHandler::IOHandler(std::string in_fname, std::string ts_fname, std::string fs_
 
     file_map = construct_map(files_filename);
     type_map = construct_map(types_filename, true);
+
+    begin_transaction();
+    auto write_names = [&](const char* sql, const std::unordered_map<uint16_t, std::string>& names) {
+        sqlite3_stmt* stmt;
+        if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+            fprintf(stderr, "Cannot prepare name lookup: %s\n", sqlite3_errmsg(db));
+            exit(-1);
+        }
+        sqlite3_bind_int(stmt, 1, 0);
+        sqlite3_bind_text(stmt, 2, "NULL", -1, SQLITE_STATIC);
+        step_and_clear_bindings(stmt);
+        for (const auto& entry : names) {
+            if (entry.first == 0) continue;
+            sqlite3_bind_int(stmt, 1, entry.first);
+            sqlite3_bind_text(stmt, 2, entry.second.c_str(), -1, SQLITE_TRANSIENT);
+            step_and_clear_bindings(stmt);
+        }
+        sqlite3_finalize(stmt);
+    };
+    write_names("INSERT INTO FILE_NAMES VALUES (?, ?)", file_map);
+    write_names("INSERT INTO TYPE_NAMES VALUES (?, ?)", type_map);
+    end_transaction();
 
     for (auto& file_ptr_and_name : file_map) {
         rev_file_map.insert(std::pair<std::string, uintptr_t>{
@@ -634,8 +677,8 @@ void IOHandler::step_and_clear_bindings(sqlite3_stmt* stmt) {
 }
 
 void IOHandler::prepare_write_to_supertable(sqlite3_stmt** stmt) {
-    int rc = sqlite3_prepare_v2(db, "INSERT INTO SUPERTABLE (FILE,LINE,TIMESTAMP,SIZE,ACTUALADDR,ADDRESS,isNew,TYPE) " \
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?);", -1, stmt, 0);
+    int rc = sqlite3_prepare_v2(db, "INSERT INTO EVENTS (FILE_ID,LINE,TIMESTAMP,SIZE,ACTUALADDR,ADDRESS,isNew,TYPE_ID,ACTUALSIZE) " \
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, stmt, 0);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "Error after sqlite prepare: %s\n", sqlite3_errstr(rc));
         fprintf(stderr, "DB error: %s\n", sqlite3_errmsg(db));
@@ -696,21 +739,25 @@ void IOHandler::prepare_write_to_align(sqlite3_stmt** stmt) {
 }
 
 void IOHandler::write_event_to_db(sqlite3_stmt* stmt, memory_event_t& ev, 
-                                uintptr_t actual_addr) {
+                                uintptr_t actual_addr, size_t actual_size) {
     if (ev.file && file_map.find(ev.file) == file_map.end()) {
         printf("FAILED to find file %d in file_map\n", ev.file);
         printf("addr: %p, line: %lu, timestamp: %lu\n", ev.addr, ev.line, ev.timestamp);
     }
-    const char* fname = ev.file ? file_map.at(ev.file).c_str() : "NULL";
-    const char* tname = ev.tindex_name ? type_map.at(ev.tindex_name).c_str() : "NULL";
-    sqlite3_bind_text(stmt, 1, fname, strlen(fname), SQLITE_STATIC);
+    // Do not silently lose events in the compatibility view's joins.
+    if ((ev.file && !file_map.count(ev.file)) || (ev.tindex_name && !type_map.count(ev.tindex_name))) {
+        fprintf(stderr, "Missing event file/type lookup\n");
+        exit(-1);
+    }
+    sqlite3_bind_int(stmt, 1, ev.file);
     sqlite3_bind_int(stmt, 2, ev.line);
     sqlite3_bind_int64(stmt, 3, ev.timestamp);
     sqlite3_bind_int64(stmt, 4, ev.size);
     sqlite3_bind_int64(stmt, 5, actual_addr);
     sqlite3_bind_int64(stmt, 6, reinterpret_cast<uintptr_t>(ev.addr));
     sqlite3_bind_int(stmt, 7, ev.typeofop);
-    sqlite3_bind_text(stmt, 8, tname, strlen(tname), SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 8, ev.tindex_name);
+    sqlite3_bind_int64(stmt, 9, actual_size);
     step_and_clear_bindings(stmt);
 }
 

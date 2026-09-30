@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{ccrr}
+\hline
+Range updates & Prefix sums & Valkey & BCCO \\
+\hline
+No & No & 100.77 / 105.99 & 6.51 / 10.25 \\
+Yes & No & 13.35 / 18.63 & 5.58 / 9.37 \\
+No & Yes & 5.85 / 11.06 & 19.97 / 23.72 \\
+Yes & Yes & 3.61 / 8.90 & 7.01 / 10.81 \\
+\hline
+\end{tabular}
+\caption{Cache preparation / complete backend preparation in seconds; medians of three interleaved trials per variant. All variants use the same retained inputs, 2,000 time buckets, 128-page and 100,000-history-record budgets, and fixed clustering seed. Complete preparation includes database reading, statistics, page preparation, cache preparation, and JSON serialization; it excludes HTTP and browser rendering. Output hashes match within each input.}
+\label{tab:heaplens-backend-ablation}
+\end{table}

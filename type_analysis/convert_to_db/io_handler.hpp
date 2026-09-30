@@ -99,7 +99,7 @@ public:
 
     void prepare_write_to_align(sqlite3_stmt**);
 
-    void write_event_to_db(sqlite3_stmt*, memory_event_t&, uintptr_t actual_addr=0);
+    void write_event_to_db(sqlite3_stmt*, memory_event_t&, uintptr_t actual_addr, size_t actual_size);
 
     void write_lines_to_db(std::unordered_map<uint16_t, std::vector<int64_t>>&);
 

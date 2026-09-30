@@ -1,0 +1,370 @@
+{
+  "input": "/inputs/valkey.sqlite",
+  "bytes": {
+    "text": 54403072,
+    "lookups": 44965888
+  },
+  "protocol": "One discarded warmup, then five alternating trials per schema and phase; OS caches not flushed.",
+  "trials": [
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 1.500225956000122,
+      "maxrss_kib": 510268,
+      "phase": "query",
+      "schema": "text",
+      "trial": 0,
+      "warmup": true
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 1.0094707590001235,
+      "maxrss_kib": 509568,
+      "phase": "query",
+      "schema": "lookups",
+      "trial": 0,
+      "warmup": true
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 1.0338471129998652,
+      "maxrss_kib": 509000,
+      "phase": "query",
+      "schema": "lookups",
+      "trial": 1,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 0.9472877810001137,
+      "maxrss_kib": 509604,
+      "phase": "query",
+      "schema": "text",
+      "trial": 1,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 0.9138562660000389,
+      "maxrss_kib": 511244,
+      "phase": "query",
+      "schema": "text",
+      "trial": 2,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 0.9867184859999725,
+      "maxrss_kib": 509540,
+      "phase": "query",
+      "schema": "lookups",
+      "trial": 2,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 0.903422589999991,
+      "maxrss_kib": 509296,
+      "phase": "query",
+      "schema": "lookups",
+      "trial": 3,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 0.85632160199998,
+      "maxrss_kib": 510620,
+      "phase": "query",
+      "schema": "text",
+      "trial": 3,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 0.8515858329999446,
+      "maxrss_kib": 510020,
+      "phase": "query",
+      "schema": "text",
+      "trial": 4,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 0.8791329199998472,
+      "maxrss_kib": 510664,
+      "phase": "query",
+      "schema": "lookups",
+      "trial": 4,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 0.8625177129999884,
+      "maxrss_kib": 509716,
+      "phase": "query",
+      "schema": "lookups",
+      "trial": 5,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "0289f7668e3635f16d205d8a22a3663644324acf8e2d0c269274a7329c0c234d",
+      "seconds": 0.8438057759999538,
+      "maxrss_kib": 511176,
+      "phase": "query",
+      "schema": "text",
+      "trial": 5,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.5830968790000952,
+      "maxrss_kib": 493400,
+      "phase": "load",
+      "schema": "text",
+      "trial": 0,
+      "warmup": true
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.5686628010000732,
+      "maxrss_kib": 493796,
+      "phase": "load",
+      "schema": "lookups",
+      "trial": 0,
+      "warmup": true
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.5822474510000575,
+      "maxrss_kib": 493392,
+      "phase": "load",
+      "schema": "lookups",
+      "trial": 1,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.5515411799999583,
+      "maxrss_kib": 494220,
+      "phase": "load",
+      "schema": "text",
+      "trial": 1,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.6064582760000121,
+      "maxrss_kib": 492828,
+      "phase": "load",
+      "schema": "text",
+      "trial": 2,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.6573006449998502,
+      "maxrss_kib": 493508,
+      "phase": "load",
+      "schema": "lookups",
+      "trial": 2,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.5732258980001461,
+      "maxrss_kib": 493124,
+      "phase": "load",
+      "schema": "lookups",
+      "trial": 3,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.5436839279998367,
+      "maxrss_kib": 493488,
+      "phase": "load",
+      "schema": "text",
+      "trial": 3,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.5480801109999902,
+      "maxrss_kib": 494048,
+      "phase": "load",
+      "schema": "text",
+      "trial": 4,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.5998979860000873,
+      "maxrss_kib": 498672,
+      "phase": "load",
+      "schema": "lookups",
+      "trial": 4,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.7099763549999807,
+      "maxrss_kib": 493872,
+      "phase": "load",
+      "schema": "lookups",
+      "trial": 5,
+      "warmup": false
+    },
+    {
+      "rows": 1024766,
+      "sha256": "d44900398840d08ab2b0a05740fe72a94fe763ac06eb955e834f9f0f42c70e8c",
+      "seconds": 1.6156835560000218,
+      "maxrss_kib": 493848,
+      "phase": "load",
+      "schema": "text",
+      "trial": 5,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.292375816999993,
+      "maxrss_kib": 688092,
+      "phase": "lifetimes",
+      "schema": "text",
+      "trial": 0,
+      "warmup": true
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.3361013500000354,
+      "maxrss_kib": 688744,
+      "phase": "lifetimes",
+      "schema": "lookups",
+      "trial": 0,
+      "warmup": true
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.3029548770000474,
+      "maxrss_kib": 688528,
+      "phase": "lifetimes",
+      "schema": "lookups",
+      "trial": 1,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.259451644999899,
+      "maxrss_kib": 688496,
+      "phase": "lifetimes",
+      "schema": "text",
+      "trial": 1,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.2987185330000557,
+      "maxrss_kib": 687908,
+      "phase": "lifetimes",
+      "schema": "text",
+      "trial": 2,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.3023435620000328,
+      "maxrss_kib": 687836,
+      "phase": "lifetimes",
+      "schema": "lookups",
+      "trial": 2,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.300721774000067,
+      "maxrss_kib": 691216,
+      "phase": "lifetimes",
+      "schema": "lookups",
+      "trial": 3,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.263605795000103,
+      "maxrss_kib": 689028,
+      "phase": "lifetimes",
+      "schema": "text",
+      "trial": 3,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.2584029679999276,
+      "maxrss_kib": 688616,
+      "phase": "lifetimes",
+      "schema": "text",
+      "trial": 4,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.2711867609998535,
+      "maxrss_kib": 688008,
+      "phase": "lifetimes",
+      "schema": "lookups",
+      "trial": 4,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.3793032620001213,
+      "maxrss_kib": 687992,
+      "phase": "lifetimes",
+      "schema": "lookups",
+      "trial": 5,
+      "warmup": false
+    },
+    {
+      "rows": 1022156,
+      "sha256": "521625439a278a1185d30d220ef8aa0cfb292dccf708fd9c61d6b83a2832c225",
+      "seconds": 2.2698157939998964,
+      "maxrss_kib": 687740,
+      "phase": "lifetimes",
+      "schema": "text",
+      "trial": 5,
+      "warmup": false
+    }
+  ]
+}
