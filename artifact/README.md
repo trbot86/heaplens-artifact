@@ -101,7 +101,29 @@ generate fresh instrumented traces, not performance measurements. Use the same
 diagnostic profile on both sides. Smaller traces may not exhibit a phenomenon
 that depends on the paper's thread count or working-set size.
 
-To use the short commands in the last two columns, define this shell helper
+#### Performance comparisons
+
+| Table 1 case | Numerical reproduction command | Compared variants / effective change |
+| --- | --- | --- |
+| ASCYLIB/EFRB | `experiment ascylib_efrb_bench --profile paper` | `a_default` through `d_both`; `SEG_OBJS=1`, `INIT=all` separately and together |
+| ASCYLIB/DVY | `experiment ascylib_dvy_bench --profile paper` | 96/72/128/192-B nodes; `DRACHSLER_PAD=0/128/192`; equal huge-page policy |
+| ASCYLIB/HJ | `experiment ascylib_hj_bench --profile paper` | retained jemalloc 5.3 / glibc malloc |
+| TPC-C/BCCO | `experiment tpcc_bcco_bench --profile paper` | `a_default`, `b_seg_ds`, `c_seg_ds_pack_lock`; `MEMHOOK_SEG_DS`, then `MACROBENCH_PACK_LOCK` |
+| TPC-C/EFRB | `experiment tpcc_efrb_bench --profile paper` | `b_mimalloc` / `e_single_recmgr_mimalloc_fixed`; shared reclamation + padded rows, allocator/segregation fixed |
+| RocksDB/HashSkipList | `rocksdb --memtable prefix_hash --profile paper` | default / `REORDER_FIELDS=1`, 56-B to 48-B bucket layout |
+| RocksDB/InlineSkipList | `rocksdb --memtable skip_list --profile paper` | baseline / alignment + segregation, thresholds 3 |
+| Valkey/string cache | `valkey --profile paper` | baseline / `patches/valkey-B1C1_64.patch` |
+| HNSWLib | `hnsw --profile paper` | packed / separate aligned vectors + huge-page advice, at both 128 D and 1536 D |
+
+Prefix numerical commands with `HEAPLENS_NUMA=1 bash artifact/run.sh`;
+ASCYLIB/TPC-C hardware counters additionally require `HEAPLENS_PERF=1`.
+For example, `HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper --dim 128`
+runs only the requested 128-D comparison. Counter-free ASCYLIB/TPC-C runs use
+`PERFBENCH_PERF=off`. Detailed workloads and placement rules follow below.
+
+#### Before/after visualization
+
+To use the short commands in this table, define this shell helper
 once from the repository root:
 
 ```bash
@@ -121,23 +143,27 @@ diagnostic driver's larger workload. Its workload
 is distinct from the uninstrumented throughput command; the recorded flags
 identify the code/allocator change being visualized.
 
-| Table 1 case | Numerical reproduction command | Compared variants / effective change | Before layout | After layout |
-| --- | --- | --- | --- | --- |
-| ASCYLIB/EFRB | `experiment ascylib_efrb_bench --profile paper` | `a_default` through `d_both`; `SEG_OBJS=1`, `INIT=all` separately and together | `trace ascylib_efrb before` | `trace ascylib_efrb after` (both) |
-| ASCYLIB/DVY | `experiment ascylib_dvy_bench --profile paper` | 96/72/128/192-B nodes; `DRACHSLER_PAD=0/128/192`; equal huge-page policy | `trace ascylib_dvy before` (96 B) | `trace ascylib_dvy after` (192 B; layout inspection, not huge-page-backing verification) |
-| ASCYLIB/HJ | `experiment ascylib_hj_bench --profile paper` | retained jemalloc 5.3 / glibc malloc | `trace ascylib_hj before` | `trace ascylib_hj after` |
-| TPC-C/BCCO | `experiment tpcc_bcco_bench --profile paper` | `a_default`, `b_seg_ds`, `c_seg_ds_pack_lock`; `MEMHOOK_SEG_DS`, then `MACROBENCH_PACK_LOCK` | `trace tpcc_bcco before` | `trace tpcc_bcco after` (segregation + packed lock) |
-| TPC-C/EFRB | `experiment tpcc_efrb_bench --profile paper` | `b_mimalloc` / `e_single_recmgr_mimalloc_fixed`; shared reclamation + padded rows, allocator/segregation fixed | `trace tpcc_efrb before` (mimalloc, segregated tree) | `trace tpcc_efrb after` (`MACROBENCH_SINGLE_RECMGR`, `MACROBENCH_PAD_ROW_TO_ALIGN`) |
-| RocksDB/HashSkipList | `rocksdb --memtable prefix_hash --profile paper` | default / `REORDER_FIELDS=1`, 56-B to 48-B bucket layout | `trace rocksdb_hsl before` | `trace rocksdb_hsl after` (same field-order change in the upstream diagnostic snapshot) |
-| RocksDB/InlineSkipList | `rocksdb --memtable skip_list --profile paper` | baseline / alignment + segregation, thresholds 3 | `trace rocksdb_isl before` | `trace rocksdb_isl after` |
-| Valkey/string cache | `valkey --profile paper` | baseline / `patches/valkey-B1C1_64.patch` | `trace valkey_trace before`; supplied trace also covered by [walkthrough](GUIDED_WALKTHROUGH.md) | `trace valkey_trace after` |
-| HNSWLib | `hnsw --profile paper` | packed / separate aligned vectors + huge-page advice, at both 128 D and 1536 D | `trace hnsw_trace before` | `trace hnsw_trace after` |
+| Table 1 case | Before layout | After layout |
+| --- | --- | --- |
+| ASCYLIB/EFRB | `trace ascylib_efrb before` | `trace ascylib_efrb after` |
+| ASCYLIB/DVY | `trace ascylib_dvy before` | `trace ascylib_dvy after` |
+| ASCYLIB/HJ | `trace ascylib_hj before` | `trace ascylib_hj after` |
+| TPC-C/BCCO | `trace tpcc_bcco before` | `trace tpcc_bcco after` |
+| TPC-C/EFRB | `trace tpcc_efrb before` | `trace tpcc_efrb after` |
+| RocksDB/HashSkipList | `trace rocksdb_hsl before` | `trace rocksdb_hsl after` |
+| RocksDB/InlineSkipList | `trace rocksdb_isl before` | `trace rocksdb_isl after` |
+| Valkey/string cache | `trace valkey_trace before` | `trace valkey_trace after` |
+| HNSWLib | `trace hnsw_trace before` | `trace hnsw_trace after` |
 
-Prefix numerical commands with `HEAPLENS_NUMA=1 bash artifact/run.sh`;
-ASCYLIB/TPC-C hardware counters additionally require `HEAPLENS_PERF=1`.
-For example, `HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper --dim 128`
-runs only the requested 128-D comparison. Counter-free ASCYLIB/TPC-C runs use
-`PERFBENCH_PERF=off`. Detailed workloads and placement rules follow below.
+Trace variant details:
+
+- ASCYLIB/EFRB's after trace enables both segregation and parallel prefill.
+- DVY compares 96-B and 192-B nodes. These traces inspect layout, not huge-page backing.
+- TPC-C/BCCO's after trace combines segregation and the packed lock.
+- TPC-C/EFRB uses mimalloc and a segregated tree on both sides; the after trace
+  adds `MACROBENCH_SINGLE_RECMGR` and `MACROBENCH_PAD_ROW_TO_ALIGN`.
+- HashSkipList applies the same field-order change in the upstream diagnostic snapshot.
+- The supplied Valkey trace is also covered by the [walkthrough](GUIDED_WALKTHROUGH.md).
 
 To view a generated database, substitute the path printed by the trace command:
 
