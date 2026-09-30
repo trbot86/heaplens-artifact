@@ -578,6 +578,24 @@ paper logs are capped at 20 GiB and trials at 900 seconds. Storage speed can
 affect logging overhead, so report the trace-output device. This command does
 not enable the separate diagnostic buffer-wait probe or count I/O waits.
 
+### Measured logging overhead
+
+The packaged full campaign completed all 120 trials on the dual Xeon Gold
+5220R machine using the configuration above: ten repetitions of each
+baseline/logging variant at each update rate for each tree. The measured
+reductions in mean throughput were:
+
+| Workload | 20% updates | 100% updates |
+|---|---:|---:|
+| EFRB | 3.30% | 10.66% |
+| DVY | 0.17% | 5.38% |
+| BCCO | -2.02% | 1.21% |
+
+The negative BCCO value means the instrumented runs were slightly faster in
+this campaign; we do not interpret it as a benefit of logging. These are
+measurements from the packaged reproduction, separate from the historical
+overhead results in `paper_data.xlsx`.
+
 ## Errata and updated reproduction configurations
 
 Paper section, appendix, and Table 1 references in this README refer to the
