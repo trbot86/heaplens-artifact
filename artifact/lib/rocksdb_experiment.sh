@@ -4,16 +4,10 @@
 # SkipList "bucket" node from 56B to 48B, upstreamed as
 # https://github.com/facebook/rocksdb/pull/13424, commit 0c7e5bd).
 #
-# Like the ASCYLIB/TPC-C experiments (see ascylib_experiment.sh /
-# tpcc_experiment.sh for the same caveat), this reproduces the *diagnostic
-# finding* -- the HeapLENS-sampled database showing the pre-fix HashSkipList
-# bucket's cache/page layout -- for the stock, unmodified data structure. It
-# does NOT apply the paper's fix or reproduce a specific before/after size
-# delta (see rocksdb_hsl_bench for that); it only produces the sampled data
-# the "before" side of that finding was computed from. artifact/vendor/
-# rocksdb is pinned to 7e272d20 (0c7e5bd's PARENT commit), i.e. the commit
-# immediately BEFORE the fix landed, deliberately -- that's what makes this
-# the "before" (unfixed) diagnostic case.
+# TRACE_VARIANT=baseline (default) uses the upstream pre-fix snapshot;
+# optimized applies the field-order change before source instrumentation.
+# Both generate diagnostic databases; the performance driver uses its separate
+# historical source snapshot and workload.
 #
 # RocksDB needed considerably more iteration than ASCYLIB/TPC-C to bring up
 # (it's a much larger, more interconnected codebase), captured in four
@@ -45,12 +39,20 @@
 set -euo pipefail
 
 run_rocksdb_experiment() {
-    local out_name="rocksdb_hsl"
+    local out_name="${1:-rocksdb_hsl}"
+    [[ "$out_name" == rocksdb_hsl || "$out_name" == rocksdb_isl ]] || return 2
 
     local SIFTER_ROOT
     SIFTER_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
     local ROCKSDB_SRC="$SIFTER_ROOT/artifact/vendor/rocksdb"
-    local WORK="$SIFTER_ROOT/artifact/experiments/${out_name}/work"
+    local memtable=prefix_hash
+    local layout_flags=()
+    if [[ "$out_name" == rocksdb_isl ]]; then
+        ROCKSDB_SRC="$SIFTER_ROOT/artifact/vendor/rocksdb-historical"
+        memtable=skip_list
+    fi
+    local RUN_ROOT="${ARTIFACT_RUN_DIR:-$SIFTER_ROOT/artifact/experiments/${out_name}}"
+    local WORK="$RUN_ROOT/work"
     local SRC_COPY="${WORK}/src"
     local INSTRUMENTED="${WORK}/instrumented"
     local MEMHOOK_DIR="$SIFTER_ROOT/memhook"
@@ -95,9 +97,22 @@ run_rocksdb_experiment() {
     local PAGES_PER_TYPE="${PAGES_PER_TYPE:-1}"
 
     echo "=== [$out_name] 1/7: fresh working copy of RocksDB ==="
-    [[ ! -e "$WORK" ]] || { echo "Preserve existing results at $WORK; use a fresh checkout." >&2; return 1; }
+    [[ ! -e "$WORK" ]] || { echo "Preserve existing results at $WORK; rerun through artifact/run.sh for a new output directory." >&2; return 1; }
     mkdir -p "$WORK"
     cp -r "$ROCKSDB_SRC" "$SRC_COPY"
+    if [[ "$out_name" == rocksdb_isl ]]; then
+        patch --batch --directory "$SRC_COPY" -p1 -i "$SIFTER_ROOT/artifact/patches/rocksdb-historical.patch"
+    fi
+    case "${TRACE_VARIANT:-baseline}" in
+        baseline) ;;
+        optimized)
+            if [[ "$out_name" == rocksdb_isl ]]; then
+                layout_flags=(ALIGN_TALL_NODE=3 SEG_TALL_NODE=3)
+            else
+                python3 "$LIB_DIR/rocksdb_trace_layout.py" "$SRC_COPY"
+            fi ;;
+        *) echo "Unknown TRACE_VARIANT" >&2; return 2 ;;
+    esac
     # Two fixups needed only for RocksDB (ASCYLIB/setbench's Makefiles don't
     # hit either of these):
     #   - A Windows checkout of this repo's own artifact/vendor/rocksdb
@@ -147,7 +162,7 @@ run_rocksdb_experiment() {
     ./sifter.sh "$SRC_COPY" "$INSTRUMENTED" \
         -t \
         --skip-refactor \
-        --build "bear -- make PORTABLE=1 DEBUG_LEVEL=0 DISABLE_WARNING_AS_ERROR=1 USE_RTTI=1 db_bench -j${BUILD_JOBS}"
+        --build "bear -- make PORTABLE=1 DEBUG_LEVEL=0 DISABLE_WARNING_AS_ERROR=1 USE_RTTI=1 ${layout_flags[*]} db_bench -j${BUILD_JOBS}"
 
     echo "=== [$out_name] 2.5/7: deduplicate colliding insertions in fixes.yaml ==="
     python3 "$LIB_DIR/dedupe_fixes_yaml.py" "$INSTRUMENTED/fixes.yaml"
@@ -164,6 +179,9 @@ run_rocksdb_experiment() {
 
     echo "=== [$out_name] 4.5/7: patch Allocate-collision classes with passthrough template overloads ==="
     python3 "$LIB_DIR/patch_allocate_overloads.py" "$INSTRUMENTED"
+    if [[ "$out_name" == rocksdb_isl ]]; then
+        python3 "$LIB_DIR/rocksdb_inline_regions.py" "$INSTRUMENTED"
+    fi
 
     echo "=== [$out_name] 5/7: rebuild db_bench linked against memhook ==="
     (
@@ -171,7 +189,7 @@ run_rocksdb_experiment() {
         make clean || true
         CXXFLAGS="-I${MEMHOOK_DIR}" \
         LDFLAGS="-L${MEMHOOK_DIR} -Wl,-rpath=${MEMHOOK_DIR} -lmemhook -ldl" \
-        make PORTABLE=1 DEBUG_LEVEL=0 DISABLE_WARNING_AS_ERROR=1 USE_RTTI=1 db_bench -j"${BUILD_JOBS}"
+        make PORTABLE=1 DEBUG_LEVEL=0 DISABLE_WARNING_AS_ERROR=1 USE_RTTI=1 "${layout_flags[@]}" db_bench -j"${BUILD_JOBS}"
     )
 
     echo "=== [$out_name] 6/7: run instrumented db_bench (HashSkipList memtable) ==="
@@ -188,7 +206,7 @@ run_rocksdb_experiment() {
         cd "$INSTRUMENTED"
         ./db_bench \
             --benchmarks="$BENCHMARKS" \
-            --memtablerep=prefix_hash \
+            --memtablerep="$memtable" \
             --hash_bucket_count="$HASH_BUCKET_COUNT" \
             --prefix_size="$PREFIX_SIZE" \
             --threads="$THREADS" \
@@ -204,16 +222,25 @@ run_rocksdb_experiment() {
 
     echo "=== [$out_name] 7/7: sample into sqlite database ==="
     cd "$SIFTER_ROOT"
+    local container_args=()
+    if [[ "$out_name" == rocksdb_isl ]]; then container_args=(--use-container); fi
     ./sifter.sh "$INSTRUMENTED" -d \
         --sample "$SAMPLE_PROPORTION" \
         --pages-per-type "$PAGES_PER_TYPE" \
-        --field-dump fielddump.txt
+        --field-dump fielddump.txt "${container_args[@]}"
 
-    local RESULT_DB="$SIFTER_ROOT/artifact/experiments/${out_name}/${out_name}.sqlite"
+    local RESULT_DB="$RUN_ROOT/${out_name}.sqlite"
     cp "$SIFTER_ROOT/type_analysis/allocs.sqlite" "$RESULT_DB"
     python3 "$SIFTER_ROOT/artifact/check_database.py" "$RESULT_DB"
+    if [[ "$out_name" == rocksdb_isl ]]; then
+        python3 "$LIB_DIR/rocksdb_inline_regions.py" --verify "$RESULT_DB" "${TRACE_VARIANT:-baseline}"
+    fi
     echo "=== [$out_name] done. Database: $RESULT_DB ==="
     echo "    Open it in the visualizer (sifter_vis_d3/sifter) to inspect the"
-    echo "    HashSkipList bucket/node cache-set occupancy at the pre-fix (56B"
-    echo "    bucket) commit, i.e. the 'before' side of PR #13424 / paper Sec 6.4."
+    echo "    $memtable layout (${TRACE_VARIANT:-baseline} variant)."
+    if [[ "$out_name" == rocksdb_hsl ]]; then
+        echo "    baseline buckets are 56B; optimized buckets are 48B."
+    else
+        echo "    optimized uses ALIGN_TALL_NODE=3 SEG_TALL_NODE=3, matching the performance variants."
+    fi
 }

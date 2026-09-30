@@ -4,6 +4,7 @@ set -eo pipefail
 indir=""
 outdir=""
 database=false
+containerArgs=()
 template=false
 skipRefactor=false
 includesOnly=false
@@ -65,6 +66,9 @@ while [ $# -gt 0 ]; do
             fi
             perffile=$2
             shift
+        ;;
+        --use-container)
+            containerArgs=(--use-container)
         ;;
         --field-dump)
             if [[ -z "$2" || "$2" == -* ]]; then
@@ -182,24 +186,26 @@ elif [ "$database" = true ]; then
         echo "(Did you forget to run your application?)"
         exit 1
     fi
-    mv $indir/binary_dump.txt type_analysis/
-    cp $indir/typeset_dump.txt type_analysis/
-    cp $indir/fileset_dump.txt type_analysis/
+    # Preserve this run's trace when another conversion reuses the scratch area.
+    # Reflinks avoid a full copy where the filesystem supports them.
+    cp --reflink=auto -- "$indir/binary_dump.txt" type_analysis/ || exit 1
+    cp -- "$indir/typeset_dump.txt" type_analysis/ || exit 1
+    cp -- "$indir/fileset_dump.txt" type_analysis/ || exit 1
     if ! [[ -z "$perffile" ]]; then
-        cp "$indir"/"$perffile" type_analysis
+        cp "$indir"/"$perffile" type_analysis || exit 1
         perffile="--perf-file $perffile"
     fi
     if ! [[ -z "$fielddump" ]]; then
-        cp $indir/"$fielddump" type_analysis
+        cp "$indir/$fielddump" type_analysis || exit 1
         fielddump="--field-dump $fielddump"
     fi
 
-    cd type_analysis
+    cd type_analysis || exit 1
     rm -f allocs.sqlite
-    make bin/convert_to_db
+    make bin/convert_to_db || exit 1
     echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran ${samplingSeed[*]}"
-    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran "${samplingSeed[@]}"
-    exit 0
+    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran "${samplingSeed[@]}" "${containerArgs[@]}"
+    exit $?
 elif [ "$includesOnly" = true ]; then
     add_includes $indir
     exit 0

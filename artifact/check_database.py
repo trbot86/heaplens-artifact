@@ -6,7 +6,7 @@ from pathlib import Path
 path = Path(sys.argv[1]).resolve()
 with sqlite3.connect(f"file:{path}?mode=ro", uri=True) as db:
     assert db.execute("PRAGMA quick_check").fetchone()[0] == "ok"
-    tables = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")]
+    tables = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type IN ('table','view')")]
     counts = {name: db.execute('SELECT COUNT(*) FROM "' + name.replace('"', '""') + '"').fetchone()[0] for name in tables}
     print("Database row counts:", counts)
     if counts.get("SUPERTABLE", 0) == 0:

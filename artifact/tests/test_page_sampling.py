@@ -1,4 +1,4 @@
-"""Native converter regressions; Linux with g++, sqlite3 and TBB development libs.
+"""Converter/reader regressions; Linux with g++, sqlite3/TBB and server dependencies.
 
 Run: python3 -m unittest discover -s artifact/tests -p test_page_sampling.py -v
 All inputs and build products are created in temporary directories.
@@ -10,6 +10,7 @@ import shutil
 import sqlite3
 import struct
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -30,7 +31,7 @@ class PageSamplingTest(unittest.TestCase):
     def tearDownClass(cls):
         cls.build.cleanup()
 
-    def convert(self, probability, minimum, seed=17, pages=40, raw_override=None, perf_address=None):
+    def convert(self, probability, minimum, seed=17, pages=40, raw_override=None, perf_address=None, use_container=False):
         # Many events per page, two types sharing every page, and address reuse.
         events = []
         for page in range(1, pages + 1):
@@ -48,6 +49,8 @@ class PageSamplingTest(unittest.TestCase):
                        '--num-pages-per-type', str(minimum), '--num-buckets', '16']
             if seed is not None:
                 command += ['--seed', str(seed)]
+            if use_container:
+                command += ['--use-container']
             if perf_address is not None:
                 (path / 'perf.txt').write_text(f'0 0x{perf_address:x} fixture 0 100.00% 0 0 0 0 7 8\n')
                 command += ['--perf-file', 'perf.txt']
@@ -55,9 +58,80 @@ class PageSamplingTest(unittest.TestCase):
             self.assertEqual((path / 'binary_dump.txt').read_bytes(), raw)
             actual_seed = int(re.search(r'Page-sampling seed: (\d+)', result.stderr)[1])
             with sqlite3.connect(path / 'allocs.sqlite') as db:
+                self.assertEqual(db.execute("SELECT type FROM sqlite_master WHERE name='SUPERTABLE'").fetchone()[0], 'view')
+                self.assertEqual(db.execute('SELECT count(*) FROM EVENTS').fetchone(),
+                                 db.execute('SELECT count(*) FROM SUPERTABLE').fetchone())
+                self.assertEqual(db.execute('SELECT count(*) FROM FILE_NAMES').fetchone()[0], 2)
                 tables = {name: sorted(db.execute('SELECT * FROM ' + name).fetchall())
                           for name in ('SUPERTABLE', 'STATS', 'ALIGNMENT', 'LINES', 'PERF')}
         return tables, actual_seed
+
+    def test_container_free_closes_nested_object(self):
+        raw = b''.join(EVENT.pack(1, ts, size, addr, 1, kind, alloc)
+                       for ts, size, addr, kind, alloc in (
+                           (1000, 256, 4096, 1, True),
+                           (2000, 32, 4160, 2, True),
+                           (3000, 0, 4096, 1, False)))
+        tables, _ = self.convert(1, 0, raw_override=raw, use_container=True)
+        frees = [r for r in tables['SUPERTABLE'] if not r[6]]
+        self.assertEqual({(r[7], r[2], r[8]) for r in frees},
+                         {('A', 3000, 256), ('B', 3000, 32)})
+
+    def test_original_extent_survives_sampling_and_frees(self):
+        start, size = 4096 - 16, 4096 + 32
+        raw = b''.join(EVENT.pack(7, ts, size, start, 1, 1, alloc)
+                       for ts, alloc in ((1000, True), (2000, False), (3000, True), (4000, False)))
+        for probability, minimum in ((1, 0), (0, 2)):
+            tables, _ = self.convert(probability, minimum, raw_override=raw)
+            rows = tables['SUPERTABLE']
+            self.assertEqual(len(rows), (3 if probability else 2) * 4)
+            for row in rows:
+                self.assertEqual(row[4], start)
+                self.assertEqual(row[8], size)
+                self.assertLessEqual(row[3], 4096)
+
+    def test_lookup_readers_and_repeated_conversion(self):
+        sys.path.insert(0, str(ROOT/'sifter_vis_d3/server'))
+        from sampler import Sampler
+        from export_page_snapshots import load_actual_sizes
+        with tempfile.TemporaryDirectory(prefix='heaplens-schema-test-') as tmp:
+            path = pathlib.Path(tmp)
+            raw = b''.join(EVENT.pack(7, ts, 8192, 4080, 1, 1, alloc)
+                           for ts, alloc in ((1000, True), (2000, False)))
+            (path/'binary_dump.txt').write_bytes(raw)
+            (path/'typeset_dump.txt').write_text('1|Node\n')
+            (path/'fileset_dump.txt').write_text('1|source.cpp\n')
+            # Exercise replacement of an old table and then of a new view.
+            with sqlite3.connect(path/'allocs.sqlite') as db:
+                db.execute('CREATE TABLE SUPERTABLE(FILE TEXT)')
+            for _ in range(2):
+                subprocess.run([str(self.binary),'--seed','17','--num-buckets','16'],
+                               cwd=path,capture_output=True,check=True)
+                self.assertEqual((path/'binary_dump.txt').read_bytes(),raw)
+            s = Sampler(str(path/'allocs.sqlite'),num_buckets=16)
+            subprocess.run([sys.executable,str(ROOT/'artifact/check_database.py'),str(path/'allocs.sqlite')],
+                           capture_output=True,check=True)
+            objects = s.get_objects(s.all_data)
+            self.assertEqual(len(objects),3)
+            self.assertEqual(set(objects.actualSize),{8192})
+            self.assertEqual(set(objects.actualAddr),{4080})
+            self.assertEqual(set(objects.file),{'source.cpp'})
+            self.assertEqual(set(objects.type),{'Node'})
+            self.assertEqual(len(s.get_records_in_interval(0,2000)),6)
+            self.assertEqual(load_actual_sizes(path/'allocs.sqlite'),{('Node',4080,1000):8192})
+            pages = s.get_sample_of_pages(0,2000,{'Node':True})
+            self.assertTrue(pages['page_num_events'])
+            for page in pages['page_num_events'].values():
+                self.assertTrue(all(e['actualSize']==8192 for e in page['events']))
+            # A pre-change database remains readable, but carries no invented extent.
+            old = path/'legacy.sqlite'
+            with sqlite3.connect(path/'allocs.sqlite') as source, sqlite3.connect(old) as db:
+                source.backup(db)
+                db.executescript('CREATE TABLE LEGACY AS SELECT FILE,LINE,TIMESTAMP,SIZE,ACTUALADDR,ADDRESS,isNew,TYPE FROM SUPERTABLE;'
+                                 'DROP VIEW SUPERTABLE; ALTER TABLE LEGACY RENAME TO SUPERTABLE;')
+            legacy = Sampler(str(old),num_buckets=16)
+            self.assertEqual(set(legacy.get_objects(legacy.all_data).actualSize),{0})
+            self.assertEqual(s.get_cache_data(32768,8),legacy.get_cache_data(32768,8))
 
     @staticmethod
     def pages(rows):

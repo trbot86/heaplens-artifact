@@ -2,14 +2,9 @@
 # Shared driver for the ASCYLIB diagnostic experiments (EFRB / DVY / HJ trees,
 # HeapLENS paper Section 6.2 and Appendix B / Table 1 rows 1-3).
 #
-# This reproduces the *diagnostic finding* (the HeapLENS-sampled database +
-# cache-set-occupancy data that shows e.g. cache set underutilization by
-# tree nodes) for the stock, unmodified data structure. It does NOT apply
-# the paper's follow-up code fix (separate memory arenas + multithreaded
-# prefill) and therefore does NOT reproduce the claimed throughput/
-# cache-miss percentages in Table 1 -- only the underlying pattern those
-# numbers were computed from. For that, see the corresponding *_bench
-# experiment (e.g. ascylib_efrb_bench).
+# TRACE_VARIANT=baseline (default) or optimized selects before/after layouts.
+# These instrumented runs generate diagnostic databases. Use the corresponding
+# *_bench command for uninstrumented throughput and hardware counters.
 #
 # Usage: run_ascylib_experiment <tree-src-dir> <binary-name> <out-name> [make-args...]
 #   tree-src-dir : path under artifact/vendor/ascylib, e.g. src/bst-ellen
@@ -26,11 +21,24 @@ run_ascylib_experiment() {
     local out_name="$3"
     shift 3
     local make_args=("$@")
+    make_args+=(SET_CPU=0)
+    local variant="${TRACE_VARIANT:-baseline}"
+    if [[ "$variant" == optimized ]]; then
+        case "$out_name" in
+            ascylib_efrb) make_args+=(SEG_OBJS=1 INIT=all) ;;
+            ascylib_dvy) make_args+=(DRACHSLER_PAD=192 VERSION=O2) ;;
+            ascylib_hj) ;; # Runtime allocator change, below.
+        esac
+    elif [[ "$variant" != baseline ]]; then
+        echo "Unknown TRACE_VARIANT: $variant" >&2; return 2
+    fi
+    [[ "$out_name" != ascylib_dvy || "$variant" != baseline ]] || make_args+=(VERSION=O2)
 
     local SIFTER_ROOT
     SIFTER_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
     local ASCYLIB_SRC="$SIFTER_ROOT/artifact/vendor/ascylib"
-    local WORK="$SIFTER_ROOT/artifact/experiments/${out_name}/work"
+    local RUN_ROOT="${ARTIFACT_RUN_DIR:-$SIFTER_ROOT/artifact/experiments/${out_name}}"
+    local WORK="$RUN_ROOT/work"
     local SRC_COPY="${WORK}/src"
     local INSTRUMENTED="${WORK}/instrumented"
     local MEMHOOK_DIR="$SIFTER_ROOT/memhook"
@@ -47,7 +55,7 @@ run_ascylib_experiment() {
     local PAGES_PER_TYPE="${PAGES_PER_TYPE:-1}"
 
     echo "=== [$out_name] 1/7: fresh working copy of ASCYLIB ==="
-    rm -rf "$WORK"
+    [[ ! -e "$WORK" ]] || { echo "Refusing to overwrite $WORK" >&2; return 1; }
     mkdir -p "$WORK"
     cp -r "$ASCYLIB_SRC" "$SRC_COPY"
     source "$SIFTER_ROOT/artifact/lib/prepare_ascylib.sh"
@@ -108,7 +116,12 @@ run_ascylib_experiment() {
         cd "$INSTRUMENTED/$tree_src_dir"
         # ASCYLIB's own Makefile.common puts binaries in <ascylib-root>/bin/
         # (BINDIR ?= $(ROOT)/bin, ROOT ?= ../..), not <tree-dir>/bin/.
-        "../../bin/${binary_name}" -i "$INITIAL" -r "$RANGE" -n "$THREADS" -u "$UPDATE_PCT" -d "$DURATION_MS"
+        local preload="$MEMHOOK_DIR/libmemhook.so"
+        # HJ's improvement replaces jemalloc backing with glibc malloc.
+        if [[ "$out_name" == ascylib_hj && "$variant" == baseline ]]; then
+            preload+=":$SIFTER_ROOT/artifact/vendor/heaplens-allocators/libjemalloc-heaplens.so"
+        fi
+        LD_PRELOAD="$preload" "../../bin/${binary_name}" -i "$INITIAL" -r "$RANGE" -n "$THREADS" -u "$UPDATE_PCT" -d "$DURATION_MS"
     )
     # Expected outputs in $INSTRUMENTED/$tree_src_dir: binary_dump.txt,
     # fileset_dump.txt, typeset_dump.txt, fielddump.txt
@@ -120,7 +133,7 @@ run_ascylib_experiment() {
         --pages-per-type "$PAGES_PER_TYPE" \
         --field-dump fielddump.txt
 
-    local RESULT_DB="$SIFTER_ROOT/artifact/experiments/${out_name}/${out_name}.sqlite"
+    local RESULT_DB="$RUN_ROOT/${out_name}.sqlite"
     cp "$SIFTER_ROOT/type_analysis/allocs.sqlite" "$RESULT_DB"
     python3 "$SIFTER_ROOT/artifact/check_database.py" "$RESULT_DB"
     echo "=== [$out_name] done. Database: $RESULT_DB ==="

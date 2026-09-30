@@ -42,7 +42,8 @@ run_tpcc_experiment() {
     local SIFTER_ROOT
     SIFTER_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
     local SETBENCH_SRC="$SIFTER_ROOT/artifact/vendor/setbench"
-    local WORK="$SIFTER_ROOT/artifact/experiments/${out_name}/work"
+    local RUN_ROOT="${ARTIFACT_RUN_DIR:-$SIFTER_ROOT/artifact/experiments/${out_name}}"
+    local WORK="$RUN_ROOT/work"
     local SRC_COPY="${WORK}/src"
     local INSTRUMENTED="${WORK}/instrumented"
     local MEMHOOK_DIR="$SIFTER_ROOT/memhook"
@@ -71,7 +72,7 @@ run_tpcc_experiment() {
     local PAGES_PER_TYPE="${PAGES_PER_TYPE:-1}"
 
     echo "=== [$out_name] 1/7: fresh working copy of setbench (with submodules) ==="
-    rm -rf "$WORK"
+    [[ ! -e "$WORK" ]] || { echo "Refusing to overwrite $WORK" >&2; return 1; }
     mkdir -p "$WORK"
     cp -r "$SETBENCH_SRC" "$SRC_COPY"
     if [ ! -e "$SRC_COPY/common/recordmgr/allocator_bump.h" ]; then
@@ -86,6 +87,14 @@ run_tpcc_experiment() {
     cp -r "$SIFTER_ROOT/artifact/patches/setbench-tpcc/." "$SRC_COPY/"
     source "$SIFTER_ROOT/artifact/lib/tpcc_allocators.sh"
     tpcc_stage_allocators "$SIFTER_ROOT" "$SRC_COPY"
+    local trace_opts="" trace_allocator="libjemalloc.so"
+    case "$out_name:${TRACE_VARIANT:-baseline}" in
+        tpcc_bcco:baseline) ;;
+        tpcc_bcco:optimized) trace_opts="-DMEMHOOK_SEG_DS -DMACROBENCH_PACK_LOCK" ;;
+        tpcc_efrb:baseline) trace_opts="-DDEBRA_ORIGINAL_FREE -DMEMHOOK_SEG_DS"; trace_allocator="libmimalloc.so" ;;
+        tpcc_efrb:optimized) trace_opts="-DDEBRA_ORIGINAL_FREE -DMEMHOOK_SEG_DS -DMACROBENCH_PAD_ROW_TO_ALIGN -DMACROBENCH_SINGLE_RECMGR -DBST_ELLEN"; trace_allocator="libmimalloc.so" ;;
+        *) echo "Unsupported trace variant" >&2; return 2 ;;
+    esac
 
     echo "=== [$out_name] 2/7: build instrumentation toolchain + generate fixes.yaml ==="
     # setbench's macrobench is C++ (-std=c++17) -- use -t/--template so type
@@ -102,7 +111,7 @@ run_tpcc_experiment() {
         -t \
         -s "$MB_SUBDIR" \
         --skip-refactor \
-        --build "bear -- make workload=TPCC data_structure_name=${ds_name}"
+        --build "bear -- make THREAD_CNT=${THREADS} workload=TPCC data_structure_name=${ds_name} data_structure_opts='${trace_opts}'"
 
     echo "=== [$out_name] 3/7: apply clang-tidy fixes ==="
     (cd "$INSTRUMENTED" && clang-apply-replacements-14 ./)
@@ -126,7 +135,7 @@ run_tpcc_experiment() {
         # in here too: it's a compile-time constant sizing several fixed
         # per-thread arrays (config.h's default is 8), not just the
         # runtime -tINT override parser.cpp also accepts.
-        make workload=TPCC data_structure_name="$ds_name" \
+        make THREAD_CNT="$THREADS" workload=TPCC data_structure_name="$ds_name" data_structure_opts="$trace_opts" \
             xargs="-DTHREAD_CNT=${THREADS} -I${MEMHOOK_DIR} -L${MEMHOOK_DIR} -Wl,-rpath=${MEMHOOK_DIR} -lmemhook -ldl"
     )
 
@@ -141,7 +150,7 @@ run_tpcc_experiment() {
         # phase) is deliberate: memhook logs every allocation, and
         # warehouse/table population alone is measurably slower under
         # instrumentation than stock, before the timed phase even starts.
-        timeout "$((RUN_SECONDS + 300))" \
+        timeout "$((RUN_SECONDS + 300))" env LD_PRELOAD="$MEMHOOK_DIR/libmemhook.so:$INSTRUMENTED/lib/$trace_allocator" \
             "./bin/rundb_TPCC_${ds_name}" -pin "0-$((THREADS - 1))"
     )
     # Expected outputs in $INSTRUMENTED/$MB_SUBDIR: binary_dump.txt,
@@ -155,8 +164,9 @@ run_tpcc_experiment() {
         --field-dump fielddump.txt \
         --page-size 2097152
 
-    local RESULT_DB="$SIFTER_ROOT/artifact/experiments/${out_name}/${out_name}.sqlite"
+    local RESULT_DB="$RUN_ROOT/${out_name}.sqlite"
     cp "$SIFTER_ROOT/type_analysis/allocs.sqlite" "$RESULT_DB"
+    python3 "$SIFTER_ROOT/artifact/check_database.py" "$RESULT_DB"
     echo "=== [$out_name] done. Database: $RESULT_DB ==="
     echo "    Open it in the visualizer in huge-page mode to inspect segregation of"
     echo "    data-structure nodes vs. database rows (cf. paper Figure 6)."

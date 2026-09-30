@@ -97,6 +97,7 @@ sifter_vis_d3/server/venv
 !/artifact/historical/
 !/artifact/historical/**
 /artifact/results/
+/artifact/.experiment.lock
 /sifter_vis_d3/sifter/node_modules/
 /sifter_vis_d3/sifter/.next/
 /artifact/experiments/*/work/

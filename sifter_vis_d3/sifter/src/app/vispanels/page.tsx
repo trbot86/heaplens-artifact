@@ -390,6 +390,9 @@ export default function VisPanels() {
     const shouldInitialize = useRef(true);
     const searchParams = useSearchParams();
     const fname = searchParams.get('fname');
+    const requestedBuckets = Number(searchParams.get('buckets'));
+    const initialBuckets = Number.isInteger(requestedBuckets) && requestedBuckets >= 1 && requestedBuckets <= INIT_NUM_BUCKETS
+        ? requestedBuckets : INIT_NUM_BUCKETS;
     const [loading, setLoading] = useState(true);
     const [initialized, setInitialized] = useState(false);
     const [requestError, setRequestError] = useState<string | null>(null);
@@ -410,7 +413,7 @@ export default function VisPanels() {
     const [perfData, setPerfData] = useState({});
     const [cacheInfo, setCacheInfo] = useState(INIT_CACHE_INFO);
     const [cacheData, setCacheData] = useState(INIT_CACHE_DATA);
-    const [numBuckets, setNumBuckets] = useState(INIT_NUM_BUCKETS);
+    const [numBuckets, setNumBuckets] = useState(initialBuckets);
     const [timeRange, setTimeRange] = useState(INIT_TIME_RANGE);
     const [getBucketIdx, setGetBucketTs] = useState(() => (ts: number) => 0);
     const [typesToSample, setTypesToSample] = useState({});
@@ -430,7 +433,7 @@ export default function VisPanels() {
     const [maxRunLength, setMaxRunLength] = useState(INIT_MAX_RUN_LENGTH);
     const [maxRunsPerCluster, setMaxRunsPerCluster] = useState(INIT_MAX_RUNS_PER_CLUSTER);
     const [clusterAlg, setClusterAlg] = useState<'mbkmeans' | 'kmeans' | 'dbscan' | 'agglomerative' | 'meanshift'>(INIT_CLUSTER_ALG);
-    const [numBucketsSetting, setNumBucketsSetting] = useState(INIT_NUM_BUCKETS);
+    const [numBucketsSetting, setNumBucketsSetting] = useState(initialBuckets);
     const [pageSizeSetting, setPageSizeSetting] = useState(INIT_PAGE_SIZE);
     const [cacheInfoSetting, setCacheInfoSetting] = useState(INIT_CACHE_INFO);
     const [cacheLineSizeSetting, setCacheLineSizeSetting] = useState(INIT_CACHELINE_SIZE);
@@ -588,6 +591,10 @@ export default function VisPanels() {
             <Snackbar open={requestError !== null} anchorOrigin={{vertical: 'top', horizontal: 'center'}}>
                 <Alert severity='error' onClose={initialized ? () => setRequestError(null) : undefined} sx={{maxWidth: 700}}>
                     {requestError}
+                    {!initialized && requestError?.includes('memory budget') && numBuckets > 1 &&
+                        <div><a href={`?fname=${encodeURIComponent(fname || '')}&buckets=${Math.max(1, Math.floor(numBuckets / 2))}`}>
+                            Retry with fewer time buckets ({Math.max(1, Math.floor(numBuckets / 2))})
+                        </a></div>}
                     {!initialized && <div><a href='/'>Back to database selection</a></div>}
                 </Alert>
             </Snackbar>

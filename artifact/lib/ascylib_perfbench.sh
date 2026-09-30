@@ -25,7 +25,7 @@ ascylib_perfbench_setup() {
     local SIFTER_ROOT
     SIFTER_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
     ASCYLIB_PERFBENCH_ROOT="$SIFTER_ROOT"
-    ASCYLIB_PERFBENCH_WORK="$SIFTER_ROOT/artifact/experiments/${out_name}/work"
+    ASCYLIB_PERFBENCH_WORK="${ARTIFACT_RUN_DIR:-$SIFTER_ROOT/artifact/experiments/${out_name}}/work"
     ASCYLIB_SRC_COPY="$ASCYLIB_PERFBENCH_WORK/src"
     ASCYLIB_PERFBENCH_BUILD_LOG="$ASCYLIB_PERFBENCH_WORK/build.log"
     rm -rf "$ASCYLIB_PERFBENCH_WORK"

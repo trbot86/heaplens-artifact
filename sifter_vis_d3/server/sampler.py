@@ -17,7 +17,7 @@ from cache_limits import validate_cache_geometry, check_cache_budget
 MAX_PAGE_PROP = 7560
 MAX_OBJ_STATS = 1000000
 CHANGE_POINT_THRESHOLD = 10
-event_labels = ['file', 'size', 'addr', 'type', 'allocTs', 'freeTs', 'line', 'actualAddr']
+event_labels = ['file', 'size', 'addr', 'type', 'allocTs', 'freeTs', 'line', 'actualAddr', 'actualSize']
 
 FILE_IND = 0
 SIZE_IND = 1
@@ -28,7 +28,6 @@ FREE_TS_IND = 5
 # TYPE_KIND_IND = 6
 LINE_IND = 6
 ACTUAL_ADDR_IND = 7
-TYPE_NO_SPACE_IND = 8
 
 
 def replace_nan(event, key):
@@ -72,6 +71,8 @@ class Sampler:
         return df
     
     def get_objects(self, df):
+        if 'actualSize' not in df.columns:
+            df = df.assign(actualSize=0)  # Legacy databases: extent unknown.
         # Duplicate ts into allocTs and freeTs
         df = self.add_free_types(df)
         df = df.rename(columns={"ts": "allocTs"})
@@ -93,7 +94,12 @@ class Sampler:
         # objects with distinct types)
         # df.loc[df["freeTs"].isnull(),"freeTs"] = df.groupby(["addr", "type"])["allocTs"].shift(periods=-1).dropna()
         # return df.iloc[:,[]]
-        return df.loc[:,["file", "size", "addr", "type", "allocTs", "freeTs", "line", "actualAddr"]]
+        return df.loc[:,event_labels]
+
+    @staticmethod
+    def actual_size_sql(con):
+        columns = {row[1] for row in con.execute('PRAGMA table_info(SUPERTABLE)')}
+        return 'ACTUALSIZE' if 'ACTUALSIZE' in columns else '0'
     
     def get_all_lines(self):
         con = sqlite3.connect(self.fname)
@@ -108,14 +114,15 @@ class Sampler:
         con = sqlite3.connect(self.fname)
         dfs = []
         i = 0
-        for chunk in pd.read_sql_query("""SELECT FILE as file,
+        for chunk in pd.read_sql_query(f"""SELECT FILE as file,
                                     SIZE as size,
                                     ADDRESS as addr,
                                     TYPE as type,
                                     TIMESTAMP as ts,
                                     isNew as is_alloc,
                                     LINE as line,
-                                    ACTUALADDR as actualAddr
+                                    ACTUALADDR as actualAddr,
+                                    {self.actual_size_sql(con)} as actualSize
                                 FROM SUPERTABLE""",
                                 con,
                                 chunksize=100000):
@@ -330,17 +337,18 @@ class Sampler:
 
     def get_records_in_interval(self, start_ts, end_ts, page_size=4096):
         con = sqlite3.connect(self.fname)
-        df = pd.read_sql_query("""SELECT FILE as file,
+        df = pd.read_sql_query(f"""SELECT FILE as file,
                                     SIZE as size,
                                     ADDRESS as addr,
                                     TYPE as type,
                                     TIMESTAMP as ts,
                                     isNew as is_alloc,
                                     LINE as line,
-                                    ACTUALADDR as actualAddr
+                                    ACTUALADDR as actualAddr,
+                                    {self.actual_size_sql(con)} as actualSize
                                 FROM SUPERTABLE
-                                WHERE is_alloc=0 OR (ts <= {} AND is_alloc=1)""".format(end_ts),
-                                con)
+                                WHERE is_alloc=0 OR (ts <= ? AND is_alloc=1)""",
+                                con, params=(end_ts,))
                                 # dtype={'file': object,
                                 #        'size': int,
                                 #        'addr': int,
@@ -597,20 +605,21 @@ class Sampler:
         print("rows.shape:", rows.shape)
 
         clean_types = np.char.replace(rows[:, TYPE_IND].astype(str), ' ', '')
+        type_no_space_ind = rows.shape[1]
         rows = np.column_stack([rows, clean_types])
         print("Done removing spaces from type names")
         print("rows.shape:", rows.shape)
 
         for obj in rows:
             entries = [obj]
-            if obj[TYPE_NO_SPACE_IND] in fields:
-                for field_ent in fields[obj[TYPE_NO_SPACE_IND]]:
+            if obj[type_no_space_ind] in fields:
+                for field_ent in fields[obj[type_no_space_ind]]:
                     if obj[ACTUAL_ADDR_IND] + field_ent["offset"] + field_ent["size"] > obj[ADDR_IND] and \
                         obj[ACTUAL_ADDR_IND] + field_ent["offset"] < obj[ADDR_IND] + obj[SIZE_IND]:
                         entries.append([obj[FILE_IND],
                                         min(field_ent["size"], obj[ACTUAL_ADDR_IND] + field_ent["offset"] + field_ent["size"] - obj[ADDR_IND]),
                                         max(obj[ACTUAL_ADDR_IND] + field_ent["offset"], obj[ADDR_IND]),
-                                        get_sub_tname(obj[TYPE_NO_SPACE_IND], field_ent["subtype"]),
+                                        get_sub_tname(obj[type_no_space_ind], field_ent["subtype"]),
                                         obj[ALLOC_TS_IND],
                                         obj[FREE_TS_IND]])
             for entry in entries:

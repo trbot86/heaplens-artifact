@@ -3,7 +3,11 @@
 #include <cstdlib>
 #include <cmath>
 
-using event_and_actual_addr = std::pair<memory_event_t*, uintptr_t>;
+struct event_and_actual_addr {
+    memory_event_t* first;
+    uintptr_t second;
+    size_t actual_size;
+};
 
 class Sampler {
 private:
@@ -45,7 +49,7 @@ private:
     void record_stats_and_align(std::unordered_map<uint16_t, tp_stats_t>);
     
 public:
-    Sampler();
+    explicit Sampler(bool use_container=false);
 
     ~Sampler();
 

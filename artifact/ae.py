@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "artifact"
 VENDOR = ART / "vendor"
 IGNORE = shutil.ignore_patterns(".git", "__pycache__", "*.pyc", "*.o", "*.so", "build", ".cache")
-EXPERIMENTS = ["ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_efrb", "rocksdb_hsl",
+EXPERIMENTS = ["ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_efrb", "rocksdb_hsl", "rocksdb_isl", "valkey_trace", "hnsw_trace",
           "ascylib_efrb_bench", "ascylib_dvy_bench", "ascylib_hj_bench", "tpcc_bcco_bench", "tpcc_efrb_bench"]
 
 def save(path, value):
@@ -239,7 +239,29 @@ def valkey(args, out):
     save(out / "summary.json", summary)
     print(json.dumps(summary, indent=2))
 
-def gui():
+def import_gui_database(args):
+    if args.database:
+        import sqlite3
+        selected = Path(args.database).resolve()
+        if not selected.is_file(): raise ValueError(f'No database: {selected}')
+        with sqlite3.connect(selected.as_uri()+'?mode=ro', uri=True) as db:
+            if db.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
+                raise ValueError('Database integrity check failed')
+            db.execute('SELECT ADDRESS, TYPE FROM SUPERTABLE LIMIT 1').fetchall()
+        label = args.label or selected.parent.name+'-'+selected.stem
+        if not re.fullmatch(r'[A-Za-z0-9_.-]+', label):
+            raise ValueError('GUI label must use letters, numbers, dots, dashes, or underscores')
+        target = ROOT/'sifter_vis_d3'/f'{label}.sqlite'
+        if target.exists():
+            if hashlib.sha256(target.read_bytes()).digest()!=hashlib.sha256(selected.read_bytes()).digest():
+                raise ValueError(f'Refusing to replace {target}; choose another --label')
+        else: shutil.copy2(selected,target)
+        print(f'Select {target.name} in the GUI', flush=True)
+        return target
+    return None
+
+def gui(args):
+    selected = import_gui_database(args)
     dest = ROOT / "sifter_vis_d3/valkey-artifact.sqlite"
     source = ART / "data/valkey/allocs.sqlite"
     if dest.exists() and hashlib.sha256(dest.read_bytes()).digest() != hashlib.sha256(source.read_bytes()).digest():
@@ -257,7 +279,7 @@ def gui():
     try:
         procs.append(subprocess.Popen([sys.executable, "-m", "flask", "--app", "server", "run", "--host=0.0.0.0"], cwd=backend))
         procs.append(subprocess.Popen(["npm", "run", "dev", "--", "--hostname", "0.0.0.0"], cwd=frontend))
-        print("Open http://localhost:3000 and select valkey-artifact.sqlite. Ctrl-C stops both services.", flush=True)
+        print(f"Open http://localhost:3000 and select {selected.name if selected else 'valkey-artifact.sqlite'}. Ctrl-C stops both services.", flush=True)
         while all(p.poll() is None for p in procs): time.sleep(1)
         raise RuntimeError("A GUI service exited")
     except KeyboardInterrupt: pass
@@ -349,16 +371,24 @@ def rocksdb(args, out):
     print(json.dumps(summary, indent=2))
 
 def experiment(args):
-    work = ART / "experiments" / args.name
-    if any((work / name).exists() for name in ("work", "results.tsv", "protocol.json")):
-        raise RuntimeError(f"This experiment already has build files or results at {work}. Keep this copy and repeat the experiment in a fresh artifact extraction or checkout; the Docker image can be reused.")
+    script = ART / "experiments" / args.name / "run.sh"
+    work = new_output(argparse.Namespace(**{**vars(args), "command": args.name}))
     env = os.environ.copy()
+    env["ARTIFACT_RUN_DIR"] = str(work)
     env["JOBS"] = str(args.jobs)
     env["ARTIFACT_PROFILE"] = args.profile
     env["PAGES_PER_TYPE"] = "1"
+    env["TRACE_VARIANT"] = args.variant or "baseline"
     env["REPS"] = str(args.reps or (10 if args.profile == "paper" else 1))
     if args.profile == "smoke":
         env.update(THREADS="2", INITIAL="4096", RANGE="8192", DURATION_MS="1000", RUN_SECONDS="3", PERFBENCH_PERF="off", ARTIFACT_NO_NUMA="1")
+        if args.name in {"rocksdb_hsl", "rocksdb_isl"}:
+            # Keep enough keys per hash bucket to expose the bucket layout.
+            env.update(NUM_KEYS="20000", HASH_BUCKET_COUNT="1024")
+    if not args.name.endswith("_bench"):
+        save(work / "protocol.json", {"arguments": vars(args), "variant": env["TRACE_VARIANT"],
+             "settings": {key: env[key] for key in ("THREADS", "INITIAL", "RANGE", "RUN_SECONDS",
+                 "DURATION_MS", "NUM_KEYS", "HASH_BUCKET_COUNT", "PAGES_PER_TYPE") if key in env}})
     if args.name.endswith("_bench"):
         smoke = args.profile == "smoke"
         default_threads = {"ascylib_efrb_bench": 4, "ascylib_dvy_bench": 8}.get(args.name, 24)
@@ -391,7 +421,25 @@ def experiment(args):
         save(work / "protocol.json", {"arguments": vars(args), "platform": platform.platform(),
              "allowed_cpus": sorted(os.sched_getaffinity(0)),
              "settings": {key: env[key] for key in fields if key in env}})
-    run(["bash", work / "run.sh"], env=env)
+    # The drivers share instrumentation build products. Serialize named runs
+    # from this checkout; timestamping isolates results, not the toolchain.
+    import fcntl
+    with (ART / ".experiment.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            if args.name == 'valkey_trace':
+                from lib import valkey_trace
+                valkey_trace.execute(args,work,sys.modules[__name__])
+            elif args.name == 'hnsw_trace':
+                from lib import hnsw_trace
+                hnsw_trace.execute(args,work,sys.modules[__name__])
+            else:
+                run(["bash", script], env=env, log=work / "driver.log")
+            save(work / "status.json", {"status": "passed", "experiment": args.name})
+        except Exception as exc:
+            save(work / "status.json", {"status": "failed", "error": str(exc)})
+            raise
+    print(f"Results: {work}", flush=True)
 
 def factorization(args, out):
     paper = args.profile == "paper"
@@ -424,12 +472,18 @@ def factorization(args, out):
 
 def parse_args(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("command", choices=["doctor", "history", "export", "smoke", "hnsw", "hnsw-factorization", "valkey", "rocksdb", "gui", "experiment", "legacy", "all-performance"],
+    p.add_argument("command", choices=["doctor", "history", "export", "smoke", "hnsw", "hnsw-factorization", "valkey", "rocksdb", "gui", "experiment", "legacy", "all-performance", "overhead"],
                    help="Select an action; legacy is a compatibility alias for experiment")
     p.add_argument("name", nargs="?", choices=EXPERIMENTS, help="Benchmark or trace name for the experiment command")
     p.add_argument("--profile", choices=["smoke", "paper"], default="smoke")
     p.add_argument("--out", help="NEW result directory; never overwrite existing results")
     p.add_argument("--jobs", type=int, default=4)
+    p.add_argument('--database', help='For gui: import a generated SQLite trace into the database selector')
+    p.add_argument('--label', help='For gui --database: unique selector name, e.g. tpcc-bcco-after')
+    p.add_argument('--variant', choices=['baseline','optimized'],
+                   help='Before/after layout for named ASCYLIB/TPC-C diagnostic traces')
+    p.add_argument("--overhead-trees", nargs='+', choices=['efrb','dvy','bcco'],
+                   help="C2 overhead trees (default: all three ASCYLIB trees)")
     p.add_argument("--reps", type=int)
     p.add_argument("--threads", type=int, help="ASCYLIB/TPC-C workers; RocksDB readers plus writer; HNSW build/query threads")
     p.add_argument("--cpus", help="Performance-run CPU list (e.g. 0-7); HashSkipList allows SMT across two nodes; other benchmarks use distinct physical cores")
@@ -453,6 +507,13 @@ def parse_args(argv=None):
                    help="HashSkipList NUMA nodes (default: 0 1); equal logical CPU counts, including SMT, on each")
     p.add_argument("--factors", choices=["hugepage", "alignment"], default="hugepage")
     args = p.parse_args(argv)
+    if (args.database or args.label) and args.command != 'gui': p.error('database/label apply only to gui')
+    if args.label and not args.database: p.error('label requires database')
+    if args.variant and not (args.command in {'experiment','legacy'} and args.name in
+                            {'ascylib_efrb','ascylib_dvy','ascylib_hj','tpcc_bcco','tpcc_efrb','rocksdb_hsl','rocksdb_isl','valkey_trace','hnsw_trace'}):
+        p.error('variant is supported for named diagnostic traces')
+    if args.overhead_trees and args.command != 'overhead': p.error('overhead-trees applies only to overhead')
+    if args.out and args.command == 'all-performance': p.error('all-performance creates a separate directory per experiment; omit --out')
     if args.command in {"experiment", "legacy"} and not args.name: p.error("experiment requires a name")
     if args.jobs < 1 or (args.reps is not None and args.reps < 1): p.error("jobs/reps must be positive")
     if min(args.rocks_key_size, args.rocks_value_size) < 1: p.error("RocksDB sizes must be positive")
@@ -466,9 +527,9 @@ def parse_args(argv=None):
     if args.update_pct is not None and not 0 <= args.update_pct <= 100: p.error("update-pct must be 0..100")
     bench = args.command in {"experiment", "legacy"} and args.name and args.name.endswith("_bench")
     hnsw_command = args.command in {"hnsw", "hnsw-factorization"}
-    if (args.threads is not None or args.cpus is not None) and not (bench or args.command == "rocksdb" or hnsw_command):
+    if (args.threads is not None or args.cpus is not None) and not (bench or args.command in {"rocksdb", "overhead"} or hnsw_command):
         p.error("threads/cpus apply to individual ASCYLIB/TPC-C/RocksDB/HNSW performance experiments")
-    if args.memory_policy and not (bench or args.command in {"rocksdb", "all-performance"} or hnsw_command):
+    if args.memory_policy and not (bench or args.command in {"rocksdb", "all-performance", "overhead"} or hnsw_command):
         p.error("memory-policy applies to performance experiments")
     if args.trial_order and not (bench or args.command in {"rocksdb", "all-performance", "hnsw"}):
         p.error("trial-order applies to ASCYLIB/TPC-C/RocksDB/HNSW; factorization uses its fixed design")
@@ -478,7 +539,8 @@ def parse_args(argv=None):
         p.error("hj-jemalloc applies only to ascylib_hj_bench")
     if args.dvy_hugepages is not None and not (bench and args.name == "ascylib_dvy_bench"):
         p.error("dvy-hugepages applies only to ascylib_dvy_bench")
-    if any(v is not None for v in (args.initial, args.range, args.duration_ms, args.update_pct)) and not (bench and args.name.startswith("ascylib_")):
+    if args.range is not None and args.command == 'overhead': p.error('overhead retains the benchmark default key range; omit --range')
+    if any(v is not None for v in (args.initial, args.range, args.duration_ms, args.update_pct)) and not (args.command == 'overhead' or (bench and args.name.startswith("ascylib_"))):
         p.error("initial/range/duration-ms/update-pct apply only to ASCYLIB performance experiments")
     if args.command == "rocksdb" and args.threads == 1: p.error("RocksDB requires a reader and a writer (at least 2 threads)")
     return args
@@ -487,7 +549,7 @@ def main():
     args = parse_args()
     if args.command == "doctor": doctor()
     elif args.command == "history": history()
-    elif args.command == "gui": gui()
+    elif args.command == "gui": gui(args)
     elif args.command in {"experiment", "legacy"}:
         experiment(args)
     elif args.command == "all-performance":
@@ -506,6 +568,9 @@ def main():
             elif args.command == "valkey": valkey(args, out)
             elif args.command == "rocksdb": rocksdb(args, out)
             elif args.command == "hnsw-factorization": factorization(args, out)
+            elif args.command == "overhead":
+                from lib import overhead_campaign
+                overhead_campaign.execute(args, out, sys.modules[__name__])
             save(out / "status.json", {"status": "passed", "scope": args.command, "profile": args.profile})
         except Exception as exc:
             save(out / "status.json", {"status": "failed", "error": str(exc)})

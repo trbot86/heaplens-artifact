@@ -223,7 +223,7 @@ rect.selection {
     height: calc($pageCardSVGHeight * 5);
     pointer-events: none;
     stroke: black;
-    stroke-width: 1px;
+    stroke-width: 2px;
     transform: translateX(calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2));
 
     &.slotObject {
@@ -233,6 +233,15 @@ rect.selection {
 
 .hugePageCardBack .pageCardObject {
     stroke: none;
+}
+
+.pageContinuationMark {
+    transform: translateX(calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2));
+    pointer-events: none;
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5px;
+    filter: drop-shadow(0 0 1px white);
 }
 
 // .pagePerfIndicator {
@@ -337,7 +346,7 @@ rect.selection {
 
 .objDelimLine {
     stroke: #e0e0e0;
-    stroke-width: 2px;
+    stroke-width: 3px;
 }
 
 
@@ -655,4 +664,3 @@ rect.selection {
     word-wrap: break-word;
     font-size: 10pt;
 }
-

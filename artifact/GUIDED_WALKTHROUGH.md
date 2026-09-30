@@ -99,8 +99,16 @@ To generate your own small trace:
 bash artifact/run.sh experiment ascylib_efrb --profile smoke
 ```
 
-The output is `artifact/experiments/ascylib_efrb/ascylib_efrb.sqlite`. Copy it
-into `sifter_vis_d3/`, return to the GUI selection page, and select it. The
+The command prints a fresh output directory under `artifact/results/`.
+Open its database with:
+
+```bash
+bash artifact/run.sh gui --database artifact/results/ascylib_efrb-TIMESTAMP/ascylib_efrb.sqlite --label efrb-before
+```
+
+Use the actual directory name printed by the command. To inspect the optimized
+layout, repeat the trace command with `--variant optimized`, then import that
+database with `--label efrb-after`. Both labels remain in the GUI selector. The
 paper-size profile uses a 2^18-key tree. Do not expect identical addresses,
 cluster IDs, or speedups from a fresh small run.
 

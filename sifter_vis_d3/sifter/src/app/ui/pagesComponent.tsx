@@ -10,12 +10,15 @@ import { HtmlTooltip } from './cacheSetComponent';
 import Grid from '@mui/material/Grid2';
 import { theme } from '../page';
 
+import { continuationEdges, visiblePageContinuation } from './continuationEdges';
+
 interface MemoryObject {
     file: string | null,
     line: number,
     size: number,
     addr: number,
     actualAddr?: number,
+    actualSize?: number,
     allocTs: number,
     freeTs: number | null,
     type: string | null
@@ -733,7 +736,15 @@ const SizeIndicator = forwardRef(({ clusterSize, sumClusterSizes, maxClusterSize
     );
 });
 
-function PageObject({ x, y, width, fill, currTs, allocTs, freeTs, isVis } : 
+function ContinuationMarks({left, right, edges, top = 10}: {left: number; right: number; edges: {before: boolean; after: boolean}; top?: number}) {
+    return <>{[edges.before ? left : null, edges.after ? right : null].map((edge, i) =>
+        edge !== null && <path key={i} className='pageContinuationMark'
+            d={`M ${edge} ${top} l 2 6 l -4 6 l 4 6 l -2 6`}>
+            <title>{i === 0 ? 'Object continues from the preceding page' : 'Object continues into the following page'}</title>
+        </path>)}</>;
+}
+
+function PageObject({ x, y, width, fill, currTs, allocTs, freeTs, isVis, edges } :
     {
         x: number,
         y: number,
@@ -742,18 +753,21 @@ function PageObject({ x, y, width, fill, currTs, allocTs, freeTs, isVis } :
         currTs: number,
         allocTs: number,
         freeTs: number | null,
-        isVis: boolean
+        isVis: boolean,
+        edges: {before: boolean; after: boolean}
     }) {
     return (
         <>
         {
             allocTs <= currTs && (freeTs == null || freeTs >= currTs) && isVis &&
+            <g>
             <rect
                 className='pageCardObject'
                 x={x}
                 y={y}
                 width={width}
                 fill={fill} />
+            </g>
         }
         </>
     );
@@ -777,6 +791,8 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
     }) {
     // const ref = useRef(null);
     const pageScale = useMemo(() => d3.scaleLinear().domain([0, pageSize]).range([0, PAGE_CARD_BORDER_WIDTH]), [pageSize]);
+    const edges = useMemo(() => visiblePageContinuation(objectData.events, addr, pageSize, currTs, pageVis),
+        [objectData, addr, pageSize, currTs, pageVis]);
     
     return (
         <div className='pageCardDiv' >
@@ -798,6 +814,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                                                 x={pageScale(ev.addr % pageSize)}
                                                 y={0}
                                                 width={pageScale(ev.size)}
+                                                edges={continuationEdges(ev, addr, pageSize)}
                                                 fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'}
                                                 isVis={(ev.type && pageVis[ev.type]) == true}
                                                 currTs={currTs}
@@ -805,6 +822,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                                                 freeTs={ev.freeTs} />)
                     }
                 </g>
+                <ContinuationMarks left={0} right={PAGE_CARD_BORDER_WIDTH} edges={edges} />
                 {
                 (showHitm || showHot) &&
                 <g 
@@ -829,7 +847,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
 
 function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageAddr,
                         colourOfType, zoomedSize, setZoomedSize, selSize, setSelSize,
-                        objData, zoomedAddr } :
+                        objData, zoomedAddr, edges } :
     {
         addr: number,
         selAddr: number,
@@ -837,6 +855,7 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
         slotSize: number,
         objData: PageContents,
         slotData: number[],
+        edges: {before: boolean; after: boolean},
         setSelPageAddr: (a: number) => void,
         colourOfType: TypeToColourMap,
         zoomedSize: number,
@@ -956,6 +975,11 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
                     className='brushGroup'
                     ref={brushRef} />
             </g>
+                <ContinuationMarks
+                    top={zoomedSize > 0 ? 80 : 10}
+                    left={pageScale(zoomedSize > 0 ? addr - zoomedAddr : 0)}
+                    right={pageScale(zoomedSize > 0 ? addr + pageSize - zoomedAddr : pageSize)}
+                    edges={edges} />
         </svg>
     );
 }
@@ -1077,6 +1101,13 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
         return getSlotDataPerBucket(data.events, addr, pageSize, NUM_SLOTS_HUGEPAGE, numBuckets, getBucketIdx, pageVis);
     }, [data, pageVis]);
 
+    const continuationEvents = useMemo(() => data.events.filter(event => {
+        const ends = continuationEdges(event, addr, pageSize);
+        return ends.before || ends.after;
+    }), [data, addr, pageSize]);
+    const edges = useMemo(() => visiblePageContinuation(continuationEvents, addr, pageSize, currTs, pageVis),
+        [continuationEvents, addr, pageSize, currTs, pageVis]);
+
     useEffect(() => {
         const filtered = {
             events: data.events.filter((obj) => obj.addr + obj.size > (zoomedSize > 0 ? zoomedAddr : selAddr) &&
@@ -1110,6 +1141,7 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
                 pageSize={pageSize}
                 objData={currData}
                 slotData={dataPerBucket[getBucketIdx(currTs)]}
+                edges={edges}
                 setSelPageAddr={setSelPageAddr}
                 colourOfType={colourOfType}
                 zoomedAddr={zoomedAddr}

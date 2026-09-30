@@ -11,6 +11,18 @@ Use x86-64 Linux with Docker Engine. Run the commands below in a Linux shell
 from the repository root. The artifact was tested with Docker Engine 29.4.0
 and Docker CLI 26.1.3.
 
+Hardware-counter runs with `HEAPLENS_PERF=1` require a Docker host running
+Linux kernel 5.8 or newer and a Docker runtime that supports `CAP_PERFMON`.
+This capability was [introduced in Linux 5.8](https://man7.org/linux/man-pages/man7/capabilities.7.html).
+The runner does not fall back to the broader `SYS_ADMIN` capability. For
+an older kernel on a trusted evaluation host, an administrator may edit
+`artifact/run.sh`, replacing `--cap-add PERFMON` with `--cap-add SYS_ADMIN`
+and removing the kernel-version guard in the `HEAPLENS_PERF` block.
+This grants substantially broader privileges; host perf restrictions may
+still apply. For
+throughput-only runs on older hosts, omit `HEAPLENS_PERF=1` and set
+`PERFBENCH_PERF=off`. GUI and trace inspection do not require this capability.
+
 Plan for roughly 20 GB of free disk space for the dependency image and small
 builds, and 8–16 GB RAM for basic checks. Use at least 32 GB RAM and additional
 scratch disk for the full application experiments; full TPC-C runs and large
@@ -60,6 +72,13 @@ away from its initially empty time. The GUI also lists `efrb-smoke.sqlite`,
 a small illustrative trace. The servers bind to the host's loopback interface;
 Ctrl-C stops them.
 
+For remote use, forward both the frontend and backend ports from your local
+machine, then open <http://localhost:3000> locally:
+
+```bash
+ssh -L 3000:localhost:3000 -L 5000:localhost:5000 host
+```
+
 To build and run small versions of the application benchmarks:
 
 ```bash
@@ -74,8 +93,73 @@ Smoke speedups are not paper evidence.
 
 ## 3. Run the performance experiments
 
-The commands in this section are the standard way to reproduce the paper's
-performance comparisons. `--profile paper` selects the workload, allocator,
+### Table 1 case-study map
+
+The rows below follow the application/data-structure rows of paper Table 1.
+Performance commands build and compare the variants listed; diagnostic commands
+generate fresh instrumented traces, not performance measurements. Use the same
+diagnostic profile on both sides. Smaller traces may not exhibit a phenomenon
+that depends on the paper's thread count or working-set size.
+
+To use the short commands in the last two columns, define this shell helper
+once from the repository root:
+
+```bash
+trace() {
+  case "$2" in
+    before) variant=baseline ;;
+    after) variant=optimized ;;
+    *) echo 'Use: trace NAME before|after' >&2; return 2 ;;
+  esac
+  bash artifact/run.sh experiment "$1" --variant "$variant" --profile smoke
+}
+```
+
+Equivalently, run `bash artifact/run.sh experiment NAME --variant baseline
+--profile smoke` (or `--variant optimized`). Use `--profile paper` for the
+diagnostic driver's larger workload. Its workload
+is distinct from the uninstrumented throughput command; the recorded flags
+identify the code/allocator change being visualized.
+
+| Table 1 case | Numerical reproduction command | Compared variants / effective change | Before layout | After layout |
+| --- | --- | --- | --- | --- |
+| ASCYLIB/EFRB | `experiment ascylib_efrb_bench --profile paper` | `a_default` through `d_both`; `SEG_OBJS=1`, `INIT=all` separately and together | `trace ascylib_efrb before` | `trace ascylib_efrb after` (both) |
+| ASCYLIB/DVY | `experiment ascylib_dvy_bench --profile paper` | 96/72/128/192-B nodes; `DRACHSLER_PAD=0/128/192`; equal huge-page policy | `trace ascylib_dvy before` (96 B) | `trace ascylib_dvy after` (192 B; layout inspection, not huge-page-backing verification) |
+| ASCYLIB/HJ | `experiment ascylib_hj_bench --profile paper` | retained jemalloc 5.3 / glibc malloc | `trace ascylib_hj before` | `trace ascylib_hj after` |
+| TPC-C/BCCO | `experiment tpcc_bcco_bench --profile paper` | `a_default`, `b_seg_ds`, `c_seg_ds_pack_lock`; `MEMHOOK_SEG_DS`, then `MACROBENCH_PACK_LOCK` | `trace tpcc_bcco before` | `trace tpcc_bcco after` (segregation + packed lock) |
+| TPC-C/EFRB | `experiment tpcc_efrb_bench --profile paper` | `b_mimalloc` / `e_single_recmgr_mimalloc_fixed`; shared reclamation + padded rows, allocator/segregation fixed | `trace tpcc_efrb before` (mimalloc, segregated tree) | `trace tpcc_efrb after` (`MACROBENCH_SINGLE_RECMGR`, `MACROBENCH_PAD_ROW_TO_ALIGN`) |
+| RocksDB/HashSkipList | `rocksdb --memtable prefix_hash --profile paper` | default / `REORDER_FIELDS=1`, 56-B to 48-B bucket layout | `trace rocksdb_hsl before` | `trace rocksdb_hsl after` (same field-order change in the upstream diagnostic snapshot) |
+| RocksDB/InlineSkipList | `rocksdb --memtable skip_list --profile paper` | baseline / alignment + segregation, thresholds 3 | `trace rocksdb_isl before` | `trace rocksdb_isl after` |
+| Valkey/string cache | `valkey --profile paper` | baseline / `patches/valkey-B1C1_64.patch` | `trace valkey_trace before`; supplied trace also covered by [walkthrough](GUIDED_WALKTHROUGH.md) | `trace valkey_trace after` |
+| HNSWLib | `hnsw --profile paper` | packed / separate aligned vectors + huge-page advice, at both 128 D and 1536 D | `trace hnsw_trace before` | `trace hnsw_trace after` |
+
+Prefix numerical commands with `HEAPLENS_NUMA=1 bash artifact/run.sh`;
+ASCYLIB/TPC-C hardware counters additionally require `HEAPLENS_PERF=1`.
+For example, `HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper --dim 128`
+runs only the requested 128-D comparison. Counter-free ASCYLIB/TPC-C runs use
+`PERFBENCH_PERF=off`. Detailed workloads and placement rules follow below.
+
+To view a generated database, substitute the path printed by the trace command:
+
+```bash
+bash artifact/run.sh gui \
+  --database artifact/results/ascylib_efrb-TIMESTAMP/ascylib_efrb.sqlite \
+  --label efrb-before
+```
+
+Repeat with the optimized trace and a different label, such as `efrb-after`.
+Each imported database remains in the GUI selector, so both can be revisited.
+TPC-C databases use 2-MiB page mode; the other listed diagnostic drivers use
+4-KiB page mode. Move the time slider into the populated interval. Inspect EFRB
+cache-set usage, DVY node sizes/alignment, HJ allocation spacing, BCCO node/row
+separation, EFRB retired-object accumulation over time, or HashSkipList bucket
+field padding. Trace source snapshots and workloads are recorded separately
+from the performance experiments; instrumentation itself can perturb layouts.
+
+The commands in this section run the artifact's full-size performance
+comparisons. See [Errata and updated reproduction configurations](#errata-and-updated-reproduction-configurations)
+for differences from the submission and the corresponding measured results.
+`--profile paper` selects the workload, allocator,
 placement, and variants described below; no additional benchmark-specific
 tuning flags or environment settings are needed beyond the commands shown.
 Without `--profile paper`, commands default to small `smoke` workloads.
@@ -109,7 +193,7 @@ HEAPLENS_NUMA=1 bash artifact/run.sh valkey --profile paper
 HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
 ```
 
-The section references use the accepted submission's numbering.
+The section references use the submission's numbering.
 
 The [reproduction configuration guide](REPRODUCTION_CONFIGURATIONS.md) expands
 these defaults into explicit commands and gives confirmed improvements on the
@@ -329,7 +413,7 @@ trial files; `summary.json` reports each dimension under `by_dimension`, without
 pooling their throughputs.
 
 ASCYLIB and TPC-C runs write `results.tsv`, `summary.txt`, and per-run logs
-under `artifact/experiments/<name>/`. `protocol.json` records the selected
+under `artifact/results/<name>-<UTC timestamp>/`. `protocol.json` records the selected
 workload and placement; `runs/campaign.json` records commands, saved binary
 hashes, and allocator paths/hashes. `runs/execution.json` records trial order.
 Saved executables and build logs are in `runs/binaries/`; each trial also has
@@ -342,11 +426,13 @@ by `operation_count`: measured tree operations for ASCYLIB, or committed
 transactions for TPC-C, as identified by `operation_unit`. Throughput is in
 operations/second (transactions/second for TPC-C).
 
-The named `experiment` scripts use fixed build/output directories and refuse
-to overwrite an earlier run. To repeat one of these experiments (for example,
-after a smoke run), keep the previous copy and use another extraction or
-checkout of the artifact. Reuse the Docker image; it need not be rebuilt.
-Valkey, HNSWLib, and RocksDB commands create new directories automatically.
+Every `artifact/run.sh experiment NAME` invocation creates a fresh timestamped
+directory, including its builds, raw logs, and summaries. Rerun the same command
+without another checkout. All processing steps receive that invocation's exact
+directory; they do not search for the newest result. `--out` selects a specific
+new directory. Named experiments from one checkout must run sequentially because
+instrumentation tools have shared build products. Older results under
+`artifact/experiments/` are left untouched.
 
 ### Saved experimental data
 
@@ -376,6 +462,31 @@ bash artifact/run.sh history
 
 ## 6. Generate traces and try model-assisted analysis
 
+### Sampling and objects that cross pages
+
+The native converter samples memory pages with probability `p` (the `--sample`
+option), then adds pages as needed to meet the per-type minimum `s`
+(`--pages-per-type`). Allocations crossing page boundaries produce a record for
+each page-local fragment, with the original allocation address retained.
+Selecting a page does not force selection of neighbouring fragments, and there
+is no recursive expansion through overlapping objects. With `p=1`, all pages
+are retained intentionally. Per-type minima and explicitly perf-directed pages
+can also increase the selected set; these are not a fixed total-page budget.
+
+The GUI subsequently clusters retained pages and selects representatives.
+That display selection is separate from native trace-to-database sampling.
+The evaluator version uses a budget of 52 pages for 4-KiB pages and 17 for
+2-MiB pages: it first selects pages for type coverage, then fills the remaining
+budget uniformly. Every object fragment on a selected page is available to
+the GUI; neighbouring pages are not forced into the display.
+
+New databases retain each allocation's original address and size, so zigzag
+marks distinguish continuation across a page boundary from a true object end.
+Older databases remain readable but omit continuation marks when the original
+extent is unknown. Ordinary object boundaries retain their solid outlines.
+
+### Generate and open a trace
+
 For `experiment NAME`, names without `_bench` generate instrumented allocation
 traces for the GUI.
 For example, to generate a small EFRB trace:
@@ -385,9 +496,37 @@ bash artifact/run.sh experiment ascylib_efrb --profile smoke
 ```
 
 The trace-generation names are `ascylib_efrb`, `ascylib_dvy`, `ascylib_hj`,
-`tpcc_bcco`, `tpcc_efrb`, and `rocksdb_hsl`. Their generated SQLite databases
-are written under `artifact/experiments/<name>/`. Trace generation is
+`tpcc_bcco`, `tpcc_efrb`, `rocksdb_hsl`, `rocksdb_isl`, `valkey_trace`, and `hnsw_trace`. Their generated SQLite databases
+are written under `artifact/results/<name>-<UTC timestamp>/`. Trace generation is
 separate from the uninstrumented performance experiments above.
+
+InlineSkipList traces include explicit annotations for the regions carved from
+its arenas: each node and its key, and the upper-level pointer array immediately
+before it. These annotations leave allocation unchanged. In the optimized
+variant, arrays belonging to nodes taller than three levels are 64-byte aligned
+and allocated in a separate arena. Inspect the `InlineSkipList` node and
+`std::atomic<...Node*>` types; the driver checks their presence and the sampled
+tall-array alignment. The database is `rocksdb_isl.sqlite`.
+
+Valkey traces use bundled jemalloc and preload 2,000 keys in smoke mode or one
+million in the larger diagnostic profile, with 128-byte values. Each variant
+produces `valkey.sqlite`. Compare the `robj` placement before and after the
+patch; this SET preload is for layout inspection, not the concurrent throughput
+measurement. The optimized instrumentation calls the patched allocators.
+
+If opening a trace exceeds the cache-view memory budget, use the error's
+**Retry with fewer time buckets** link. This reduces temporal resolution only
+when requested; it does not change cache geometry. Once loaded, the time-bucket
+setting is also available in Settings.
+
+HNSWLib traces use the performance source snapshot with semantic annotations for
+slabs, elements, vector payloads, links, and labels. The smoke profile builds
+2,000 vectors at 128 dimensions; the larger diagnostic profile builds one million
+vectors at each of 128 and 1536 dimensions (`--dim` selects one).
+Databases are saved as `d128/hnsw.sqlite` and `d1536/hnsw.sqlite` within the result
+directory. Compare the packed vectors with the separate, 64-byte-aligned vector
+slab. Nested regions are reconstructed using the converter's `--use-container`
+option, which this driver supplies automatically.
 
 For a guided Valkey LLM example, follow [LLM_EXAMPLE.md](LLM_EXAMPLE.md).
 It includes the saved input and optimization patch, plus prompts for a
@@ -397,15 +536,56 @@ fresh model-assisted run. To regenerate the text input from the supplied trace:
 bash artifact/run.sh export
 ```
 
-## Errata
+## 7. Reproduce logging overhead (C2)
 
-**TPC-C artifact packaging.** The initial artifact inadvertently pointed the
-tree-segregation allocation path at the process-wide jemalloc library. Loading
-that same library again did not provide a separate allocator. The corrected
-drivers restore the distinct jemalloc library used by the retained experiments
-and reject accidental reuse of the global allocator. This was introduced during
-artifact preparation; the retained paper results are unchanged. See
-[allocator provenance](vendor/heaplens-allocators/README.md).
+This command measures baseline versus instrumented execution using the stock
+HeapLENS logger. It builds matched ASCYLIB EFRB, DVY, and BCCO binaries and runs
+20% and 100% update workloads, alternating baseline/logging order between
+repetitions. The BCCO workload here is the standalone tree, not TPC-C/BCCO.
+
+```bash
+# Small end-to-end check of the measurement and trace capture.
+bash artifact/run.sh overhead --profile smoke --overhead-trees efrb
+
+# Full C2 configuration, ten repetitions of each variant/workload.
+HEAPLENS_NUMA=1 bash artifact/run.sh overhead --profile paper
+```
+
+Paper mode uses 24 physical cores on `--server-node` (default 0), single-node
+memory interleaving, 10,000,000 requested initial keys (rounded by ASCYLIB to
+16,777,216), and a 3,000-ms measured phase. Both builds use `INIT=all`,
+`SET_CPU=0`, and `VERSION=O3`; logging additionally uses HeapLENS's source
+instrumentation and logger. Both use the same dynamic SSMEM allocator.
+The build/runtime protocol follows the retained overhead experiment, not the
+search-only optimization workloads in Section 3.
+
+`--threads`, `--cpus`, `--server-node`, `--initial`, `--duration-ms`, `--update-pct`,
+`--reps`, and `--overhead-trees efrb dvy bcco` allow smaller or targeted runs.
+For example, append `--threads 6` on a six-core host; report that configuration
+with its result. Smoke mode uses two workers (or the available smaller count),
+4,096 initial keys, 1,000 ms, and one repetition per variant/update rate.
+
+Results are saved in `artifact/results/overhead-<timestamp>/`: `protocol.json`,
+build logs and binaries, per-trial commands, raw benchmark output, compressed
+allocation logs, `results.json`, and `summary.json`. The reported overhead is
+`100 * (1 - mean(logging throughput) / mean(baseline throughput))`. Compression
+and verification occur after timing. Only a newly generated raw log is removed,
+after its compressed copy has been independently hash-verified.
+
+Allow at least 100 GiB of free disk space for paper-mode builds and traces.
+The runner stops before starting a trial if fewer than 50 GiB remain; individual
+paper logs are capped at 20 GiB and trials at 900 seconds. Storage speed can
+affect logging overhead, so report the trace-output device. This command does
+not enable the separate diagnostic buffer-wait probe or count I/O waits.
+
+## Errata and updated reproduction configurations
+
+Paper section, appendix, and Table 1 references in this README refer to the
+submission. The corrections and configuration updates below will be reflected
+in the camera-ready paper. The supplied workbook and `artifact/historical/`
+preserve the submission's underlying measurements.
+
+### Paper corrections
 
 **Counter normalization.** The original ASCYLIB (EFRB, DVY, HJ) and TPC-C
 (BCCO, EFRB) scripts inadvertently divided cache/TLB miss and context-switch
@@ -416,5 +596,70 @@ speedups are unaffected. Relative counter changes are preserved when measurement
 durations match, apart from rounding; they require recalculation for
 variable-duration TPC-C runs. The supplied workbook preserves the original data.
 
-**Valkey improvement.** The maximum throughput improvement is 5.9%;
-the paper's inconsistent reference to 6.2% is incorrect.
+**Valkey improvement.** The submission inconsistently reports the historical
+maximum improvement as 5.9% and 6.2%; 5.9% is correct. The artifact's ten-pair
+reproduction measured a mean improvement of 4.45%, compared with the historical
+mean of 4.23%.
+
+### Changed experimental configurations and corresponding results
+
+During artifact validation, we clarified several incompletely specified
+settings and measured some comparisons under revised configurations. We
+distinguish these below. The README's `--profile paper` commands use the
+configurations listed here; their measured throughputs and improvements are
+the reference results for those commands. We will update the camera-ready
+paper's configurations and results together.
+
+The following comparisons use changed settings or implementation details.
+All updated measurements below were collected on the dual Xeon Gold 5220R
+machine. Throughputs are means, and updated percentage gains are ratios of
+mean throughput.
+
+| Experiment | Configuration change | Submission's improvement | Updated before throughput | Updated after throughput | Updated improvement |
+|---|---|---:|---:|---:|---:|
+| Standalone EFRB | Five-second trials, matching the submission's description; the retained script specifies three seconds | 35.14% | 6,755,200 ops/s | 8,755,900 ops/s | 29.62% |
+| HJ | 24 threads instead of eight | Approximately 4% | 35,622,600 ops/s | 37,567,200 ops/s | 5.46% |
+| HNSWLib, 128-D | 128 dimensions instead of 768; corrected huge-page advice placement, described below | 6.3% mean; 16% maximum at 768-D | 66,340.30 queries/s | 72,650.18 queries/s | 9.51% |
+| HNSWLib, 1536-D | 1536 dimensions instead of 768; corrected huge-page advice placement, described below | 6.3% mean; 16% maximum at 768-D | 7,156.33 queries/s | 7,626.05 queries/s | 6.56% |
+| RocksDB InlineSkipList | Memory-only workload on 20 physical cores, without the compaction wait described in the submission | Approximately 3% | 5,810,938.5 ops/s | 6,311,177.9 ops/s | 8.61% |
+
+**HNSWLib:** The artifact uses a corrected implementation that issues
+vector-slab huge-page advice before first touch. The submission's 6.3% is
+the mean of individual relative gains; its retained measurements give 6.17%
+using the ratio-of-means statistic used above. The original source and
+768-dimensional workload remain available through
+`--hnsw-source original --dim 768`.
+
+**InlineSkipList:** The memory-only configuration disables WAL, automatic
+compaction, and shutdown flushing, and provides sufficient memtable capacity
+to avoid SST writes.
+
+[Reproduction configurations](REPRODUCTION_CONFIGURATIONS.md) provides complete
+commands, settings, and confidence intervals. Results from changed
+configurations are reported separately from historical measurements.
+The HNSWLib factorization commands in Section 4 additionally separate the
+effects of layout changes and huge-page advice, and of separation and alignment.
+These analyses supplement the submitted evaluation.
+
+### Clarified or previously unspecified settings
+
+These entries document settings separately from the changes above. Where
+historical evidence establishes a setting, we identify it; where the artifact
+makes an environmental dependency explicit, we describe that control.
+
+| Experiment | Clarification |
+|---|---|
+| Standalone EFRB | The retained data behind the reported gain use four threads; the artifact selects four threads. |
+| DVY | Explicitly control and check huge-page backing, applying the same allocator advice policy to every node-layout variant. The artifact supplies an isolated runtime for this purpose. |
+| RocksDB HashSkipList | Specify the retained workbook's 96-thread, 10-million-key, 32/128-byte key/value, 256-MiB-buffer configuration. WAL is disabled, but flushing and compaction remain enabled. |
+
+### Artifact packaging correction
+
+**TPC-C allocator separation.** The initial artifact inadvertently pointed the
+tree-segregation allocation path at the process-wide jemalloc library. Loading
+that same library again did not provide the second segregating allocator it
+was supposed to. The corrected drivers restore the distinct jemalloc library
+used by the retained experiments and reject accidental reuse of the global
+allocator. This was introduced during artifact preparation; the retained paper
+results are unchanged. See
+[allocator provenance](vendor/heaplens-allocators/README.md).

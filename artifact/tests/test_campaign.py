@@ -54,9 +54,16 @@ class CpuAndOptions(unittest.TestCase):
                         'UPDATE_PCT': '10', 'REPS': '10', 'PERFBENCH_CPUS': '2,4',
                         'PERFBENCH_MEMORY': 'interleave', 'PERFBENCH_ORDER': 'interleaved', 'ARTIFACT_NO_NUMA': '0'}
             for key, value in expected.items(): self.assertEqual(env[key], value, key)
-            protocol = json.loads((work / 'protocol.json').read_text())
+            first = Path(env['ARTIFACT_RUN_DIR'])
+            protocol = json.loads((first / 'protocol.json').read_text())
             self.assertEqual(protocol['settings']['THREADS'], '2')
-            with self.assertRaises(RuntimeError): ae.experiment(args)
+            ae.experiment(args)
+            second = Path(run.call_args.kwargs['env']['ARTIFACT_RUN_DIR'])
+            self.assertNotEqual(first, second)
+            self.assertEqual(json.loads((first/'protocol.json').read_text()), protocol)
+            self.assertEqual(run.call_args.args[0], ['bash', work/'run.sh'])
+            args.out = str(first)
+            with self.assertRaises(FileExistsError): ae.experiment(args)
 
     def test_smoke_stays_unpinned_unless_requested(self):
         args = ae.parse_args(['experiment', 'tpcc_efrb_bench'])

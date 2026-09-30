@@ -149,6 +149,13 @@ def main() -> int:
     for rel_path, anchor, insertion in PATCHES:
         path = root / rel_path
         src = path.read_text()
+        # The paper's InlineSkipList snapshot extends AllocateAligned with
+        # alignment controls. Forward both controls unchanged in its shim.
+        if rel_path in ('memory/arena.h', 'memory/allocator.h') and 'AllocateAligned' in anchor and 'custom_align' in src:
+            anchor = anchor.replace('Logger* logger = nullptr)', 'Logger* logger = nullptr, int custom_align = 16, bool force_align=false)')
+            insertion = insertion.replace('Logger* logger = nullptr)', 'Logger* logger = nullptr, int custom_align = 16, bool force_align=false)')
+            insertion = insertion.replace('AllocateAligned(bytes, huge_page_size, logger);',
+                                          'AllocateAligned(bytes, huge_page_size, logger, custom_align, force_align);')
         if insertion in src:
             print(f"patch_allocate_overloads: {rel_path}: already patched, skipping")
             continue

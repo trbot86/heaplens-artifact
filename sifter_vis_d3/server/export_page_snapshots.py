@@ -151,7 +151,7 @@ def table_columns(db_path: Path, table: str) -> set[str]:
 def table_exists(db_path: Path, table: str) -> bool:
     with sqlite3.connect(db_path) as con:
         row = con.execute(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+            "SELECT 1 FROM sqlite_master WHERE type IN ('table', 'view') AND name=?",
             (table,),
         ).fetchone()
     return row is not None

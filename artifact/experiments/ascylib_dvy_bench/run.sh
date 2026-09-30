@@ -28,8 +28,9 @@ UPDATE_PCT="${UPDATE_PCT:-0}"  # search-only
 REPS="${REPS:-3}"              # paper used 10; override for full fidelity
 
 OUT_NAME="ascylib_dvy_bench"
-RESULTS_TSV="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/results.tsv"
-RUN_DIR="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/runs"
+RUN_ROOT="${ARTIFACT_RUN_DIR:-$SIFTER_ROOT/artifact/experiments/$OUT_NAME}"
+RESULTS_TSV="$RUN_ROOT/results.tsv"
+RUN_DIR="$RUN_ROOT/runs"
 
 echo "=== [$OUT_NAME] fresh working copy of ASCYLIB ==="
 ascylib_perfbench_setup "$OUT_NAME"
@@ -58,4 +59,4 @@ python3 "$SIFTER_ROOT/artifact/lib/dvy_runtime.py" --plan "$RUN_DIR/campaign.jso
 perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
 
 perfbench_print_summary "$RESULTS_TSV" "ASCYLIB DVY tree: node padding 96B/72B/128B/192B (paper Appendix B.1 / Table 3)" \
-    "$SIFTER_ROOT/artifact/experiments/$OUT_NAME/summary.txt"
+    "$RUN_ROOT/summary.txt"
