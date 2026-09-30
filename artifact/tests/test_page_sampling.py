@@ -31,7 +31,7 @@ class PageSamplingTest(unittest.TestCase):
     def tearDownClass(cls):
         cls.build.cleanup()
 
-    def convert(self, probability, minimum, seed=17, pages=40, raw_override=None, perf_address=None):
+    def convert(self, probability, minimum, seed=17, pages=40, raw_override=None, perf_address=None, use_container=False):
         # Many events per page, two types sharing every page, and address reuse.
         events = []
         for page in range(1, pages + 1):
@@ -49,6 +49,8 @@ class PageSamplingTest(unittest.TestCase):
                        '--num-pages-per-type', str(minimum), '--num-buckets', '16']
             if seed is not None:
                 command += ['--seed', str(seed)]
+            if use_container:
+                command += ['--use-container']
             if perf_address is not None:
                 (path / 'perf.txt').write_text(f'0 0x{perf_address:x} fixture 0 100.00% 0 0 0 0 7 8\n')
                 command += ['--perf-file', 'perf.txt']
@@ -63,6 +65,17 @@ class PageSamplingTest(unittest.TestCase):
                 tables = {name: sorted(db.execute('SELECT * FROM ' + name).fetchall())
                           for name in ('SUPERTABLE', 'STATS', 'ALIGNMENT', 'LINES', 'PERF')}
         return tables, actual_seed
+
+    def test_container_free_closes_nested_object(self):
+        raw = b''.join(EVENT.pack(1, ts, size, addr, 1, kind, alloc)
+                       for ts, size, addr, kind, alloc in (
+                           (1000, 256, 4096, 1, True),
+                           (2000, 32, 4160, 2, True),
+                           (3000, 0, 4096, 1, False)))
+        tables, _ = self.convert(1, 0, raw_override=raw, use_container=True)
+        frees = [r for r in tables['SUPERTABLE'] if not r[6]]
+        self.assertEqual({(r[7], r[2], r[8]) for r in frees},
+                         {('A', 3000, 256), ('B', 3000, 32)})
 
     def test_original_extent_survives_sampling_and_frees(self):
         start, size = 4096 - 16, 4096 + 32

@@ -20,7 +20,9 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+PROFILE=paper
 if [ "${1:-}" = "--quick" ]; then
+    PROFILE=smoke
     export DURATION_MS=1000
     export RUN_SECONDS=10
     export SAMPLE_PROPORTION=0.05
@@ -36,7 +38,7 @@ for exp in "${EXPERIMENTS[@]}"; do
     echo "############################################################"
     echo "# $exp"
     echo "############################################################"
-    if ! "$SCRIPT_DIR/experiments/$exp/run.sh"; then
+    if ! python3 "$SCRIPT_DIR/ae.py" experiment "$exp" --profile "$PROFILE"; then
         echo "!!! $exp FAILED" >&2
         FAILED+=("$exp")
     fi
@@ -44,7 +46,7 @@ done
 
 echo
 if [ "${#FAILED[@]}" -eq 0 ]; then
-    echo "All experiments completed. Result databases are under artifact/experiments/*/*.sqlite"
+    echo "All experiments completed. Result databases are under artifact/results/<name>-<timestamp>/"
 else
     echo "The following experiments failed: ${FAILED[*]}" >&2
     exit 1

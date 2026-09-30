@@ -1,10 +1,10 @@
 #include "sampler.hpp"
 
-Sampler::Sampler() : io{},
+Sampler::Sampler(bool use_container) : io{},
             perf_pages{std::unordered_map<uintptr_t, std::unordered_map<uintptr_t, perf_data_t>>{}},
             seen_perf_pages{std::unordered_set<uintptr_t>{}} {
             
-    auto events_and_size = io.get_all_events();
+    auto events_and_size = io.get_all_events(use_container);
     all_events = events_and_size.first;
     num_events = events_and_size.second;
 }

@@ -27,8 +27,9 @@ THREADS="$(tpcc_perfbench_cap_threads "${THREADS:-24}")"
 REPS="${REPS:-3}"   # paper used 10; override for full fidelity
 
 OUT_NAME="tpcc_bcco_bench"
-RESULTS_TSV="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/results.tsv"
-RUN_DIR="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/runs"
+RUN_ROOT="${ARTIFACT_RUN_DIR:-$SIFTER_ROOT/artifact/experiments/$OUT_NAME}"
+RESULTS_TSV="$RUN_ROOT/results.tsv"
+RUN_DIR="$RUN_ROOT/runs"
 DS_NAME="bronson_pext_bst_occ"
 
 echo "=== [$OUT_NAME] fresh working copy of setbench ==="
@@ -52,4 +53,4 @@ tpcc_perfbench_variant "$RESULTS_TSV" "$RUN_DIR" "c_seg_ds_pack_lock" "$DS_NAME"
 perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
 
 perfbench_print_summary "$RESULTS_TSV" "TPC-C/BCCO tree: default -> node segregation -> +row-lock fix (paper Section 6.3 / Table 1 row 4)" \
-    "$SIFTER_ROOT/artifact/experiments/$OUT_NAME/summary.txt"
+    "$RUN_ROOT/summary.txt"

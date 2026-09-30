@@ -49,7 +49,7 @@ private:
     void record_stats_and_align(std::unordered_map<uint16_t, tp_stats_t>);
     
 public:
-    Sampler();
+    explicit Sampler(bool use_container=false);
 
     ~Sampler();
 

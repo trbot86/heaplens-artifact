@@ -78,7 +78,8 @@ class Hnsw(unittest.TestCase):
                 dest=Path(tmp)/'experiments'/args.name;dest.mkdir(parents=True)
                 ae.experiment(args)
                 self.assertEqual(run.call_args.kwargs['env']['HJ_JEMALLOC'],version or '5.3')
-                self.assertEqual(json.loads((dest/'protocol.json').read_text())['settings']['HJ_JEMALLOC'],version or '5.3')
+                actual = Path(run.call_args.kwargs['env']['ARTIFACT_RUN_DIR'])
+                self.assertEqual(json.loads((actual/'protocol.json').read_text())['settings']['HJ_JEMALLOC'],version or '5.3')
 
     def test_builds_all_cells_before_running_and_keeps_blocks(self):
         args=ae.parse_args(['hnsw','--reps','2','--hnsw-source','corrected','--dim','128'])

@@ -6,8 +6,8 @@ in the primary recipes make the defaults explicit; they are not extra tuning
 steps. Alternative workloads and factorization commands are labelled separately.
 Repetition counts are stated below (ten per variant unless specified).
 Run from the repository root after building the Docker image.
-Use a fresh checkout for each ASCYLIB campaign, as described in the main README.
-HNSW automatically creates a new output directory for each command.
+Commands create a new timestamped directory under `artifact/results/` for each
+invocation, so repeated campaigns do not require a fresh checkout.
 
 ## Standalone EFRB: four threads
 

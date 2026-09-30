@@ -55,7 +55,7 @@ tpcc_perfbench_setup() {
     local SIFTER_ROOT
     SIFTER_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
     TPCC_PERFBENCH_ROOT="$SIFTER_ROOT"
-    TPCC_PERFBENCH_WORK="$SIFTER_ROOT/artifact/experiments/${out_name}/work"
+    TPCC_PERFBENCH_WORK="${ARTIFACT_RUN_DIR:-$SIFTER_ROOT/artifact/experiments/${out_name}}/work"
     TPCC_SRC_COPY="$TPCC_PERFBENCH_WORK/src"
     TPCC_MACROBENCH="$TPCC_SRC_COPY/macrobench"
     TPCC_PERFBENCH_BUILD_LOG="$TPCC_PERFBENCH_WORK/build.log"

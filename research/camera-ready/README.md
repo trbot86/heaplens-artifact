@@ -11,10 +11,40 @@ See [the completed matrix](BACKEND_MATRIX_RESULTS.md) and copy-ready LaTeX
 tables for [backend preparation](backend-matrix-table.tex) and
 [representative UI interactions](interface-ablation-table.tex).
 
-This work is isolated on `codex/camera-ready-sampling`, based on evaluator
-revision `8b67cade6017ac8e3ccff242a208c5dc025380ea`. The evaluator-facing `main`
-branch and its checkout are unchanged. No native converter or benchmark
-configuration changes are included.
+This work is isolated on `codex/camera-ready-sampling`. On September 30,
+the local CR work was checkpointed at `6e2052c`, then evaluator fixes through
+`fe4c12d` were merged into this branch. The integration does not modify
+evaluator-facing `main`. Earlier result files retain the sources and settings
+they measured; merging fixes does not retroactively validate those measurements
+against the integrated revision.
+
+## Initial sampling versus representative selection
+
+The converter uses `p` for random page retention, then adds pages to satisfy
+the `s`-page floor per type (or all available pages when fewer than `s` exist).
+Perf-directed pages are also retained. These steps determine the database
+available to clustering, and are not limited by the GUI page/record budgets.
+Only afterward does the GUI cluster those pages and run the selection policy
+below. Its missing-type pass is budget-limited one-page coverage, not the
+converter's `s` parameter. Thus `p=1` retains all pages and renders `s`
+ineffective; varying `s` is informative when `p<1`.
+
+The final sampling matrix must pass the CR budgets explicitly when calling
+the backend outside the GUI. Final HNSW attribution is to be measured on Pyke
+at both 128 D and 1536 D with the final workload and source settings, including
+separation/alignment attribution. Earlier 768-D or other-host decompositions
+are not substitutes. Before reusing other measurements, compare their source,
+build, workload, allocator, placement, and measurement manifests against this
+integrated branch; rerun affected comparisons with all variants together.
+
+Integration checks (September 30): the Python suite reported 109 tests with
+one SetBench-dependent class skipped because that submodule is absent from
+this worktree. Continuation, current-bucket, detail-filtering, and snapshot-export
+helper suites passed, including 2,649 current-bucket equality cases and 600
+randomized detail-filter oracle checks. Comparing frontend source diagnostics
+against checkpoint `6e2052c` found 51 on both sides and no added diagnostics;
+this does not claim a clean production build. Full GUI interaction checks and
+the final measurement campaigns have not been repeated on this merged revision.
 
 ## Selection policy
 

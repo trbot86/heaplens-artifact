@@ -32,8 +32,9 @@ UPDATE_PCT="${UPDATE_PCT:-0}"  # search-only
 REPS="${REPS:-3}"              # paper used 10; override for full fidelity
 
 OUT_NAME="ascylib_efrb_bench"
-RESULTS_TSV="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/results.tsv"
-RUN_DIR="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/runs"
+RUN_ROOT="${ARTIFACT_RUN_DIR:-$SIFTER_ROOT/artifact/experiments/$OUT_NAME}"
+RESULTS_TSV="$RUN_ROOT/results.tsv"
+RUN_DIR="$RUN_ROOT/runs"
 
 echo "=== [$OUT_NAME] fresh working copy of ASCYLIB ==="
 ascylib_perfbench_setup "$OUT_NAME"
@@ -56,4 +57,4 @@ run_variant "d_both" SEG_OBJS=1 INIT=all
 perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
 
 perfbench_print_summary "$RESULTS_TSV" "ASCYLIB EFRB tree: default -> +obj segregation / +MT prefill / +both (paper Section 6.2 / Figure 5 / Table 1 row 1)" \
-    "$SIFTER_ROOT/artifact/experiments/$OUT_NAME/summary.txt"
+    "$RUN_ROOT/summary.txt"

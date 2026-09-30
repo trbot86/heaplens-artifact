@@ -223,7 +223,7 @@ rect.selection {
     height: calc($pageCardSVGHeight * 5);
     pointer-events: none;
     stroke: black;
-    stroke-width: 1px;
+    stroke-width: 2px;
     transform: translateX(calc(($pageCardSVGWidth - $pageCardBorderWidth) / 2));
 
     &.slotObject {
@@ -346,7 +346,7 @@ rect.selection {
 
 .objDelimLine {
     stroke: #e0e0e0;
-    stroke-width: 2px;
+    stroke-width: 3px;
 }
 
 

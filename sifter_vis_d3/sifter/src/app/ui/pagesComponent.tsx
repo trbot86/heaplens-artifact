@@ -571,7 +571,7 @@ const SizeIndicator = forwardRef(({ clusterSize, sumClusterSizes, maxClusterSize
 });
 
 function ContinuationMarks({left, right, edges, top = 10}: {left: number; right: number; edges: {before: boolean; after: boolean}; top?: number}) {
-    return <>{[edges.before ? left + 3 : null, edges.after ? right - 3 : null].map((edge, i) =>
+    return <>{[edges.before ? left : null, edges.after ? right : null].map((edge, i) =>
         edge !== null && <path key={i} className='pageContinuationMark'
             d={`M ${edge} ${top} l 2 6 l -4 6 l 4 6 l -2 6`}>
             <title>{i === 0 ? 'Object continues from the preceding page' : 'Object continues into the following page'}</title>
@@ -601,7 +601,6 @@ function PageObject({ x, y, width, fill, currTs, allocTs, freeTs, isVis, edges }
                 y={y}
                 width={width}
                 fill={fill} />
-            <ContinuationMarks left={x} right={x + width} edges={edges} />
             </g>
         }
         </>
@@ -626,6 +625,8 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
     }) {
     // const ref = useRef(null);
     const pageScale = useMemo(() => d3.scaleLinear().domain([0, pageSize]).range([0, PAGE_CARD_BORDER_WIDTH]), [pageSize]);
+    const edges = useMemo(() => visiblePageContinuation(objectData.events, addr, pageSize, currTs, pageVis),
+        [objectData, addr, pageSize, currTs, pageVis]);
     
     return (
         <div className='pageCardDiv' >
@@ -655,6 +656,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                                                 freeTs={ev.freeTs} />)
                     }
                 </g>
+                <ContinuationMarks left={0} right={PAGE_CARD_BORDER_WIDTH} edges={edges} />
                 {
                 (showHitm || showHot) &&
                 <g 
@@ -806,12 +808,12 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
                 <g 
                     className='brushGroup'
                     ref={brushRef} />
+            </g>
                 <ContinuationMarks
                     top={zoomedSize > 0 ? 80 : 10}
                     left={pageScale(zoomedSize > 0 ? addr - zoomedAddr : 0)}
                     right={pageScale(zoomedSize > 0 ? addr + pageSize - zoomedAddr : pageSize)}
                     edges={edges} />
-            </g>
         </svg>
     );
 }

@@ -24,8 +24,9 @@ UPDATE_PCT="${UPDATE_PCT:-0}"      # search-only
 REPS="${REPS:-3}"                  # paper used 10; override for full fidelity
 
 OUT_NAME="ascylib_hj_bench"
-RESULTS_TSV="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/results.tsv"
-RUN_DIR="$SIFTER_ROOT/artifact/experiments/$OUT_NAME/runs"
+RUN_ROOT="${ARTIFACT_RUN_DIR:-$SIFTER_ROOT/artifact/experiments/$OUT_NAME}"
+RESULTS_TSV="$RUN_ROOT/results.tsv"
+RUN_DIR="$RUN_ROOT/runs"
 case "${HJ_JEMALLOC:-5.3}" in
     5.3) JEMALLOC_LIB="$SIFTER_ROOT/artifact/vendor/heaplens-allocators/libjemalloc-heaplens.so" ;;
     5.0) JEMALLOC_LIB="$SIFTER_ROOT/artifact/vendor/setbench/lib/libjemalloc.so" ;;
@@ -53,4 +54,4 @@ ascylib_perfbench_variant "$RESULTS_TSV" "$RUN_DIR" "jemalloc" "lf-bst-howley" \
 perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
 
 perfbench_print_summary "$RESULTS_TSV" "ASCYLIB HJ tree: glibc malloc vs jemalloc (paper Appendix B.2 / Table 4)" \
-    "$SIFTER_ROOT/artifact/experiments/$OUT_NAME/summary.txt"
+    "$RUN_ROOT/summary.txt"

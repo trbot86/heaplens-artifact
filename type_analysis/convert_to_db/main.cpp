@@ -18,6 +18,8 @@ int main(int argc, char* argv[]) {
     size_t frag_gran = 0;
     size_t num_threads = 1;
     unsigned int seed = 0;
+    bool use_container = false;
+    app.add_flag("--use-container", use_container, "Preserve nested allocation regions and close them when their container is freed");
     auto seed_option = app.add_option("--seed", seed,
         "Optional page-sampling seed (default: initialize from system entropy)");
 
@@ -63,7 +65,7 @@ int main(int argc, char* argv[]) {
     std::srand(seed);
     std::cerr << "Page-sampling seed: " << seed << '\n';
 
-    Sampler s{};
+    Sampler s{use_container};
     if (!perf_filename.empty())
         s.note_perf_addrs(perf_filename, page_size, cache_line_size, hitm_cutoff);
     s.sample_pages_and_record_stats(page_size, num_pages_per_type, 
