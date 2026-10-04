@@ -6,6 +6,7 @@ allocation/layout implementation and huge-page advice stay unchanged.
 import os
 import shutil
 from lib.valkey_trace import prepare_toolchain,replace_once
+from lib import hnsw_query_allocations
 
 
 def annotate(work):
@@ -49,14 +50,19 @@ inline const char* heaplens_hnsw_layout_variant_name() { return heaplens_hnsw_la
 
 def execute(args,out,api):
     tool=prepare_toolchain(api.ROOT,out)
+    logger=tool/'memhook/memhook.cpp'
+    logger.write_text(hnsw_query_allocations.logger(logger.read_text()))
     api.run(['make','USE_TEMPLATE=1','-j'+str(args.jobs)],cwd=tool/'memhook',log=out/'logger-build.log')
     work=out/'source';shutil.copytree(api.VENDOR/'hnswlib-corrected',work,ignore=api.IGNORE)
     assets=api.ART/'lib/hnsw_trace'
     shutil.copy2(assets/'heaplens_hooks.h',work/'hnswlib/heaplens_hooks.h')
     hooks=work/'hnswlib/heaplens_hooks.h'
     replace_once(hooks,'#include "memhook_interface.h"','#include "memhook_interface.h"\nextern "C" void memhook_record_alloc(void*,size_t,int,uint16_t,uint16_t);\n#define MEMHOOK_LOG_CPP_ALLOC_AT(ptr, sz, tid, fid, ln) memhook_record_alloc(ptr,sz,ln,fid,typetable.insert(&tid));')
+    hooks.write_text(hnsw_query_allocations.hooks(hooks.read_text()))
     shutil.copy2(assets/'heaplens_hnsw_bench.cpp',work/'trace.cpp')
     annotate(work)
+    algorithm=work/'hnswlib/hnswalg.h'
+    algorithm.write_text(hnsw_query_allocations.algorithm(algorithm.read_text()))
     optimized=args.variant=='optimized'
     defines=['-DHNSWLIB_LAYOUT_VECTOR_SOA64=1','-DHNSWLIB_LAYOUT_MADVISE_HUGEPAGE=1'] if optimized else []
     binary=work/'trace'
@@ -70,7 +76,8 @@ def execute(args,out,api):
         cmd=[str(binary),'--elements',str(count),'--dim',str(dim),'--queries','1000','--iterations','1','--warmup','100',
              '--threads',str(threads),'--build-threads',str(threads),'--m','16','--ef-construction','200','--ef-search','64','--k','10','--query-mode','indexed','--seed','47']
         api.save(trial/'protocol.json',dict(command=cmd,defines=defines,source='hnswlib-corrected',
-            scope='Retained C++ diagnostic workload with semantic slab/element/vector/link/label regions; not throughput reproduction'))
+            scope='Retained C++ diagnostic workload with semantic regions and query-context new/new[] allocations; not throughput reproduction',
+            query_scratch='HeapLensHnswQueryScratch labels dynamic searchKnn context, not exact STL types or exhaustive allocation coverage'))
         env=dict(os.environ,MEMHOOK_OUTPUT_DUMP_FILE=str(trial/'binary_dump.txt'),MEMHOOK_OUTPUT_TYPE_FILE=str(trial/'typeset_dump.txt'))
         api.run(cmd,cwd=trial,env=env,log=trial/'benchmark.log',timeout=3600)
         (trial/'fileset_dump.txt').write_text('65001|hnswlib/hnswalg.h\n65002|hnswlib/visited_list_pool.h\n65003|trace.cpp\n')

@@ -2,8 +2,8 @@
 
 The subsequent [matched backend 2x2](BACKEND_MATRIX_RESULTS.md) measures spatial
 and temporal factors together. Use that matrix for joint attribution; the
-standalone measurements below remain preserved. [Paper material](PAPER_PROCESSING_OPTIMIZATIONS.md)
-collects the mechanism descriptions and selected tables.
+standalone measurements below remain preserved. The configurations and results
+are included here without the separately distributed paper sources.
 
 September 29, 2026. Completed on the local Windows workstation, on
 `codex/camera-ready-sampling`. Evaluator-facing `main` is unchanged. These are

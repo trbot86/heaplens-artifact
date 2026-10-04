@@ -63,10 +63,9 @@ No measured trial was censored.
 
 Raw results: [backend-matrix-results-20260929.json](backend-matrix-results-20260929.json).
 Summary: [backend-matrix-summary-20260929.json](backend-matrix-summary-20260929.json).
-LaTeX table: [backend-matrix-table.tex](backend-matrix-table.tex).
 Author-local frozen sources, controller records, manifests, and trial logs:
 `artifact-tools/backend-matrix-20260929/` in the parent workspace.
 
-See [paper prose and interface table](PAPER_PROCESSING_OPTIMIZATIONS.md). Earlier
-standalone ablations remain preserved; this matched matrix supersedes them
+Earlier [standalone ablations](LOCAL_PIPELINE_ABLATION_RESULTS.md) remain
+preserved; this matched matrix supersedes them
 for joint spatial/temporal attribution.

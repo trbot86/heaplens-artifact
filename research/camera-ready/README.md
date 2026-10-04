@@ -4,12 +4,10 @@ The completed [local pipeline ablation](LOCAL_PIPELINE_ABLATION_RESULTS.md)
 separates native conversion, backend preparation, actual database-to-UI loading,
 and exact 64-KiB detail interactions. It includes both gains and negative results.
 
-The [paper material](PAPER_PROCESSING_OPTIMIZATIONS.md) assembles mechanism
-descriptions and an interface table. Its companion matched backend matrix
-isolates spatial range updates and temporal prefix sums under one configuration.
-See [the completed matrix](BACKEND_MATRIX_RESULTS.md) and copy-ready LaTeX
-tables for [backend preparation](backend-matrix-table.tex) and
-[representative UI interactions](interface-ablation-table.tex).
+The [matched backend matrix](BACKEND_MATRIX_RESULTS.md) isolates spatial range
+updates and temporal prefix sums under one configuration. The linked result
+documents include configurations, measurements, and interpretation. Paper sources
+and publication tables are distributed separately and are not part of this artifact.
 
 This work is isolated on `codex/camera-ready-sampling`. On September 30,
 the local CR work was checkpointed at `6e2052c`, then evaluator fixes through
