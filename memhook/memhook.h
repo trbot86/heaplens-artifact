@@ -18,6 +18,7 @@
 #include <vector>
 #include <stdio.h>
 #include <aio.h>
+#include <errno.h>
 #include <unordered_set>
 
 #include "memhook_interface.h"
@@ -32,7 +33,9 @@
 #define MEMHOOK_MAX_TRACK 1000000
 #define MEMHOOK_MAX_TYPE_LENGTH 1000
 #define MEMHOOK_MAX_RETRY 10
+#ifndef MEMHOOK_MAX_BUFFER_SIZE
 #define MEMHOOK_MAX_BUFFER_SIZE 1000000
+#endif
 #define PADDING 64
 
 using namespace std;
@@ -53,6 +56,8 @@ thread_local int log_index = 0;
 thread_local struct aiocb * async_struct_first_buffer = NULL;
 thread_local struct aiocb * async_struct_second_buffer = NULL;
 thread_local struct aiocb * async_struct_array = NULL;
+thread_local bool *async_submitted = NULL;
+thread_local bool memhook_thread_sealed = false;
 
 // double pointer variables are required for the aio_suspend api
 thread_local struct aiocb ** async_api_struct_list = NULL;
@@ -69,6 +74,29 @@ thread_local memhook_info_t unit_log;
 thread_local int fileset_fd;
 
 int global_fd;
+
+// Only submitted requests may be queried; every completion must be reaped.
+// A failed trace is not usable, so never recycle a failed or short write.
+static void memhook_finish_aio(int index) {
+  if (!async_submitted[index]) return;
+  struct aiocb *request = &async_struct_array[index];
+  const struct aiocb *requests[] = {request};
+  int status;
+  while ((status = aio_error(request)) == EINPROGRESS) {
+    if (aio_suspend(requests, 1, NULL) != 0 && errno != EINTR) {
+      static const char message[] = "HeapLENS: AIO wait failed; trace invalid\n";
+      (void)write(STDERR_FILENO, message, sizeof(message) - 1);
+      _exit(94);
+    }
+  }
+  ssize_t bytes = aio_return(request);
+  if (status != 0 || bytes < 0 || size_t(bytes) != request->aio_nbytes) {
+    static const char message[] = "HeapLENS: AIO completion failed or short; trace invalid\n";
+    (void)write(STDERR_FILENO, message, sizeof(message) - 1);
+    _exit(94);
+  }
+  async_submitted[index] = false;
+}
 
 uint64_t memhook_get_server_clock() {
 #if defined(__i386__)
@@ -124,19 +152,17 @@ class ThreadExiter
       // printf("ThreadExiter Constructor has been called - v2\n");
     }
     ~ThreadExiter()
+    { finish(); }
+    void finish()
     {
+      if (memhook_thread_sealed) return;
+      // Pool vector growth can invoke allocation hooks. Seal before handing
+      // off the tail, so logger bookkeeping cannot append to the saved tail.
+      memhook_thread_sealed = true;
       // printf("ThreadExiter Destructor has been called - v2\n");
 
       if(async_struct_array) {
-        for (int i = 1; i < number_of_buffers; i++) {
-          if (aio_error(&async_struct_array[(buffer_index + i) % number_of_buffers]) == EINPROGRESS){
-            async_api_struct_list[0] = &async_struct_array[(buffer_index + i) % number_of_buffers];
-            
-            if (aio_suspend(async_api_struct_list, 1, NULL) != 0) {
-              cout << "aio_suspend failed in thread destructor" << endl;
-            }
-          }
-        }
+        for (int i = 0; i < number_of_buffers; i++) memhook_finish_aio(i);
 
         int unfilled_buffer_size = sizeof(struct memhook_info_t)* log_index;
         //ADD FILE AND TYPES TO MEMPOOL OBJECT
@@ -197,6 +223,7 @@ MemStampCollector::~MemStampCollector() {
 }
 
 void MemStampCollector::copy(memhook_info_t &unit_log){
+  if (memhook_thread_sealed) return;
 	if (thread_first_call) {
 		allocation_log = (struct memhook_info_t **) malloc(sizeof(struct memhook_info_t*)*number_of_buffers);
     for(int i = 0; i < number_of_buffers; i++) {
@@ -204,7 +231,9 @@ void MemStampCollector::copy(memhook_info_t &unit_log){
     }
 
     // printf("%lu \n", sizeof(struct memhook_info_t));
-    async_struct_array = (struct aiocb*) malloc(sizeof(struct aiocb)*number_of_buffers);
+    async_struct_array = (struct aiocb*) calloc(number_of_buffers, sizeof(struct aiocb));
+    async_submitted = (bool*) calloc(number_of_buffers, sizeof(bool));
+    if (!async_struct_array || !async_submitted) _exit(94);
     async_api_struct_list = (struct aiocb **) malloc(sizeof(struct aiocb*)*1);
 
     thread_first_call = 0;
@@ -224,19 +253,16 @@ void MemStampCollector::copy(memhook_info_t &unit_log){
     async_struct_array[buffer_index].aio_sigevent.sigev_notify = SIGEV_NONE;
 
     if (aio_write(&async_struct_array[buffer_index]) != 0) {
-      cout << "aio_write FAILED" << endl;
+      static const char message[] = "HeapLENS: AIO submission failed; trace invalid\n";
+      (void)write(STDERR_FILENO, message, sizeof(message) - 1);
+      _exit(94);
     }
+    async_submitted[buffer_index] = true;
 
     buffer_index = (buffer_index + 1) % number_of_buffers;
     log_index = 0;
 
-    if (aio_error(&async_struct_array[buffer_index]) == EINPROGRESS){
-      async_api_struct_list[0] = &async_struct_array[buffer_index];
-      
-      if (aio_suspend(async_api_struct_list, 1, NULL) != 0) {
-        cout << "aio_suspend failed in copy" << endl;
-      }
-    }
+    memhook_finish_aio(buffer_index);
   }
 }
 
@@ -248,4 +274,6 @@ int arrayCount = 0;
 thread_local bool setup = false;
 
 thread_local ThreadExiter exiter;
+// Only call on the producer itself, after its application work is quiescent.
+extern "C" void memhook_terminal_flush() { exiter.finish(); }
 #endif

@@ -165,6 +165,13 @@ Trace variant details:
 - HashSkipList applies the same field-order change in the upstream diagnostic snapshot.
 - The supplied Valkey trace is also covered by the [walkthrough](GUIDED_WALKTHROUGH.md).
 
+Valkey trace collection seals each persistent producer after the preload or
+measured client phase ends, before shutting down the server. Shutdown activity
+after sealing is outside the trace. Failed finalization or a failed server exit
+prevents conversion. The logger also rejects failed/short asynchronous writes;
+these are invalid traces, not successful partial results. This correctness fix
+does not remove the cost of producing and writing allocation records.
+
 To view a generated database, substitute the path printed by the trace command:
 
 ```bash
