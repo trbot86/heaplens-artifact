@@ -14,6 +14,8 @@ sys.path.insert(0, str(ART))
 import ae
 from lib import rocksdb_hashskiplist as hsl
 from lib import rocksdb_memoryonly as memory
+from lib import rocksdb_timing as timing
+from test_rocksdb_timing import fixture as timing_fixture
 
 
 class HashSkipList(unittest.TestCase):
@@ -101,7 +103,7 @@ class HashSkipList(unittest.TestCase):
                 if cmd[0] == 'make':
                     builds.append(cmd); (cwd / 'db_bench').write_bytes(b'fixture')
                 elif cmd[0] == 'numactl':
-                    commands.append(cmd); log.write_text('readwhilewriting : 1 micros/op 100 ops/sec\n')
+                    commands.append(cmd); log.write_text(timing_fixture(96))
 
             args = ae.parse_args(['rocksdb', '--profile', 'paper', '--reps', '2'])
             with patch.object(ae, 'VENDOR', vendor), patch.object(ae, 'run', side_effect=fake_run), \
@@ -109,12 +111,14 @@ class HashSkipList(unittest.TestCase):
                  patch.object(memory, 'environment', return_value={'LD_PRELOAD': str(allocator)}), \
                  patch.object(memory, 'check_memory') as memory_check, \
                  patch.object(memory, 'write_options') as memory_options, \
+                 patch.object(timing, 'apply', return_value={'tested': True}) as timing_patch, \
                  patch.object(hsl, 'validate', return_value={'status': 'passed'}) as validation, \
                  patch.object(ae.time, 'sleep'), redirect_stdout(io.StringIO()):
                 ae.rocksdb(args, out)
             cpus.assert_called_once_with([0, 1], 96, None)
             memory_check.assert_not_called(); memory_options.assert_not_called()
             self.assertEqual(len(builds), 2)
+            self.assertEqual(timing_patch.call_count, 2)
             self.assertEqual(builds[1], builds[0] + ['REORDER_FIELDS=1'])
             self.assertEqual(builds[0][3:], ['DEBUG_LEVEL=0', 'PORTABLE=1', 'DISABLE_WARNING_AS_ERROR=1'])
             self.assertEqual(len(commands), 4); self.assertEqual(validation.call_count, 4)
@@ -129,6 +133,11 @@ class HashSkipList(unittest.TestCase):
             self.assertEqual(protocol['optimized_flags'], ['REORDER_FIELDS=1'])
             self.assertEqual(protocol['write_buffer_bytes'], 268435456)
             self.assertEqual(protocol['duration_seconds'], 10)
+            summary = json.loads((out / 'summary.json').read_text())
+            self.assertEqual(summary['variants']['baseline']['mean'], int(90 * 95 / 4.1))
+            self.assertAlmostEqual(summary['reader_only']['variants']['baseline']['mean'], 90 * 95 / 1.1)
+            self.assertEqual(len(summary['timing_runs']), 4)
+            self.assertEqual(len(list(out.glob('*-rep*/timing.json'))), 4)
 
 
 if __name__ == '__main__': unittest.main()

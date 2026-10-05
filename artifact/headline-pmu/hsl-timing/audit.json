@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "cells": 18,
+  "trace_archives": 12,
+  "database_archives": 18,
+  "guarded_inputs_and_history": 1692,
+  "retained_files": 138,
+  "trace_source_bytes": 235395320120,
+  "trace_archive_bytes": 34189676545,
+  "database_source_bytes": 35755068754,
+  "database_archive_bytes": 18711657386
+}

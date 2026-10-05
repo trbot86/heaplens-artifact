@@ -18,7 +18,7 @@ import sys
 import time
 from lib.perfstat_campaign import schedule
 from lib import hnsw_campaign
-from lib import rocksdb_memoryonly, rocksdb_hashskiplist
+from lib import rocksdb_memoryonly, rocksdb_hashskiplist, rocksdb_timing
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "artifact"
@@ -326,12 +326,15 @@ def rocksdb(args, out):
          "available_memory_bytes": available, "options_sha256": options_hash,
          "pause_seconds": 15 if paper else 0, "optimized_flags": flags})
     values = {}
+    timing_values = {"baseline": [], "optimized": []}
+    timing_rows = []
     for variant, extra in (("baseline", []), ("optimized", flags)):
         work = out / variant
         shutil.copytree(VENDOR / "rocksdb-historical", work, ignore=IGNORE)
         # Preserve the experimental baseline used by the historical campaign;
         # the flags, not a different parent revision, select before/after.
         run(["patch", "--batch", "-p1", "-i", ART / "patches/rocksdb-historical.patch"], cwd=work, log=out / f"{variant}-build.log")
+        timing_sources = rocksdb_timing.apply(work) if not memory_only else None
         # Refuse a silent no-op experiment against pristine upstream source.
         for definition in flags:
             macro = definition.split("=")[0]
@@ -341,7 +344,8 @@ def rocksdb(args, out):
         run(["make", f"-j{args.jobs}", "db_bench", "DEBUG_LEVEL=0", "PORTABLE=1", "DISABLE_WARNING_AS_ERROR=1", *extra],
             cwd=work, log=out / f"{variant}-build.log")
         save(out / f"{variant}-binary.json", {"sha256": hashlib.sha256((work / "db_bench").read_bytes()).hexdigest(),
-             "flags": extra, "source_revision": "19e4aba3db75bd6add7177164c892ab6cdfd50b3 + rocksdb-historical.patch"})
+             "flags": extra, "source_revision": "19e4aba3db75bd6add7177164c892ab6cdfd50b3 + rocksdb-historical.patch",
+             "additive_timing_sources": timing_sources})
         values[variant] = []
     order = schedule(list(values), reps, args.trial_order or "interleaved")
     save(out / "execution.json", {"sequence": order, "order": args.trial_order or "interleaved"})
@@ -364,9 +368,20 @@ def rocksdb(args, out):
         matches = re.findall(r"readwhilewriting\s*:\s*[\d.]+\s+micros/op\s+([\d.]+)\s+ops/sec", (trial / "benchmark.log").read_text())
         if not matches: raise RuntimeError(f"No throughput in {trial / 'benchmark.log'}")
         values[variant].append(float(matches[-1]))
+        if not memory_only:
+            timing = rocksdb_timing.parse((trial / "benchmark.log").read_text(), threads)
+            save(trial / "timing.json", timing)
+            timing_values[variant].append(timing["reader_only_throughput"])
+            timing_rows.append(dict(variant=variant, repetition=rep + 1,
+                                   **{k: v for k, v in timing.items() if k not in ("workers", "endpoints")}))
         if paper: time.sleep(15)
     summary = compare(values); summary["profile"] = args.profile; summary["memtable"] = args.memtable
     summary["persistence"] = persistence
+    if not memory_only:
+        summary["native_metric"] = rocksdb_timing.NATIVE_METRIC
+        summary["reader_only"] = compare(timing_values)
+        summary["reader_only"]["metric"] = "reader operations per earliest-reader-start to latest-reader-finish interval"
+        summary["timing_runs"] = timing_rows
     save(out / "summary.json", summary)
     print(json.dumps(summary, indent=2))
 

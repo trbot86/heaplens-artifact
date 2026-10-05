@@ -25,11 +25,28 @@ that does not measure the cost of the corrected implementation.
 
 The artifact now waits for completion before buffer reuse and checks completion
 status and returned byte count. These are per-request metadata checks, not
-payload scans or checksums during timing. Targeted old/new-logger performance
-validation is pending; do not relabel these historical numbers as overhead of
-the current logger. Invalid interrupted/instrumentation attempts were preserved
+payload scans or checksums during timing. Targeted old/new-logger validation
+completed in two separate batches described below. Do not relabel the original
+numbers as overhead of every current release change. Invalid interrupted/instrumentation attempts were preserved
 as diagnostics; the two explicitly approved replacements fill their intended
 cells without selection by performance.
+
+## Completed AIO and HSL timing validation
+
+The [validation guide](VALIDATION.md) explains both additional batches and every
+block comparison. The 18-cell AIO spot check covers baseline BCCO and HSL in three
+rotating plain/old/fixed blocks each. A separate 18-cell HSL follow-up covers all
+six possible arm orders and reports reader-only and writer-completion timings
+alongside the unchanged native rate. The fixed logger in these comparisons
+differs only in AIO completion handling; release sealing and HNSW query-allocation
+coverage were not part of the comparison. Do not pool the batches.
+
+Run `python3 artifact/headline-pmu/verify_validation.py` to verify the bundled
+evidence hashes, recompute all per-block/mean comparisons, and reconcile every
+HSL reader/writer endpoint report. This is local analysis only; it launches no
+workload. The [full HSL report](hsl-timing/RESULTS.md) contains all 18 observations,
+writer tails, separate post-worker gaps, record production, and wait totals.
+Raw archives are retained separately and are not re-audited by this command.
 
 ## Full measurement reproduction: expensive, separate opt-in
 

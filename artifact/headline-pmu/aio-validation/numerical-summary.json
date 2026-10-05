@@ -1,0 +1,504 @@
+{
+  "status": "audited_descriptive_numbers",
+  "cells": [
+    {
+      "application": "bcco",
+      "arm": "plain",
+      "block": 1,
+      "throughput": 967488.673589,
+      "operations": 2361722,
+      "operation_unit": "committed_transaction",
+      "reader_elapsed_seconds": null,
+      "phase1": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 0
+      },
+      "records_per_operation": 0.0,
+      "record_bytes_per_operation": 0.0,
+      "aggregate_phase1_thread_seconds": 0.0
+    },
+    {
+      "application": "bcco",
+      "arm": "old",
+      "block": 1,
+      "throughput": 497076.335956,
+      "operations": 2057660,
+      "operation_unit": "committed_transaction",
+      "reader_elapsed_seconds": null,
+      "phase1": {
+        "records": 146091977,
+        "full_buffers": 134,
+        "reuse_count": 67,
+        "reuse_ns": 14539752511,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 645558679
+      },
+      "records_per_operation": 70.99908488282807,
+      "record_bytes_per_operation": 2839.963395313123,
+      "aggregate_phase1_thread_seconds": 94.997418461,
+      "raw_bytes": 8901667960,
+      "archive_bytes": 1722068514,
+      "raw_records": 222541699,
+      "raw_minus_report_records": 685
+    },
+    {
+      "application": "bcco",
+      "arm": "fixed",
+      "block": 1,
+      "throughput": 484564.786972,
+      "operations": 2170280,
+      "operation_unit": "committed_transaction",
+      "reader_elapsed_seconds": null,
+      "phase1": {
+        "records": 153551251,
+        "full_buffers": 142,
+        "reuse_count": 94,
+        "reuse_ns": 26368322696,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 712208909
+      },
+      "records_per_operation": 70.75181589472326,
+      "record_bytes_per_operation": 2830.0726357889303,
+      "aggregate_phase1_thread_seconds": 102.7753817,
+      "raw_bytes": 9200383720,
+      "archive_bytes": 1780208600,
+      "raw_records": 230009593,
+      "raw_minus_report_records": 685
+    },
+    {
+      "application": "bcco",
+      "arm": "old",
+      "block": 2,
+      "throughput": 456348.414364,
+      "operations": 2005196,
+      "operation_unit": "committed_transaction",
+      "reader_elapsed_seconds": null,
+      "phase1": {
+        "records": 145707098,
+        "full_buffers": 140,
+        "reuse_count": 90,
+        "reuse_ns": 26751069435,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 824937114
+      },
+      "records_per_operation": 72.66476593809284,
+      "record_bytes_per_operation": 2906.590637523713,
+      "aggregate_phase1_thread_seconds": 100.857048137,
+      "raw_bytes": 8886344800,
+      "archive_bytes": 1714576838,
+      "raw_records": 222158620,
+      "raw_minus_report_records": 685
+    },
+    {
+      "application": "bcco",
+      "arm": "fixed",
+      "block": 2,
+      "throughput": 527386.572466,
+      "operations": 2119413,
+      "operation_unit": "committed_transaction",
+      "reader_elapsed_seconds": null,
+      "phase1": {
+        "records": 146101321,
+        "full_buffers": 138,
+        "reuse_count": 73,
+        "reuse_ns": 11380978133,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 577154936
+      },
+      "records_per_operation": 68.93480458976141,
+      "record_bytes_per_operation": 2757.3921835904566,
+      "aggregate_phase1_thread_seconds": 92.242184445,
+      "raw_bytes": 8902147080,
+      "archive_bytes": 1724854019,
+      "raw_records": 222553677,
+      "raw_minus_report_records": 685
+    },
+    {
+      "application": "bcco",
+      "arm": "plain",
+      "block": 2,
+      "throughput": 973451.832372,
+      "operations": 2375834,
+      "operation_unit": "committed_transaction",
+      "reader_elapsed_seconds": null,
+      "phase1": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 0
+      },
+      "records_per_operation": 0.0,
+      "record_bytes_per_operation": 0.0,
+      "aggregate_phase1_thread_seconds": 0.0
+    },
+    {
+      "application": "bcco",
+      "arm": "fixed",
+      "block": 3,
+      "throughput": 474019.525802,
+      "operations": 2076993,
+      "operation_unit": "committed_transaction",
+      "reader_elapsed_seconds": null,
+      "phase1": {
+        "records": 146627962,
+        "full_buffers": 136,
+        "reuse_count": 76,
+        "reuse_ns": 18025758250,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 864176827
+      },
+      "records_per_operation": 70.59627162922553,
+      "record_bytes_per_operation": 2823.850865169021,
+      "aggregate_phase1_thread_seconds": 100.568879523,
+      "raw_bytes": 8923560560,
+      "archive_bytes": 1723172383,
+      "raw_records": 223089014,
+      "raw_minus_report_records": 685
+    },
+    {
+      "application": "bcco",
+      "arm": "plain",
+      "block": 3,
+      "throughput": 972997.456297,
+      "operations": 2357742,
+      "operation_unit": "committed_transaction",
+      "reader_elapsed_seconds": null,
+      "phase1": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 0
+      },
+      "records_per_operation": 0.0,
+      "record_bytes_per_operation": 0.0,
+      "aggregate_phase1_thread_seconds": 0.0
+    },
+    {
+      "application": "bcco",
+      "arm": "old",
+      "block": 3,
+      "throughput": 471715.104347,
+      "operations": 2109015,
+      "operation_unit": "committed_transaction",
+      "reader_elapsed_seconds": null,
+      "phase1": {
+        "records": 150644711,
+        "full_buffers": 140,
+        "reuse_count": 63,
+        "reuse_ns": 14250540695,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 777510840
+      },
+      "records_per_operation": 71.428942420988,
+      "record_bytes_per_operation": 2857.1576968395198,
+      "aggregate_phase1_thread_seconds": 102.596004808,
+      "raw_bytes": 9084771720,
+      "archive_bytes": 1759026506,
+      "raw_records": 227119293,
+      "raw_minus_report_records": 685
+    },
+    {
+      "application": "hsl",
+      "arm": "plain",
+      "block": 1,
+      "throughput": 4661983,
+      "operations": 142211905,
+      "operation_unit": "reader operations",
+      "reader_elapsed_seconds": 30.505,
+      "phase1": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 0
+      },
+      "records_per_operation": 0.0,
+      "record_bytes_per_operation": 0.0,
+      "aggregate_phase1_thread_seconds": 0.0
+    },
+    {
+      "application": "hsl",
+      "arm": "old",
+      "block": 1,
+      "throughput": 1953103,
+      "operations": 85873905,
+      "operation_unit": "reader operations",
+      "reader_elapsed_seconds": 43.968,
+      "phase1": {
+        "records": 503202817,
+        "full_buffers": 488,
+        "reuse_count": 350,
+        "reuse_ns": 502609962221,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 2930957639
+      },
+      "records_per_operation": 5.859787289281884,
+      "record_bytes_per_operation": 234.39149157127534,
+      "aggregate_phase1_thread_seconds": 1047.04089026,
+      "raw_bytes": 20404774720,
+      "archive_bytes": 2951097555,
+      "raw_records": 510119368,
+      "raw_minus_report_records": 13
+    },
+    {
+      "application": "hsl",
+      "arm": "fixed",
+      "block": 1,
+      "throughput": 7237990,
+      "operations": 84861905,
+      "operation_unit": "reader operations",
+      "reader_elapsed_seconds": 11.725,
+      "phase1": {
+        "records": 498714500,
+        "full_buffers": 484,
+        "reuse_count": 343,
+        "reuse_ns": 453154511846,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 2743611362
+      },
+      "records_per_operation": 5.876777100396226,
+      "record_bytes_per_operation": 235.07108401584904,
+      "aggregate_phase1_thread_seconds": 1016.068992487,
+      "raw_bytes": 20224649480,
+      "archive_bytes": 2934685208,
+      "raw_records": 505616237,
+      "raw_minus_report_records": 13
+    },
+    {
+      "application": "hsl",
+      "arm": "old",
+      "block": 2,
+      "throughput": 2447275,
+      "operations": 74978905,
+      "operation_unit": "reader operations",
+      "reader_elapsed_seconds": 30.638,
+      "phase1": {
+        "records": 440714520,
+        "full_buffers": 395,
+        "reuse_count": 176,
+        "reuse_ns": 225678114230,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 2930258139
+      },
+      "records_per_operation": 5.877846842388536,
+      "record_bytes_per_operation": 235.11387369554143,
+      "aggregate_phase1_thread_seconds": 980.925909351,
+      "raw_bytes": 17904876880,
+      "archive_bytes": 2622414407,
+      "raw_records": 447621922,
+      "raw_minus_report_records": 13
+    },
+    {
+      "application": "hsl",
+      "arm": "fixed",
+      "block": 2,
+      "throughput": 6889223,
+      "operations": 85548905,
+      "operation_unit": "reader operations",
+      "reader_elapsed_seconds": 12.418,
+      "phase1": {
+        "records": 506207241,
+        "full_buffers": 483,
+        "reuse_count": 322,
+        "reuse_ns": 375386869926,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 2612458884
+      },
+      "records_per_operation": 5.9171679754404805,
+      "record_bytes_per_operation": 236.68671901761923,
+      "aggregate_phase1_thread_seconds": 1037.958398887,
+      "raw_bytes": 20524914160,
+      "archive_bytes": 2989008696,
+      "raw_records": 513122854,
+      "raw_minus_report_records": 13
+    },
+    {
+      "application": "hsl",
+      "arm": "plain",
+      "block": 2,
+      "throughput": 11658391,
+      "operations": 144461905,
+      "operation_unit": "reader operations",
+      "reader_elapsed_seconds": 12.391,
+      "phase1": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 0
+      },
+      "records_per_operation": 0.0,
+      "record_bytes_per_operation": 0.0,
+      "aggregate_phase1_thread_seconds": 0.0
+    },
+    {
+      "application": "hsl",
+      "arm": "fixed",
+      "block": 3,
+      "throughput": 4020082,
+      "operations": 73860905,
+      "operation_unit": "reader operations",
+      "reader_elapsed_seconds": 18.373,
+      "phase1": {
+        "records": 435657718,
+        "full_buffers": 424,
+        "reuse_count": 293,
+        "reuse_ns": 440464646006,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 3939454688
+      },
+      "records_per_operation": 5.898353371110197,
+      "record_bytes_per_operation": 235.93413484440788,
+      "aggregate_phase1_thread_seconds": 1046.276501647,
+      "raw_bytes": 17702952920,
+      "archive_bytes": 2574833528,
+      "raw_records": 442573823,
+      "raw_minus_report_records": 13
+    },
+    {
+      "application": "hsl",
+      "arm": "plain",
+      "block": 3,
+      "throughput": 12167632,
+      "operations": 143841905,
+      "operation_unit": "reader operations",
+      "reader_elapsed_seconds": 11.822,
+      "phase1": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 0
+      },
+      "records_per_operation": 0.0,
+      "record_bytes_per_operation": 0.0,
+      "aggregate_phase1_thread_seconds": 0.0
+    },
+    {
+      "application": "hsl",
+      "arm": "old",
+      "block": 3,
+      "throughput": 5360712,
+      "operations": 71974905,
+      "operation_unit": "reader operations",
+      "reader_elapsed_seconds": 13.426,
+      "phase1": {
+        "records": 425861341,
+        "full_buffers": 411,
+        "reuse_count": 261,
+        "reuse_ns": 389728609137,
+        "shutdown_ns": 0,
+        "reuse_max_ns": 3603040053
+      },
+      "records_per_operation": 5.916803099635908,
+      "record_bytes_per_operation": 236.67212398543631,
+      "aggregate_phase1_thread_seconds": 1090.131534793,
+      "raw_bytes": 17311035920,
+      "archive_bytes": 2522384768,
+      "raw_records": 432775898,
+      "raw_minus_report_records": 13
+    }
+  ],
+  "summary": {
+    "bcco": {
+      "throughput": {
+        "plain": {
+          "mean": 971312.654086,
+          "minimum": 967488.673589,
+          "maximum": 973451.832372
+        },
+        "old": {
+          "mean": 475046.6182223334,
+          "minimum": 456348.414364,
+          "maximum": 497076.335956
+        },
+        "fixed": {
+          "mean": 495323.6284133333,
+          "minimum": 474019.525802,
+          "maximum": 527386.572466
+        }
+      },
+      "blocks": [
+        {
+          "block": 1,
+          "old_loss_percent": 48.6219994584491,
+          "fixed_loss_percent": 49.91519795529425,
+          "fixed_vs_old_percent": -2.517027683471851
+        },
+        {
+          "block": 2,
+          "old_loss_percent": 53.12059629575913,
+          "fixed_loss_percent": 45.82304383968104,
+          "fixed_vs_old_percent": 15.56664948666555
+        },
+        {
+          "block": 3,
+          "old_loss_percent": 51.519389768783476,
+          "fixed_loss_percent": 51.28255241221215,
+          "fixed_vs_old_percent": 0.4885197513846862
+        }
+      ],
+      "ratio_of_means": {
+        "old_loss_percent": 51.092306249283894,
+        "fixed_loss_percent": 49.00471785993253,
+        "fixed_vs_old_percent": 4.268425331997583
+      }
+    },
+    "hsl": {
+      "throughput": {
+        "plain": {
+          "mean": 9496002,
+          "minimum": 4661983,
+          "maximum": 12167632
+        },
+        "old": {
+          "mean": 3253696.6666666665,
+          "minimum": 1953103,
+          "maximum": 5360712
+        },
+        "fixed": {
+          "mean": 6049098.333333333,
+          "minimum": 4020082,
+          "maximum": 7237990
+        }
+      },
+      "blocks": [
+        {
+          "block": 1,
+          "old_loss_percent": 58.10574598834874,
+          "fixed_loss_percent": -55.255606895177436,
+          "fixed_vs_old_percent": 270.58926231745073
+        },
+        {
+          "block": 2,
+          "old_loss_percent": 79.00846694882682,
+          "fixed_loss_percent": 40.90760037126907,
+          "fixed_vs_old_percent": 181.5058789878538
+        },
+        {
+          "block": 3,
+          "old_loss_percent": 55.94284902764974,
+          "fixed_loss_percent": 66.96085154449116,
+          "fixed_vs_old_percent": -25.008431715787005
+        }
+      ],
+      "ratio_of_means": {
+        "old_loss_percent": 65.73614172925969,
+        "fixed_loss_percent": 36.298472416777784,
+        "fixed_vs_old_percent": 85.91463658259477
+      }
+    }
+  },
+  "caveat": "Three rotating blocks, no equivalence proof or isolated causal estimate given observed throughput variation. Phase-1 waits are aggregated thread time, not wall time; HSL background logging is outside phase 1."
+}

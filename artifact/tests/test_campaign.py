@@ -18,6 +18,7 @@ sys.path.insert(0, str(ART))
 import ae
 from lib import perfstat_campaign as campaign
 from lib.perfstat_results import FIELDS
+from test_rocksdb_timing import fixture as timing_fixture
 
 
 class CpuAndOptions(unittest.TestCase):
@@ -215,10 +216,11 @@ class Campaign(unittest.TestCase):
                     self.assertIn('--value_size=128', cmd)
                     self.assertIn('--write_buffer_size=268435456', cmd)
                     observed.append(cwd.name)
-                    log.write_text('readwhilewriting : 1 micros/op 100 ops/sec\n')
+                    log.write_text(timing_fixture(18))
 
             with patch.object(ae, 'VENDOR', vendor), patch.object(ae, 'run', side_effect=fake_run), \
                  patch.object(ae.rocksdb_hashskiplist, 'cpus', return_value=list(range(18))), \
+                 patch.object(ae.rocksdb_timing, 'apply', return_value={'tested': True}), \
                  patch.object(ae.rocksdb_memoryonly, 'environment', return_value={'LD_PRELOAD': str(allocator)}), \
                  patch.object(ae.rocksdb_hashskiplist, 'validate', return_value={'status': 'passed'}) as validation, \
                  patch.object(ae.time, 'sleep'), redirect_stdout(io.StringIO()):
