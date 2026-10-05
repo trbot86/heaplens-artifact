@@ -1,0 +1,37 @@
+[
+  {
+    "path": "campaign-numerical-summary.json",
+    "sha256": "89f08db789992e97a90eb59bf42b98ef309a76554204216bf5cc78051e9dc30e",
+    "source_sha256": "89f08db789992e97a90eb59bf42b98ef309a76554204216bf5cc78051e9dc30e"
+  },
+  {
+    "path": "aio-validation/numerical-summary.json",
+    "sha256": "22cff25286f3fac431f4d9c4ff6f539c4a118de62524724f9a443b93606e591e",
+    "source_sha256": "22cff25286f3fac431f4d9c4ff6f539c4a118de62524724f9a443b93606e591e"
+  },
+  {
+    "path": "aio-validation/audit.json",
+    "sha256": "d7c3943df7f79e82acf5d5de50ee6e303f9268df8f0d27498caecec346604235",
+    "source_sha256": "d7c3943df7f79e82acf5d5de50ee6e303f9268df8f0d27498caecec346604235"
+  },
+  {
+    "path": "hsl-timing/numerical-summary.json",
+    "sha256": "ff42c14bf68db8e3d2e872456c7bdf034a862eed86f7f0bd0e40823ed1824d17",
+    "source_sha256": "ff42c14bf68db8e3d2e872456c7bdf034a862eed86f7f0bd0e40823ed1824d17"
+  },
+  {
+    "path": "hsl-timing/audit.json",
+    "sha256": "6a4e80b824ab6fbdea562b30cec35ea279d2e00a4b60e6a7dc02683e850ce8b2",
+    "source_sha256": "6a4e80b824ab6fbdea562b30cec35ea279d2e00a4b60e6a7dc02683e850ce8b2"
+  },
+  {
+    "path": "hsl-timing/RESULTS.md",
+    "sha256": "7697a90c2033418c87d51255c5d3e74c51e8160ddbb926582c3b36f2ac285ad9",
+    "source_sha256": "7697a90c2033418c87d51255c5d3e74c51e8160ddbb926582c3b36f2ac285ad9"
+  },
+  {
+    "path": "hsl-timing/endpoint-reports.json",
+    "sha256": "f5777f86430ae41ddcaaa812446119eef466bc523c9dd9aa3b95a955b7f503c3",
+    "scope": "Extracted native/worker/aggregate report lines; source log hashes retained per cell"
+  }
+]

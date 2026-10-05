@@ -322,6 +322,18 @@ and disabled WAL/synchronous writes. They use different memtable configurations:
   and no WAL payload, including at shutdown. Metadata and diagnostic writes
   remain. The paper profile requires at least 64 GiB available memory.
 
+HashSkipList preserves the native `db_bench` output and the existing `summary.json`
+`variants` rates. That metric divides reader operations by the native mixed-workload
+completion interval, which can include a writer tail and time after all workers
+finish. New runs additionally write `timing.json` for every trial: exact native,
+reader and writer endpoints/counts, logical/OS worker identities, reader-only
+throughput, writer completion relative to reader start, and the separate post-worker
+gap. `summary.json` adds `reader_only` comparisons and `timing_runs`. Reader-only
+timing spans the earliest reader start to the latest reader finish; it still
+includes interference from the concurrent writer and background work. Historical
+rates remain unchanged. The [retained logging measurements](headline-pmu/README.md)
+explain the separate logger versions and include the targeted validation results.
+
 `--threads`, `--rocks-key-size`, and `--rocks-value-size` override the counts
 and sizes. Both smoke profiles use two total threads, 10,000 initial keys,
 and two-second measurements. Effective options and persistence checks are
