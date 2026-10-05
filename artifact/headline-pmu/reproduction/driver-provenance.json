@@ -1,0 +1,150 @@
+{
+  "prepare_ascylib.py": {
+    "original_sha256": "8ee0dad3941788b9e5177d6509128f1927d8f31049ea9e0ad892a51c770d7f09",
+    "portable_sha256": "f862e00e540859ba65009ab10581b8f9eb228a3b4e40526457c4a202ed6d2fb2"
+  },
+  "prepare_tpcc.py": {
+    "original_sha256": "07d04a109a0697610c5e8eba1cceb789d39788c367525ef3f5aafdd6c921200a",
+    "portable_sha256": "14ff9b48f144ec3ce42be8604b58e31c00c52c3ce79edf481316dafc682d844d"
+  },
+  "prepare_rocks.py": {
+    "original_sha256": "6abb68dca444d0e71d2fde316ae9c046b0d94edcd6165a2ff515783009964ae1",
+    "portable_sha256": "1b166130bb584f3c704308d014fc971eec038dad7c862971b6d414253d98a9cf"
+  },
+  "prepare_hnsw.py": {
+    "original_sha256": "c211a51d1aa2e0d65c1bade0f4c852fdd97d9f56f4a59cb54f129e8c134c45f3",
+    "portable_sha256": "e393d418d7b4eca3ccfc7ac665046b34215a13d86f6ba6a9b0cc2a9bdcf9c7f8"
+  },
+  "prepare_valkey.py": {
+    "original_sha256": "ee0f29342a4369672b8a80df788749cf7a99886c47d02f06afc2e6719b8fac7e",
+    "portable_sha256": "6b784401a313fcc7ded4ee1f82e99eda66aaecd9af9ebe216137bc3de08aa04f"
+  },
+  "run_ascylib.py": {
+    "original_sha256": "832e2cdc03779ad9068546169e08b663081aa5e5feab2022c639b29830c5eef4",
+    "portable_sha256": "02f6b3e113d7f645ad40ab0133664b6e5dcfc31ae9ccac7795d491916550b081"
+  },
+  "run_tpcc.py": {
+    "original_sha256": "c34538345ca0d3f74845b0be0ca966b84f801913ad4f39663943d5eb5c0f57c2",
+    "portable_sha256": "1eb331de533ba0403cb3e6069cd6272523fdc528cc2fab6e07f1c7e6fddb0a4b"
+  },
+  "run_rocks.py": {
+    "original_sha256": "7f4fdbfaf9590c64161e3b49f4df390a27ee6caa078dac0d821dc7892723631d",
+    "portable_sha256": "07ca12e1e12cbf165502a7e9618c53a5cdb20acab66a9c6f8fb7b009956e8825"
+  },
+  "run_valkey.py": {
+    "original_sha256": "85187cfaf263d250bf85578616c0b85394b0062906f31595efdd86c4b2efcf76",
+    "portable_sha256": "0e47dd8f3ab53dddd93c6fc4c7b74c776cdc49180b3886748315800f190fec1b"
+  },
+  "smoke_hnsw.py": {
+    "original_sha256": "7fe33bdbf488b6172af367413d2857bd77c2c2ab5ff501f4bc1ea2311bccbb7b",
+    "portable_sha256": "acb822b3cc394e144ff35e40288a81d1591b2d0c6b08b57a84cbee08f949766e"
+  },
+  "trace_store.py": {
+    "original_sha256": "888586472458a9b924c76b36156aa57f71e9d01c497a5ef83795953dd5504b98",
+    "portable_sha256": "b9a2096ffd1e9b327b484ec5b342331307a88db8b09fb42f3d97a5be5710fc05"
+  },
+  "rocks_measurement.py": {
+    "original_sha256": "57379c2cdb9722b5f4a65c40f4e1f06b3d76c27e286a014b8a0ae0e624d8d838",
+    "portable_sha256": "37967013c7d74da344e537de01f35971fccc4dfb9b2a53c4b83ac03fe975225c"
+  },
+  "valkey_protocol.py": {
+    "original_sha256": "5519abecf939c6afdee62f464d41a8ee7c28510d2d9e312711935563de344089",
+    "portable_sha256": "7c33f9bb08e5f2f06827e51e3d209fa08b73d0171af214dff3b67056926f5a14"
+  },
+  "smoke_valkey_terminal.py": {
+    "original_sha256": "dd61b6192d0fd98be90ffd8d8cca8f68cfcfafe6e5582d0ea5168911e7169c23",
+    "portable_sha256": "2f4eec0c9ad2c0464b69e206a31f33a8f5f5a823db1c34adc88a635d6c77678a"
+  },
+  "audit_valkey.py": {
+    "original_sha256": "957235b656bbf45dbafd188f1437920ffc164653ca68897f4bf26df9f73e1e79",
+    "portable_sha256": "5d959dfb3da15749d4dacb5308ac16ee4ea517d65808483d49186c4789c06147"
+  },
+  "audit_hnsw.py": {
+    "original_sha256": "738df038873fa744884bfd8771fd915b73b1b815aed2c172fb5eda4237255325",
+    "portable_sha256": "78725f2e2e1cd2c6d0986585a0459a5e2583ffb798cbc9bb2c2c65259091289a"
+  },
+  "retain_valkey.py": {
+    "original_sha256": "6eaca488e40406534e4e144f269f2f38b88e91c44b71ae1ee5b03f5a68fca8d8",
+    "portable_sha256": "5d180f2f93f855bc42b7f3758577f17db79a759bcc24407edb1d798a5d9e0e76"
+  },
+  "retain_hnsw.py": {
+    "original_sha256": "3e735023120787f4bd8a89a084e6d7277f82d8dc73427950d56bf48339209268",
+    "portable_sha256": "6b700cbae3b2415bfbac9055971cfcb64c7f2dc4a10674887aed8c8a394c9acd"
+  },
+  "retain_hsl_db.py": {
+    "original_sha256": "ba2841fcac20a319eacf08bbcffad01e5e6e994c913a778318c2e2680435eaf9",
+    "portable_sha256": "3ec4c873aa0d3c180c29b21915589c1639108d29b9a2c447800608c83f16b39f"
+  },
+  "phase_gate.h": {
+    "original_sha256": "159b24825f5bb9805d12625d483db235460a8eb663b8c59b773f62cbc8bbd662",
+    "portable_sha256": "159b24825f5bb9805d12625d483db235460a8eb663b8c59b773f62cbc8bbd662"
+  },
+  "overhead-wait-probe.h": {
+    "original_sha256": "59617d37dce36d1c15c11646e8140fac74031396ec4a0dfa1082059f322a1341",
+    "portable_sha256": "59617d37dce36d1c15c11646e8140fac74031396ec4a0dfa1082059f322a1341"
+  },
+  "aio_completion.h": {
+    "original_sha256": "82888dc95b9793491413c31c07df7bc6547691fcdadec7eced1f4cb86fcd4659",
+    "portable_sha256": "82888dc95b9793491413c31c07df7bc6547691fcdadec7eced1f4cb86fcd4659"
+  },
+  "wait_events.h": {
+    "original_sha256": "31d30d26484ddb09c61a4cc7a9ea9358968eed48bfb5918d20004029de31afb4",
+    "portable_sha256": "31d30d26484ddb09c61a4cc7a9ea9358968eed48bfb5918d20004029de31afb4"
+  },
+  "wait_window.h": {
+    "original_sha256": "efcd69b0d169b985dac289678f48ac7a3460cdd78f46dd47414614202f445aae",
+    "portable_sha256": "efcd69b0d169b985dac289678f48ac7a3460cdd78f46dd47414614202f445aae"
+  },
+  "valkey_wait_probe.h": {
+    "original_sha256": "96c7bb3acdc1a60b5b42eda36e19fd88daebe690fe0be2c81cd8e8f3007f9747",
+    "portable_sha256": "96c7bb3acdc1a60b5b42eda36e19fd88daebe690fe0be2c81cd8e8f3007f9747"
+  },
+  "valkey_aio_overlay.py": {
+    "original_sha256": "463246c9b1aff12fc92a6928432c521628955bb2884eb2d082a9b356ab53fb1b",
+    "portable_sha256": "c57763e441d46ee92d668f75dd9e078b957a35d95fdf4bcc55a13075ec93dddb"
+  },
+  "valkey_terminal_overlay.py": {
+    "original_sha256": "d1736f9f81bcdff80fcabe535dc2c2bdfc47e3a20d937a1dbe54ca03f649e60d",
+    "portable_sha256": "0f92456e10ce0ef79059af329553003f06cd0acfe2501fe5297dc188ed9fbc4b"
+  },
+  "valkey_workers_overlay.py": {
+    "original_sha256": "3ba572a1c176b3208b27262eb0e6239567628903985a42ed498848727e8bae72",
+    "portable_sha256": "c0930b8ec2f29f7f945bdcf33071a624fc1f80bcfded1181859c575ea2166f66"
+  },
+  "valkey_bio_overlay.py": {
+    "original_sha256": "c172fd5b80334e15e3ec9e1e1eac207ad860ca8113a0faf6e82e4ec8bde78e6c",
+    "portable_sha256": "17583d5202aaf1f9b6f6dec5e88d2783f005a6c61cbd797aa42df5113eb54275"
+  },
+  "valkey_control_overlay.py": {
+    "original_sha256": "2b2c15c4414d1d2861ebc39bbfc8a64412c51428da2d6e2fba66e269637cf067",
+    "portable_sha256": "3fefb49012055b83c5a256e367a418feae058b6961a22cc07f0d96b802279bf1"
+  },
+  "valkey_readiness_diagnostics.py": {
+    "original_sha256": "97b907d6d79ab5bd4bca62dc85edee51233cd9400c9a5b9e52a5e90feac6d77c",
+    "portable_sha256": "40aebfe90948646839cacf7b6c1e8e3d87f75c95731649aa3d399ac14c05255a"
+  },
+  "valkey_readiness_drain.py": {
+    "original_sha256": "3d3375488ce1d4bccb8410eaf0476a170d9a4470793f1ab85858d7ac52b96ef0",
+    "portable_sha256": "4b5eb043786d235daab32e669605038cd48a9dd1c5270714fba3d02d65775d11"
+  },
+  "rebuild_valkey_diagnostics.py": {
+    "original_sha256": "bcf6d62eaa523e8de5f4f2254e707c383d2b5688a79fbaa1bfb0324997aaed5d",
+    "portable_sha256": "f80e3d5ce15a8537613bc850643d4c222a9327b236b3af0f5eee0c98ad536252"
+  },
+  "hnsw_phase.h": {
+    "original_sha256": "0c47b5b3825947816747f76cee31cc07852d2cb04e003bda3fe7fb67f13f3053",
+    "portable_sha256": "0c47b5b3825947816747f76cee31cc07852d2cb04e003bda3fe7fb67f13f3053"
+  },
+  "hnsw_phase_overlay.py": {
+    "original_sha256": "48525b758ec8e83fd2c3274a5a106c2fe33b09b36d25f36332e36cdbd0217b4b",
+    "portable_sha256": "3c7fec9e9a7f77d0ac0ec5634cc1454bc558295c41799a7fdc92d20702d9f754"
+  },
+  "hnsw_logger_overlay.py": {
+    "original_sha256": "401f1cd70e1991b2fb62239f4767b2b874ce51f92d4d57627493422f85ff011a",
+    "portable_sha256": "c15938d51709fd8c91087f0096984608f7b04e8f7bf729dc3563234ae099b8c8"
+  },
+  "hnsw_query_overlay.py": {
+    "original_sha256": "13c140d4440174f397d53b4829b9d0ab47117662143fc9d4cd1b77bf9d884f28",
+    "portable_sha256": "56b7a13c799982cd28e8522c61ce9aaf11a0ec26370f0908a6644a9e2ead9d3c"
+  }
+}
