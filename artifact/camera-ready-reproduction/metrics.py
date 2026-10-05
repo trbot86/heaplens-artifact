@@ -36,11 +36,11 @@ def backend(rows):
     return result
 
 
-def toggle(rows):
+def toggle(rows,policies=('baseline','optimized')):
     result = []
     for name, budget in [('valkey-full',52),('tpcc-bcco-2m',17),('tpcc-bcco-2m',128)]:
         values = {}
-        for policy in ('baseline','optimized'):
+        for policy in policies:
             group = [r for r in rows if (r['name'],r['budget'],r['policy']) == (name,budget,policy)]
             if len(group) != 3 or {r['rep'] for r in group} != {0,1,2} or any(r['errors'] for r in group):
                 raise ValueError('Incomplete or failed UI toggle trials')
@@ -51,23 +51,23 @@ def toggle(rows):
                 if not times: raise ValueError('Missing cache toggle timing')
                 trials.append(median(times))
             values[policy] = dict(milliseconds=median(trials), trial_medians_ms=trials)
-        for rep in range(3):
+        for rep in range(3) if len(policies)==2 else ():
             pair = [r for r in rows if (r['name'],r['budget'],r['rep']) == (name,budget,rep)]
             if len(pair) != 2 or pair[0]['states'] != pair[1]['states'] or pair[0]['exports'] != pair[1]['exports']:
                 raise ValueError('UI rendered states or text exports differ')
         result.append(dict(case=name, pages=budget, **values))
-    if len(rows) != 18: raise ValueError('Unexpected UI toggle trial count')
+    if len(rows) != 9*len(policies): raise ValueError('Unexpected UI toggle trial count')
     return result
 
 
 def detail(before, after):
-    for rows in (before,after):
+    for rows in (before,after) if before is not None else (after,):
         finals=[r for r in rows if r.get('checkpoint')=='final']
         if len(finals)!=9:raise ValueError('Unexpected detail final-row count')
     result = []
     for name, baseline_rects in [('dense64k',65538),('dense1m',65538),('live1m',7815)]:
         values = {}
-        for policy, rows in [('baseline',before),('optimized',after)]:
+        for policy, rows in ([('baseline',before)] if before is not None else [])+[('optimized',after)]:
             finals = [r for r in rows if r.get('checkpoint')=='final' and r['rep']>=0 and r['name']==name]
             if len(finals)!=3 or {r['rep'] for r in finals}!={0,1,2}:
                 raise ValueError('Incomplete or duplicate detail trials')
@@ -150,3 +150,19 @@ def application_references(root):
             raise ValueError('Overhead percentage differs from audit means')
     return dict(scope='Recomputed ratios from retained independent-audit means; no new raw-trial audit',
                 comparisons=pairs,stock_logging_overhead=overhead['summary'])
+
+
+def backend_current(rows):
+    expected={(case,rep) for case in ('valkey','bcco') for rep in (-1,0,1,2)}
+    if len(rows)!=8 or {(r['case'],r['rep']) for r in rows}!=expected:
+        raise ValueError('Incomplete current backend trials')
+    result=[]
+    for case in ('valkey','bcco'):
+        group=[r for r in rows if r['case']==case]
+        if any(r['status']!='complete' or r['spatial']!='range' or r['policy']!='prefix' for r in group):
+            raise ValueError('Invalid current backend trial')
+        if len({r['payload_sha256'] for r in group})!=1:raise ValueError('Current backend output differs across trials')
+        measured=[r for r in group if r['rep']>=0]
+        result.append(dict(case=case,trials=3,cache_seconds=median(r['phases']['cache'] for r in measured),
+                           preparation_seconds=median(r['total_seconds'] for r in measured)))
+    return result

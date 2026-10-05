@@ -1,0 +1,14 @@
+{
+  "root": "/mnt/c/Users/trbot/Documents/ChatGPT/atc2026/artifact-camera-ready",
+  "files": {
+    "sources/backend/sifter_vis_d3/server/cache_limits.py": "15591e5aa913dbb65f7015a6c7a3ba51ec000074aac19e654e2884945fa0a8bb",
+    "sources/backend/sifter_vis_d3/server/cache_ranges.py": "853f74f946336b31a22b8396aec4ae1ccb1c6feb5476b4da0b570f1b315de4a9",
+    "sources/backend/sifter_vis_d3/server/export_page_snapshots.py": "0735565e4bae36f30e21dbccd326a1ae7e060c44cf6a6622ab3ceb4caca5b4d2",
+    "sources/backend/sifter_vis_d3/server/logger.py": "60c7a6f8f7d18394e69c0c4876fbc44737760e5f183020e2d17f06ae2409af8f",
+    "sources/backend/sifter_vis_d3/server/page_selection.py": "363c616e43a858993e70860c432e2d77e1d55f608e3de042689de54877ebc371",
+    "sources/backend/sifter_vis_d3/server/requirements.txt": "53ecfcc13364431282ef4c9153d6709f985917ce165278067f4a8ee18ba0d82d",
+    "sources/backend/sifter_vis_d3/server/sampler.py": "f680b8b20d811ee12fed274631cb245c6ada77d6b29e30aa3768adb4b5facaa7",
+    "sources/backend/sifter_vis_d3/server/server.py": "814c421e1145e9de9dc65d9c0de23aabfa14585ded4c0c5a5e06d7207422bef8"
+  },
+  "scope": "Current checkout; separate observations, not a reproduction of historical timings"
+}

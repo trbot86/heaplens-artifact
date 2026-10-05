@@ -91,7 +91,8 @@ npm install --prefix artifact/results/browser-tools --save-exact playwright-core
 node artifact/results/browser-tools/node_modules/playwright-core/cli.js install chromium
 ```
 
-Run sequentially with localhost ports 5000 and 3000–3003 free. Each command
+Run sequentially with localhost ports 5000 and 3000–3003 free. If those ports
+are occupied, add `--port-offset 180` to use 5180 and 3180–3183. Each command
 starts private Docker services, uses the explicitly selected host browser and
 stops its own services at completion or failure. Allow 24 GiB host RAM and at
 least 4 GiB disk; startup/compilation is outside the reported interaction times.
@@ -131,6 +132,57 @@ cache/statistics panels as fixed controls. They deliberately bypass normal
 selection budgets to test rendering scale. They are not new application traces.
 Both UI studies measure response to the second animation frame, a rendering
 proxy rather than compositor presentation latency.
+
+## Measure the current checkout separately
+
+The preceding commands reproduce the frozen implementations behind the paper's
+numbers. To check later code with the same retained inputs, use these commands:
+
+```bash
+python3 artifact/camera-ready-reproduction/reproduce.py backend-current --source-root . --out artifact/results/current-backend --acknowledge-cost
+python3 artifact/camera-ready-reproduction/reproduce.py ui-toggle-current --source-root . --out artifact/results/current-ui-toggle --browser "$(node -e 'console.log(require(process.cwd()+"/artifact/results/browser-tools/node_modules/playwright-core").chromium.executablePath())')" --playwright "$PWD/artifact/results/browser-tools/node_modules/playwright-core" --environment-note "Local Chromium; record GPU/display conditions with this run" --acknowledge-cost
+python3 artifact/camera-ready-reproduction/reproduce.py ui-detail-current --source-root . --out artifact/results/current-ui-detail --browser "$(node -e 'console.log(require(process.cwd()+"/artifact/results/browser-tools/node_modules/playwright-core").chromium.executablePath())')" --playwright "$PWD/artifact/results/browser-tools/node_modules/playwright-core" --environment-note "Local Chromium; record GPU/display conditions with this run" --acknowledge-cost
+```
+
+Output: each directory's `summary.json`, `current-source.json`, `evidence/`
+and `cleanup.json`. Browser runs also record GPU/compositing and browser
+version in `evidence/browser-probe.json`, before timed interactions. The current
+backend runs two warmups plus six measured cells using range updates and prefix
+sums. Prepared-output hashes must match
+across repetitions of each input. Current UI studies run only the current
+implementation: nine measured trials per study, with page-count/error checks
+for toggles and exact-selection/rectangle-count checks for detail views. They
+do not report a before/after speedup. Bounds and resources are the same as above.
+
+Each run copies and hashes the checkout's relevant source files. The extracted
+frozen source remains alongside it. For the fixed BCCO replay fixture, the
+private frontend copy starts at 2-MiB pages, matching the frozen experiment;
+the original checkout is unchanged. Port changes and effective UI source hashes
+are recorded in `runtime-adapters.json`. The current backend's synthetic test
+adapter accommodates its extra `actualSize` field; measured production code is
+unchanged. Legacy and current prepared payloads can have different schemas, so
+their whole-payload hashes must not be treated as cross-version equality tests.
+
+These are fresh measurements on the chosen machine, not replacements for the
+paper's saved references. The backend command times database-to-payload
+preparation; the UI commands replay payloads and time interactions. They do not
+measure native log conversion or total application-to-screen time, and these
+independent timings must not be added into an end-to-end pipeline claim.
+
+### WSL with an existing Windows browser
+
+The controller can run under WSL while using Windows Node and Edge, as in the
+reference environment. Pass existing paths using WSL's `/mnt/c/...` spelling:
+
+```bash
+python3 artifact/camera-ready-reproduction/reproduce.py ui-toggle --out artifact/results/cr-ui-toggle-windows --windows-host-browser --node "/mnt/c/Program Files/nodejs/node.exe" --browser "/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" --playwright "$PWD/artifact/results/browser-tools/node_modules/playwright-core" --port-offset 180 --environment-note "Windows Edge under WSL; record version and GPU/display conditions" --acknowledge-cost
+```
+
+Adjust `--node` and `--browser` if installed elsewhere. The Playwright directory
+must be accessible to Windows. The same options work for detail and current
+studies. A bounded Windows wrapper starts Node hidden, forwards the study
+settings, records separate stdout/stderr logs, and stops its own process tree
+on timeout. No browser or system dependency is installed automatically.
 
 ## Sampling: rare and common allocation patterns
 
@@ -255,9 +307,12 @@ revalidate timings on subsequently merged source. Application commands use the
 current artifact with the recorded workload and corrected diagnostics. Preserve
 their new provenance with any reported numbers.
 
-The packaged component checks, saved-result arithmetic and controller failure
-tests have been run. Full newly packaged browser, sampling and backend campaigns
-have not all been rerun end to end. Saved results are the completed historical
-measurements. Main-figure full-profile reruns remain deferred. A
+The frozen backend matrix and both browser studies passed end to end, as did
+separate current-camera-ready backend/UI checks. See the [October 5 validation
+report and individual rows](validation-20261005/README.md), including the observed
+UI timing differences. Source snapshots, controller versions and a read-only
+evidence verifier are included. The saved paper references remain unchanged.
+The packaged sampling campaign and main-figure full-profile reruns remain
+deferred. A
 [retained perf-c2c input example](../perf-c2c-example/README.md) now includes
 matching report/database inputs and a checked GUI walkthrough.

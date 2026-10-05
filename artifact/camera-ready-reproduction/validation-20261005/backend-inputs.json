@@ -1,0 +1,6 @@
+{
+  "manifest_sha256": "822664e271fe876c648247cabf522b898bc3f612cb65ba4f0228aa8ef472fef3",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+  "python": "3.10.10 (main, Feb  8 2023, 14:49:42) [GCC 7.5.0]",
+  "scope": "Frozen measured sources and retained research inputs; not measurements of later release changes"
+}
