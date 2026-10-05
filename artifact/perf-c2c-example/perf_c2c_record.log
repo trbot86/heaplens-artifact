@@ -1,0 +1,10 @@
+[ perf record: Woken up 2660 times to write data ]
+Warning:
+Processed 8296148 events and lost 25 chunks!
+
+Check IO/CPU overload!
+
+Warning:
+Processed 8922344 samples and lost 7.27%!
+
+[ perf record: Captured and wrote 695.409 MB /root/sifter/hnswlib_bench_heaplens_pyke_c2c/heaplens_runs/docker_perf_c2c_20260609_1835/perf_c2c.data (8273832 samples) ]

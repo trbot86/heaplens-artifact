@@ -258,5 +258,6 @@ their new provenance with any reported numbers.
 The packaged component checks, saved-result arithmetic and controller failure
 tests have been run. Full newly packaged browser, sampling and backend campaigns
 have not all been rerun end to end. Saved results are the completed historical
-measurements. Main-figure full-profile reruns and the separate perf-c2c input
-example are deferred; the existing figure commands remain available.
+measurements. Main-figure full-profile reruns remain deferred. A
+[retained perf-c2c input example](../perf-c2c-example/README.md) now includes
+matching report/database inputs and a checked GUI walkthrough.

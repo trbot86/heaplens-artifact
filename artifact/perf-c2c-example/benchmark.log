@@ -1,0 +1,37 @@
+==> Layout variant: 0
+==> NUMA pinning benchmark: node=0 cpus=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+==> Recording perf c2c data: /root/sifter/hnswlib_bench_heaplens_pyke_c2c/heaplens_runs/docker_perf_c2c_20260609_1835/perf_c2c.data
+Done memhook constructor
+memory_pool Constructor 
+HEAPLENS_CONFIG layout_variant=0 layout_name=baseline elements=1000000 dim=128 queries=100000 iterations=5 total_queries=500000 warmup=10000 threads=24 build_threads=24 m=16 ef_construction=200 ef_search=64 k=10 query_mode=indexed seed=47 input_data_bytes=512000000
+HEAPLENS_PHASE_BEGIN name=generate_data ts_us=18936534726914 rss_bytes=3444736
+HEAPLENS_PHASE_END name=generate_data elapsed_us=303318 ts_us=18936535030234 rss_bytes=516472832
+HEAPLENS_PHASE_BEGIN name=generate_query_ids ts_us=18936535030295 rss_bytes=516472832
+HEAPLENS_PHASE_END name=generate_query_ids elapsed_us=2874 ts_us=18936535033170 rss_bytes=517009408
+HEAPLENS_PHASE_BEGIN name=build_index ts_us=18936535033193 rss_bytes=517009408
+HEAPLENS_PHASE_END name=build_index elapsed_us=47053593 ts_us=18936582086789 rss_bytes=3241996288
+HEAPLENS_RESULT phase=build seconds=47.0536 inserts_per_second=21252.4 elements=1000000 rss_bytes=3241996288
+HEAPLENS_PHASE_BEGIN name=warmup_search ts_us=18936582086961 rss_bytes=3241996288
+HEAPLENS_RESULT phase=warmup queries=10000 results=100000 checksum=13499108663379252518 rss_bytes=3251302400
+HEAPLENS_PHASE_END name=warmup_search elapsed_us=171577 ts_us=18936582258538 rss_bytes=3251302400
+HEAPLENS_PHASE_BEGIN name=steady_search ts_us=18936582258547 rss_bytes=3251302400
+HEAPLENS_PHASE_END name=steady_search elapsed_us=8093557 ts_us=18936590352108 rss_bytes=3699093504
+HEAPLENS_RESULT phase=query seconds=8.09355 queries=500000 qps=61777.6 us_per_query=16.1871 results=5000000 checksum=17303219016420468433 distance_sum=6.36583e+07 self_recall_at_k=0.55187 rss_bytes=3699093504
+MEMHOOK POOL DESTRUCTOR
+(C++) Typetable bucket is: 0x55acc1f4f988
+(C++) Typetable bucket is: 0x55acc1f4f928
+(C++) Typetable bucket is: 0x55acc1f4f870
+(C++) Typetable bucket is: 0x55acc1f4f998
+(C++) Typetable bucket is: 0x55acc1f4f938
+(C++) Typetable bucket is: 0x55acc1f4f880
+(C++) Typetable bucket is: 0x55acc1f4f9a8
+(C++) Typetable bucket is: 0x55acc1f4f948
+(C++) Typetable bucket is: 0x55acc1f4f890
+(C++) Typetable bucket is: 0x55acc1f4f9b8
+(C++) Typetable bucket is: 0x55acc1f4f958
+(C++) Typetable bucket is: 0x55acc1f4f8a0
+(C++) Typetable bucket is: 0x55acc1f4f968
+(C++) Typetable bucket is: 0x55acc1f4f908
+(C++) Typetable bucket is: 0x55acc1f4f978
+(C++) Typetable bucket is: 0x55acc1f4f918
+(C++) Typetable bucket is: 0x55acc1f4f858
