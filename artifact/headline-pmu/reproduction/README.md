@@ -59,7 +59,7 @@ python3 artifact/headline-pmu/reproduction/launch.py build "${options[@]}"
 python3 artifact/headline-pmu/reproduction/launch.py run "${options[@]}"
 ```
 
-`build` reconstructs the historical source from a SHA-256 manifest plus five
+`build` reconstructs the historical source from a SHA-256 manifest plus pinned
 small historical source blobs, and builds all selected variants before timing.
 The dependency image is pinned by its actual image ID. The source revision is
 `7f4f5f20125ad0a2571abc8ddb0e98e13c7ae109`; the archived author overlays and

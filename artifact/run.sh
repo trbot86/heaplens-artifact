@@ -32,5 +32,6 @@ if [[ "${HEAPLENS_PERF:-0}" == 1 ]]; then
 fi
 exec docker run --rm -i --init "${extra[@]}" -e NEXT_TELEMETRY_DISABLED=1 \
     -e HEAPLENS_CACHE_BUDGET_MB="${HEAPLENS_CACHE_BUDGET_MB:-4096}" \
+    -e HEAPLENS_HOST_ROOT="$ROOT" \
     -e PERFBENCH_PERF="${PERFBENCH_PERF:-on}" \
     -v "$ROOT:/root/sifter" -w /root/sifter "$IMAGE" python3 artifact/ae.py "$@"

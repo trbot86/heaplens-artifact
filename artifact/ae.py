@@ -30,6 +30,18 @@ EXPERIMENTS = ["ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_e
 def save(path, value):
     Path(path).write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
+def host_path(path):
+    """Display paths under the mounted repository in the host's namespace."""
+    host_root = os.environ.get("HEAPLENS_HOST_ROOT")
+    if host_root:
+        try:
+            relative = Path(path).resolve().relative_to(ROOT.resolve())
+        except ValueError:
+            pass
+        else:
+            return str(Path(host_root) / relative)
+    return str(path)
+
 def run(cmd, *, cwd=ROOT, log=None, env=None, timeout=None):
     cmd = [str(x) for x in cmd]
     print("+", " ".join(cmd), flush=True)
@@ -38,7 +50,7 @@ def run(cmd, *, cwd=ROOT, log=None, env=None, timeout=None):
             f.write("COMMAND: " + repr(cmd) + "\n"); f.flush()
             proc = subprocess.run(cmd, cwd=cwd, env=env, stdout=f, stderr=subprocess.STDOUT, timeout=timeout)
         if proc.returncode:
-            raise RuntimeError(f"Exit {proc.returncode}; see {log}")
+            raise RuntimeError(f"Exit {proc.returncode}; see {host_path(log)}")
     else:
         subprocess.run(cmd, cwd=cwd, env=env, check=True, timeout=timeout)
 
@@ -46,6 +58,7 @@ def new_output(args):
     stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S-%fZ")
     path = Path(args.out).resolve() if args.out else ART / "results" / f"{args.command}-{stamp}"
     path.mkdir(parents=True, exist_ok=False)
+    print(f"Output directory: {host_path(path)}", flush=True)
     save(path / "environment.json", {"created_utc": stamp, "platform": platform.platform(),
          "python": sys.version, "arguments": vars(args), "affinity": sorted(os.sched_getaffinity(0)),
          "note": "Smoke runs are functionality checks, not performance evidence."})
@@ -98,7 +111,7 @@ def export(out):
     files = list((out / "export/compact").glob("*.txt"))
     if not files or not (out / "export/heaplens_analysis.txt").is_file():
         raise RuntimeError("Exporter produced incomplete output")
-    print(f"Export OK: {len(files)} compact files; {out / 'export'}")
+    print(f"Export OK: {len(files)} compact files; {host_path(out / 'export')}")
 
 def hnsw(args, out):
     paper = args.profile == "paper"
@@ -454,7 +467,7 @@ def experiment(args):
         except Exception as exc:
             save(work / "status.json", {"status": "failed", "error": str(exc)})
             raise
-    print(f"Results: {work}", flush=True)
+    print(f"Results: {host_path(work)}", flush=True)
 
 def factorization(args, out):
     paper = args.profile == "paper"
@@ -495,8 +508,8 @@ def parse_args(argv=None):
     p.add_argument("--jobs", type=int, default=4)
     p.add_argument('--database', help='For gui: import a generated SQLite trace into the database selector')
     p.add_argument('--label', help='For gui --database: unique selector name, e.g. tpcc-bcco-after')
-    p.add_argument('--variant', choices=['baseline','optimized'],
-                   help='Before/after layout for named ASCYLIB/TPC-C diagnostic traces')
+    p.add_argument('--variant', choices=['baseline','segregation-only','prefill-only','optimized'],
+                   help='Diagnostic layout; EFRB also supports segregation-only and prefill-only')
     p.add_argument("--overhead-trees", nargs='+', choices=['efrb','dvy','bcco'],
                    help="C2 overhead trees (default: all three ASCYLIB trees)")
     p.add_argument("--reps", type=int)
@@ -527,6 +540,8 @@ def parse_args(argv=None):
     if args.variant and not (args.command in {'experiment','legacy'} and args.name in
                             {'ascylib_efrb','ascylib_dvy','ascylib_hj','tpcc_bcco','tpcc_efrb','rocksdb_hsl','rocksdb_isl','valkey_trace','hnsw_trace'}):
         p.error('variant is supported for named diagnostic traces')
+    if args.variant in {'segregation-only', 'prefill-only'} and args.name != 'ascylib_efrb':
+        p.error('intermediate variants apply only to the ascylib_efrb diagnostic trace')
     if args.overhead_trees and args.command != 'overhead': p.error('overhead-trees applies only to overhead')
     if args.out and args.command == 'all-performance': p.error('all-performance creates a separate directory per experiment; omit --out')
     if args.command in {"experiment", "legacy"} and not args.name: p.error("experiment requires a name")
@@ -590,7 +605,7 @@ def main():
         except Exception as exc:
             save(out / "status.json", {"status": "failed", "error": str(exc)})
             raise
-        print("Results:", out)
+        print("Results:", host_path(out))
 
 if __name__ == "__main__":
     main()
