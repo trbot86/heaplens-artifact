@@ -26,6 +26,37 @@ from lib.rocksdb_inline_regions import apply as annotate_inline, verify as verif
 
 
 class Workflows(unittest.TestCase):
+    def test_host_paths_only_translate_files_inside_repository(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / 'repo'
+            with patch.object(ae, 'ROOT', root), patch.dict(os.environ, HEAPLENS_HOST_ROOT='/host/project with spaces'):
+                self.assertEqual(ae.host_path(root / 'artifact/results/example'),
+                                 '/host/project with spaces/artifact/results/example')
+                outside = Path(tmp) / 'repo-other/result'
+                self.assertEqual(ae.host_path(outside), str(outside))
+            with patch.dict(os.environ, HEAPLENS_HOST_ROOT=''):
+                self.assertEqual(ae.host_path(root / 'artifact/results/example'),
+                                 str(root / 'artifact/results/example'))
+
+    def test_efrb_trace_build_flags_isolate_each_change(self):
+        # Execute the driver's selection before it performs builds or writes.
+        source = (ART/'lib/ascylib_experiment.sh').read_text()
+        body = source[source.index('    local tree_src_dir='):source.index('    local SIFTER_ROOT')]
+        script = 'select_flags() {\n' + body + '\nprintf "%s\\n" "${make_args[@]}"\n}\nselect_flags src/bst-ellen lf-bst_ellen "$TEST_NAME" STM=LOCKFREE'
+        expected = {'baseline': [], 'segregation-only': ['SEG_OBJS=1'],
+                    'prefill-only': ['INIT=all'], 'optimized': ['SEG_OBJS=1', 'INIT=all']}
+        for variant, flags in expected.items():
+            result = subprocess.run(['bash', '-c', script], capture_output=True, text=True,
+                env={**os.environ, 'TRACE_VARIANT': variant, 'TEST_NAME': 'ascylib_efrb'})
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.splitlines(), ['STM=LOCKFREE', 'SET_CPU=0'] + flags)
+        for name, variant in [('ascylib_efrb', 'unknown'), ('ascylib_dvy', 'prefill-only'),
+                              ('ascylib_hj', 'segregation-only')]:
+            result = subprocess.run(['bash', '-c', script], capture_output=True, text=True,
+                env={**os.environ, 'TRACE_VARIANT': variant, 'TEST_NAME': name})
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(result.stdout, '')
+
     def test_hj_before_uses_jemalloc_and_after_uses_glibc(self):
         source = (ART/'lib/ascylib_experiment.sh').read_text()
         start = source.index('        local preload=')
@@ -156,6 +187,7 @@ class Workflows(unittest.TestCase):
                 else:
                     self.assertIn('PERFMON',logfile.read_text())
                     self.assertNotIn('SYS_ADMIN',logfile.read_text())
+                    self.assertIn('HEAPLENS_HOST_ROOT='+str(ART.parent),logfile.read_text())
 
     def test_variant_options(self):
         for name in ('ascylib_efrb','ascylib_dvy','ascylib_hj','tpcc_efrb','tpcc_bcco','rocksdb_hsl','rocksdb_isl','valkey_trace'):
@@ -163,6 +195,11 @@ class Workflows(unittest.TestCase):
                 self.assertEqual(ae.parse_args(['experiment',name,'--variant',variant]).variant,variant)
         with redirect_stderr(io.StringIO()),self.assertRaises(SystemExit):
             ae.parse_args(['experiment','ascylib_efrb_bench','--variant','optimized'])
+        for variant in ('segregation-only', 'prefill-only'):
+            self.assertEqual(ae.parse_args(['experiment','ascylib_efrb','--variant',variant]).variant,variant)
+            for name in ('ascylib_dvy', 'ascylib_hj', 'tpcc_efrb', 'rocksdb_hsl', 'valkey_trace', 'hnsw_trace'):
+                with redirect_stderr(io.StringIO()),self.assertRaises(SystemExit):
+                    ae.parse_args(['experiment',name,'--variant',variant])
 
     def test_overhead_options(self):
         args=ae.parse_args(['overhead','--threads','6','--duration-ms','2000',

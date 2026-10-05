@@ -7,7 +7,7 @@
     "artifact/config/rocksdb-memoryonly/README.md": {"kind":"file","mode":436,"sha256":"5fbc9be5e7559ffc20986e10ec4c42eb743a428adebff47da0dc644f02025161","bytes":1887,"override":false},
     "artifact/config/rocksdb-memoryonly/prefix_hash.ini": {"kind":"file","mode":436,"sha256":"bcc738c0d9895fb43f0f335f3a9eb40977d6f3c0b7664f5c8d2ed86c929603ad","bytes":6640,"override":false},
     "artifact/config/rocksdb-memoryonly/skip_list.ini": {"kind":"file","mode":436,"sha256":"d97f0c393703bca98d1f323550c3ac3e6b8c44e703168aa5d176bb239abbc8be","bytes":7594,"override":false},
-    "artifact/lib/ascylib_experiment.sh": {"kind":"file","mode":509,"sha256":"0d1291d23bd169b72a4d663608b28aab8d82da792fdb8afd9edc15815899151e","bytes":7345,"override":false},
+    "artifact/lib/ascylib_experiment.sh": {"kind":"file","mode":509,"sha256":"0d1291d23bd169b72a4d663608b28aab8d82da792fdb8afd9edc15815899151e","bytes":7345,"override":true},
     "artifact/lib/ascylib_perfbench.sh": {"kind":"file","mode":436,"sha256":"0edefb775d675e1eff5fa86151dcb49aa01e49b5e7539b1a7391777b0b65e83a","bytes":4706,"override":false},
     "artifact/lib/dedupe_fixes_yaml.py": {"kind":"file","mode":436,"sha256":"b4c21c813196c310929b66e5849d5af5160ea7a834564ddbe7fb490195d7114f","bytes":3857,"override":false},
     "artifact/lib/dvy_runtime.py": {"kind":"file","mode":436,"sha256":"4c1dd4e235feed55c1fd60d63e76ecc4691eafa54a5660882aaad5c998fccb16","bytes":8535,"override":false},
