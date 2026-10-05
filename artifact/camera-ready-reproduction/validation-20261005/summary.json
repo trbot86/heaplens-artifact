@@ -1,0 +1,282 @@
+{
+  "backend": [
+    {
+      "case": "valkey",
+      "spatial": "enumerated",
+      "temporal": "direct",
+      "trials": 3,
+      "cache_seconds": 98.21988426998723,
+      "preparation_seconds": 103.56296620203648
+    },
+    {
+      "case": "valkey",
+      "spatial": "range",
+      "temporal": "direct",
+      "trials": 3,
+      "cache_seconds": 13.534558875951916,
+      "preparation_seconds": 18.917498435010202
+    },
+    {
+      "case": "valkey",
+      "spatial": "enumerated",
+      "temporal": "prefix",
+      "trials": 3,
+      "cache_seconds": 5.802856203983538,
+      "preparation_seconds": 11.177680042921565
+    },
+    {
+      "case": "valkey",
+      "spatial": "range",
+      "temporal": "prefix",
+      "trials": 3,
+      "cache_seconds": 3.527793931076303,
+      "preparation_seconds": 8.893470716080628
+    },
+    {
+      "case": "bcco",
+      "spatial": "enumerated",
+      "temporal": "direct",
+      "trials": 3,
+      "cache_seconds": 6.664646902005188,
+      "preparation_seconds": 10.590113308979198
+    },
+    {
+      "case": "bcco",
+      "spatial": "range",
+      "temporal": "direct",
+      "trials": 3,
+      "cache_seconds": 5.680982940946706,
+      "preparation_seconds": 9.573027242906392
+    },
+    {
+      "case": "bcco",
+      "spatial": "enumerated",
+      "temporal": "prefix",
+      "trials": 3,
+      "cache_seconds": 19.91124229505658,
+      "preparation_seconds": 23.834319144953042
+    },
+    {
+      "case": "bcco",
+      "spatial": "range",
+      "temporal": "prefix",
+      "trials": 3,
+      "cache_seconds": 7.058579215081409,
+      "preparation_seconds": 10.936714509036392
+    }
+  ],
+  "backend-current": [
+    {
+      "case": "valkey",
+      "trials": 3,
+      "cache_seconds": 3.6017958839656785,
+      "preparation_seconds": 9.214372707996517
+    },
+    {
+      "case": "bcco",
+      "trials": 3,
+      "cache_seconds": 7.197091471985914,
+      "preparation_seconds": 11.181970419012941
+    }
+  ],
+  "ui-toggle": [
+    {
+      "case": "valkey-full",
+      "pages": 52,
+      "baseline": {
+        "milliseconds": 817.8499999046326,
+        "trial_medians_ms": [
+          918.5999999046326,
+          800.4500000476837,
+          817.8499999046326
+        ]
+      },
+      "optimized": {
+        "milliseconds": 80.70000004768372,
+        "trial_medians_ms": [
+          81.20000004768372,
+          78.20000004768372,
+          80.70000004768372
+        ]
+      }
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "pages": 17,
+      "baseline": {
+        "milliseconds": 487.5,
+        "trial_medians_ms": [
+          484.25,
+          487.5,
+          497.2499997615814
+        ]
+      },
+      "optimized": {
+        "milliseconds": 53.44999980926514,
+        "trial_medians_ms": [
+          53.84999990463257,
+          53.44999980926514,
+          53.39999985694885
+        ]
+      }
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "pages": 128,
+      "baseline": {
+        "milliseconds": 1027.2000000476837,
+        "trial_medians_ms": [
+          1051.9000000953674,
+          1024.5,
+          1027.2000000476837
+        ]
+      },
+      "optimized": {
+        "milliseconds": 252.29999995231628,
+        "trial_medians_ms": [
+          254.85000014305115,
+          252.29999995231628,
+          251.89999985694885
+        ]
+      }
+    }
+  ],
+  "ui-toggle-current": [
+    {
+      "case": "valkey-full",
+      "pages": 52,
+      "optimized": {
+        "milliseconds": 89.49999976158142,
+        "trial_medians_ms": [
+          90.70000004768372,
+          86.35000014305115,
+          89.49999976158142
+        ]
+      }
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "pages": 17,
+      "optimized": {
+        "milliseconds": 56.25,
+        "trial_medians_ms": [
+          55.89999985694885,
+          57.049999952316284,
+          56.25
+        ]
+      }
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "pages": 128,
+      "optimized": {
+        "milliseconds": 255.70000004768372,
+        "trial_medians_ms": [
+          255.70000004768372,
+          256.5499999523163,
+          255.5
+        ]
+      }
+    }
+  ],
+  "ui-detail": [
+    {
+      "case": "dense64k",
+      "selected_bytes": 65536,
+      "baseline": {
+        "milliseconds": 19257.5,
+        "trial_medians_ms": [
+          19476.5,
+          18909.900000095367,
+          19257.5
+        ]
+      },
+      "optimized": {
+        "milliseconds": 370.2000002861023,
+        "trial_medians_ms": [
+          388.40000009536743,
+          370.2000002861023,
+          365.19999980926514
+        ]
+      }
+    },
+    {
+      "case": "dense1m",
+      "selected_bytes": 65536,
+      "baseline": {
+        "milliseconds": 21120.799999713898,
+        "trial_medians_ms": [
+          21042.300000190735,
+          21120.799999713898,
+          21634.900000095367
+        ]
+      },
+      "optimized": {
+        "milliseconds": 403.19999980926514,
+        "trial_medians_ms": [
+          402.09999990463257,
+          404,
+          403.19999980926514
+        ]
+      }
+    },
+    {
+      "case": "live1m",
+      "selected_bytes": 65536,
+      "baseline": {
+        "milliseconds": 3079,
+        "trial_medians_ms": [
+          3075.5999999046326,
+          3085.7999997138977,
+          3079
+        ]
+      },
+      "optimized": {
+        "milliseconds": 1148.3999996185303,
+        "trial_medians_ms": [
+          1156.8000001907349,
+          1140.0999999046326,
+          1148.3999996185303
+        ]
+      }
+    }
+  ],
+  "ui-detail-current": [
+    {
+      "case": "dense64k",
+      "selected_bytes": 65536,
+      "optimized": {
+        "milliseconds": 373.40000009536743,
+        "trial_medians_ms": [
+          373.40000009536743,
+          379,
+          368.80000019073486
+        ]
+      }
+    },
+    {
+      "case": "dense1m",
+      "selected_bytes": 65536,
+      "optimized": {
+        "milliseconds": 409.69999980926514,
+        "trial_medians_ms": [
+          418.69999980926514,
+          409.69999980926514,
+          408.7999997138977
+        ]
+      }
+    },
+    {
+      "case": "live1m",
+      "selected_bytes": 65536,
+      "optimized": {
+        "milliseconds": 1144.6999998092651,
+        "trial_medians_ms": [
+          1142.7000002861023,
+          1153,
+          1144.6999998092651
+        ]
+      }
+    }
+  ]
+}

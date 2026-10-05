@@ -1,0 +1,12 @@
+{
+  "manifest_sha256": "822664e271fe876c648247cabf522b898bc3f612cb65ba4f0228aa8ef472fef3",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+  "python": "3.10.10 (main, Feb  8 2023, 14:49:42) [GCC 7.5.0]",
+  "scope": "Frozen measured sources and retained research inputs; not measurements of later release changes",
+  "controller_sha256": {
+    "reproduce.py": "47807a43ffd21ffd51ffd67af9f5ec71c4967f805a00cfdf57518e27b7cab98a",
+    "metrics.py": "581175fc684cd8612196e505feeba4349b296c003560e41c49c3727aee04e431",
+    "windows-browser.ps1": "1d944298a68222af2272850c30962aad05e085abca5a8909a7dd35ae8bbde814",
+    "browser-probe.cjs": "40dcc4c04258022d8efa54cca35ecde97de5f4d776b63b5a923b7efea31321e5"
+  }
+}

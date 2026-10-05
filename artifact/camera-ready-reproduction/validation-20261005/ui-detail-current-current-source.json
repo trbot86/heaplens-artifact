@@ -1,0 +1,32 @@
+{
+  "root": "/mnt/c/Users/trbot/Documents/ChatGPT/atc2026/artifact-camera-ready",
+  "files": {
+    "sources/ui/detail-optimized/.eslintrc.json": "d35587a0c3a74208038315134836a971afaa804b751ba7f395412e033de1e7e1",
+    "sources/ui/detail-optimized/.gitignore": "f37e7e1b90353a16ba7bec8979585311ee6d00311209391e5ab47162df4ca922",
+    "sources/ui/detail-optimized/.prettierignore": "cde10c9a7d8c568894baff85929ab3418f6666379183d5c171360a047fc77f29",
+    "sources/ui/detail-optimized/README.md": "60b55ff7df79af72590f9524208e46642bc32bdc175cdad41349681c0e2f958f",
+    "sources/ui/detail-optimized/next.config.mjs": "1e3206cb200e264fdddb4dbb2e4772daebc839fdbc94b78316d74892a0de6fa2",
+    "sources/ui/detail-optimized/package-lock.json": "09f99a90f24b3fb8f3f13673a9f5310b37251eecbea6d4259214c7c7201d1a1d",
+    "sources/ui/detail-optimized/package.json": "aa18f65586b95a1ee4acbbbfd6a4889ae40421f1299809e00c03bf8de573cfc9",
+    "sources/ui/detail-optimized/src/app/favicon.ico": "2b8ad2d33455a8f736fc3a8ebf8f0bdea8848ad4c0db48a2833bd0f9cd775932",
+    "sources/ui/detail-optimized/src/app/globals.css": "7529073db4db514e661ecd34ce67b12ed9f16445d926e9d600bc258b3f11e8e6",
+    "sources/ui/detail-optimized/src/app/layout.tsx": "d33310b4ca839590093807f82fd954a33dffa656a0a3fa822dc5878806a48d53",
+    "sources/ui/detail-optimized/src/app/page.scss": "f9414c1b9f7af60276f7e4e7d256787facfbba42c046184e0a251851e278a1b7",
+    "sources/ui/detail-optimized/src/app/page.tsx": "92ec125038b776278d344657afed51022cf67d1794525ced6cac6f3143dd5933",
+    "sources/ui/detail-optimized/src/app/ui/cacheSetComponent.tsx": "b74edecc30958fed9d7079ae0a67a155a2e63b4c8869fa7840f693968bc100bd",
+    "sources/ui/detail-optimized/src/app/ui/componentStyles.scss": "ef9fcdcbe9c64249ffb3f707063cbf4a6c7a6106b263ce2237cd3df6a0520f42",
+    "sources/ui/detail-optimized/src/app/ui/continuationEdges.ts": "42b546a3cdb0f096fc708a4de65d078ff9260ab0ebc2db2f9112388c4a4b5c27",
+    "sources/ui/detail-optimized/src/app/ui/currentBucket.ts": "0e04c1e4334252f39bb7bad7e826f8bb7c76d691623ad95cedf8fcf57b5efaa4",
+    "sources/ui/detail-optimized/src/app/ui/detailEvents.ts": "f810fc97219fd9b262ecc093e39eec01db49f22c06fc9b0fad1017f280c80d60",
+    "sources/ui/detail-optimized/src/app/ui/fonts.ts": "3319e7ce1fb3aabc722622547cbda8c52f22bf7e9157bba0dc55cdca39618181",
+    "sources/ui/detail-optimized/src/app/ui/legendComponent.tsx": "12c3dba158d663c606cafb2ebddde73b86ba1aacb29f8c554de95589039c7a11",
+    "sources/ui/detail-optimized/src/app/ui/pagesComponent.tsx": "3221ec106d4e573c3e267420166f84844d89f74abb59f2d7649244a5ffea8d18",
+    "sources/ui/detail-optimized/src/app/ui/snapshotExport.ts": "3b00ca9fd8e435ca9e30191fa312d9a28aea4b8ce7051dd00fd34c68f711ecfc",
+    "sources/ui/detail-optimized/src/app/ui/snapshotExportButton.tsx": "5249e5e05fe585dd08ff04f396098d7b8f4803696ae09444ca6372f02fdb78c4",
+    "sources/ui/detail-optimized/src/app/ui/testdata.js": "4e15154a53bf58d200bbf01f794281b15558956389d999074ace3fae68defceb",
+    "sources/ui/detail-optimized/src/app/ui/timeGraphComponent.tsx": "f12a54e9e17f4f0bedcdaf41b688eabc09d097566b6945d131c34b0bf73a9c70",
+    "sources/ui/detail-optimized/src/app/vispanels/page.tsx": "de75e2d8fefe62a4877913681abd9cdf10d296763cb1e89e9b90f18893ad4188",
+    "sources/ui/detail-optimized/tsconfig.json": "8d371d806be06b40b40dc330fad24c157d7a83c7a7d8a56434384696d82c0a69"
+  },
+  "scope": "Current checkout; separate observations, not a reproduction of historical timings"
+}

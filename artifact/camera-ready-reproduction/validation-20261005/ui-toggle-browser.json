@@ -1,0 +1,9 @@
+{
+  "browser": "/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+  "node": "/mnt/c/Users/trbot/AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/OpenAI/Codex/bin/node.exe",
+  "playwright": "/mnt/c/Users/trbot/Documents/ChatGPT/atc2026/artifact-tools/node_modules/playwright-core",
+  "playwright_version": "1.62.1",
+  "node_version": "v24.14.0",
+  "environment_note": "Windows 11 / WSL2 Docker; i7-14700KF; RTX 3080; headless Edge 154.0.4258.53. See separate GPU probe. Existing unrelated services left running.",
+  "scope": "Host browser; report GPU acceleration and display environment separately"
+}

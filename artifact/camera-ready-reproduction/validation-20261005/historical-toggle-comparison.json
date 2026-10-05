@@ -1,0 +1,149 @@
+{
+  "status": "passed",
+  "trials": [
+    {
+      "case": "valkey-full",
+      "budget": 52,
+      "rep": 0,
+      "policy": "baseline",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "valkey-full",
+      "budget": 52,
+      "rep": 0,
+      "policy": "optimized",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "valkey-full",
+      "budget": 52,
+      "rep": 1,
+      "policy": "optimized",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "valkey-full",
+      "budget": 52,
+      "rep": 1,
+      "policy": "baseline",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "valkey-full",
+      "budget": 52,
+      "rep": 2,
+      "policy": "baseline",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "valkey-full",
+      "budget": 52,
+      "rep": 2,
+      "policy": "optimized",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 17,
+      "rep": 0,
+      "policy": "baseline",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 17,
+      "rep": 0,
+      "policy": "optimized",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 17,
+      "rep": 1,
+      "policy": "optimized",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 17,
+      "rep": 1,
+      "policy": "baseline",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 17,
+      "rep": 2,
+      "policy": "baseline",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 17,
+      "rep": 2,
+      "policy": "optimized",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 128,
+      "rep": 0,
+      "policy": "baseline",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 128,
+      "rep": 0,
+      "policy": "optimized",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 128,
+      "rep": 1,
+      "policy": "optimized",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 128,
+      "rep": 1,
+      "policy": "baseline",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 128,
+      "rep": 2,
+      "policy": "baseline",
+      "states_equal": true,
+      "exports_equal": true
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 128,
+      "rep": 2,
+      "policy": "optimized",
+      "states_equal": true,
+      "exports_equal": true
+    }
+  ]
+}

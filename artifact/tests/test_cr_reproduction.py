@@ -92,6 +92,40 @@ class Reproduction(unittest.TestCase):
             (root/'manifest.json').write_text(json.dumps(dict(assets={},saved={'x.json':{'sha256':'0'*64}})))
             with self.assertRaisesRegex(ValueError,'evidence changed'):cr.verify(root)
 
+    def test_current_commands_and_ports_are_guarded(self):
+        for command in ('backend-current','ui-toggle-current','ui-detail-current'):
+            with redirect_stderr(io.StringIO()),self.assertRaises(SystemExit):
+                cr.parse_args([command,'--out','x'])
+        for offset in ('-1','60536'):
+            with redirect_stderr(io.StringIO()),self.assertRaises(SystemExit):
+                cr.parse_args(['plan','--port-offset',offset])
+        self.assertEqual(cr.parse_args(['plan','--port-offset','180']).port_offset,180)
+
+    def test_current_backend_schema_adapter_preserves_frozen_source(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'repo';out=Path(tmp)/'run'
+            source=root/'sifter_vis_d3/server';source.mkdir(parents=True)
+            (source/'sampler.py').write_text('current')
+            target=out/'sources/backend/sifter_vis_d3/server';target.mkdir(parents=True)
+            (target/'sampler.py').write_text('frozen')
+            worker=out/'sources/backend/tools/ablate_cache_prefix.py';worker.parent.mkdir()
+            worker.write_text('        ], columns=module.event_labels)')
+            cr.current_sources(out,root,'backend')
+            self.assertEqual((target/'sampler.py').read_text(),'current')
+            self.assertEqual((target.with_name('server-frozen')/'sampler.py').read_text(),'frozen')
+            self.assertIn("objects['actualSize']=0",worker.read_text())
+            self.assertEqual(json.loads((out/'current-source.json').read_text())['files']['sources/backend/sifter_vis_d3/server/sampler.py'],cr.digest(source/'sampler.py'))
+
+    def test_current_metrics_require_complete_valid_trials(self):
+        root=cr.BUNDLE/'saved'
+        rows=[r for r in metrics.read(root/'backend.json') if r['spatial']=='range' and r['policy']=='prefix']
+        self.assertEqual(len(metrics.backend_current(rows)),2)
+        with self.assertRaises(ValueError):metrics.backend_current(rows[:-1])
+        toggles=[r for r in metrics.jsonlines(root/'toggle.jsonl') if r['policy']=='optimized']
+        self.assertEqual(len(metrics.toggle(toggles,('optimized',))),3)
+        with self.assertRaises(ValueError):metrics.toggle(toggles[:-1],('optimized',))
+        self.assertEqual(len(metrics.detail(None,metrics.jsonlines(root/'detail-optimized.jsonl'))),3)
+
     def test_metric_checks_reject_missing_cells_and_wrong_outputs(self):
         root=cr.BUNDLE/'saved'
         rows=metrics.read(root/'backend.json')
