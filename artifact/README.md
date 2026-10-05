@@ -709,6 +709,12 @@ makes an environmental dependency explicit, we describe that control.
 | DVY | Explicitly control and check huge-page backing, applying the same allocator advice policy to every node-layout variant. The artifact supplies an isolated runtime for this purpose. |
 | RocksDB HashSkipList | Specify the retained workbook's 96-thread, 10-million-key, 32/128-byte key/value, 256-MiB-buffer configuration. WAL is disabled, but flushing and compaction remain enabled. |
 
+
+The HNSW diagnostic trace includes query-context `new`/`new[]` allocations as
+`HeapLensHnswQueryScratch`, in addition to semantic index regions. This label
+describes allocations within `searchKnn`, not exact STL types or exhaustive
+Python/NumPy coverage. It preserves the original allocator and layout behavior.
+
 ### Artifact packaging correction
 
 **TPC-C allocator separation.** The initial artifact inadvertently pointed the

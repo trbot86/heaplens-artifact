@@ -51,8 +51,9 @@ Raw archives are retained separately and are not re-audited by this command.
 ## Full measurement reproduction: expensive, separate opt-in
 
 **Budget 48 hours or more**, depending on machine and storage. This is not part
-of the default smoke run. The original serial controller was host-specific;
-this directory does not yet provide a portable full-campaign launcher. Do not
+of the default smoke run. The [portable launcher](reproduction/README.md) provides
+an explicit opt-in historical-source rebuild and 400-cell run, with a plan-only
+default, fresh storage, bounded stages and verified retention. Do not
 execute old recovery controllers or substitute the C++ HNSW trace diagnostic
 for the headline Python-binding workload.
 

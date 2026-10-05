@@ -1,0 +1,6 @@
+# Historical source blobs and driver provenance must survive checkout unchanged.
+*.blob -text -diff whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab
+*.py text eol=lf
+*.h text eol=lf
+*.json text eol=lf
+*.md text eol=lf
