@@ -1,7 +1,9 @@
 # Full configurations and reference
 
 Return to the [step-by-step evaluator guide](README.md). Commands in that guide
-already select the defaults described here. This supplement preserves the full
+select their stated configurations. The camera-ready README explicitly binds
+EFRB/DVY memory to match its final campaign; the earlier confirmations below
+retain single-node interleaving. This supplement preserves the full
 configuration recipes, runtime and NUMA details, variant explanations, output
 schemas, sampling rules and errata formerly interleaved with the README steps.
 The evaluator confirmations below remain separate from the camera-ready campaign
@@ -19,6 +21,11 @@ and from the logging/PMU batches; no retained measurement has been replaced.
 - [Sampling, traces and model-assisted analysis](#generate-traces-and-try-model-assisted-analysis)
 - [C2 overhead](#reproduce-logging-overhead-c2)
 - [Errata and configuration changes](#errata-and-updated-reproduction-configurations)
+
+The [camera-ready reproduction guide](camera-ready-reproduction/README.md) adds
+backend/UI/sampling commands, final campaign references, and controlled TPC-C
+and HNSW factors. It preserves the distinction between recorded frozen sources
+and timings on current artifact code.
 
 ## Explicit performance configurations
 
@@ -301,7 +308,7 @@ with its effective make arguments and workload values.
 | `--variant` | Performance variant counterpart | Additional make arguments | Figure 5 |
 | --- | --- | --- | --- |
 | `baseline` (default) | `a_default` | none | (a) |
-| `segregation-only` | `b_seg_objs` | `SEG_OBJS=1` | not a panel |
+| `segregation-only` | `b_obj_seg` | `SEG_OBJS=1` | not a panel |
 | `prefill-only` | `c_mt_prefill` | `INIT=all` | (b) |
 | `optimized` | `d_both` | `SEG_OBJS=1 INIT=all` | (c) |
 

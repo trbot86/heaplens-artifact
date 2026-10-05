@@ -1,0 +1,159 @@
+{
+  "status": "passed",
+  "experiments": [
+    {
+      "experiment": "ascylib_efrb_bench-20261001T014706-260467Z",
+      "trials": 40,
+      "threads": 4,
+      "means": {
+        "a_default": 6611800.0,
+        "b_obj_seg": 7900900.0,
+        "c_mt_prefill": 8081600.0,
+        "d_both": 8670600.0
+      },
+      "missing_counter_trials": {},
+      "perf_running_pct_range": [
+        79.99,
+        100.0
+      ],
+      "counter_scope": "Whole-process counters including setup/teardown, divided by measured operations.",
+      "settings": {
+        "ARTIFACT_NO_NUMA": "0",
+        "DURATION_MS": "5000",
+        "INITIAL": "262144",
+        "PERFBENCH_CPUS": "0,1,2,3",
+        "PERFBENCH_MEMORY": "interleave",
+        "PERFBENCH_NODE": "0",
+        "PERFBENCH_ORDER": "interleaved",
+        "PERFBENCH_PERF": "on",
+        "RANGE": "524288",
+        "REPS": "10",
+        "THREADS": "4",
+        "UPDATE_PCT": "0"
+      }
+    },
+    {
+      "experiment": "ascylib_dvy_bench-20261001T015202-593391Z",
+      "trials": 40,
+      "threads": 8,
+      "means": {
+        "a_96B_default": 17510600.0,
+        "b_72B_no_pad": 19167300.0,
+        "c_128B_pad": 16388500.0,
+        "d_192B_pad": 20581600.0
+      },
+      "missing_counter_trials": {},
+      "perf_running_pct_range": [
+        79.98,
+        100.0
+      ],
+      "counter_scope": "Whole-process counters including setup/teardown, divided by measured operations.",
+      "settings": {
+        "ARTIFACT_NO_NUMA": "0",
+        "DURATION_MS": "5000",
+        "DVY_HUGEPAGES": "auto",
+        "INITIAL": "1048576",
+        "PERFBENCH_CPUS": "0,1,2,3,4,5,6,7",
+        "PERFBENCH_MEMORY": "interleave",
+        "PERFBENCH_NODE": "0",
+        "PERFBENCH_ORDER": "interleaved",
+        "PERFBENCH_PERF": "on",
+        "RANGE": "2097152",
+        "REPS": "10",
+        "THREADS": "8",
+        "UPDATE_PCT": "0"
+      }
+    },
+    {
+      "experiment": "ascylib_hj_bench-20261001T015843-029287Z",
+      "trials": 20,
+      "threads": 24,
+      "means": {
+        "glibc_malloc": 37280400.0,
+        "jemalloc": 34904500.0
+      },
+      "missing_counter_trials": {},
+      "perf_running_pct_range": [
+        79.99,
+        100.0
+      ],
+      "counter_scope": "Whole-process counters including setup/teardown, divided by measured operations.",
+      "settings": {
+        "ARTIFACT_NO_NUMA": "0",
+        "DURATION_MS": "5000",
+        "HJ_JEMALLOC": "5.3",
+        "INITIAL": "1048576",
+        "PERFBENCH_CPUS": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23",
+        "PERFBENCH_MEMORY": "membind",
+        "PERFBENCH_NODE": "0",
+        "PERFBENCH_ORDER": "interleaved",
+        "PERFBENCH_PERF": "on",
+        "RANGE": "2097152",
+        "REPS": "10",
+        "THREADS": "24",
+        "UPDATE_PCT": "0"
+      }
+    },
+    {
+      "experiment": "tpcc_bcco_bench-20261001T022705-836442Z",
+      "trials": 50,
+      "threads": 24,
+      "means": {
+        "a_default": 965678.3672937,
+        "b_seg_ds": 992845.919162,
+        "c_seg_ds_pack_lock": 1119539.9080872,
+        "d_lock_only": 1073032.0125145,
+        "e_combined_single_recmgr": 1119609.3055247
+      },
+      "missing_counter_trials": {},
+      "perf_running_pct_range": [
+        79.93,
+        100.0
+      ],
+      "counter_scope": "Whole-process counters including setup/teardown, divided by measured operations.",
+      "settings": {
+        "ARTIFACT_NO_NUMA": "0",
+        "PERFBENCH_CPUS": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23",
+        "PERFBENCH_MEMORY": "membind",
+        "PERFBENCH_NODE": "0",
+        "PERFBENCH_ORDER": "interleaved",
+        "PERFBENCH_PERF": "on",
+        "REPS": "10",
+        "THREADS": "24"
+      }
+    },
+    {
+      "experiment": "tpcc_efrb_bench-20261001T023621-589166Z",
+      "trials": 70,
+      "threads": 24,
+      "means": {
+        "a_jemalloc": 125313.7918167,
+        "b_mimalloc": 125671.35679209999,
+        "c_mimalloc_fixed": 108274.18555760001,
+        "d_single_recmgr": 150399.9210677,
+        "e_single_recmgr_mimalloc_fixed": 152240.1614839,
+        "f_padding_only_segregated": 126330.4029168,
+        "g_single_recmgr_mimalloc": 150188.7037838
+      },
+      "missing_counter_trials": {},
+      "perf_running_pct_range": [
+        79.98,
+        100.0
+      ],
+      "counter_scope": "Whole-process counters including setup/teardown, divided by measured operations.",
+      "settings": {
+        "ARTIFACT_NO_NUMA": "0",
+        "PERFBENCH_CPUS": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23",
+        "PERFBENCH_MEMORY": "membind",
+        "PERFBENCH_NODE": "0",
+        "PERFBENCH_ORDER": "interleaved",
+        "PERFBENCH_PERF": "on",
+        "REPS": "10",
+        "THREADS": "24"
+      }
+    }
+  ],
+  "trials": 220,
+  "scope": "Counts, commands, recorded pinning/allocator, raw throughput, raw counters and operation denominators; binary hashes require separate remote check",
+  "note": "ASCYLIB throughput follows its #Mops output (rounded to 1000 ops/s); operation counts use exact srch+insr+rems totals"
+}

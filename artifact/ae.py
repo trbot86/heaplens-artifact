@@ -407,6 +407,8 @@ def experiment(args):
     env["ARTIFACT_PROFILE"] = args.profile
     env["PAGES_PER_TYPE"] = "1"
     env["TRACE_VARIANT"] = args.variant or "baseline"
+    if args.name in {"tpcc_bcco_bench", "tpcc_efrb_bench"}:
+        env["HEAPLENS_CR_FULL_FACTORS"] = "1" if args.tpcc_factors == "full" else "0"
     env["REPS"] = str(args.reps or (10 if args.profile == "paper" else 1))
     if args.profile == "smoke":
         env.update(THREADS="2", INITIAL="4096", RANGE="8192", DURATION_MS="1000", RUN_SECONDS="3", PERFBENCH_PERF="off", ARTIFACT_NO_NUMA="1")
@@ -445,7 +447,7 @@ def experiment(args):
             env["DVY_HUGEPAGES"] = args.dvy_hugepages or "auto"
         fields = ("THREADS", "REPS", "INITIAL", "RANGE", "DURATION_MS", "UPDATE_PCT",
                   "PERFBENCH_NODE", "PERFBENCH_CPUS", "PERFBENCH_MEMORY", "PERFBENCH_ORDER",
-                  "PERFBENCH_PERF", "ARTIFACT_NO_NUMA", "HJ_JEMALLOC", "DVY_HUGEPAGES")
+                  "PERFBENCH_PERF", "ARTIFACT_NO_NUMA", "HJ_JEMALLOC", "DVY_HUGEPAGES", "HEAPLENS_CR_FULL_FACTORS")
         save(work / "protocol.json", {"arguments": vars(args), "platform": platform.platform(),
              "allowed_cpus": sorted(os.sched_getaffinity(0)),
              "settings": {key: env[key] for key in fields if key in env}})
@@ -513,6 +515,8 @@ def parse_args(argv=None):
     p.add_argument("--overhead-trees", nargs='+', choices=['efrb','dvy','bcco'],
                    help="C2 overhead trees (default: all three ASCYLIB trees)")
     p.add_argument("--reps", type=int)
+    p.add_argument('--tpcc-factors', choices=['standard','full'],
+                   help='TPC-C performance only: include the controlled lock/padding/reclaimer factor cells')
     p.add_argument("--threads", type=int, help="ASCYLIB/TPC-C workers; RocksDB readers plus writer; HNSW build/query threads")
     p.add_argument("--cpus", help="Performance-run CPU list (e.g. 0-7); HashSkipList allows SMT across two nodes; other benchmarks use distinct physical cores")
     p.add_argument("--memory-policy", choices=["bind", "interleave"], help="Memory placement (default: bind; standalone EFRB/DVY: interleave on --server-node; HashSkipList: interleave across --rocks-nodes)")
@@ -535,6 +539,8 @@ def parse_args(argv=None):
                    help="HashSkipList NUMA nodes (default: 0 1); equal logical CPU counts, including SMT, on each")
     p.add_argument("--factors", choices=["hugepage", "alignment"], default="hugepage")
     args = p.parse_args(argv)
+    if args.tpcc_factors and not (args.command in {'experiment','legacy'} and args.name in {'tpcc_bcco_bench','tpcc_efrb_bench'}):
+        p.error('tpcc-factors applies only to TPC-C performance experiments')
     if (args.database or args.label) and args.command != 'gui': p.error('database/label apply only to gui')
     if args.label and not args.database: p.error('label requires database')
     if args.variant and not (args.command in {'experiment','legacy'} and args.name in

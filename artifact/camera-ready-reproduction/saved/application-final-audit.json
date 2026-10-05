@@ -1,0 +1,77 @@
+{
+  "status": "passed",
+  "experiments": {
+    "final-hnsw": {
+      "trials": 40,
+      "mean_qps": {
+        "128/baseline": 66389.3253976941,
+        "128/vector_huge": 72726.56357152227,
+        "1536/baseline": 7149.511773076242,
+        "1536/vector_huge": 7618.666142722808
+      },
+      "scope": "Raw JSON/CSV equality, configuration, query-count denominators; --probe is benchmark worker mode, not a mapping probe"
+    },
+    "factor-alignment-128": {
+      "trials": 18,
+      "mean_qps": {
+        "128/packed": 66356.63956135203,
+        "128/separated_aligned64": 68559.30644280247,
+        "128/separated_unaligned32": 62855.34289062665
+      },
+      "scope": "Raw JSON/CSV equality, configuration, query-count denominators; --probe is benchmark worker mode, not a mapping probe"
+    },
+    "factor-alignment-1536": {
+      "trials": 18,
+      "mean_qps": {
+        "1536/packed": 7157.393826587718,
+        "1536/separated_aligned64": 7321.390175054529,
+        "1536/separated_unaligned32": 7212.390866272013
+      },
+      "scope": "Raw JSON/CSV equality, configuration, query-count denominators; --probe is benchmark worker mode, not a mapping probe"
+    },
+    "factor-hugepage-128": {
+      "trials": 40,
+      "mean_qps": {
+        "128/baseline": 66192.0058441991,
+        "128/both": 72645.52416301546,
+        "128/hugepage": 67903.68954936347,
+        "128/vector_soa64": 68317.48792390716
+      },
+      "scope": "Raw JSON/CSV equality, configuration, query-count denominators; --probe is benchmark worker mode, not a mapping probe"
+    },
+    "factor-hugepage-1536": {
+      "trials": 40,
+      "mean_qps": {
+        "1536/baseline": 7151.587515465453,
+        "1536/both": 7624.720645656617,
+        "1536/hugepage": 7281.553090867119,
+        "1536/vector_soa64": 7317.556534236079
+      },
+      "scope": "Raw JSON/CSV equality, configuration, query-count denominators; --probe is benchmark worker mode, not a mapping probe"
+    },
+    "final-valkey": {
+      "trials": 20,
+      "means": {
+        "B1C1_64": 1125766.661,
+        "baseline": 1082973.798
+      },
+      "limitation": "Driver did not save pre-run binary hashes; post-run hashes identify retained binaries, not an independent time-of-run hash check"
+    },
+    "final-hashskiplist": {
+      "trials": 20,
+      "means": {
+        "baseline": 14767111.5,
+        "optimized": 15876234.4
+      },
+      "persistence": "flushing and compaction enabled; WAL disabled"
+    },
+    "final-inlineskiplist": {
+      "trials": 20,
+      "means": {
+        "baseline": 5825925.5,
+        "optimized": 6383288.4
+      },
+      "persistence": "memory-only"
+    }
+  }
+}
