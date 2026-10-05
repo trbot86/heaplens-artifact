@@ -50,6 +50,13 @@ echo "=== [$OUT_NAME] c_bronson_pack_lock (threads=$THREADS) ==="
 tpcc_perfbench_build "$DS_NAME" "$THREADS" "-DMEMHOOK_SEG_DS -DMACROBENCH_PACK_LOCK"
 tpcc_perfbench_variant "$RESULTS_TSV" "$RUN_DIR" "c_seg_ds_pack_lock" "$DS_NAME" "$THREADS" "$REPS" "$JEMALLOC_LIB"
 
+if [[ "${HEAPLENS_CR_FULL_FACTORS:-0}" == 1 ]]; then
+    tpcc_perfbench_build "$DS_NAME" "$THREADS" "-DMACROBENCH_PACK_LOCK"
+    tpcc_perfbench_variant "$RESULTS_TSV" "$RUN_DIR" "d_lock_only" "$DS_NAME" "$THREADS" "$REPS" "$JEMALLOC_LIB"
+    tpcc_perfbench_build "$DS_NAME" "$THREADS" "-DMEMHOOK_SEG_DS -DMACROBENCH_PACK_LOCK -DMACROBENCH_SINGLE_RECMGR -DBST_BRONSON"
+    tpcc_perfbench_variant "$RESULTS_TSV" "$RUN_DIR" "e_combined_single_recmgr" "$DS_NAME" "$THREADS" "$REPS" "$JEMALLOC_LIB"
+fi
+
 perfbench_run_campaign "$RESULTS_TSV" "$RUN_DIR"
 
 perfbench_print_summary "$RESULTS_TSV" "TPC-C/BCCO tree: default -> node segregation -> +row-lock fix (paper Section 6.3 / Table 1 row 4)" \

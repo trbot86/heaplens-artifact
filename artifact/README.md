@@ -1,4 +1,4 @@
-# HeapLENS — ACM ATC 2026 artifact
+# HeapLENS â€” ACM ATC 2026 artifact
 
 **Paper:** *HeapLENS: Heap Layout Evaluation & Navigation Suite*, paper 483.
 This guide follows the submitted paper's Table 1 and main figures. Each result
@@ -11,7 +11,7 @@ the commands here already select the documented defaults.
 ## 1. Install and check the artifact
 
 Use an x86-64 Linux shell with Docker Engine, from the repository root.
-Budget about 20 GB disk and 8–16 GB RAM for installation and small checks.
+Budget about 20 GB disk and 8â€“16 GB RAM for installation and small checks.
 Full experiments take many hours and need more resources: in particular,
 HashSkipList needs 96 logical CPUs across two nodes; InlineSkipList needs
 64 GiB available memory; Valkey needs 24 physical cores on each of two nodes.
@@ -205,7 +205,7 @@ Output: `artifact/results/fig4/ascylib_efrb.sqlite`. Expected: during prefill,
 repeated groups of three tree nodes and one operation descriptor. Inspect a
 4-KiB page; the paper colors nodes blue and descriptors yellow.
 
-### Figure 5(a–c): EFRB cache occupancy
+### Figure 5(aâ€“c): EFRB cache occupancy
 
 ```bash
 bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --out artifact/results/fig5a
@@ -222,7 +222,7 @@ with `fig5b`, then `fig5c`, to import each database; earlier imports remain list
 Each result's `trace-configuration.json` records the effective flags. The optional
 `segregation-only` variant exposes the fourth factor but is not a Figure 5 panel.
 
-### Figure 6(a–b): BCCO node density
+### Figure 6(aâ€“b): BCCO node density
 
 ```bash
 bash artifact/run.sh experiment tpcc_bcco --variant baseline --profile paper --out artifact/results/fig6a
@@ -235,7 +235,7 @@ with database allocations before, and denser node regions after segregation in
 the 2-MiB heatmap. Import `fig6b` in the same way. The optimized driver also packs
 the lock; this pair is not a segregation-only throughput attribution.
 
-### Figure 7(a–b): mimalloc row layout
+### Figure 7(aâ€“b): mimalloc row layout
 
 ```bash
 bash artifact/run.sh experiment tpcc_efrb --variant baseline --profile paper --out artifact/results/fig7a
@@ -247,7 +247,7 @@ Output: `artifact/results/fig7{a,b}/tpcc_efrb.sqlite`. Expected: 48-byte `row_t`
 objects with 64-byte alignment before, and padded 64-byte rows after. Import
 `fig7b` to compare. Shared reclamation also changes in the optimized variant.
 
-### Figure 8(a–b): HashSkipList bucket fields
+### Figure 8(aâ€“b): HashSkipList bucket fields
 
 ```bash
 bash artifact/run.sh experiment rocksdb_hsl --variant baseline --profile paper --out artifact/results/fig8a
@@ -261,7 +261,7 @@ shrinks from 56 to 48 bytes after. Import `fig8b` to compare. The trace driver
 uses the upstream diagnostic snapshot; Table 1 performance uses the historical
 snapshot. [Trace scope and all appendix figures](REPRODUCTION_CONFIGURATIONS.md#appendix-figure-and-table-index).
 
-## 5. Check saved results and optional extensions
+## 5. Check saved results and additional camera-ready results
 
 ```bash
 bash artifact/run.sh history
@@ -275,7 +275,12 @@ and the separate AIO/HSL validation evidence. See the
 [retained logging results and version boundaries](headline-pmu/README.md).
 No logging-overhead rerun is required to inspect those results.
 
-Optional procedures are in the supplementary guide:
+The [camera-ready reproduction guide](camera-ready-reproduction/README.md) gives
+complete commands, output locations and expected values for backend preparation,
+UI interaction latency, sampling, TPC-C factors and both HNSW dimensions. Start
+with its saved-data verifier; fresh measurements are explicit opt-ins.
+
+Other optional procedures are in the supplementary guide:
 [HNSW attribution](REPRODUCTION_CONFIGURATIONS.md#attribute-the-hnswlib-improvement),
 [C2 logging overhead](REPRODUCTION_CONFIGURATIONS.md#reproduce-logging-overhead-c2),
 [other diagnostic traces and LLM export](REPRODUCTION_CONFIGURATIONS.md#generate-traces-and-try-model-assisted-analysis),

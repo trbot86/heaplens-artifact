@@ -1,0 +1,73 @@
+{
+  "status": "passed",
+  "trials": 120,
+  "prior_prefix_unchanged": 63,
+  "new_trials": 57,
+  "logging_traces": 60,
+  "raw_trace_bytes": 156344952400,
+  "summary": [
+    {
+      "tree": "efrb",
+      "update_pct": 20,
+      "baseline_ops_s": 12841885.8,
+      "logging_ops_s": 12489248.0,
+      "throughput_reduction_pct": 2.7459970092554533,
+      "runs_per_arm": 10
+    },
+    {
+      "tree": "efrb",
+      "update_pct": 100,
+      "baseline_ops_s": 11913348.6,
+      "logging_ops_s": 10506738.6,
+      "throughput_reduction_pct": 11.807007813067772,
+      "runs_per_arm": 10
+    },
+    {
+      "tree": "dvy",
+      "update_pct": 20,
+      "baseline_ops_s": 16113928.5,
+      "logging_ops_s": 16106729.6,
+      "throughput_reduction_pct": 0.044675015158472206,
+      "runs_per_arm": 10
+    },
+    {
+      "tree": "dvy",
+      "update_pct": 100,
+      "baseline_ops_s": 14669657.9,
+      "logging_ops_s": 13941727.5,
+      "throughput_reduction_pct": 4.962149799007926,
+      "runs_per_arm": 10
+    },
+    {
+      "tree": "bcco",
+      "update_pct": 20,
+      "baseline_ops_s": 18041246.0,
+      "logging_ops_s": 18152740.1,
+      "throughput_reduction_pct": -0.617995564164479,
+      "runs_per_arm": 10
+    },
+    {
+      "tree": "bcco",
+      "update_pct": 100,
+      "baseline_ops_s": 15583158.1,
+      "logging_ops_s": 15513622.7,
+      "throughput_reduction_pct": 0.4462214883130806,
+      "runs_per_arm": 10
+    }
+  ],
+  "checks": [
+    "All collected file hashes",
+    "Exact schedule and per-cell repetitions",
+    "Original prefix matches pre-resume local snapshot",
+    "Per-trial commands, pinning, allocator paths and binary identities",
+    "Raw benchmark throughput and initial size",
+    "Raw-count summaries recomputed independently",
+    "Trace metadata and compressed file presence"
+  ],
+  "boundaries": [
+    "Compressed traces were hash-verified by the original archiver; this audit does not decompress all traces again",
+    "Binary hashes are compared against retained preflight identities; separate post-run remote hash verification is recorded independently",
+    "Throughput reduction covers the benchmark operation loop, not whole-program elapsed time",
+    "This is stock logging, without blocked-I/O wait probes"
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "efrb": {
+    "display_success": 20,
+    "trials": 20
+  },
+  "valkey": {
+    "p0.001-s1": {
+      "display_success": 20,
+      "displayed_pages_range": [
+        32,
+        45
+      ],
+      "displayed_target_objects_range": [
+        23,
+        27
+      ],
+      "initial_success": 20,
+      "initial_success_but_display_failure": 0,
+      "minimum_violation_trials": 0,
+      "original_robj_success": 20,
+      "retained_pages_range": [
+        32,
+        45
+      ],
+      "trials": 20,
+      "unverified_crossing_payload_trials": 0
+    },
+    "p0.01-s1": {
+      "display_success": 20,
+      "displayed_pages_range": [
+        49,
+        83
+      ],
+      "displayed_target_objects_range": [
+        23,
+        26
+      ],
+      "initial_success": 20,
+      "initial_success_but_display_failure": 0,
+      "minimum_violation_trials": 0,
+      "original_robj_success": 20,
+      "retained_pages_range": [
+        109,
+        150
+      ],
+      "trials": 20,
+      "unverified_crossing_payload_trials": 0
+    },
+    "p0.1-s1": {
+      "display_success": 20,
+      "displayed_pages_range": [
+        84,
+        110
+      ],
+      "displayed_target_objects_range": [
+        23,
+        47
+      ],
+      "initial_success": 20,
+      "initial_success_but_display_failure": 0,
+      "minimum_violation_trials": 0,
+      "original_robj_success": 20,
+      "retained_pages_range": [
+        1017,
+        1130
+      ],
+      "trials": 20,
+      "unverified_crossing_payload_trials": 0
+    },
+    "p0.1-s2": {
+      "display_success": 20,
+      "displayed_pages_range": [
+        89,
+        116
+      ],
+      "displayed_target_objects_range": [
+        23,
+        48
+      ],
+      "initial_success": 20,
+      "initial_success_but_display_failure": 0,
+      "minimum_violation_trials": 0,
+      "original_robj_success": 20,
+      "retained_pages_range": [
+        1025,
+        1137
+      ],
+      "trials": 20,
+      "unverified_crossing_payload_trials": 0
+    },
+    "p1-s1": {
+      "display_success": 20,
+      "displayed_pages_range": [
+        128,
+        128
+      ],
+      "displayed_target_objects_range": [
+        24,
+        46
+      ],
+      "initial_success": 20,
+      "initial_success_but_display_failure": 0,
+      "minimum_violation_trials": 0,
+      "original_robj_success": 20,
+      "retained_pages_range": [
+        10607,
+        10607
+      ],
+      "trials": 20,
+      "unverified_crossing_payload_trials": 0
+    }
+  }
+}

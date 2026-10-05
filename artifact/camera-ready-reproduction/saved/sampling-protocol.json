@@ -1,0 +1,72 @@
+{
+  "build": [
+    "g++",
+    "-std=c++17",
+    "-O1",
+    "/root/sifter/type_analysis/convert_to_db/io_handler.cpp",
+    "/root/sifter/type_analysis/convert_to_db/main.cpp",
+    "/root/sifter/type_analysis/convert_to_db/sampler.cpp",
+    "-lsqlite3",
+    "-lpthread",
+    "-ltbb",
+    "-o",
+    "/work/convert"
+  ],
+  "converter_sha256": "3559a5b3a580ba0cd6018e647fca8dbe2b12e2a62b59c608ef2684da413b695f",
+  "gui_buckets": 2000,
+  "native_buckets": 3000,
+  "oracle_sha256": "7a118bf087d6e511f3c620ad6657f5677b507584ebd9d310c279cbd0e0f8eb31",
+  "page_budget": 128,
+  "raw_sha256": "ec130ec8ab27036a74e709f38de96e6808e239f6b43d2edae83f0dccf25cd583",
+  "record_budget": 100000,
+  "repetitions": 20,
+  "scoring_script_sha256": {
+    "rax_sampling_study.py": "37885b0ed9ff94e32a45894897d93c14057131cf50441482dfa51f2b461eb0c3",
+    "sampling_layout_study.py": "2ff8451e7a312f0c2e33f7fa0bea63fc95a129860c607eb6687d9717f6537b75"
+  },
+  "seeds": [
+    20260928,
+    20260929,
+    20260930,
+    20260931,
+    20260932,
+    20260933,
+    20260934,
+    20260935,
+    20260936,
+    20260937,
+    20260938,
+    20260939,
+    20260940,
+    20260941,
+    20260942,
+    20260943,
+    20260944,
+    20260945,
+    20260946,
+    20260947
+  ],
+  "settings": [
+    [
+      0.001,
+      1
+    ],
+    [
+      0.01,
+      1
+    ],
+    [
+      0.1,
+      1
+    ],
+    [
+      0.1,
+      2
+    ],
+    [
+      1.0,
+      1
+    ]
+  ],
+  "source_revision": "7f4f5f20125ad0a2571abc8ddb0e98e13c7ae109"
+}

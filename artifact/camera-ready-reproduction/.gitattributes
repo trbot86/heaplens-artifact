@@ -1,0 +1,3 @@
+# Hashes refer to the exact retained evidence bytes, on every platform.
+saved/** -text whitespace=cr-at-eol
+*.tar.gz -text
