@@ -1,0 +1,813 @@
+{
+  "cells": [
+    {
+      "arm": "plain",
+      "block": 4,
+      "throughput": 12361330,
+      "operation_count": 132605905,
+      "native_exact_elapsed_seconds": 10.727478,
+      "reader_only_elapsed_seconds": 10.121532,
+      "reader_only_throughput": 13101366.966976935,
+      "writer_elapsed_seconds": 10.721005,
+      "writer_completion_from_reader_start_seconds": 10.725857,
+      "writer_tail_after_readers_seconds": 0.604325,
+      "pmu": {
+        "cycles": 2366911192826.0,
+        "instructions": 1258030491358.0,
+        "cache-misses": 4194259475.0,
+        "dTLB-load-misses": 2072319335.0
+      },
+      "all_phase_records": 0,
+      "measured_waits": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0
+      },
+      "native_post_worker_gap_seconds": 0.0016210000000000946
+    },
+    {
+      "arm": "old",
+      "block": 4,
+      "throughput": 5079382,
+      "operation_count": 82610905,
+      "native_exact_elapsed_seconds": 16.263967,
+      "reader_only_elapsed_seconds": 13.216559,
+      "reader_only_throughput": 6250560.754883325,
+      "writer_elapsed_seconds": 14.090925,
+      "writer_completion_from_reader_start_seconds": 14.100434,
+      "writer_tail_after_readers_seconds": 0.883875,
+      "pmu": {
+        "cycles": 1638149595040.0,
+        "instructions": 967199207350.0,
+        "cache-misses": 3300723507.0,
+        "dTLB-load-misses": 1351069648.0
+      },
+      "all_phase_records": 494687408,
+      "measured_waits": {
+        "records": 487775970,
+        "full_buffers": 473,
+        "reuse_count": 306,
+        "reuse_ns": 367259505959,
+        "shutdown_ns": 0
+      },
+      "raw_records": 494687421,
+      "raw_bytes": 19787496840,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 2.163533000000001
+    },
+    {
+      "arm": "fixed",
+      "block": 4,
+      "throughput": 7155920,
+      "operation_count": 84001905,
+      "native_exact_elapsed_seconds": 11.738798,
+      "reader_only_elapsed_seconds": 11.725045,
+      "reader_only_throughput": 7164314.081523781,
+      "writer_elapsed_seconds": 11.720797,
+      "writer_completion_from_reader_start_seconds": 11.72505,
+      "writer_tail_after_readers_seconds": 5e-06,
+      "pmu": {
+        "cycles": 1457671778325.0,
+        "instructions": 958707602481.0,
+        "cache-misses": 2988397375.0,
+        "dTLB-load-misses": 1115639009.0
+      },
+      "all_phase_records": 508027135,
+      "measured_waits": {
+        "records": 501120602,
+        "full_buffers": 487,
+        "reuse_count": 333,
+        "reuse_ns": 486774602653,
+        "shutdown_ns": 0
+      },
+      "raw_records": 508027148,
+      "raw_bytes": 20321085920,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.01374799999999965
+    },
+    {
+      "arm": "old",
+      "block": 5,
+      "throughput": 6899683,
+      "operation_count": 85009905,
+      "native_exact_elapsed_seconds": 12.320841,
+      "reader_only_elapsed_seconds": 12.31005,
+      "reader_only_throughput": 6905731.901982526,
+      "writer_elapsed_seconds": 12.301396,
+      "writer_completion_from_reader_start_seconds": 12.310056,
+      "writer_tail_after_readers_seconds": 6e-06,
+      "pmu": {
+        "cycles": 1558103011556.0,
+        "instructions": 986643504059.0,
+        "cache-misses": 3196833472.0,
+        "dTLB-load-misses": 1305993001.0
+      },
+      "all_phase_records": 505886342,
+      "measured_waits": {
+        "records": 498974142,
+        "full_buffers": 480,
+        "reuse_count": 277,
+        "reuse_ns": 387599205571,
+        "shutdown_ns": 0
+      },
+      "raw_records": 505886355,
+      "raw_bytes": 20235454200,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.010785000000000267
+    },
+    {
+      "arm": "fixed",
+      "block": 5,
+      "throughput": 6912714,
+      "operation_count": 82312905,
+      "native_exact_elapsed_seconds": 11.907465,
+      "reader_only_elapsed_seconds": 11.895848,
+      "reader_only_throughput": 6919465.094039533,
+      "writer_elapsed_seconds": 11.827044,
+      "writer_completion_from_reader_start_seconds": 11.895856,
+      "writer_tail_after_readers_seconds": 8e-06,
+      "pmu": {
+        "cycles": 1510890109588.0,
+        "instructions": 950510519350.0,
+        "cache-misses": 3083648650.0,
+        "dTLB-load-misses": 1280551522.0
+      },
+      "all_phase_records": 489671144,
+      "measured_waits": {
+        "records": 482769684,
+        "full_buffers": 467,
+        "reuse_count": 340,
+        "reuse_ns": 527495373587,
+        "shutdown_ns": 0
+      },
+      "raw_records": 489671157,
+      "raw_bytes": 19586846280,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.01160899999999998
+    },
+    {
+      "arm": "plain",
+      "block": 5,
+      "throughput": 13810602,
+      "operation_count": 139571905,
+      "native_exact_elapsed_seconds": 10.106142,
+      "reader_only_elapsed_seconds": 10.065561,
+      "reader_only_throughput": 13866281.77008713,
+      "writer_elapsed_seconds": 10.046707,
+      "writer_completion_from_reader_start_seconds": 10.104454,
+      "writer_tail_after_readers_seconds": 0.038893,
+      "pmu": {
+        "cycles": 2667323788243.0,
+        "instructions": 1315760591498.0,
+        "cache-misses": 4885525637.0,
+        "dTLB-load-misses": 2233330959.0
+      },
+      "all_phase_records": 0,
+      "measured_waits": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0
+      },
+      "native_post_worker_gap_seconds": 0.0016879999999996897
+    },
+    {
+      "arm": "fixed",
+      "block": 6,
+      "throughput": 7080694,
+      "operation_count": 83483905,
+      "native_exact_elapsed_seconds": 11.790355,
+      "reader_only_elapsed_seconds": 11.779584,
+      "reader_only_throughput": 7087169.207333637,
+      "writer_elapsed_seconds": 11.714364,
+      "writer_completion_from_reader_start_seconds": 11.77959,
+      "writer_tail_after_readers_seconds": 6e-06,
+      "pmu": {
+        "cycles": 1515296392226.0,
+        "instructions": 958327096982.0,
+        "cache-misses": 3070793259.0,
+        "dTLB-load-misses": 1212438179.0
+      },
+      "all_phase_records": 495005200,
+      "measured_waits": {
+        "records": 488102980,
+        "full_buffers": 474,
+        "reuse_count": 349,
+        "reuse_ns": 516784684987,
+        "shutdown_ns": 0
+      },
+      "raw_records": 495005213,
+      "raw_bytes": 19800208520,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.010764999999999247
+    },
+    {
+      "arm": "plain",
+      "block": 6,
+      "throughput": 10636927,
+      "operation_count": 142886905,
+      "native_exact_elapsed_seconds": 13.433099,
+      "reader_only_elapsed_seconds": 10.04638,
+      "reader_only_throughput": 14222725.499135014,
+      "writer_elapsed_seconds": 13.429858,
+      "writer_completion_from_reader_start_seconds": 13.431345,
+      "writer_tail_after_readers_seconds": 3.384965,
+      "pmu": {
+        "cycles": 2752345542495.0,
+        "instructions": 1357322801456.0,
+        "cache-misses": 4885105533.0,
+        "dTLB-load-misses": 2799065822.0
+      },
+      "all_phase_records": 0,
+      "measured_waits": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0
+      },
+      "native_post_worker_gap_seconds": 0.0017540000000000333
+    },
+    {
+      "arm": "old",
+      "block": 6,
+      "throughput": 4230582,
+      "operation_count": 82595905,
+      "native_exact_elapsed_seconds": 19.523531,
+      "reader_only_elapsed_seconds": 11.798902,
+      "reader_only_throughput": 7000304.350353956,
+      "writer_elapsed_seconds": 19.518325,
+      "writer_completion_from_reader_start_seconds": 19.520946,
+      "writer_tail_after_readers_seconds": 7.722044,
+      "pmu": {
+        "cycles": 1556373705040.0,
+        "instructions": 988764420236.0,
+        "cache-misses": 3086347925.0,
+        "dTLB-load-misses": 1279186828.0
+      },
+      "all_phase_records": 492508084,
+      "measured_waits": {
+        "records": 485590688,
+        "full_buffers": 470,
+        "reuse_count": 351,
+        "reuse_ns": 515517486804,
+        "shutdown_ns": 0
+      },
+      "raw_records": 492508097,
+      "raw_bytes": 19700323880,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.0025849999999998374
+    },
+    {
+      "arm": "plain",
+      "block": 7,
+      "throughput": 11253264,
+      "operation_count": 132399905,
+      "native_exact_elapsed_seconds": 11.765466,
+      "reader_only_elapsed_seconds": 10.048262,
+      "reader_only_throughput": 13176398.565244418,
+      "writer_elapsed_seconds": 11.749064,
+      "writer_completion_from_reader_start_seconds": 11.763159,
+      "writer_tail_after_readers_seconds": 1.714897,
+      "pmu": {
+        "cycles": 2535455112875.0,
+        "instructions": 1252695872768.0,
+        "cache-misses": 4547145322.0,
+        "dTLB-load-misses": 2467568693.0
+      },
+      "all_phase_records": 0,
+      "measured_waits": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0
+      },
+      "native_post_worker_gap_seconds": 0.002307000000000059
+    },
+    {
+      "arm": "fixed",
+      "block": 7,
+      "throughput": 5923273,
+      "operation_count": 78352905,
+      "native_exact_elapsed_seconds": 13.227974,
+      "reader_only_elapsed_seconds": 12.53965,
+      "reader_only_throughput": 6248412.435753789,
+      "writer_elapsed_seconds": 13.216257,
+      "writer_completion_from_reader_start_seconds": 13.225361,
+      "writer_tail_after_readers_seconds": 0.685711,
+      "pmu": {
+        "cycles": 1534891051855.0,
+        "instructions": 924957313986.0,
+        "cache-misses": 3017487889.0,
+        "dTLB-load-misses": 1219523234.0
+      },
+      "all_phase_records": 470041363,
+      "measured_waits": {
+        "records": 463131138,
+        "full_buffers": 445,
+        "reuse_count": 309,
+        "reuse_ns": 444237738064,
+        "shutdown_ns": 0
+      },
+      "raw_records": 470041376,
+      "raw_bytes": 18801655040,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.0026130000000001985
+    },
+    {
+      "arm": "old",
+      "block": 7,
+      "throughput": 6350389,
+      "operation_count": 80341905,
+      "native_exact_elapsed_seconds": 12.651492,
+      "reader_only_elapsed_seconds": 12.033045,
+      "reader_only_throughput": 6676772.587487208,
+      "writer_elapsed_seconds": 12.630854,
+      "writer_completion_from_reader_start_seconds": 12.642089,
+      "writer_tail_after_readers_seconds": 0.609044,
+      "pmu": {
+        "cycles": 1563965445139.0,
+        "instructions": 939276895680.0,
+        "cache-misses": 3142378042.0,
+        "dTLB-load-misses": 1373867219.0
+      },
+      "all_phase_records": 480981336,
+      "measured_waits": {
+        "records": 474070083,
+        "full_buffers": 459,
+        "reuse_count": 318,
+        "reuse_ns": 445798058655,
+        "shutdown_ns": 0
+      },
+      "raw_records": 480981349,
+      "raw_bytes": 19239253960,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.00940299999999894
+    },
+    {
+      "arm": "fixed",
+      "block": 8,
+      "throughput": 6568895,
+      "operation_count": 79843905,
+      "native_exact_elapsed_seconds": 12.154844,
+      "reader_only_elapsed_seconds": 11.551204,
+      "reader_only_throughput": 6912171.666260937,
+      "writer_elapsed_seconds": 12.130206,
+      "writer_completion_from_reader_start_seconds": 12.143799,
+      "writer_tail_after_readers_seconds": 0.592595,
+      "pmu": {
+        "cycles": 1585538981690.0,
+        "instructions": 939838615601.0,
+        "cache-misses": 3134155587.0,
+        "dTLB-load-misses": 1271022083.0
+      },
+      "all_phase_records": 481966808,
+      "measured_waits": {
+        "records": 475054261,
+        "full_buffers": 456,
+        "reuse_count": 278,
+        "reuse_ns": 356105992505,
+        "shutdown_ns": 0
+      },
+      "raw_records": 481966821,
+      "raw_bytes": 19278672840,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.011045000000001082
+    },
+    {
+      "arm": "old",
+      "block": 8,
+      "throughput": 6854909,
+      "operation_count": 82982905,
+      "native_exact_elapsed_seconds": 12.105616,
+      "reader_only_elapsed_seconds": 11.831669,
+      "reader_only_throughput": 7013626.310878035,
+      "writer_elapsed_seconds": 11.942571,
+      "writer_completion_from_reader_start_seconds": 12.099921,
+      "writer_tail_after_readers_seconds": 0.268252,
+      "pmu": {
+        "cycles": 1576458346402.0,
+        "instructions": 964874153408.0,
+        "cache-misses": 3123183253.0,
+        "dTLB-load-misses": 1413617981.0
+      },
+      "all_phase_records": 495550228,
+      "measured_waits": {
+        "records": 488640411,
+        "full_buffers": 472,
+        "reuse_count": 252,
+        "reuse_ns": 353984530763,
+        "shutdown_ns": 0
+      },
+      "raw_records": 495550241,
+      "raw_bytes": 19822009640,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.0056949999999993395
+    },
+    {
+      "arm": "plain",
+      "block": 8,
+      "throughput": 12103163,
+      "operation_count": 144028905,
+      "native_exact_elapsed_seconds": 11.900104,
+      "reader_only_elapsed_seconds": 10.027177,
+      "reader_only_throughput": 14363853.854379952,
+      "writer_elapsed_seconds": 11.875363,
+      "writer_completion_from_reader_start_seconds": 11.898601,
+      "writer_tail_after_readers_seconds": 1.871424,
+      "pmu": {
+        "cycles": 2750983285277.0,
+        "instructions": 1359100564806.0,
+        "cache-misses": 4876741013.0,
+        "dTLB-load-misses": 2274231595.0
+      },
+      "all_phase_records": 0,
+      "measured_waits": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0
+      },
+      "native_post_worker_gap_seconds": 0.0015030000000013644
+    },
+    {
+      "arm": "old",
+      "block": 9,
+      "throughput": 6784662,
+      "operation_count": 80923905,
+      "native_exact_elapsed_seconds": 11.927476,
+      "reader_only_elapsed_seconds": 11.915585,
+      "reader_only_throughput": 6791433.656005979,
+      "writer_elapsed_seconds": 11.90952,
+      "writer_completion_from_reader_start_seconds": 11.915593,
+      "writer_tail_after_readers_seconds": 8e-06,
+      "pmu": {
+        "cycles": 1483936120884.0,
+        "instructions": 931503058306.0,
+        "cache-misses": 2864276193.0,
+        "dTLB-load-misses": 1303862849.0
+      },
+      "all_phase_records": 479859418,
+      "measured_waits": {
+        "records": 472955837,
+        "full_buffers": 456,
+        "reuse_count": 338,
+        "reuse_ns": 526412156056,
+        "shutdown_ns": 0
+      },
+      "raw_records": 479859431,
+      "raw_bytes": 19194377240,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.011883000000000976
+    },
+    {
+      "arm": "plain",
+      "block": 9,
+      "throughput": 11848457,
+      "operation_count": 133996905,
+      "native_exact_elapsed_seconds": 11.309228,
+      "reader_only_elapsed_seconds": 10.105547,
+      "reader_only_throughput": 13259737.943923274,
+      "writer_elapsed_seconds": 11.254679,
+      "writer_completion_from_reader_start_seconds": 11.307769,
+      "writer_tail_after_readers_seconds": 1.202222,
+      "pmu": {
+        "cycles": 2403278435677.0,
+        "instructions": 1265413360016.0,
+        "cache-misses": 4338919918.0,
+        "dTLB-load-misses": 2244935032.0
+      },
+      "all_phase_records": 0,
+      "measured_waits": {
+        "records": 0,
+        "full_buffers": 0,
+        "reuse_count": 0,
+        "reuse_ns": 0,
+        "shutdown_ns": 0
+      },
+      "native_post_worker_gap_seconds": 0.0014589999999987668
+    },
+    {
+      "arm": "fixed",
+      "block": 9,
+      "throughput": 6716984,
+      "operation_count": 81652905,
+      "native_exact_elapsed_seconds": 12.156185,
+      "reader_only_elapsed_seconds": 11.638744,
+      "reader_only_throughput": 7015611.392432035,
+      "writer_elapsed_seconds": 12.13976,
+      "writer_completion_from_reader_start_seconds": 12.152211,
+      "writer_tail_after_readers_seconds": 0.513467,
+      "pmu": {
+        "cycles": 1563306561055.0,
+        "instructions": 957867819922.0,
+        "cache-misses": 3071073493.0,
+        "dTLB-load-misses": 1359115924.0
+      },
+      "all_phase_records": 490698381,
+      "measured_waits": {
+        "records": 483786133,
+        "full_buffers": 468,
+        "reuse_count": 331,
+        "reuse_ns": 444341726801,
+        "shutdown_ns": 0
+      },
+      "raw_records": 490698394,
+      "raw_bytes": 19627935760,
+      "raw_minus_report_records": 13,
+      "native_post_worker_gap_seconds": 0.003974000000001254
+    }
+  ],
+  "groups": {
+    "plain": {
+      "throughput": {
+        "mean": 12002290.5,
+        "sample_sd": 1082404.5487160056,
+        "min": 10636927,
+        "max": 13810602
+      },
+      "reader_only_throughput": {
+        "mean": 13665060.766624454,
+        "sample_sd": 558680.5282156442,
+        "min": 13101366.966976935,
+        "max": 14363853.854379952
+      },
+      "native_exact_elapsed_seconds": {
+        "mean": 11.540252833333334,
+        "sample_sd": 1.1431298901574427,
+        "min": 10.106142,
+        "max": 13.433099
+      },
+      "reader_only_elapsed_seconds": {
+        "mean": 10.0690765,
+        "sample_sd": 0.03687269508321856,
+        "min": 10.027177,
+        "max": 10.121532
+      },
+      "writer_completion_from_reader_start_seconds": {
+        "mean": 11.538530833333333,
+        "sample_sd": 1.1430765464070054,
+        "min": 10.104454,
+        "max": 13.431345
+      },
+      "writer_tail_after_readers_seconds": {
+        "mean": 1.4694543333333332,
+        "sample_sd": 1.1625291773934392,
+        "min": 0.038893,
+        "max": 3.384965
+      },
+      "native_post_worker_gap_seconds": {
+        "mean": 0.0017220000000000013,
+        "sample_sd": 0.0003071598932152843,
+        "min": 0.0014589999999987668,
+        "max": 0.002307000000000059
+      },
+      "writer_elapsed_seconds": {
+        "mean": 11.512779333333333,
+        "sample_sd": 1.158048223242999,
+        "min": 10.046707,
+        "max": 13.429858
+      },
+      "operation_count": {
+        "mean": 137581738.33333334,
+        "sample_sd": 5256098.530913083,
+        "min": 132399905,
+        "max": 144028905
+      }
+    },
+    "old": {
+      "throughput": {
+        "mean": 6033267.833333333,
+        "sample_sd": 1118078.966135651,
+        "min": 4230582,
+        "max": 6899683
+      },
+      "reader_only_throughput": {
+        "mean": 6773071.593598505,
+        "sample_sd": 286261.52226849523,
+        "min": 6250560.754883325,
+        "max": 7013626.310878035
+      },
+      "native_exact_elapsed_seconds": {
+        "mean": 14.132153833333334,
+        "sample_sd": 3.100072538326767,
+        "min": 11.927476,
+        "max": 19.523531
+      },
+      "reader_only_elapsed_seconds": {
+        "mean": 12.184301666666666,
+        "sample_sd": 0.5383934940876114,
+        "min": 11.798902,
+        "max": 13.216559
+      },
+      "writer_completion_from_reader_start_seconds": {
+        "mean": 13.764839833333333,
+        "sample_sd": 2.926226773655754,
+        "min": 11.915593,
+        "max": 19.520946
+      },
+      "writer_tail_after_readers_seconds": {
+        "mean": 1.5805381666666667,
+        "sample_sd": 3.0287121654380047,
+        "min": 6e-06,
+        "max": 7.722044
+      },
+      "native_post_worker_gap_seconds": {
+        "mean": 0.3673140000000001,
+        "sample_sd": 0.8799707549783691,
+        "min": 0.0025849999999998374,
+        "max": 2.163533000000001
+      },
+      "writer_elapsed_seconds": {
+        "mean": 13.732265166666666,
+        "sample_sd": 2.945947167005642,
+        "min": 11.90952,
+        "max": 19.518325
+      },
+      "operation_count": {
+        "mean": 82410905,
+        "sample_sd": 1652158.5880296116,
+        "min": 80341905,
+        "max": 85009905
+      }
+    },
+    "fixed": {
+      "throughput": {
+        "mean": 6726413.333333333,
+        "sample_sd": 450473.9811743478,
+        "min": 5923273,
+        "max": 7155920
+      },
+      "reader_only_throughput": {
+        "mean": 6891190.646223952,
+        "sample_sd": 329511.15455106297,
+        "min": 6248412.435753789,
+        "max": 7164314.081523781
+      },
+      "native_exact_elapsed_seconds": {
+        "mean": 12.1626035,
+        "sample_sd": 0.5510701245789867,
+        "min": 11.738798,
+        "max": 13.227974
+      },
+      "reader_only_elapsed_seconds": {
+        "mean": 11.8550125,
+        "sample_sd": 0.3555414808146863,
+        "min": 11.551204,
+        "max": 12.53965
+      },
+      "writer_completion_from_reader_start_seconds": {
+        "mean": 12.1536445,
+        "sample_sd": 0.5547504250196656,
+        "min": 11.72505,
+        "max": 13.225361
+      },
+      "writer_tail_after_readers_seconds": {
+        "mean": 0.298632,
+        "sample_sd": 0.33164147545685535,
+        "min": 5e-06,
+        "max": 0.685711
+      },
+      "native_post_worker_gap_seconds": {
+        "mean": 0.008959000000000236,
+        "sample_sd": 0.00453193102330526,
+        "min": 0.0026130000000001985,
+        "max": 0.01374799999999965
+      },
+      "writer_elapsed_seconds": {
+        "mean": 12.124738,
+        "sample_sd": 0.5677792098803903,
+        "min": 11.714364,
+        "max": 13.216257
+      },
+      "operation_count": {
+        "mean": 81608071.66666667,
+        "sample_sd": 2165935.494576574,
+        "min": 78352905,
+        "max": 84001905
+      }
+    }
+  },
+  "blocks": [
+    {
+      "block": 4,
+      "metrics": {
+        "throughput": {
+          "old_vs_plain_pct": -58.909097969231475,
+          "fixed_vs_plain_pct": -42.110436336543074,
+          "fixed_vs_old_pct": 40.88170568781793
+        },
+        "reader_only_throughput": {
+          "old_vs_plain_pct": -52.290774156327544,
+          "fixed_vs_plain_pct": -45.31628570070574,
+          "fixed_vs_old_pct": 14.618741621326947
+        }
+      }
+    },
+    {
+      "block": 5,
+      "metrics": {
+        "throughput": {
+          "old_vs_plain_pct": -50.04067889292588,
+          "fixed_vs_plain_pct": -49.94632384598441,
+          "fixed_vs_old_pct": 0.18886374924760307
+        },
+        "reader_only_throughput": {
+          "old_vs_plain_pct": -50.197666422156274,
+          "fixed_vs_plain_pct": -50.09862623038235,
+          "fixed_vs_old_pct": 0.19886656840912842
+        }
+      }
+    },
+    {
+      "block": 6,
+      "metrics": {
+        "throughput": {
+          "old_vs_plain_pct": -60.22740402373731,
+          "fixed_vs_plain_pct": -33.43289843015751,
+          "fixed_vs_old_pct": 67.36926503256527
+        },
+        "reader_only_throughput": {
+          "old_vs_plain_pct": -50.780851737736945,
+          "fixed_vs_plain_pct": -50.17010482439066,
+          "fixed_vs_old_pct": 1.2408725768514595
+        }
+      }
+    },
+    {
+      "block": 7,
+      "metrics": {
+        "throughput": {
+          "old_vs_plain_pct": -43.56847044555251,
+          "fixed_vs_plain_pct": -47.363955915368194,
+          "fixed_vs_old_pct": -6.725824197541286
+        },
+        "reader_only_throughput": {
+          "old_vs_plain_pct": -49.3277882083908,
+          "fixed_vs_plain_pct": -52.57875355838644,
+          "fixed_vs_old_pct": -6.4156768276966485
+        }
+      }
+    },
+    {
+      "block": 8,
+      "metrics": {
+        "throughput": {
+          "old_vs_plain_pct": -43.36266478440388,
+          "fixed_vs_plain_pct": -45.72579911548741,
+          "fixed_vs_old_pct": -4.172396745164675
+        },
+        "reader_only_throughput": {
+          "old_vs_plain_pct": -51.1716954100074,
+          "fixed_vs_plain_pct": -51.87801451938877,
+          "fixed_vs_old_pct": -1.4465362156484307
+        }
+      }
+    },
+    {
+      "block": 9,
+      "metrics": {
+        "throughput": {
+          "old_vs_plain_pct": -42.738012215430246,
+          "fixed_vs_plain_pct": -43.30920895438115,
+          "fixed_vs_old_pct": -0.9975146882777675
+        },
+        "reader_only_throughput": {
+          "old_vs_plain_pct": -48.78153938842823,
+          "fixed_vs_plain_pct": -47.09087447955804,
+          "fixed_vs_old_pct": 3.300889735229995
+        }
+      }
+    }
+  ],
+  "ratios_of_means": {
+    "throughput": {
+      "old_vs_plain_pct": -49.732362890788785,
+      "fixed_vs_plain_pct": -43.95725271494359,
+      "fixed_vs_old_pct": 11.488724173165753
+    },
+    "reader_only_throughput": {
+      "old_vs_plain_pct": -50.435115443166886,
+      "fixed_vs_plain_pct": -49.57072812251961,
+      "fixed_vs_old_pct": 1.7439510419037463
+    }
+  },
+  "audit": {
+    "status": "passed",
+    "cells": 18,
+    "trace_archives": 12,
+    "database_archives": 18,
+    "guarded_inputs_and_history": 1692,
+    "retained_files": 138,
+    "trace_source_bytes": 235395320120,
+    "trace_archive_bytes": 34189676545,
+    "database_source_bytes": 35755068754,
+    "database_archive_bytes": 18711657386
+  },
+  "scope": "Six additional HSL blocks; distinct from original 400 cells and prior 18-cell validation"
+}
