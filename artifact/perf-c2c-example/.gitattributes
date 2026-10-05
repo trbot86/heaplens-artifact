@@ -1,0 +1,4 @@
+*.gz -text
+# Retained formatted reports/logs include alignment spaces; preserve exact bytes.
+*.log -text -whitespace
+perf_c2c_report_for_db.txt -text -whitespace

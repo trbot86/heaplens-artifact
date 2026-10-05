@@ -270,7 +270,7 @@ captured panels; it does not claim that every historical screenshot is regenerat
 
 | Figure or table | Command / output / expected observation |
 | --- | --- |
-| `perf c2c` visualization | No bundled end-to-end capture command or matching `perf c2c` input for this screenshot. Ordinary allocation traces do not reproduce its HITM counts. |
+| `perf c2c` visualization | [Retained HNSW perf-c2c walkthrough](perf-c2c-example/README.md): complete preparation and GUI commands, ten imported cache lines on three pages. This example is not confirmed as the original screenshot input; its capture loss is documented. |
 | Cache-line alignment distribution | `bash artifact/run.sh gui`; select `efrb-smoke.sqlite` and inspect the alignment distribution at a populated time. Expect type-specific alignment categories, not the exact historical counts. |
 | DVY layouts (96 B / 72 B) and 128-B cache occupancy | The performance command `HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_dvy_bench --profile paper` runs all four node sizes and writes `summary.txt`. The diagnostic CLI currently exposes 96 B (`baseline`) and 192 B (`optimized`) only; the exact 72-B and 128-B figure traces are not available through it. |
 | HJ cache occupancy and glibc slab header | Run the two HJ trace commands below; output `ascylib_hj.sqlite` in each selected directory. Compare node cache-set usage, then the first slab page for glibc's header. Exact placement depends on allocation. |

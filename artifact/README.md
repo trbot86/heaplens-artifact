@@ -284,6 +284,10 @@ complete commands, output locations and expected values for backend preparation,
 UI interaction latency, sampling, TPC-C factors and both HNSW dimensions. Start
 with its saved-data verifier; fresh measurements are explicit opt-ins.
 
+A [saved perf-c2c walkthrough](perf-c2c-example/README.md) supplies a matching
+HNSW report/database pair, preparation command and expected GUI markers. It
+requires no fresh hardware capture.
+
 Other optional procedures are in the supplementary guide:
 [HNSW attribution](REPRODUCTION_CONFIGURATIONS.md#attribute-the-hnswlib-improvement),
 [C2 logging overhead](REPRODUCTION_CONFIGURATIONS.md#reproduce-logging-overhead-c2),

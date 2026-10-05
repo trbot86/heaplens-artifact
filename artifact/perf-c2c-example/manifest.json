@@ -1,0 +1,90 @@
+{
+  "files": {
+    "allocs.sqlite.gz": {
+      "bytes": 35678976,
+      "sha256": "d6e636f3b334c265381000ac8198a8ac2dee96ce459f200b1f4be3ab480cff18"
+    },
+    "benchmark.log": {
+      "bytes": 2637,
+      "sha256": "51f41f9a74845fbd96e4801c7f0566e420d69865c3e9e5d6d93056bb7174c9f2"
+    },
+    "perf_c2c_record.log": {
+      "bytes": 350,
+      "sha256": "92a64366ff1391b51a73dd80a349add9b822f2147ea70e4afb8e3de1b67e0573"
+    },
+    "perf_c2c_report_for_db.txt": {
+      "bytes": 29442,
+      "sha256": "8cab95d707332744f702bb1e3817524af6a566c3602dc3a5b6777004df956ccf"
+    }
+  },
+  "database": {
+    "bytes": 396025856,
+    "sha256": "9a421b98840bebc7f6645515298ee97738f6dc9e61ec10e04fe0df9a2cb00755",
+    "perf_rows": [
+      [
+        94200490791552,
+        0.2800000011920929,
+        4746,
+        77
+      ],
+      [
+        94200490791680,
+        0.3499999940395355,
+        1351,
+        422
+      ],
+      [
+        94200490791744,
+        0.25999999046325684,
+        4418,
+        0
+      ],
+      [
+        94200490791808,
+        0.25,
+        5318,
+        0
+      ],
+      [
+        94200490791872,
+        0.5600000023841858,
+        9735,
+        562
+      ],
+      [
+        94200490792000,
+        0.33000001311302185,
+        549,
+        525
+      ],
+      [
+        94200490792128,
+        1.1100000143051147,
+        475,
+        124
+      ],
+      [
+        94200490792192,
+        1.440000057220459,
+        1922,
+        1206
+      ],
+      [
+        140646354518016,
+        0.15000000596046448,
+        122,
+        205
+      ],
+      [
+        140649508634624,
+        0.17000000178813934,
+        141,
+        386
+      ]
+    ]
+  },
+  "origin": "Retained HNSW diagnostic execution docker_perf_c2c_20260609_1835, Pyke, June 9 2026",
+  "scope": "Same-execution report/database example; not a new capture, headline performance result or confirmed original figure input",
+  "capture_loss": "The retained perf record log reports 7.27% lost samples and 25 lost chunks.",
+  "excluded": "11.1 GB binary allocation log, perf.data and 1.66 GB full report are not bundled; the retained for-db report is included unchanged."
+}

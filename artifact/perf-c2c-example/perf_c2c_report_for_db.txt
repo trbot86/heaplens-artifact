@@ -1,0 +1,218 @@
+=================================================
+            Trace Event Information              
+=================================================
+  Total records                     :    8273832
+  Locked Load/Store Operations      :      37673
+  Load Operations                   :    4157847
+  Loads - uncacheable               :         10
+  Loads - IO                        :          0
+  Loads - Miss                      :          0
+  Loads - no mapping                :        715
+  Load Fill Buffer Hit              :    2798648
+  Load L1D hit                      :    1018779
+  Load L2D hit                      :      17016
+  Load LLC hit                      :     174594
+  Load Local HITM                   :      16689
+  Load Remote HITM                  :          0
+  Load Remote HIT                   :          0
+  Load Local DRAM                   :     148082
+  Load Remote DRAM                  :          3
+  Load MESI State Exclusive         :          3
+  Load MESI State Shared            :     148082
+  Load LLC Misses                   :     148085
+  Load access blocked by data       :          0
+  Load access blocked by address    :          0
+  Load HIT Local Peer               :          0
+  Load HIT Remote Peer              :          0
+  LLC Misses to Local DRAM          :      100.0%
+  LLC Misses to Remote DRAM         :        0.0%
+  LLC Misses to Remote cache (HIT)  :        0.0%
+  LLC Misses to Remote cache (HITM) :        0.0%
+  Store Operations                  :    4115985
+  Store - uncacheable               :          0
+  Store - no mapping                :          2
+  Store L1D Hit                     :    4096729
+  Store L1D Miss                    :      19254
+  Store No available memory level   :          0
+  No Page Map Rejects               :       3811
+  Unable to parse data source       :          0
+
+=================================================
+    Global Shared Cache Line Event Information   
+=================================================
+  Total Shared Cache Lines          :      15178
+  Load HITs on shared lines         :      75724
+  Fill Buffer Hits on shared lines  :      23674
+  L1D hits on shared lines          :      18556
+  L2D hits on shared lines          :        344
+  LLC hits on shared lines          :      29082
+  Load hits on peer cache or nodes  :          0
+  Locked Access on shared lines     :       4513
+  Blocked Access on shared lines    :          0
+  Store HITs on shared lines        :      95265
+  Store L1D hits on shared lines    :      94980
+  Store No available memory level   :          0
+  Total Merged records              :     111954
+
+=================================================
+                 c2c details                     
+=================================================
+  Events                            : cpu/mem-loads,ldlat=30/P
+                                    : cpu/mem-stores/P
+  Cachelines sort on                : Total HITMs
+  Cacheline data grouping           : offset,iaddr
+
+=================================================
+           Shared Data Cache Line Table          
+=================================================
+#
+#        ----------- Cacheline ----------      Tot  ------- Load Hitm -------    Total    Total    Total  --------- Stores --------  ----- Core Load Hit -----  - LLC Load Hit --  - RMT Load Hit --  --- Load Dram ----
+# Index             Address  Node  PA cnt     Hitm    Total  LclHitm  RmtHitm  records    Loads   Stores    L1Hit   L1Miss      N/A       FB       L1       L2    LclHit  LclHitm    RmtHit  RmtHitm       Lcl       Rmt
+# .....  ..................  ....  ......  .......  .......  .......  .......  .......  .......  .......  .......  .......  .......  .......  .......  .......  ........  .......  ........  .......  ........  ........
+#
+      0      0x55acc2ca9500     0    2134    1.44%      241      241        0     3128     1922     1206     1203        3        0     1267      344        0        70      241         0        0         0         0
+      1      0x55acc2ca94c0     0     391    1.11%      186      186        0      599      475      124       43       81        0      278        0        0        11      186         0        0         0         0
+      2      0x55acc2ca93c0     0    5782    0.56%       94       94        0    10297     9735      562      558        4        0     5329     2583        6      1723       94         0        0         0         0
+      3      0x7fec412dc100     0     490    0.46%       76       76        0      854      468      386      386        0        0      232      155        0         5       76         0        0         0         0
+      4      0x55acc2ca9300     0     908    0.35%       58       58        0     1773     1351      422      422        0        0      236      120        6       931       58         0        0         0         0
+      5      0x55acc2ca9440     0     463    0.33%       55       55        0     1074      549      525      525        0        0        2      452        0        40       55         0        0         0         0
+      6      0x55acc2ca9280     0     479    0.28%       47       47        0     4823     4746       77       77        0        0     1337     2180       16      1166       47         0        0         0         0
+      7      0x55acc2ca9340     0     769    0.26%       43       43        0     4418     4418        0        0        0        0     1411     2191        5       768       43         0        0         0         0
+      8      0x55acc2ca9380     0     193    0.25%       41       41        0     5318     5318        0        0        0        0     1251     3149       17       860       41         0        0         0         0
+      9      0x7feb84000000     0     204    0.17%       29       29        0      527      141      386      385        1        0       13       77        2        19       29         0        0         1         0
+     10      0x7feac8000000     0     105    0.15%       25       25        0      327      122      205      205        0        0       15       52        3        27       25         0        0         0         0
+
+=================================================
+      Shared Cache Line Distribution Pareto      
+=================================================
+#
+#        ----- HITM -----  ------- Store Refs ------  --------- Data address ---------                      ---------- cycles ----------    Total       cpu                                               Shared                                      
+#   Num  RmtHitm  LclHitm   L1 Hit  L1 Miss      N/A              Offset  Node  PA cnt        Code address  rmt hitm  lcl hitm      load  records       cnt                          Symbol               Object                     Source:Line  Node
+# .....  .......  .......  .......  .......  .......  ..................  ....  ......  ..................  ........  ........  ........  .......  ........  ..............................  ...................  ..............................  ....
+#
+  ----------------------------------------------------------------------
+      0        0      241     1203        3        0      0x55acc2ca9500
+  ----------------------------------------------------------------------
+           0.00%    0.83%    0.00%    0.00%    0.00%                0x20     0       1      0x7fec6bd04294         0       154       208        3         3  [.] 0x0000000000091294          libc.so.6            libc.so.6[91294]                 0
+           0.00%    0.83%    0.50%    0.00%    0.00%                0x20     0       1      0x7fec6bd042a3         0      4231       152       12         8  [.] 0x00000000000912a3          libc.so.6            libc.so.6[912a3]                 0
+           0.00%    0.41%   42.64%    0.00%    0.00%                0x20     0       1      0x7fec6bd0af40         0       433       316      758        24  [.] pthread_mutex_lock          libc.so.6            pthread_mutex_lock+80            0
+           0.00%    0.00%   45.55%    0.00%    0.00%                0x20     0       1      0x7fec6bd0caa4         0         0       404      701        24  [.] pthread_mutex_unlock        libc.so.6            pthread_mutex_unlock+52          0
+           0.00%    0.00%    0.17%    0.00%    0.00%                0x28     0       1      0x7fec6bd0af5d         0         0         0        2         2  [.] pthread_mutex_lock          libc.so.6            pthread_mutex_lock+109           0
+           0.00%    0.00%    0.08%    0.00%    0.00%                0x28     0       1      0x7fec6bd0ca90         0         0         0        1         1  [.] pthread_mutex_unlock        libc.so.6            pthread_mutex_unlock+32          0
+           0.00%    0.00%   11.06%  100.00%    0.00%                0x2c     0       1      0x7fec6bd0ca8c         0         0       114      270        24  [.] pthread_mutex_unlock        libc.so.6            pthread_mutex_unlock+28          0
+           0.00%   96.27%    0.00%    0.00%    0.00%                0x30     0       1      0x7fec6bd0aef4         0       154        99      253        24  [.] pthread_mutex_lock          libc.so.6            pthread_mutex_lock+4             0
+           0.00%    1.66%    0.00%    0.00%    0.00%                0x30     0       1      0x7fec6bd0af22         0       166       149      203        24  [.] pthread_mutex_lock          libc.so.6            pthread_mutex_lock+50            0
+
+  ----------------------------------------------------------------------
+      1        0      186       43       81        0      0x55acc2ca94c0
+  ----------------------------------------------------------------------
+           0.00%   26.34%    0.00%    0.00%    0.00%                0x20     0       1      0x55acc1f41e82         0       164       132       59        21  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   11.29%    0.00%    0.00%    0.00%                0x20     0       1      0x55acc1f44252         0       166       180       30        17  [.] std::priority_queue<std::p  heaplens_hnsw_bench  std::priority_queue<std::pair<   0
+           0.00%    0.00%   32.56%   97.53%    0.00%                0x20     0       1      0x55acc1f4045e         0         0         0       93        24  [.] hnswlib::VisitedListPool::  heaplens_hnsw_bench  hnswlib::VisitedListPool::getF   0
+           0.00%    0.00%   25.58%    0.00%    0.00%                0x20     0       1      0x55acc1f4067b         0         0         0       11        10  [.] hnswlib::VisitedListPool::  heaplens_hnsw_bench  hnswlib::VisitedListPool::getF   0
+           0.00%    0.00%   41.86%    2.47%    0.00%                0x20     0       1      0x55acc1f4125f         0         0         0       20        15  [.] void std::deque<hnswlib::V  heaplens_hnsw_bench  void std::deque<hnswlib::Visit   0
+           0.00%    5.38%    0.00%    0.00%    0.00%                0x28     0       1      0x55acc1f4425c         0       165       162       26        16  [.] std::priority_queue<std::p  heaplens_hnsw_bench  std::priority_queue<std::pair<   0
+           0.00%    4.30%    0.00%    0.00%    0.00%                0x28     0       1      0x55acc1f41e8e         0       159       156       69        22  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    0.54%    0.00%    0.00%    0.00%                0x28     0       1      0x55acc1f44261         0       187       163        9         7  [.] std::priority_queue<std::p  heaplens_hnsw_bench  std::priority_queue<std::pair<   0
+           0.00%   48.92%    0.00%    0.00%    0.00%                0x30     0       1      0x55acc1f40408         0       151        80      100        24  [.] hnswlib::VisitedListPool::  heaplens_hnsw_bench  hnswlib::VisitedListPool::getF   0
+           0.00%    3.23%    0.00%    0.00%    0.00%                0x38     0       1      0x55acc1f4040f         0       146       144       85        22  [.] hnswlib::VisitedListPool::  heaplens_hnsw_bench  hnswlib::VisitedListPool::getF   0
+
+  ----------------------------------------------------------------------
+      2        0       94      558        4        0      0x55acc2ca93c0
+  ----------------------------------------------------------------------
+           0.00%    7.45%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f4632e         0       336       304      875        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    1.06%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f3e9d4         0       501       418      153        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    0.00%    0.00%   75.00%    0.00%                 0x8     0       1      0x55acc1f415e6         0         0       513     2791        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   67.02%    0.00%    0.00%    0.00%                0x10     0       1      0x55acc1f415d4         0       532       531     2830        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   18.09%    0.00%    0.00%    0.00%                0x10     0       1      0x55acc1f46308         0       419       248     1780        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    5.32%    0.00%    0.00%    0.00%                0x10     0       1      0x55acc1f3e9ae         0       361       199      476        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    1.06%    0.00%    0.00%    0.00%                0x10     0       1      0x55acc1f490e4         0      1063       228       91        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    0.00%    0.18%    0.00%    0.00%                0x18     0       1      0x7fec6bd042a3         0         0       898        2         2  [.] 0x00000000000912a3          libc.so.6            libc.so.6[912a3]                 0
+           0.00%    0.00%   67.38%    0.00%    0.00%                0x18     0       1      0x7fec6bd0af40         0         0       875      448        24  [.] pthread_mutex_lock          libc.so.6            pthread_mutex_lock+80            0
+           0.00%    0.00%   31.18%    0.00%    0.00%                0x18     0       1      0x7fec6bd0caa4         0         0      1040      232        24  [.] pthread_mutex_unlock        libc.so.6            pthread_mutex_unlock+52          0
+           0.00%    0.00%    0.18%    0.00%    0.00%                0x20     0       1      0x7fec6bd0af5d         0         0         0        1         1  [.] pthread_mutex_lock          libc.so.6            pthread_mutex_lock+109           0
+           0.00%    0.00%    1.08%   25.00%    0.00%                0x24     0       1      0x7fec6bd0ca8c         0         0       445       10         7  [.] pthread_mutex_unlock        libc.so.6            pthread_mutex_unlock+28          0
+
+  ----------------------------------------------------------------------
+      3        0       76      386        0        0      0x7fec412dc100
+  ----------------------------------------------------------------------
+           0.00%    0.00%    0.52%    0.00%    0.00%                0x18     0       1      0x7fec6bd042a3         0         0       133        3         3  [.] 0x00000000000912a3    libc.so.6         libc.so.6[912a3]          0
+           0.00%    0.00%   68.13%    0.00%    0.00%                0x18     0       1      0x7fec6bd0af40         0         0       339      339        24  [.] pthread_mutex_lock    libc.so.6         pthread_mutex_lock+80     0
+           0.00%    0.00%   27.98%    0.00%    0.00%                0x18     0       1      0x7fec6bd0caa4         0         0       155      190        24  [.] pthread_mutex_unlock  libc.so.6         pthread_mutex_unlock+52   0
+           0.00%    5.26%    0.00%    0.00%    0.00%                0x20     0       1      0x7fec6bd0af4a         0       230       203       79        24  [.] pthread_mutex_lock    libc.so.6         pthread_mutex_lock+90     0
+           0.00%    0.00%    3.37%    0.00%    0.00%                0x24     0       1      0x7fec6bd0ca8c         0         0       134       18        14  [.] pthread_mutex_unlock  libc.so.6         pthread_mutex_unlock+28   0
+           0.00%   88.16%    0.00%    0.00%    0.00%                0x28     0       1      0x7fec6bd0aef4         0       230       204       69        23  [.] pthread_mutex_lock    libc.so.6         pthread_mutex_lock+4      0
+           0.00%    3.95%    0.00%    0.00%    0.00%                0x28     0       1      0x7fec6bd0af22         0       216       212       77        24  [.] pthread_mutex_lock    libc.so.6         pthread_mutex_lock+50     0
+           0.00%    2.63%    0.00%    0.00%    0.00%                0x28     0       1      0x7fec6bd0ca74         0       163       123        7         7  [.] pthread_mutex_unlock  libc.so.6         pthread_mutex_unlock+4    0
+
+  ----------------------------------------------------------------------
+      4        0       58      422        0        0      0x55acc2ca9300
+  ----------------------------------------------------------------------
+           0.00%    0.00%   40.05%    0.00%    0.00%                0x10     0       1      0x7fec6bd0af40         0         0      1123      225        24  [.] pthread_mutex_lock          libc.so.6            pthread_mutex_lock+80            0
+           0.00%    0.00%   59.95%    0.00%    0.00%                0x10     0       1      0x7fec6bd0caa4         0         0       533      298        24  [.] pthread_mutex_unlock        libc.so.6            pthread_mutex_unlock+52          0
+           0.00%   89.66%    0.00%    0.00%    0.00%                0x38     0       1      0x55acc1f414c0         0       152        68      851        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    8.62%    0.00%    0.00%    0.00%                0x38     0       1      0x55acc1f3e78f         0       190        79      212        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    1.72%    0.00%    0.00%    0.00%                0x38     0       1      0x55acc1f49054         0       168        84       14        12  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+
+  ----------------------------------------------------------------------
+      5        0       55      525        0        0      0x55acc2ca9440
+  ----------------------------------------------------------------------
+           0.00%    3.64%   33.14%    0.00%    0.00%                 0x8     0       1      0x55acc1f44756         0       858       621      417        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   65.45%   66.86%    0.00%    0.00%                0x10     0       1      0x55acc1f4474b         0      1212       579      598        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   30.91%    0.00%    0.00%    0.00%                0x18     0       1      0x55acc1f49fef         0       151        61       59        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+
+  ----------------------------------------------------------------------
+      6        0       47       77        0        0      0x55acc2ca9280
+  ----------------------------------------------------------------------
+           0.00%    2.13%    0.00%    0.00%    0.00%                 0x0     0       1      0x55acc1f3c859         0       222       146        3         3  [.] std::thread::_State_impl<s  heaplens_hnsw_bench  std::thread::_State_impl<std::   0
+           0.00%    0.00%  100.00%    0.00%    0.00%                0x10     0       1      0x55acc1f4882f         0         0      1422      142        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   44.68%    0.00%    0.00%    0.00%                0x18     0       1      0x55acc1f41758         0       330       244     2704        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   25.53%    0.00%    0.00%    0.00%                0x18     0       1      0x55acc1f462f5         0       234       313      616        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   19.15%    0.00%    0.00%    0.00%                0x18     0       1      0x55acc1f416d9         0       173       405      293        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    2.13%    0.00%    0.00%    0.00%                0x18     0       1      0x55acc1f41516         0       204       368      191        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    2.13%    0.00%    0.00%    0.00%                0x18     0       1      0x55acc1f48a03         0       181       406        9         6  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    2.13%    0.00%    0.00%    0.00%                0x18     0       1      0x55acc1f48a49         0       663       238        3         3  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    2.13%    0.00%    0.00%    0.00%                0x20     0       1      0x55acc1f419ef         0       150       268       13        10  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+
+  ----------------------------------------------------------------------
+      7        0       43        0        0        0      0x55acc2ca9340
+  ----------------------------------------------------------------------
+           0.00%   60.47%    0.00%    0.00%    0.00%                0x28     0       1      0x55acc1f41751         0       243       405     1041        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   16.28%    0.00%    0.00%    0.00%                0x28     0       1      0x55acc1f4630f         0       216       297      458        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    6.98%    0.00%    0.00%    0.00%                0x28     0       1      0x55acc1f3e9b5         0       157       354       96        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    4.65%    0.00%    0.00%    0.00%                0x28     0       1      0x55acc1f416f9         0       213       432      209        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    2.33%    0.00%    0.00%    0.00%                0x28     0       1      0x55acc1f4155a         0       152       287      149        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    2.33%    0.00%    0.00%    0.00%                0x28     0       1      0x55acc1f490ee         0       180       462        8         8  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    6.98%    0.00%    0.00%    0.00%                0x30     0       1      0x55acc1f416f2         0       170       367      216        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+
+  ----------------------------------------------------------------------
+      8        0       41        0        0        0      0x55acc2ca9380
+  ----------------------------------------------------------------------
+           0.00%   46.34%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f4174a         0       264       230     1949        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   19.51%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f416e4         0       371       403      228        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%   14.63%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f4631d         0       273       286      425        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    4.88%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f3e9c3         0       294       369       81        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    4.88%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f46324         0       168       103     1649        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    4.88%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f490f5         0       879        91      112        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    2.44%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f3e9ca         0       156        97      476        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+           0.00%    2.44%    0.00%    0.00%    0.00%                 0x8     0       1      0x55acc1f4151b         0       538       342      147        24  [.] hnswlib::HierarchicalNSW<f  heaplens_hnsw_bench  hnswlib::HierarchicalNSW<float   0
+
+  ----------------------------------------------------------------------
+      9        0       29      385        1        0      0x7feb84000000
+  ----------------------------------------------------------------------
+           0.00%  100.00%    0.00%    0.00%    0.00%                 0x0     0       1      0x7fec6bd18449         0       169        88       49        18  [.] cfree               libc.so.6         cfree+105          0
+           0.00%    0.00%    8.05%    0.00%    0.00%                0x30     0       1      0x7fec6bd1593d         0         0       284       45        11  [.] 0x00000000000a293d  libc.so.6         libc.so.6[a293d]   0
+           0.00%    0.00%   16.36%    0.00%    0.00%                0x30     0       1      0x7fec6bd15ca7         0         0       214       74        10  [.] 0x00000000000a2ca7  libc.so.6         libc.so.6[a2ca7]   0
+           0.00%    0.00%   43.90%    0.00%    0.00%                0x30     0       1      0x7fec6bd18122         0         0       193      189        11  [.] malloc              libc.so.6         malloc+130         0
+           0.00%    0.00%   15.84%    0.00%    0.00%                0x30     0       1      0x7fec6bd18144         0         0       243       95        11  [.] malloc              libc.so.6         malloc+164         0
+           0.00%    0.00%   15.84%  100.00%    0.00%                0x38     0       1      0x7fec6bd1578b         0         0         0       62         5  [.] 0x00000000000a278b  libc.so.6         libc.so.6[a278b]   0
+
+  ----------------------------------------------------------------------
+     10        0       25      205        0        0      0x7feac8000000
+  ----------------------------------------------------------------------
+           0.00%  100.00%    0.00%    0.00%    0.00%                 0x0     0       1      0x7fec6bd18449         0       162        85       55        19  [.] cfree               libc.so.6         cfree+105          0
+           0.00%    0.00%   12.20%    0.00%    0.00%                0x30     0       1      0x7fec6bd1593d         0         0       188       38         8  [.] 0x00000000000a293d  libc.so.6         libc.so.6[a293d]   0
+           0.00%    0.00%   28.78%    0.00%    0.00%                0x30     0       1      0x7fec6bd15ca7         0         0       244       69         8  [.] 0x00000000000a2ca7  libc.so.6         libc.so.6[a2ca7]   0
+           0.00%    0.00%   43.90%    0.00%    0.00%                0x30     0       1      0x7fec6bd18122         0         0       174      102         9  [.] malloc              libc.so.6         malloc+130         0
+           0.00%    0.00%   14.15%    0.00%    0.00%                0x30     0       1      0x7fec6bd18144         0         0       212       46         8  [.] malloc              libc.so.6         malloc+164         0
+           0.00%    0.00%    0.98%    0.00%    0.00%                0x38     0       1      0x7fec6bd1578b         0         0         0        2         1  [.] 0x00000000000a278b  libc.so.6         libc.so.6[a278b]   0
