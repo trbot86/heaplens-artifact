@@ -52,6 +52,9 @@ static void expect_owner(Owner* p) {
     expect("Leaf", p->child, sizeof(*p->child));
 }
 int main() {
+    Leaf* global_syntax = ::new Leaf;
+    expect("Leaf", global_syntax, sizeof(Leaf));
+    delete global_syntax;
     Owner* owner = new Owner;
     StorageOwner* storage = new StorageOwner;
     Leaf* leaves = new Leaf[array_bound()];

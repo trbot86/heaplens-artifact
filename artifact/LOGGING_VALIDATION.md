@@ -24,7 +24,8 @@ expression must be regenerated to use this path; the legacy interface is not
 the correctness authority for nested construction.
 
 Unsupported custom allocation/deallocation functions, deduced `new auto`, and
-implicit placement-array bounds are rejected with diagnostics instead of receiving guessed extents.
+implicit or class-valued placement-array bounds are rejected with diagnostics
+instead of receiving guessed extents or repeating a user-defined conversion.
 In particular, substituting a custom placement allocation function for standard
 `new(storage) T[n]` can introduce an array cookie and change the storage ABI.
 Custom allocation functions need explicit allocation/region hooks. This is not a claim of

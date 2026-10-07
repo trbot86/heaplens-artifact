@@ -262,6 +262,12 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
         }
         const FunctionDecl *Allocator = node->getOperatorNew();
         if (!Allocator) return;
+        SourceLocation NewToken = node->getBeginLoc();
+        if (node->isGlobalNew()) {
+            auto Token = Lexer::findNextToken(NewToken, SM, Result.Context->getLangOpts());
+            if (!Token) return;
+            NewToken = Token->getLocation();
+        }
         const std::string Site = std::to_string(filemap[FileName]) + ", (__LINE__)";
         if (Allocator->isReservedGlobalPlacementOperator()) {
 #ifdef ALLOCLOGGING_PLACEMENT_NEW
@@ -273,6 +279,12 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
                 if (!Bound || Bound->getBeginLoc().isInvalid() || Bound->getEndLoc().isInvalid()) {
                     diag(node->getExprLoc(), "implicit placement array bound requires an explicit extent hook",
                          DiagnosticIDs::Error);
+                    return;
+                }
+                const Expr *WrittenBound = Bound->IgnoreUnlessSpelledInSource();
+                if (!WrittenBound->getType()->isIntegralOrEnumerationType() &&
+                    !WrittenBound->getType()->isDependentType()) {
+                    diag(node->getExprLoc(), "class-valued placement array bound requires an explicit extent hook", DiagnosticIDs::Error);
                     return;
                 }
                 const std::string Count = "heaplens_array_count_" + std::to_string(SM.getFileOffset(node->getExprLoc()));
@@ -289,6 +301,10 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
                 }
                 SourceLocation ArrayEnd = Lexer::getLocForEndOfToken(Closing->getLocation(), 0, SM, Result.Context->getLangOpts());
                 if (SM.isBeforeInTranslationUnit(End, ArrayEnd)) End = ArrayEnd;
+                if (node->getDirectInitRange().getEnd().isValid()) {
+                    SourceLocation InitEnd = Lexer::getLocForEndOfToken(node->getDirectInitRange().getEnd(), 0, SM, Result.Context->getLangOpts());
+                    if (SM.isBeforeInTranslationUnit(End, InitEnd)) End = InitEnd;
+                }
                 diag(node->getExprLoc(), "record placement array extent without changing its allocation function", DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(node->getExprLoc(),
                         std::string("([") + (Local ? "&" : "") + "]() { size_t " + Count + " = 0; return (MemPlacementArrayStamp(" + Site + ", " + Count + ") * ")
@@ -333,7 +349,7 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
         }
         // A class-specific delete can hide the matching placement-delete
         // overload if construction throws. Do not change that cleanup lookup.
-        if (!TaggedAdapter && hasCustomDelete(node->getAllocatedType()->getAsCXXRecordDecl(), node->isArray())) {
+        if (!TaggedAdapter && !node->isGlobalNew() && hasCustomDelete(node->getAllocatedType()->getAsCXXRecordDecl(), node->isArray())) {
             diag(node->getExprLoc(), "class-specific operator delete requires an explicit allocation hook",
                  DiagnosticIDs::Error);
             return;
@@ -356,8 +372,7 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
             Insert = node->getPlacementArg(0)->getBeginLoc();
             Text = Tag + ", ";
         } else {
-            // getExprLoc is the 'new' token, including for ::new.
-            Insert = Lexer::getLocForEndOfToken(node->getExprLoc(), 0, SM,
+            Insert = Lexer::getLocForEndOfToken(NewToken, 0, SM,
                                                 Result.Context->getLangOpts());
             Text = " (" + Tag + ")";
         }
