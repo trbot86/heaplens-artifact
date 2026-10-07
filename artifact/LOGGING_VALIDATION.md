@@ -18,7 +18,7 @@ have native tests. Existing transformed sources using the legacy `MemStamp`
 expression must be regenerated to use this path; the legacy interface is not
 the correctness authority for nested construction.
 
-Unsupported custom allocation functions, deduced `new auto`, and placement-new
+Unsupported custom allocation/deallocation functions, deduced `new auto`, and placement-new
 arrays are rejected with diagnostics instead of receiving guessed extents.
 In particular, substituting a custom placement allocation function for standard
 `new(storage) T[n]` can introduce an array cookie and change the storage ABI.

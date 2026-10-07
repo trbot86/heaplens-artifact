@@ -8,6 +8,7 @@
 
 #include "AllocationLoggingCheck.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Lex/Lexer.h"
@@ -232,6 +233,20 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
     }
 }
 
+static bool hasCustomDelete(const CXXRecordDecl *Record, bool Array) {
+    if (!Record || !Record->hasDefinition()) return false;
+    Record = Record->getDefinition();
+    for (const Decl *D : Record->decls()) {
+        const auto *F = dyn_cast<FunctionDecl>(D);
+        if (F && F->isOverloadedOperator() &&
+            F->getOverloadedOperator() == (Array ? OO_Array_Delete : OO_Delete))
+            return true;
+    }
+    for (const auto &Base : Record->bases())
+        if (hasCustomDelete(Base.getType()->getAsCXXRecordDecl(), Array)) return true;
+    return false;
+}
+
 void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &Result, std::string newbind) {
     const clang::CXXNewExpr* node =
         Result.Nodes.getNodeAs<clang::CXXNewExpr>(newbind);
@@ -282,6 +297,13 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
         }
         if (!Standard) {
             diag(node->getExprLoc(), "custom operator new requires an explicit allocation hook",
+                 DiagnosticIDs::Error);
+            return;
+        }
+        // A class-specific delete can hide the matching placement-delete
+        // overload if construction throws. Do not change that cleanup lookup.
+        if (hasCustomDelete(node->getAllocatedType()->getAsCXXRecordDecl(), node->isArray())) {
+            diag(node->getExprLoc(), "class-specific operator delete requires an explicit allocation hook",
                  DiagnosticIDs::Error);
             return;
         }

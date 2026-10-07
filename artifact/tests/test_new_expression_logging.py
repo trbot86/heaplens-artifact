@@ -74,3 +74,22 @@ class NewExpressionLogging(unittest.TestCase):
         (trial/'driver.log').write_text(str(failure.exception))
         self.assertIn('placement-new arrays require an explicit extent hook', str(failure.exception))
         self.assertEqual((target/'main.cpp').read_text(), cpp)
+
+    def test_rejects_custom_cleanup_without_changing_exception_semantics(self):
+        base = Path(os.environ.get('HEAPLENS_TEST_EVIDENCE', tempfile.gettempdir()))
+        for array in (False, True):
+            trial = Path(tempfile.mkdtemp(prefix='custom-delete-', dir=base))
+            source = trial/'input'; source.mkdir(); target = trial/'project'
+            brackets = '[]' if array else ''
+            expression = 'new Child[2]' if array else 'new Child'
+            cpp = ('#include <new>\nstruct Base { static void operator delete'+brackets+
+                   '(void* p) { ::operator delete'+brackets+'(p); } };\n'
+                   'struct Child : Base { Child() { throw 7; } };\n'
+                   'int main() { try { '+expression+'; } catch (int) {} }\n')
+            (source/'main.cpp').write_text(cpp)
+            (source/'Makefile').write_text('all:\n\tg++ -std=c++11 -c main.cpp\n')
+            with self.assertRaises(AssertionError) as failure:
+                run(['bash', 'sifter.sh', str(source), str(target), '-t', '--skip-refactor'])
+            (trial/'driver.log').write_text(str(failure.exception))
+            self.assertIn('class-specific operator delete requires an explicit allocation hook', str(failure.exception))
+            self.assertEqual((target/'main.cpp').read_text(), cpp)
