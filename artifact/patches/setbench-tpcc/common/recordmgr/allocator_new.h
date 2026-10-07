@@ -85,11 +85,13 @@ public:
         #ifdef MEMHOOK_SEG_DS
         T* result = (T*) ds_malloc(sizeof(T));
         #else
-        T* result = new T;
+        // Typed logging is supplied explicitly below in the final trace build.
+        // Suppress automatic annotation even during the initial plain build.
+        T* result = new T; // NOLINT(misc-allocation-logging)
         #endif
         #ifdef HEAPLENS_TPCC_TRACE
-        // Header allocations and dlsym calls are not rewritten by the trace
-        // driver's Clang pass. Record the actual object at this boundary.
+        // This allocation boundary covers both ordinary and dlsym allocators.
+        // The NOLINT above prevents a second record from source annotation.
         memhook_record_alloc(result, sizeof(T), typeid(T),
                              HEAPLENS_TPCC_RECORDMGR_FILE_ID, __LINE__);
         #endif

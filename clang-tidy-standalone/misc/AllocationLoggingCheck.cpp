@@ -134,6 +134,19 @@ void AllocationLoggingCheck::registerMatchers(MatchFinder *Finder) {
 #endif
 }
 
+bool AllocationLoggingCheck::isProjectLocation(SourceLocation Loc, const SourceManager &SM) const {
+    // The driver supplies a canonical project root, including headers above a
+    // selected build subdirectory. Do not rewrite external or system headers.
+    if (Loc.isInvalid() || Loc.isMacroID() || SM.isInSystemHeader(Loc)) return false;
+    const char *Root = std::getenv("HEAPLENS_ANNOTATION_ROOT");
+    if (!Root || !*Root) return true; // Preserve standalone clang-tidy filtering.
+    const FileEntry *File = SM.getFileEntryForID(SM.getFileID(Loc));
+    if (!File) return false;
+    StringRef Path = File->tryGetRealPathName();
+    std::string Prefix = std::string(Root) + "/";
+    return Path.startswith(Prefix);
+}
+
 void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResult &Result, std::string allocnodebind, std::string typenodebind, std::string declnodebind) {
     const clang::CallExpr *mnode =
         Result.Nodes.getNodeAs<clang::CallExpr>(allocnodebind);
@@ -142,7 +155,7 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
     const clang::Type *typenode =
         Result.Nodes.getNodeAs<clang::Type>(typenodebind);
 
-    if(mnode) {
+    if(mnode && isProjectLocation(mnode->getExprLoc(), *Result.SourceManager)) {
         if(declnode) {
             std::string type;
 
@@ -208,7 +221,7 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
     const clang::CXXNewExpr* node =
         Result.Nodes.getNodeAs<clang::CXXNewExpr>(newbind);
 
-    if (node) {
+    if (node && isProjectLocation(node->getExprLoc(), *Result.SourceManager)) {
         auto &SM = Result.Context->getSourceManager();
         std::string FileName = SM.getFilename(node->getExprLoc()).str();
         if (filemap.find(FileName) == filemap.end()) {

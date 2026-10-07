@@ -43,7 +43,11 @@ This step uses clang-tidy to add logging instructions to the target application.
 
 	If the target application is compiled by simply calling 'make', then you do not need to specify the build command.
 
-	Note: currently, you must use the --skip-refactor flag. Hypothetically, excluding the flag does the remaining refactoring in a single step, but this isn't working right now...
+	The tool considers source files and included headers inside the copied project. The `-s` option selects a build subdirectory without excluding headers elsewhere in that project. System headers and headers outside the copied project are excluded.
+
+	Omit `--skip-refactor` to apply the edits and add the logger includes immediately; then skip the manual steps 4 and 6 below. Both paths have [focused native regression tests](artifact/PROJECT_HEADER_VALIDATION.md).
+
+	For an allocation site that already records its own typed event, add `// NOLINT(misc-allocation-logging)` on that allocation's line to prevent a second automatic record. Custom function-pointer allocation paths still need explicit tracing support.
 
 	To add custom logging, use the ```MEMHOOK_LOG_ALLOC``` and ```MEMHOOK_LOG_FREE``` macros in memhook_interface.h as follows:
 

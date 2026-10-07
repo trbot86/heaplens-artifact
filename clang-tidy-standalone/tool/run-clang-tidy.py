@@ -176,7 +176,7 @@ def apply_fixes(args, fixes_path):
   if args.style:
     invocation.append('-style=' + args.style)
   invocation.append(fixes_path)
-  subprocess.call(invocation)
+  subprocess.check_call(invocation)
 
 
 def run_tidy(args, tmpdir, build_path, queue, lock, failed_files):
@@ -326,7 +326,10 @@ def main():
       shutil.rmtree(tmpdir)
     os.kill(0, 9)
 
-  tmp_merged_path = "/tmp/merged-replacements.yaml"
+  # clang-apply-replacements consumes a directory. Keep only the merged file
+  # in that directory, so duplicate per-TU header edits are not applied twice.
+  merged_dir = tempfile.mkdtemp(prefix='heaplens-fixes-')
+  tmp_merged_path = os.path.join(merged_dir, 'merged-replacements.yaml')
   merge_no_duplicates(tmpdir, tmp_merged_path)
 
   if yaml and args.export_fixes:
@@ -342,14 +345,14 @@ def main():
   if args.fix:
     print('Applying fixes ...')
     try:
-      apply_fixes(args, tmp_merged_path)
+      apply_fixes(args, merged_dir)
     except:
       print('Error applying fixes.\n', file=sys.stderr)
       traceback.print_exc()
       return_code=1
 
   # print("Here is tmpdir: {}".format(tmpdir))
-  os.remove(tmp_merged_path)
+  shutil.rmtree(merged_dir)
   if tmpdir:
     shutil.rmtree(tmpdir)
   sys.exit(return_code)
