@@ -78,6 +78,7 @@ PY
     cp -r "$ASCYLIB_SRC" "$SRC_COPY"
     source "$SIFTER_ROOT/artifact/lib/prepare_ascylib.sh"
     prepare_ascylib "$SIFTER_ROOT" "$SRC_COPY"
+    python3 "$SIFTER_ROOT/artifact/lib/ascylib_readonly.py" "$SRC_COPY"
     local SSMEM_LIB_DIR="$WORK/trace-ssmem"
     prepare_ascylib_trace_ssmem "$SIFTER_ROOT" "$SSMEM_LIB_DIR"
     # Clang rejects GCC's legacy cast-as-lvalue assembly output operands.
