@@ -207,9 +207,10 @@ int posix_memalign(void** ptr, size_t align, size_t size) {
     unit_log.typeofop = true;
 
     int r = posix_memalign(ptr, align, size);
-    unit_log.addr = *ptr;
-
-    memhookCollector.copy(unit_log);
+    if (r == 0 && *ptr) {
+        unit_log.addr = *ptr;
+        memhookCollector.copy(unit_log);
+    }
 
     return r;
 }

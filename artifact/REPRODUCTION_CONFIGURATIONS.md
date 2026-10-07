@@ -371,6 +371,115 @@ image; it needs no corresponding installation on the host. Only DVY uses
 this runtime. Rebuild the image after updating these scripts. Other experiments
 retain their existing runtime, allocator and huge-page settings.
 
+## Per-scenario resource planning
+
+The main README repeats these allowances immediately below each command so a
+reader can assess a scenario before starting a build. Memory is **available**
+memory, not installed memory. Scratch disk is additional to the roughly 20-GB
+shared dependency image/install budget. Retaining multiple result directories
+adds their disk use. GUI/browser memory is additional to a completed trace.
+
+| Table 1 scenario | Default CPU placement | Free RAM allowance | Extra scratch allowance | Planning time | Retained campaign elapsed time |
+|---|---|---:|---:|---:|---:|
+| ASCYLIB/EFRB | 4 physical cores, node 0 | 16 GiB | 5 GiB | 5–15 min | 4.9 min |
+| ASCYLIB/DVY | 8 physical cores, node 0 | 16 GiB | 5 GiB | 5–15 min | 5.7 min |
+| ASCYLIB/HJ | 24 physical cores, node 0 | 16 GiB | 5 GiB | 5–10 min | 2.7 min |
+| TPC-C/BCCO | 24 physical cores, node 0 | 32 GiB | 10 GiB | 10–30 min | 7.8 min, full factor set |
+| TPC-C/EFRB | 24 physical cores, node 0 | 32 GiB | 10 GiB | 15–45 min | 28.3 min, full factor set |
+| HashSkipList | 48 logical CPUs on each of two nodes | 64 GiB | 100 GiB | 30–90 min | 31.4 min |
+| InlineSkipList | 20 physical cores, node 0 | **64 GiB enforced** | 10 GiB | 45–120 min | 43.4 min |
+| Valkey | 24 physical cores on each of two nodes | 32 GiB | 10 GiB | 15–45 min | 14.0 min |
+| HNSW, both dimensions | 24 physical cores, node 0 | 32 GiB | 10 GiB | 3–6 hours | 178.5 min |
+
+Observed times are from the retained September 30–October 1 camera-ready
+controller on the dual Xeon Gold 5220R host, including its per-stage builds and
+trials but excluding the shared image build. TPC-C observations include the
+optional full factors, so they are not exact timings of the shorter default
+commands. Planning ranges allow variation; they are not deadlines. Memory/disk
+allowances are conservative estimates from the configured workloads and
+retention policy, **not measured peaks, verified minima or guarantees**. Only
+InlineSkipList currently enforces the 64-GiB memory check before building.
+
+ASCYLIB and TPC-C commands in the main README request counters, requiring the
+runner's kernel ≥5.8 check, Docker `PERFMON` support and PMU access. Throughput
+alone can use `PERFBENCH_PERF=off` without `HEAPLENS_PERF=1`. The RocksDB,
+Valkey and HNSW commands shown there do not request PMU counters. The kernel's
+[perf access-control documentation](https://www.kernel.org/doc/html/latest/admin-guide/perf-security.html)
+explains permissions. Huge-page availability affects DVY and HNSW comparisons;
+the artifact does not change host huge-page policy.
+
+Figure trace commands have different configurations from Table 1. They use 24
+worker threads by default, without fixed NUMA placement; layout checks can run
+on fewer physical cores. Allow 16 GiB RAM / 10 GiB scratch / 5–30 minutes per
+EFRB trace, 32 GiB / 100 GiB / 30–120 minutes per TPC-C trace, and 32 GiB /
+100 GiB / 1–3 hours per RocksDB trace. These trace allowances are estimates,
+not a newly timed figure suite; instrumentation, compilation and SQLite
+processing dominate the short application's duration. Trace size depends on
+event volume. No PMU or kernel-5.8 counter capability is needed for these
+trace/GUI commands. Use the saved trace walkthrough first if resources are tight.
+
+## Figure 5 trace correction
+
+The paper displays **node-only** modeled L1 occupancy. Showing `info_t`
+descriptors as well can conceal the node imbalance. The main README now
+includes the explicit **Only this type** cache-visibility step and explains the
+tooltip's type-share percentage separately from the color normalization.
+
+The full paper-profile baseline was checked locally on October 6 (262,144
+initial keys, 24 workers, five seconds of search-only execution). Both `node_t`
+and `info_t` allocations were 64 bytes. **The gray/yellow/red pattern appears
+during early prefill.** With corrected retirement logging and node-only
+visibility, buckets 1–30 of the default 2,000 buckets have 16 empty sets, 32 sets
+at roughly half the maximum count, and 16 at the maximum. For example, bucket
+16 has 16 zero counts, 32 counts between 2,417 and 2,551, and 16 counts of
+4,976–4,977. Their columns can rotate with address alignment.
+
+Zoom into the start of the rising node-count curve and move the timeline within
+early prefill. The production backend's node counts exactly match an independent
+live-address enumeration at every bucket. This verifies the qualitative panel
+(a) pattern in the current full-profile trace; it does not identify the original
+screenshot's exact timestamp or freshly validate panels (b) and (c).
+
+![Node-only cache occupancy during early prefill and after prefill in the same trace](data/efrb/prefill-comparison.png)
+
+This comparison renders the production heatmap component's colors from the
+[recorded counts](data/efrb/prefill-observation.json); it is not an interactive
+GUI screenshot. Both panels use the same trace and cache geometry, with colors
+normalized within each panel.
+
+SSMEM starts with a 32-MiB chunk and rolls over when `mem_curr + size >=
+mem_size`, leaving its last 64-byte slot unused. The recorded allocations split
+into regions of 524,287 and 524,289 objects. Descriptor addresses occupy a
+different residue modulo 256 in each region; the nodes therefore leave a
+different quarter of L1 sets unused in each region. Combining regions fills
+those gaps. In this trace the second region starts in bucket 31, and all sets
+then have nodes. The final prefill allocation is in bucket 93. Thus the empty
+quarter is a prefill observation, not a guarantee about the entire completed
+tree. No allocator-parameter change is needed to observe it. Ignoring
+retirements after prefill gives approximately 8,192 nodes plus 8,192
+descriptors in some sets, versus 16,384 nodes in others. The near-equal totals
+explain uniform red alongside 50% and 100% node shares. This closely matches
+the evaluator's screenshot, but their database was not available to verify
+their exact addresses or build.
+
+Static SSMEM linkage in the diagnostic build also put `ssmem_free` in the
+executable, bypassing memhook's interposed
+retirement hook. Allocations were recorded but retired leaves could remain live
+in the trace, concealing the yellow/red differences between node-occupied sets.
+A local four-object native probe recorded four allocations and zero retirements
+with that arrangement. The diagnostic driver now builds and loads shared SSMEM;
+the native regression requires exactly one allocation and retirement per object.
+`ssmem-linkage.json` records library/binary hashes and checks that the diagnostic
+binary leaves `ssmem_free` dynamically resolved before collecting any trace.
+
+Old databases cannot recover missing retirement timestamps by recoloring or
+changing visibility. Preserve them and generate a new trace with the corrected
+driver in a new output directory. The bundled `efrb-smoke.sqlite` remains the
+original illustrative input: it exposes node-unused sets with the node-only
+filter, but is not evidence for the paper's yellow/red distribution. Existing
+results have not been replaced. Performance-only ASCYLIB builds are unchanged;
+the separate retained logging-overhead driver already uses shared SSMEM.
+
 ## GUI and small benchmark checks
 
 

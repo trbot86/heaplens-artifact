@@ -369,7 +369,9 @@ extern "C" {
 
     int posix_memalign_s(void** memptr, size_t alignment, size_t size, int line, uint16_t fid, uint16_t tid) {
         int ret = posix_memalign(memptr, alignment, size);
-        MEMHOOK_LOG_C_ALLOC(memptr, size, line, fid, tid)
+        if (ret == 0 && *memptr) {
+            MEMHOOK_LOG_C_ALLOC(*memptr, size, line, fid, tid)
+        }
         return ret;
     }
 

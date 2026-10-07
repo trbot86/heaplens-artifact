@@ -78,6 +78,8 @@ PY
     cp -r "$ASCYLIB_SRC" "$SRC_COPY"
     source "$SIFTER_ROOT/artifact/lib/prepare_ascylib.sh"
     prepare_ascylib "$SIFTER_ROOT" "$SRC_COPY"
+    local SSMEM_LIB_DIR="$WORK/trace-ssmem"
+    prepare_ascylib_trace_ssmem "$SIFTER_ROOT" "$SSMEM_LIB_DIR"
     # Clang rejects GCC's legacy cast-as-lvalue assembly output operands.
     patch --batch --directory "$SRC_COPY" -p1 -i "$SIFTER_ROOT/artifact/patches/ascylib-clang14.patch"
 
@@ -100,7 +102,7 @@ PY
     ./sifter.sh "$SRC_COPY" "$INSTRUMENTED" \
         -s "$tree_src_dir" \
         --skip-refactor \
-        --build "env CFLAGS=-fno-pie LDFLAGS=-no-pie bear -- make ${make_args[*]}"
+        --build "env CFLAGS=-fno-pie LDFLAGS='-no-pie -L${SSMEM_LIB_DIR} -Wl,-rpath=${SSMEM_LIB_DIR}' bear -- make ${make_args[*]}"
 
     echo "=== [$out_name] 3/7: apply clang-tidy fixes ==="
     (cd "$INSTRUMENTED" && clang-apply-replacements-14 ./)
@@ -124,9 +126,27 @@ PY
         cd "$INSTRUMENTED/$tree_src_dir"
         make clean "${make_args[@]}" || true
         CFLAGS="-fno-pie -DMEMHOOK_ASCYLIB -I${MEMHOOK_DIR}" \
-        LDFLAGS="-no-pie -L${MEMHOOK_DIR} -Wl,-rpath=${MEMHOOK_DIR} -lmemhook -ldl" \
+        LDFLAGS="-no-pie -L${SSMEM_LIB_DIR} -Wl,-rpath=${SSMEM_LIB_DIR} -L${MEMHOOK_DIR} -Wl,-rpath=${MEMHOOK_DIR} -lmemhook -ldl" \
         make "${make_args[@]}"
     )
+
+    # Fail before collecting a misleading trace if static linking returns.
+    python3 - "$INSTRUMENTED/bin/$binary_name" "$SSMEM_LIB_DIR/libssmem_x86_64.so" "$RUN_ROOT/ssmem-linkage.json" <<'PY'
+import hashlib, json, subprocess, sys
+from pathlib import Path
+binary, library, receipt = map(Path, sys.argv[1:])
+linked = subprocess.check_output(['ldd', str(binary)], text=True)
+if str(library) not in linked:
+    raise RuntimeError('Diagnostic binary must load the recorded shared SSMEM library')
+symbols = subprocess.check_output(['nm', '-D', str(binary)], text=True)
+if not any(line.split() == ['U', 'ssmem_free'] for line in symbols.splitlines()):
+    raise RuntimeError('Diagnostic ssmem_free must remain interposable')
+Path(receipt).write_text(json.dumps({'library': str(library),
+    'library_sha256': hashlib.sha256(library.read_bytes()).hexdigest(),
+    'binary_sha256': hashlib.sha256(binary.read_bytes()).hexdigest(),
+    'ssmem_free': 'undefined dynamic symbol; memhook intercepts retirements',
+    'ldd': linked}, indent=2) + '\n')
+PY
 
     echo "=== [$out_name] 6/7: run instrumented benchmark ==="
     echo "    threads=$THREADS initial=$INITIAL range=$RANGE duration_ms=$DURATION_MS update%=$UPDATE_PCT"

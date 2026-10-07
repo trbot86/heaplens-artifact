@@ -10,3 +10,15 @@ prepare_ascylib() {
     make -C "$copy/ssmem-source" libssmem.a CFLAGS='-O3 -Wall -fPIC'
     cp "$copy/ssmem-source/libssmem.a" "$copy/external/lib/libssmem_x86_64.a"
 }
+
+# Diagnostic traces need interposable retirement calls. With static SSMEM,
+# ssmem_free in the executable bypasses memhook's LD_PRELOAD hook. Performance
+# builds continue to use the archive produced by prepare_ascylib above.
+prepare_ascylib_trace_ssmem() {
+    local root="$1" output="$2"
+    mkdir "$output"
+    gcc -shared -fPIC -O3 -D_GNU_SOURCE \
+        -I"$root/artifact/vendor/ssmem/include" \
+        "$root/artifact/vendor/ssmem/src/ssmem.c" \
+        -o "$output/libssmem_x86_64.so" -lpthread -lrt
+}

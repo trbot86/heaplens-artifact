@@ -102,6 +102,11 @@ of the paper's screenshot, addresses, cluster numbers, or performance result.
    apparently full pages do not imply uniform use of cache sets by a type.
    Including descriptors in the heatmap conceals the imbalance. These are
    modeled address occupancies, not measured miss counts.
+   A tooltip percentage is the type's share of the hovered set's visible count;
+   it is not percent cache capacity. Color instead compares visible counts
+   across sets at that time. The retained small trace predates the
+   [retirement-linkage correction](REPRODUCTION_CONFIGURATIONS.md#figure-5-trace-correction),
+   so it does not reproduce the paper's yellow/red differences among occupied sets.
 6. This suggests separating node and descriptor allocation streams, or
    perturbing the regular allocation order. The four-variant performance
    driver below tests those hypotheses independently of instrumentation.
@@ -124,6 +129,14 @@ layout, repeat the trace command with `--variant optimized`, then import that
 database with `--label efrb-after`. Both labels remain in the GUI selector. The
 paper-size profile uses a 2^18-key tree. Do not expect identical addresses,
 cluster IDs, or speedups from a fresh small run.
+
+For **Figure 5(a) with a fresh full paper-profile trace**, use the node-only
+cache filter above and zoom into **early prefill**, while the node-count curve
+is rising. Unlike this small saved trace, the full trace crosses an allocator
+chunk boundary; later chunks can fill earlier node-unused sets. A local
+full-profile check shows the gray/yellow/red pattern in buckets 1–30 of 2,000,
+then loses the gray sets in bucket 31. Exact timeline fractions vary by run.
+See [Figure 5 trace correction](REPRODUCTION_CONFIGURATIONS.md#figure-5-trace-correction).
 
 The corresponding uninstrumented four-variant experiment is:
 
