@@ -335,14 +335,40 @@ objects with 64-byte alignment before, and padded 64-byte rows after. Import
 ```bash
 bash artifact/run.sh experiment rocksdb_hsl --variant baseline --profile paper --out artifact/results/fig8a
 bash artifact/run.sh experiment rocksdb_hsl --variant optimized --profile paper --out artifact/results/fig8b
-bash artifact/run.sh gui --database artifact/results/fig8a/rocksdb_hsl.sqlite --label fig8a
+HEAPLENS_CACHE_BUDGET_MB=12000 bash artifact/run.sh gui --database artifact/results/fig8a/rocksdb_hsl.sqlite --label fig8a
 ```
 
 Plan: 24 worker threads, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 1–3 hours per trace (estimate); no PMU required.
 
-Output: `artifact/results/fig8{a,b}/rocksdb_hsl.sqlite`. Expected: expand a bucket
-to see padding holes at offsets 36 and 52 before field reordering; the bucket
-shrinks from 56 to 48 bytes after. Import `fig8b` to compare. The trace driver
+The GUI command raises the cache-view preflight budget from 4 GiB to about
+11.7 GiB (12,000 MiB). One evaluator's trace needed an estimated 5.63 GiB for
+cache arrays and response data. This estimate varies with the trace and
+Settings, and excludes other server/browser memory; retain the 32-GiB free-RAM
+allowance above. With less memory, reduce time buckets as the error suggests.
+That changes temporal resolution, not object sizes or field offsets. Raising
+this budget does not increase a Docker/WSL memory limit.
+
+Output: `artifact/results/fig8{a,b}/rocksdb_hsl.sqlite`. To inspect the bucket:
+
+1. Find **`rocksdb::SkipList<char const*, rocksdb::MemTableRep::KeyComparator const&>`**
+   in the type table. The shorter `HashSkipListRep` name denotes its owner;
+   the type ending in `::Node` denotes an individual list node.
+2. Expand the visibility controls, right-click that type's middle (page)
+   checkbox, and choose **Only this type**. Click **Resample**, then move the
+   time selector into the populated trace.
+3. Expand the bucket type's field list and select a bucket-containing page
+   region for the byte-level detail view. Before reordering, the object is
+   56 bytes with four-byte padding regions at **36–39** and **52–55**. Offsets
+   are relative to the object's start, which need not be cache-line aligned.
+4. Stop the GUI and repeat the GUI command with `fig8b` in both paths/labels.
+   The reordered object is **48 bytes**: `prev_height_` is at offset 36 and
+   `prev_` is at offset 40, with neither padding region.
+
+The GUI matches the equivalent `const char*`/`char const*` bucket spellings
+used by compiler field metadata and runtime type names. Earlier GUI versions
+could show the bucket without attaching its recorded fields. See the
+[Figure 8 field and memory notes](REPRODUCTION_CONFIGURATIONS.md#figure-8-field-metadata-and-memory).
+The trace driver
 uses the upstream diagnostic snapshot; Table 1 performance uses the historical
 snapshot. [Trace scope and all appendix figures](REPRODUCTION_CONFIGURATIONS.md#appendix-figure-and-table-index).
 

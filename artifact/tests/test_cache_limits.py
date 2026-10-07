@@ -34,6 +34,17 @@ class CacheLimitsTest(unittest.TestCase):
                     check_cache_budget(1, 1, 1)
 
     @patch.dict(os.environ, {'HEAPLENS_CACHE_BUDGET_MB': '4096'})
+    def test_error_explains_budget_override_without_changing_geometry(self):
+        import re
+        with self.assertRaises(CacheBudgetExceeded) as caught:
+            check_cache_budget(1000, 64, 982)
+        message = str(caught.exception)
+        required = int(re.search(r'HEAPLENS_CACHE_BUDGET_MB=(\d+)', message).group(1))
+        self.assertIn('additional memory for the server and browser', message)
+        with patch.dict(os.environ, {'HEAPLENS_CACHE_BUDGET_MB': str(required)}):
+            self.assertEqual(check_cache_budget(1000, 64, 982), 1002*64*982*96)
+
+    @patch.dict(os.environ, {'HEAPLENS_CACHE_BUDGET_MB': '4096'})
     def test_guard_precedes_dense_allocation(self):
         sampler = Sampler.__new__(Sampler)
         sampler.page_size, sampler.cache_line_size, sampler.num_buckets = 4096, 64, 2000

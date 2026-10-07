@@ -13,6 +13,7 @@ import math
 import os
 from random import randint, shuffle
 from cache_limits import validate_cache_geometry, check_cache_budget
+from field_type_aliases import match_field_types
 
 MAX_PAGE_PROP = 7560
 MAX_OBJ_STATS = 1000000
@@ -387,7 +388,9 @@ class Sampler:
                                     FROM FIELDS""",
                                     con)
             con.close()
-            return {k: v.to_dict(orient='records') for k, v in df[df['type'].isin(types)].set_index('type').groupby(level=0)}
+            fields = {k: v.to_dict(orient='records') for k, v in
+                      df.set_index('type').groupby(level=0)}
+            return match_field_types(fields, types)
         except:
             return dict()
 
