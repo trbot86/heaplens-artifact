@@ -356,8 +356,11 @@ Output: `artifact/results/fig8{a,b}/rocksdb_hsl.sqlite`. To inspect the bucket:
 2. Expand the visibility controls, right-click that type's middle (page)
    checkbox, and choose **Only this type**. Click **Resample**, then move the
    time selector into the populated trace.
-3. Expand the bucket type's field list and select a bucket-containing page
-   region for the byte-level detail view. Before reordering, the object is
+3. Expand the bucket type's field list and **enable the middle (page) checkbox
+   on each indented field row**: the earlier **Only this type** action hid
+   those fields as well. Scroll the page list to a page with colored bucket
+   allocations and select it for the byte-level detail view. Scroll upward
+   over that detail view to magnify the rows. Before reordering, the object is
    56 bytes with four-byte padding regions at **36–39** and **52–55**. Offsets
    are relative to the object's start, which need not be cache-line aligned.
 4. Stop the GUI and repeat the GUI command with `fig8b` in both paths/labels.

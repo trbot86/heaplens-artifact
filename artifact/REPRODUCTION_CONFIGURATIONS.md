@@ -496,13 +496,18 @@ not merged by this narrow alias.
 A native check of the pinned diagnostic source and field-reordering patch
 confirms a 56-byte baseline bucket with padding at bytes 36–39 and 52–55,
 and a 48-byte reordered bucket without these holes. The field extractor's
-nine baseline fields exactly match a retained HSL database. This validates
-the native layouts and field association, not a fresh full optimized trace
-or the evaluator's own database.
+nine baseline fields exactly match a retained HSL database. In a subsequent
+browser check using that database, the expanded baseline bucket visibly shows
+both padding gaps. This validates the native layouts, field association and
+baseline field display, not a fresh full optimized trace, optimized browser
+view, or the evaluator's own database.
 
 Select the full bucket type above, use its page-only filter **before**
-Resample, move to a populated time, and expand fields in the byte-detail
-view. `HashSkipListRep` and the type ending in `::Node` are different objects.
+Resample, move to a populated time, and expand the bucket's fields. Enable
+the middle page checkbox for each indented field row; **Only this type** also
+disabled those field checkboxes. Scroll to a page with colored bucket objects,
+select it, and scroll upward over the byte-detail view to magnify its rows.
+`HashSkipListRep` and the type ending in `::Node` are different objects.
 The paper's offsets are relative to the bucket's start, not necessarily the
 cache-line origin. The main README gives both commands and memory guidance.
 If the bucket is absent or has a different recorded size, changing GUI
