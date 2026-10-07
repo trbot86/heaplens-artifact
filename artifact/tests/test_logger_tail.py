@@ -48,4 +48,14 @@ int main() {
                 self.assertEqual(sum(not r[6] and r[3] in {x[3] for x in objects} for r in rows),39)
             else:self.assertIn('trace invalid',p.stderr)
             outcomes.append(dict(fault=fault,returncode=p.returncode,trace_bytes=(cell/'binary_dump.txt').stat().st_size))
+        for fault,variable in [('type-open','MEMHOOK_OUTPUT_TYPE_FILE'),
+                               ('type-write','MEMHOOK_OUTPUT_TYPE_FILE'),
+                               ('binary-open','MEMHOOK_OUTPUT_DUMP_FILE')]:
+            cell=trial/fault;cell.mkdir();blocked=cell/'blocked';blocked.mkdir()
+            env=os.environ.copy();env[variable]='/dev/full' if fault=='type-write' else str(blocked)
+            p=subprocess.run([str(trial/'probe')],cwd=cell,env=env,capture_output=True,text=True,timeout=20)
+            (cell/'output.txt').write_text(p.stdout+p.stderr)
+            self.assertEqual(p.returncode,94,p.stderr)
+            self.assertIn('trace invalid',p.stderr)
+            outcomes.append(dict(fault=fault,returncode=p.returncode))
         (trial/'verification.json').write_text(json.dumps(dict(status='passed',outcomes=outcomes),indent=2))
