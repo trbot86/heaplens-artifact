@@ -5,6 +5,10 @@ before its constructors execute. The compiler supplies the requested extent to
 the `MemhookNew<T>` allocation overload, including array storage. This avoids
 using a single pending allocation record across nested constructors. Matching
 delete overloads preserve cleanup when construction throws.
+For ordinary `new[]`, this is the allocator's complete extent, including an
+ABI array cookie when present. The recorded allocation base need not be the
+first element's address; these checks do not certify field overlays for such
+array cookies.
 
 Placement new retains its original allocation function and records the
 returned object independently through `MemPlacementStamp`. Placement arrays
