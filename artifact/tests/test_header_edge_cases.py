@@ -101,6 +101,59 @@ int main(void) {
     def test_template_placement_new(self):
         self.exercise(True)
 
+    def test_nested_placement_preserves_outer_allocation(self):
+        base=Path(os.environ.get('HEAPLENS_TEST_EVIDENCE',tempfile.gettempdir()))
+        trial=Path(tempfile.mkdtemp(prefix='nested-placement-',dir=base))
+        source=trial/'input'; source.mkdir(); target=trial/'project'
+        (source/'shared.h').write_text('''#pragma once
+#include <new>
+struct Child { long values[2]; };
+struct Parent {
+    long prefix;
+    alignas(Child) unsigned char storage[sizeof(Child)];
+    Child* child;
+    Parent() : prefix(7),child(new(storage) Child()) {}
+};
+struct ZeroParent {
+    alignas(Child) unsigned char storage[sizeof(Child)];
+    long suffix;
+    ZeroParent() : suffix(9) { new(storage) Child(); }
+};
+''')
+        (source/'main.cpp').write_text('''#include "shared.h"
+#include <cstdio>
+#include <type_traits>
+static_assert(std::is_trivially_destructible<Parent>::value,"No array cookie");
+int main() {
+    Parent* p=new Parent;
+    ZeroParent* z=new ZeroParent;
+    Parent* a=new Parent[10];
+    printf("EXPECT Parent %p %zu\\n",(void*)p,sizeof(*p));
+    printf("EXPECT ZeroParent %p %zu\\n",(void*)z,sizeof(*z));
+    printf("EXPECT Parent %p %zu\\n",(void*)a,10*sizeof(*a));
+    printf("EXPECT Child %p %zu\\n",(void*)p->child,sizeof(Child));
+    printf("EXPECT Child %p %zu\\n",(void*)z->storage,sizeof(Child));
+    for(int i=0;i<10;++i) printf("EXPECT Child %p %zu\\n",(void*)a[i].child,sizeof(Child));
+    delete p; delete z; delete[] a;
+}
+''')
+        (source/'Makefile').write_text('all:\n\tg++ -std=c++17 -O0 -I/root/sifter/memhook main.cpp '
+            '-L/root/sifter/memhook -Wl,-rpath=/root/sifter/memhook -lmemhook -ldl -pthread -o probe\n')
+        (trial/'clean.log').write_text(run(['make','clean'],ROOT/'memhook'))
+        (trial/'driver.log').write_text(run(['bash','sifter.sh',str(source),str(target),'-t','--skip-refactor']))
+        run(['clang-apply-replacements-14',str(target)])
+        run(['bash','sifter.sh',str(target),'--includes-only'])
+        (trial/'build.log').write_text(run(['make'],target))
+        output=run(['./probe'],target); (trial/'output.txt').write_text(output)
+        expected={(t,int(p,16)):int(n) for t,p,n in re.findall(r'EXPECT (\w+) (0x[0-9a-f]+) (\d+)',output)}
+        self.assertEqual(len(expected),15)
+        records=list(struct.iter_unpack('<QQQQHH?3x',(target/'binary_dump.txt').read_bytes()))
+        types={int(i):s for i,s in (row.split('|',1) for row in (target/'typeset_dump.txt').read_text().splitlines())}
+        actual=[(types.get(r[5]),r[3],r[2]) for r in records if r[6] and types.get(r[5]) in {'Child','Parent','ZeroParent'}]
+        (trial/'comparison.json').write_text(json.dumps(dict(expected=[(t,p,n) for (t,p),n in expected.items()],actual=actual),indent=2)+'\n')
+        self.assertEqual(len(actual),15)
+        self.assertEqual({(t,p):n for t,p,n in actual},expected)
+
     def test_factory_named_alloc_and_qualified_malloc(self):
         base=Path(os.environ.get('HEAPLENS_TEST_EVIDENCE',tempfile.gettempdir()))
         trial=Path(tempfile.mkdtemp(prefix='qualified-alloc-',dir=base))

@@ -10,6 +10,7 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
+#include "clang/Lex/Lexer.h"
 
 #include <iostream>
 
@@ -243,28 +244,72 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
         if (filemap.find(FileName) == filemap.end()) {
             filemap[FileName] = filemap.size();
         }
-        if (node->getNumPlacementArgs() == 0) {
-            diag(node->getExprLoc(), "insert MemStamp",
-                DiagnosticIDs::Warning)
-                << FixItHint::CreateInsertion(
-                        node->getExprLoc(),
-                        "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * ");
-        }
+        const FunctionDecl *Allocator = node->getOperatorNew();
+        if (!Allocator) return;
+        const std::string Site = std::to_string(filemap[FileName]) + ", (__LINE__)";
+        if (Allocator->isReservedGlobalPlacementOperator()) {
 #ifdef ALLOCLOGGING_PLACEMENT_NEW
-        // TODO: if dereference on same line, need to put parentheses around like *(MemStamp() * (T*) new () T())
-        else if (node->getNumPlacementArgs() > 0) {
-            // Placement new already returns the allocated pointer type. An
-            // explicit cast embeds a template instantiation and can conflict
-            // with edits from another translation unit including this header.
-            // Let operator* deduce the result type instead.
-            std::string out = "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * ";
-            diag(node->getExprLoc(), "insert MemStamp (placement new)",
+            // Preserve the standard placement allocation function and its ABI.
+            // Arrays need an independently captured element count; sizeof(T)
+            // would silently truncate them, so reject that unsupported case.
+            if (node->isArray()) {
+                diag(node->getExprLoc(), "placement-new arrays require an explicit extent hook",
+                     DiagnosticIDs::Error);
+                return;
+            }
+            SourceLocation End = Lexer::getLocForEndOfToken(
+                node->getEndLoc(), 0, SM, Result.Context->getLangOpts());
+            diag(node->getExprLoc(), "record placement object independently",
                 DiagnosticIDs::Warning)
-                << FixItHint::CreateInsertion(
-                        node->getExprLoc(),
-                        out);
-        }
+                << FixItHint::CreateInsertion(node->getExprLoc(),
+                    "(MemPlacementStamp(" + Site + ") * ")
+                << FixItHint::CreateInsertion(End, ")");
 #endif
+            return;
+        }
+
+        // Do not redirect class-specific or custom arena allocation functions.
+        bool Standard = Allocator->getDeclContext()->getRedeclContext()->isTranslationUnit();
+        for (unsigned I = 1; I < Allocator->getNumParams(); ++I) {
+            QualType Arg = Allocator->getParamDecl(I)->getType()
+                               .getNonReferenceType().getUnqualifiedType();
+            std::string Name;
+            if (const auto *R = Arg->getAs<RecordType>())
+                Name = R->getDecl()->getQualifiedNameAsString();
+            else if (const auto *E = Arg->getAs<EnumType>())
+                Name = E->getDecl()->getQualifiedNameAsString();
+            Standard &= Name == "std::nothrow_t" || Name == "std::align_val_t";
+        }
+        if (!Standard) {
+            diag(node->getExprLoc(), "custom operator new requires an explicit allocation hook",
+                 DiagnosticIDs::Error);
+            return;
+        }
+        // Use the spelling in the shared header, not a concrete template
+        // instantiation from this translation unit (e.g. Node<K>, not Node<1>).
+        const TypeSourceInfo *Info = node->getAllocatedTypeSourceInfo();
+        std::string Type = Lexer::getSourceText(
+            CharSourceRange::getTokenRange(Info->getTypeLoc().getSourceRange()),
+            SM, Result.Context->getLangOpts()).str();
+        if (Type.empty() || node->getAllocatedType()->getContainedAutoType()) {
+            diag(node->getExprLoc(), "deduced new type requires an explicit allocation hook",
+                 DiagnosticIDs::Error);
+            return;
+        }
+        std::string Tag = "MemhookNew<" + Type + ">(" + Site + ")";
+        SourceLocation Insert;
+        std::string Text;
+        if (node->getNumPlacementArgs()) {
+            Insert = node->getPlacementArg(0)->getBeginLoc();
+            Text = Tag + ", ";
+        } else {
+            // getExprLoc is the 'new' token, including for ::new.
+            Insert = Lexer::getLocForEndOfToken(node->getExprLoc(), 0, SM,
+                                                Result.Context->getLangOpts());
+            Text = " (" + Tag + ")";
+        }
+        diag(Insert, "record allocation before constructor activity", DiagnosticIDs::Warning)
+            << FixItHint::CreateInsertion(Insert, Text);
     }
 }
 

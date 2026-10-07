@@ -3,7 +3,7 @@ CFLAGS= -fPIC -ftls-model=initial-exec -g -O2
 Includes= /usr/lib/llvm-6.0/include/
 Libs=
 OBJ= memhook.o hash.o
-DEPS=hash.h memhook.h memhook_interface.h memstamp.h memhook_xoshiro256p.h
+DEPS=hash.h memhook.h memhook_interface.h memstamp.h memhook_new.h memhook_xoshiro256p.h
 
 ifdef MEMHOOK_ASCYLIB
 	CFLAGS += -DMEMHOOK_ASCYLIB
