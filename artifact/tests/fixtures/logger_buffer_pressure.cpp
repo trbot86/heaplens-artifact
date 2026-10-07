@@ -47,8 +47,10 @@ extern "C" ssize_t aio_return(aiocb* p) noexcept {
   assert(requests.count(p) && requests.at(p).ready);
   const auto& expected=requests.at(p).bytes;
   assert(expected.size()==p->aio_nbytes);
-  assert(memcmp(expected.data(),(const void*)p->aio_buf,p->aio_nbytes)==0);
-  assert(write(global_fd,(const void*)p->aio_buf,p->aio_nbytes)==(ssize_t)p->aio_nbytes);
+  if (p->aio_nbytes) {
+    assert(memcmp(expected.data(),(const void*)p->aio_buf,p->aio_nbytes)==0);
+    assert(write(global_fd,(const void*)p->aio_buf,p->aio_nbytes)==(ssize_t)p->aio_nbytes);
+  }
   requests.erase(p); ++reaps;
   return p->aio_nbytes;
 }
@@ -80,12 +82,39 @@ static void producer(int id,int count) {
   terminal.finish(); terminal.finish();
 }
 
+static void completed_slot_control() {
+  // Slot 0 remains busy while the most recently submitted slot 1 is ready.
+  // A two-slot scan must reuse slot 1; round-robin must wait for slot 0.
+  std::thread test([] {
+    aiocb controls[2] = {};
+    bool submitted[2] = {true,true};
+    async_struct_array=controls; async_submitted=submitted;
+    number_of_buffers=2;
+    requests.emplace(&controls[0],Pending{{},false});
+    requests.emplace(&controls[1],Pending{{},true});
+    int before=waits;
+    int chosen=memhook_next_buffer(1);
+#if MEMHOOK_REUSE_COMPLETED_BUFFERS
+    assert(chosen==1 && waits==before);
+    memhook_finish_aio(0);
+#else
+    assert(chosen==0 && waits==before+1);
+    memhook_finish_aio(1);
+#endif
+    assert(requests.empty());
+    async_struct_array=nullptr; async_submitted=nullptr;
+  });
+  test.join();
+  submissions=reaps=waits=operation_waits=drain_waits=0;
+}
+
 int main(int argc,char** argv) {
   assert(argc==3);
   int count=atoi(argv[1]);
   fail_growth=getenv("MEMHOOK_TEST_FAIL_GROW")!=nullptr;
   global_fd=open(argv[2],O_RDWR|O_CREAT|O_EXCL|O_APPEND,0600);
   assert(global_fd>=0);
+  completed_slot_control();
   for(int wave=0;wave<3;++wave) {
     std::vector<std::thread> threads;
     for(int i=0;i<3;++i) threads.emplace_back(producer,wave*3+i,count);

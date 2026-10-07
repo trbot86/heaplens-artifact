@@ -39,6 +39,9 @@
 #ifndef MEMHOOK_MAX_BUFFERS
 #define MEMHOOK_MAX_BUFFERS 2
 #endif
+#ifndef MEMHOOK_REUSE_COMPLETED_BUFFERS
+#define MEMHOOK_REUSE_COMPLETED_BUFFERS (MEMHOOK_MAX_BUFFERS > 2)
+#endif
 #ifndef MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES
 #define MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES (512ULL * 1024 * 1024)
 #endif
@@ -128,7 +131,7 @@ static bool memhook_grow_buffer() {
 }
 
 static int memhook_next_buffer(int previous) {
-#if MEMHOOK_MAX_BUFFERS > 2
+#if MEMHOOK_REUSE_COMPLETED_BUFFERS
   for (int offset = 1; offset <= number_of_buffers; ++offset) {
     int candidate = (previous + offset) % number_of_buffers;
     if (!async_submitted[candidate]) return candidate;
