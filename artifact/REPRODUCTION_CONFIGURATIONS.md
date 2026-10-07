@@ -491,7 +491,8 @@ therefore omitted the nine recorded fields from the bucket's expansion. The
 read-time correction recognizes this exact equivalent spelling and uses the
 database's actual field offsets; it does not manufacture fields or modify
 the database. Other template instantiations and pointer/const variants are
-not merged by this narrow alias.
+not merged by this narrow alias. A general solution that gives both data
+sources consistent type names is tracked in the [tool TODO](TOOL_TODO.md).
 
 A native check of the pinned diagnostic source and field-reordering patch
 confirms a 56-byte baseline bucket with padding at bytes 36–39 and 52–55,
