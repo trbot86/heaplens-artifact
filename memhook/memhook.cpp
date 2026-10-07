@@ -242,29 +242,25 @@ void *memhook_malloc(size_t size, int line = 0, bool log = true) {
 }
 
 void memhook_free(void *ptr, int line = 0, bool log = false) {
+    if (!ptr || !initialized ||
+        (ptr >= (void*) tmpbuff && ptr <= (void*)(tmpbuff + tmppos))) return;
     if (!setup) {
         exiter.add();
         setup = true;
     }
     
-    if (!initialized || (ptr >= (void*) tmpbuff && ptr <= (void*)(tmpbuff + tmppos))) { // possible off-by-one error at right endpoint...
-        // fprintf(stdout, "freeing temp memory\n");
-        return;
-    }
-
     // if (!next_free) next_free = (void (*)(void *))dlsym(RTLD_NEXT, "free");
     // if (!next_free) fprintf(stdout, "failed to find next free\n");
+    // Publish retirement before the allocator can hand this address to another
+    // producer. Keep a separate event so allocator callbacks cannot overwrite
+    // it, and do not disturb an enclosing pending allocation.
+    memhook_info_t event;
+    memset(&event, 0, sizeof(event));
+    event.timestamp = memhook_get_server_clock();
+    event.addr = ptr;
+    event.line = line;
+    memhookCollector.copy(event);
     next_free(ptr);
-
-    unit_log.timestamp = memhook_get_server_clock();
-    unit_log.size = 0;
-    unit_log.addr = ptr;
-    unit_log.typeofop = false;
-    unit_log.line = line;
-    // if (log) {
-    //     unit_log.file = file;
-    //     unit_log.line = line;
-    // }
 }
 
 
@@ -322,19 +318,15 @@ extern "C" {
     }
 
     void free(void* ptr) {
-        if (!ptr) return;
         memhook_free(ptr, 0, false);
-        if (initialized) {
-            memhookCollector.copy(unit_log);
-        }
     }
 
     #ifdef USE_RALLOC
     void RP_free(void* ptr) {
         if (!next_RP_free) next_RP_free = (void (*)(void *))dlsym(RTLD_NEXT, "RP_free");
         if (!next_RP_free) fprintf(stdout, "failed to find next RP_free\n");
-        next_RP_free(ptr);
         MEMHOOK_LOG_FREE(ptr)
+        next_RP_free(ptr);
     }
     #endif
 
@@ -377,9 +369,8 @@ extern "C" {
         if (!next_ssmem_free) next_ssmem_free = (void (*)(ssmem_allocator_t*, void*))dlsym(RTLD_NEXT, "ssmem_free");
         if (!next_ssmem_free) fprintf(stdout, "failed to find next ssmem free\n");
 
-        next_ssmem_free(a, ptr);
-        
         MEMHOOK_LOG_FREE(ptr)
+        next_ssmem_free(a, ptr);
         #endif
     }
 
@@ -487,12 +478,10 @@ void *operator new[] (size_t size) {
 
 void operator delete(void * mem) _GLIBCXX_USE_NOEXCEPT {
     memhook_free(mem, 0, false);
-    memhookCollector.copy(unit_log);
     return;
 }
 
 void operator delete[](void *mem)  _GLIBCXX_USE_NOEXCEPT {
     memhook_free(mem, 0, false);
-    memhookCollector.copy(unit_log);
     return;
 }

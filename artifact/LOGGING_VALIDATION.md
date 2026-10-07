@@ -51,6 +51,14 @@ Failure to open the binary output or open/write/close its type dictionary also
 marks the trace invalid and exits with status 94. A complete binary stream is
 insufficient if its type dictionary cannot be published.
 
+Retirement events are copied before calling the underlying free/retirement
+function. An allocator can make an address available to another thread before
+its free call returns; recording afterward can invert the two lifetimes. A
+deterministic two-thread native test forces that interleaving for ordinary
+free, scalar delete and array delete, and checks allocation/free/allocation/free
+order. Null free/delete calls emit no event. These timestamps describe the
+instrumented API boundary, not the allocator's internal reclamation instant.
+
 Run the native checks inside the artifact image:
 
 ```bash
@@ -59,7 +67,7 @@ HEAPLENS_RUN_INSTRUMENTATION_TESTS=1 python3 -m unittest -v \
   test_new_expression_logging test_header_edge_cases \
   test_project_header_logging test_tpcc_header_logging \
   test_rocksdb_header_logging test_custom_allocator_logging \
-  test_logger_lifecycle test_logger_tail
+  test_logger_lifecycle test_logger_tail test_retirement_order
 ```
 
 The checks compare addresses, extents, type names, event multiplicity and
