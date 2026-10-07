@@ -51,3 +51,11 @@ that fewer operation-loop waits can be accompanied by more final-drain waits.
 Any efficacy study must report operation completion, total drained completion,
 record equality, peak RSS and buffer high-water marks. Compare policies with
 identical trace coverage before considering an updated overhead claim.
+
+The prototype also chooses any completed slot before waiting, even when its
+maximum is two. A pilot should therefore keep three controls: the corrected
+default two-buffer implementation, this prototype capped at two, and the
+prototype capped at four with a 512 MiB shared extra-buffer budget. This
+separates the effect of choosing a completed slot from adding storage capacity.
+The prototype now includes the same allocation and retirement repairs as the
+correctness candidate; actual-library checks pass under both two/four limits.
