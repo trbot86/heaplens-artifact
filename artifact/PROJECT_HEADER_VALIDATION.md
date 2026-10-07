@@ -11,13 +11,29 @@ native tests. The immediate path passes a directory to `clang-apply-replacements
 containing only the merged edits, and propagates failures. TPC-C's explicit node
 hook uses `NOLINT(misc-allocation-logging)` to avoid a second automatic record.
 
+The wrapper rejects conflicting edits at the same source location and stops
+without applying a partial result if any translation unit fails. Identical
+edits from repeated inclusion of a header are merged. Source-file identities
+use canonical paths so different include spellings do not assign different
+logging identifiers to the same file.
+
+Placement-new annotations let the logger deduce the result type instead of
+inserting a cast containing a template instantiation. For malloc-style calls,
+the checker annotates the template definition and uses type names visible in
+that scope; different instantiations cannot overwrite a shared header with
+their concrete types.
+Names outside templates retain their qualification. Custom factory methods
+named `alloc` are not rewritten as allocator wrappers; allocations in their
+bodies are still eligible. Qualified allocation calls use the function-name
+token for insertion rather than an offset into the qualifier.
+
 Run these checks inside the artifact image with the source at `/root/sifter`
 and its pinned dependencies initialized:
 
 ```bash
 cd /root/sifter/artifact/tests
 HEAPLENS_RUN_INSTRUMENTATION_TESTS=1 \
-  python3 -m unittest -v test_project_header_logging test_tpcc_header_logging test_rocksdb_header_logging
+  python3 -m unittest -v test_project_header_logging test_header_edge_cases test_header_merge test_tpcc_header_logging test_rocksdb_header_logging
 ```
 
 The tests build the annotation tool and logger and execute small correctness
@@ -29,6 +45,11 @@ fresh temporary directories. These tests do not run the paper workloads.
 | --- | --- |
 | Shared header, two translation units, template instantiations, `new` and `malloc` | Exactly 60 typed header allocations and 20 source-file allocations, each with one free, correct address, size and source |
 | Immediate edits with spaces and punctuation in the output path | Same exact counts; external header remains unchanged |
+| Native C header and source allocations | Exactly 40 typed 24-byte allocations and 40 frees |
+| Placement-new template instances | Exactly 40 typed objects with independently checked 8-/24-byte sizes and backing addresses |
+| Nested template malloc and assignment, two translation units | Exactly 42 typed allocations with independently checked 8-/16-/24-byte sizes |
+| Factory named `alloc` and qualified `::malloc` | Factory call preserved; 40 exactly-once typed 24-byte allocations, including a namespace-qualified node type |
+| Conflicting edits and a failed translation unit | Nonzero exit; no partial edits applied |
 | TPC-C node allocator after automatic annotation | Ordinary and separate allocators each record exactly 1,000 typed 56-byte nodes and 1,000 frees |
 | Pinned RocksDB SkipList and InlineSkipList headers | 31 nodes for each structure; inline nodes and 12 pointer-prefix regions match independently reported backing/key addresses; all 60 lookups succeed |
 

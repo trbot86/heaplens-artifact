@@ -14,7 +14,6 @@
 #include <iostream>
 
 #define MATCH_FUNCTIONS allOf(anyOf(hasName("_mm_malloc"), \
-                                    hasName("alloc"), \
                                     hasName("malloc"), \
                                     hasName("ssmem_alloc"), \
                                     hasName("ssalloc"), \
@@ -49,15 +48,15 @@ StatementMatcher sizeofMallocMatcher = expr(sizeOfExpr(allOf(
 // matches malloc lhs without explicit casts
 StatementMatcher lhsofMallocMatcher = binaryOperator(
     hasOperatorName("="),
-    anyOf(hasDescendant(callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fdecllhsmalloc")))
+    anyOf(hasDescendant(callExpr(unless(isInTemplateInstantiation()), callee(functionDecl(MATCH_FUNCTIONS).bind("fdecllhsmalloc")))
                             .bind("lhsmalloc")),
-        hasRHS(hasDescendant(callExpr(callee(functionDecl(MATCH_FUNCTIONS)))
+        hasRHS(hasDescendant(callExpr(unless(isInTemplateInstantiation()), callee(functionDecl(MATCH_FUNCTIONS)))
                                    .bind("lhsmalloc")))),
     hasLHS(hasType(type().bind("lhs-type"))));
 
 DeclarationMatcher declMallocMatcher = varDecl(
     hasDescendant(
-        callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fdeclmalloc"))).bind("declmalloc")),
+        callExpr(unless(isInTemplateInstantiation()), callee(functionDecl(MATCH_FUNCTIONS).bind("fdeclmalloc"))).bind("declmalloc")),
     hasType(type().bind("decltype")));
 
 StatementMatcher returnMallocMatcher = returnStmt(
@@ -155,13 +154,23 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
     const clang::Type *typenode =
         Result.Nodes.getNodeAs<clang::Type>(typenodebind);
 
-    if(mnode && isProjectLocation(mnode->getExprLoc(), *Result.SourceManager)) {
+    SourceLocation CalleeLoc;
+    if (mnode) {
+        CalleeLoc = mnode->getExprLoc();
+        const Expr *Callee = mnode->getCallee()->IgnoreParenImpCasts();
+        if (const auto *Ref = dyn_cast<DeclRefExpr>(Callee))
+            CalleeLoc = Ref->getLocation();
+        else if (const auto *Member = dyn_cast<MemberExpr>(Callee))
+            CalleeLoc = Member->getMemberLoc();
+    }
+    if(mnode && isProjectLocation(CalleeLoc, *Result.SourceManager)) {
         if(declnode) {
             std::string type;
 
             static PrintingPolicy print_policy((Result.Context)->getLangOpts());
             print_policy.FullyQualifiedName = 0;
             print_policy.SuppressScope = 1;
+            print_policy.SuppressTagKeyword = 1;
 
             if (typenode->isBuiltinType()) {
                 type = typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy);
@@ -170,7 +179,11 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
                 type = typenode->getAsRecordDecl()->getQualifiedNameAsString();
             }
             else if (typenode->isPointerType()) {
-                type = typenode->getPointeeType().getAsString();
+                // Preserve names as visible inside the original template,
+                // rather than spelling a concrete instantiation into a header.
+                type = typenode->isDependentType()
+                    ? typenode->getPointeeType().getAsString(print_policy)
+                    : typenode->getPointeeType().getAsString();
             }
 #ifndef ALLOCLOGGING_TEMPLATE
             if (typemap.find(type) == typemap.end()) {
@@ -178,10 +191,11 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
             }
 #endif
 
-            FullSourceLoc fsrcloc = Result.Context->getFullLoc(mnode->getExprLoc());
+            FullSourceLoc fsrcloc = Result.Context->getFullLoc(CalleeLoc);
             /* TODO: get the following to work will allocations performed in macro defs */
             if (!fsrcloc.isMacroID()) {
-                std::string FileName = fsrcloc.getFileEntry()->getName().str();
+                std::string FileName = fsrcloc.getFileEntry()->tryGetRealPathName().str();
+                if (FileName.empty()) FileName = fsrcloc.getFileEntry()->getName().str();
                 if (filemap.find(FileName) == filemap.end()) {
                     filemap[FileName] = filemap.size();
                 }
@@ -196,16 +210,16 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
                 int offset = declnode->getNameAsString().size();
 
     #ifdef ALLOCLOGGING_TEMPLATE
-                diag(mnode->getExprLoc().getLocWithOffset(offset), "insert type here",
+                diag(CalleeLoc.getLocWithOffset(offset), "insert type here",
                     DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(
-                        mnode->getExprLoc().getLocWithOffset(offset),
+                        CalleeLoc.getLocWithOffset(offset),
                         "<" + type + ", " + std::to_string(line) + ", " + std::to_string(filemap[FileName]) + ">");
     #else    
-                diag(mnode->getExprLoc().getLocWithOffset(offset), "insert _s here",
+                diag(CalleeLoc.getLocWithOffset(offset), "insert _s here",
                     DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(
-                        mnode->getExprLoc().getLocWithOffset(offset), "_s");
+                        CalleeLoc.getLocWithOffset(offset), "_s");
                 diag(mnode->getEndLoc(), "insert file name, line number, and type",
                     DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(
@@ -223,7 +237,9 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
 
     if (node && isProjectLocation(node->getExprLoc(), *Result.SourceManager)) {
         auto &SM = Result.Context->getSourceManager();
-        std::string FileName = SM.getFilename(node->getExprLoc()).str();
+        const FileEntry *File = SM.getFileEntryForID(SM.getFileID(node->getExprLoc()));
+        std::string FileName = File ? File->tryGetRealPathName().str() : "";
+        if (FileName.empty()) FileName = SM.getFilename(node->getExprLoc()).str();
         if (filemap.find(FileName) == filemap.end()) {
             filemap[FileName] = filemap.size();
         }
@@ -237,9 +253,11 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
 #ifdef ALLOCLOGGING_PLACEMENT_NEW
         // TODO: if dereference on same line, need to put parentheses around like *(MemStamp() * (T*) new () T())
         else if (node->getNumPlacementArgs() > 0) {
-            std::string type = node->getAllocatedType().getUnqualifiedType().getAsString();
-            // std::string type = node->getAllocatedType().getTypePtr()->getAs<clang::RecordType>()->getDecl()->getNameAsString();
-            std::string out = "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * (" + type + "*) ";
+            // Placement new already returns the allocated pointer type. An
+            // explicit cast embeds a template instantiation and can conflict
+            // with edits from another translation unit including this header.
+            // Let operator* deduce the result type instead.
+            std::string out = "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * ";
             diag(node->getExprLoc(), "insert MemStamp (placement new)",
                 DiagnosticIDs::Warning)
                 << FixItHint::CreateInsertion(
