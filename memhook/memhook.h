@@ -36,6 +36,16 @@
 #ifndef MEMHOOK_MAX_BUFFER_SIZE
 #define MEMHOOK_MAX_BUFFER_SIZE 1000000
 #endif
+#ifndef MEMHOOK_MAX_BUFFERS
+#define MEMHOOK_MAX_BUFFERS 2
+#endif
+#ifndef MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES
+#define MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES (512ULL * 1024 * 1024)
+#endif
+static_assert(MEMHOOK_MAX_BUFFERS >= 2, "at least two logger buffers required");
+// Prototype: the aggregate cap includes extra buffers retained as thread tails.
+// Request/control arrays have fixed addresses while asynchronous I/O is active.
+std::atomic<size_t> memhook_extra_buffer_bytes{0};
 #define PADDING 64
 
 using namespace std;
@@ -96,6 +106,43 @@ static void memhook_finish_aio(int index) {
     _exit(94);
   }
   async_submitted[index] = false;
+}
+
+static bool memhook_grow_buffer() {
+  if (number_of_buffers >= MEMHOOK_MAX_BUFFERS) return false;
+  const size_t bytes = sizeof(memhook_info_t) * MEMHOOK_MAX_BUFFER_SIZE;
+  const size_t budget = MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES;
+  if (bytes > budget) return false;
+  size_t used = memhook_extra_buffer_bytes.load(std::memory_order_relaxed);
+  do {
+    if (used > budget - bytes) return false;
+  } while (!memhook_extra_buffer_bytes.compare_exchange_weak(
+      used, used + bytes, std::memory_order_relaxed));
+  memhook_info_t* buffer = (memhook_info_t*)malloc(bytes);
+  if (!buffer) {
+    memhook_extra_buffer_bytes.fetch_sub(bytes, std::memory_order_relaxed);
+    return false; // Optional capacity exhausted: use the normal bounded wait.
+  }
+  allocation_log[number_of_buffers++] = buffer;
+  return true;
+}
+
+static int memhook_next_buffer(int previous) {
+#if MEMHOOK_MAX_BUFFERS > 2
+  for (int offset = 1; offset <= number_of_buffers; ++offset) {
+    int candidate = (previous + offset) % number_of_buffers;
+    if (!async_submitted[candidate]) return candidate;
+    // Only query submitted requests. Reap and validate every completed write.
+    if (aio_error(&async_struct_array[candidate]) != EINPROGRESS) {
+      memhook_finish_aio(candidate);
+      return candidate;
+    }
+  }
+  if (memhook_grow_buffer()) return number_of_buffers - 1;
+#endif
+  int candidate = (previous + 1) % number_of_buffers;
+  memhook_finish_aio(candidate);
+  return candidate;
 }
 
 uint64_t memhook_get_server_clock() {
@@ -167,6 +214,18 @@ class ThreadExiter
         int unfilled_buffer_size = sizeof(struct memhook_info_t)* log_index;
         //ADD FILE AND TYPES TO MEMPOOL OBJECT
         mem_pool_obj.add(allocation_log[buffer_index], unfilled_buffer_size);
+        // The pool owns only the nonempty tail. Retire unused buffers at thread
+        // exit; otherwise repeated short-lived producers retain every buffer.
+        for (int i = 0; i < number_of_buffers; ++i) {
+          if (i == buffer_index && unfilled_buffer_size) continue;
+          free(allocation_log[i]);
+          if (i >= 2) memhook_extra_buffer_bytes.fetch_sub(
+              sizeof(memhook_info_t)*MEMHOOK_MAX_BUFFER_SIZE, std::memory_order_relaxed);
+        }
+        free(allocation_log);
+        free(async_struct_array);
+        free(async_submitted);
+        free(async_api_struct_list);
       }
       //close(fd);
     }
@@ -225,14 +284,16 @@ MemStampCollector::~MemStampCollector() {
 void MemStampCollector::copy(memhook_info_t &unit_log){
   if (memhook_thread_sealed) return;
 	if (thread_first_call) {
-		allocation_log = (struct memhook_info_t **) malloc(sizeof(struct memhook_info_t*)*number_of_buffers);
+		allocation_log = (struct memhook_info_t **) calloc(MEMHOOK_MAX_BUFFERS,sizeof(struct memhook_info_t*));
+    if (!allocation_log) _exit(94);
     for(int i = 0; i < number_of_buffers; i++) {
       allocation_log[i] = (struct memhook_info_t*) malloc(sizeof(struct memhook_info_t)*MEMHOOK_MAX_BUFFER_SIZE);
+      if (!allocation_log[i]) _exit(94);
     }
 
     // printf("%lu \n", sizeof(struct memhook_info_t));
-    async_struct_array = (struct aiocb*) calloc(number_of_buffers, sizeof(struct aiocb));
-    async_submitted = (bool*) calloc(number_of_buffers, sizeof(bool));
+    async_struct_array = (struct aiocb*) calloc(MEMHOOK_MAX_BUFFERS, sizeof(struct aiocb));
+    async_submitted = (bool*) calloc(MEMHOOK_MAX_BUFFERS, sizeof(bool));
     if (!async_struct_array || !async_submitted) _exit(94);
     async_api_struct_list = (struct aiocb **) malloc(sizeof(struct aiocb*)*1);
 
@@ -259,10 +320,8 @@ void MemStampCollector::copy(memhook_info_t &unit_log){
     }
     async_submitted[buffer_index] = true;
 
-    buffer_index = (buffer_index + 1) % number_of_buffers;
+    buffer_index = memhook_next_buffer(buffer_index);
     log_index = 0;
-
-    memhook_finish_aio(buffer_index);
   }
 }
 
