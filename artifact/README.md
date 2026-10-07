@@ -304,15 +304,17 @@ Plan: 2 worker threads and 2 warehouses by default, without fixed NUMA placement
 Output: `artifact/results/fig6{a,b}/tpcc_bcco.sqlite`. Expected: BCCO nodes mixed
 with database allocations before, and denser node regions after segregation in
 the 2-MiB heatmap. Import `fig6b` in the same way.
-Select **Settings → Page settings → 2 MiB**, dismiss Settings and click
-**Resample**. Move the time marker well into the trace. Expand the visibility
+Select **Settings → Page settings → 2 MiB** and dismiss Settings. Expand the visibility
 controls using the arrow in the type-table header, then right-click the middle
 (page) checkbox for `node_t<unsigned long, itemid_t*>` and select **Only this
-type**. The command now checks for typed 56-byte BCCO nodes and writes
+type**. Now click **Resample**, then move the time marker well into the trace.
+Resampling after choosing the node type selects node-containing pages; merely
+hiding other types leaves the previous mixed-type sample, which can omit the
+separate node regions. The command now checks for typed 56-byte BCCO nodes and writes
 `node-coverage.json`; a database containing only other types fails this check.
 Both commands were validated locally in about 5.5 minutes combined; actual
-runtime depends on the machine. The baseline GUI and both recorded density
-patterns were checked; the optimized GUI was not separately inspected.
+runtime depends on the machine. Both recorded density patterns and both GUI
+views were checked, including node-only resampling at 2 MiB.
 See [release validation and remaining limits](RELEASE_NOTES_20261007.md). The optimized driver also packs
 the lock; this pair is not a segregation-only throughput attribution.
 
