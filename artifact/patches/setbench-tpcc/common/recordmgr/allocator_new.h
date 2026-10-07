@@ -14,6 +14,12 @@
 #include <cassert>
 #include <iostream>
 
+#ifdef HEAPLENS_TPCC_TRACE
+#include "memhook_interface.h"
+// Registered by tpcc_experiment.sh in the trace's fileset_dump.txt.
+#define HEAPLENS_TPCC_RECORDMGR_FILE_ID 65004
+#endif
+
 // MEMHOOK_SEG_DS routes record-managed tree objects through a separately
 // loaded allocator rather than the process-wide allocation path. The TPC-C
 // drivers stage the retained jemalloc library under a distinct filename.
@@ -77,10 +83,17 @@ public:
 //            }
         }
         #ifdef MEMHOOK_SEG_DS
-        return (T*) ds_malloc(sizeof(T));
+        T* result = (T*) ds_malloc(sizeof(T));
         #else
-        return new T; //(T*) malloc(sizeof(T));
+        T* result = new T;
         #endif
+        #ifdef HEAPLENS_TPCC_TRACE
+        // Header allocations and dlsym calls are not rewritten by the trace
+        // driver's Clang pass. Record the actual object at this boundary.
+        memhook_record_alloc(result, sizeof(T), typeid(T),
+                             HEAPLENS_TPCC_RECORDMGR_FILE_ID, __LINE__);
+        #endif
+        return result;
     }
     void deallocate(const int tid, T * const p) {
         // note: allocators perform the actual freeing/deleting, since
@@ -96,9 +109,14 @@ public:
         TIMELINE_START(tid);
 #endif
         #ifdef MEMHOOK_SEG_DS
+        #ifdef HEAPLENS_TPCC_TRACE
+        // Log before returning the address to the separate heap. Never route
+        // its pointers through the process-wide free hook.
+        memhook_record_free(p, HEAPLENS_TPCC_RECORDMGR_FILE_ID, __LINE__);
+        #endif
         ds_free(p);
         #else
-        delete p;
+        delete p; // Ordinary delete is already intercepted by memhook.
         #endif
 #if defined TIMELINE_RECORD_EVERY_DEAMORTIZED_FREE
         TIMELINE_END_INMEM_Llu(tid, timeline_freeOne, 0);

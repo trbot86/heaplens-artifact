@@ -136,6 +136,13 @@ extern memhook_hashtable typetable;
 extern void *memhook_malloc(size_t size, int line, bool log);
 extern void memhook_free(void *ptr, int line, bool log);
 
+// Record an allocation owned by an allocator outside ordinary interposition.
+// These functions only log; callers retain the matching allocation/free path.
+// The template logger must be built with USE_TEMPLATE=1.
+extern void memhook_record_alloc(void *ptr, size_t size, const std::type_info &type,
+                                 uint16_t file, int line);
+extern void memhook_record_free(void *ptr, uint16_t file, int line);
+
 
 template <class T>
 inline T* operator*(const MemStamp &stamp, T* p)

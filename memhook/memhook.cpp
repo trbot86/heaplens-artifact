@@ -246,6 +246,46 @@ void memhook_free(void *ptr, int line = 0, bool log = false) {
 }
 
 
+#ifdef USE_TEMPLATE
+void memhook_record_alloc(void *ptr, size_t size, const std::type_info &type,
+                          uint16_t file, int line) {
+    if (!ptr || !initialized) return;
+    if (!setup) {
+        exiter.add();
+        setup = true;
+    }
+    // Do not inherit a pending operator-new record or constructor activity.
+    memhook_info_t event;
+    memset(&event, 0, sizeof(event));
+    event.timestamp = memhook_get_server_clock();
+    event.size = size;
+    event.addr = ptr;
+    event.typeofop = true;
+    event.file = file;
+    event.line = line;
+    event.tindex_name = typetable.insert(&type);
+    memhookCollector.copy(event);
+    memset(&unit_log, 0, sizeof(unit_log));
+}
+
+void memhook_record_free(void *ptr, uint16_t file, int line) {
+    if (!ptr || !initialized) return;
+    if (!setup) {
+        exiter.add();
+        setup = true;
+    }
+    memhook_info_t event;
+    memset(&event, 0, sizeof(event));
+    event.timestamp = memhook_get_server_clock();
+    event.addr = ptr;
+    event.typeofop = false;
+    event.file = file;
+    event.line = line;
+    memhookCollector.copy(event);
+    memset(&unit_log, 0, sizeof(unit_log));
+}
+#endif
+
 extern "C" {
 
     // Used for C/C++ projects which do not support templating

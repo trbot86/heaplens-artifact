@@ -60,7 +60,8 @@ class Sampler:
         return
 
     def add_free_types(self, df):
-        df.sort_values('ts', inplace=True)
+        # Converter overlap closures precede replacements at the same timestamp.
+        df.sort_values(['ts', 'is_alloc'], kind='stable', inplace=True)
         df.loc[(df["file"] == "NULL") | (df["size"] == 0) | (df["type"] =="NULL"),["file", "size", "type"]] = None, None, None
         # df.loc[df["size"] == 0,"size"] = None
         # df.loc[df["type"] == "NULL","type"] = None

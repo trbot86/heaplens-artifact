@@ -118,6 +118,13 @@ run_tpcc_experiment() {
 
     echo "=== [$out_name] 4/7: add memhook_interface.h includes ==="
     ./sifter.sh "$INSTRUMENTED" --includes-only
+    # The record-manager header and dlsym allocator need explicit typed hooks.
+    # Keep this file ID disjoint from the IDs assigned by source rewriting.
+    if grep -q '^65004|' "$INSTRUMENTED/$MB_SUBDIR/fileset_dump.txt"; then
+        echo "ERROR: TPC-C record-manager file ID already in use" >&2
+        return 1
+    fi
+    printf '65004|%s\n' "$INSTRUMENTED/common/recordmgr/allocator_new.h" >> "$INSTRUMENTED/$MB_SUBDIR/fileset_dump.txt"
     # No separate mem_alloc::alloc patch step here -- it's already baked
     # into patches/setbench-tpcc/macrobench/system/mem_alloc.h (see the
     # file-header comment above) and was applied back in step 1.
@@ -136,7 +143,7 @@ run_tpcc_experiment() {
         # per-thread arrays (config.h's default is 8), not just the
         # runtime -tINT override parser.cpp also accepts.
         make THREAD_CNT="$THREADS" workload=TPCC data_structure_name="$ds_name" data_structure_opts="$trace_opts" \
-            xargs="-DTHREAD_CNT=${THREADS} -I${MEMHOOK_DIR} -L${MEMHOOK_DIR} -Wl,-rpath=${MEMHOOK_DIR} -lmemhook -ldl"
+            xargs="-DHEAPLENS_TPCC_TRACE=1 -DTHREAD_CNT=${THREADS} -I${MEMHOOK_DIR} -L${MEMHOOK_DIR} -Wl,-rpath=${MEMHOOK_DIR} -lmemhook -ldl"
     )
 
     echo "=== [$out_name] 6/7: run instrumented TPC-C benchmark ==="
@@ -167,6 +174,10 @@ run_tpcc_experiment() {
     local RESULT_DB="$RUN_ROOT/${out_name}.sqlite"
     cp "$SIFTER_ROOT/type_analysis/allocs.sqlite" "$RESULT_DB"
     python3 "$SIFTER_ROOT/artifact/check_database.py" "$RESULT_DB"
+    if [[ "$out_name" == tpcc_bcco ]]; then
+        python3 "$SIFTER_ROOT/artifact/check_tpcc_nodes.py" "$RESULT_DB" \
+            --output "$RUN_ROOT/node-coverage.json"
+    fi
     echo "=== [$out_name] done. Database: $RESULT_DB ==="
     echo "    Open it in the visualizer in huge-page mode to inspect segregation of"
     echo "    data-structure nodes vs. database rows (cf. paper Figure 6)."

@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "Please cite this software artifact when using its code or reproduction materials."
+type: software
+title: "HeapLENS: Heap Layout Evaluation & Navigation Suite — ACM ATC 2026 artifact"
+authors:
+  - family-names: Brown
+    given-names: Trevor
+  - family-names: Ovens
+    given-names: Sean
+  - family-names: Pathak
+    given-names: Gautam
+version: "2026.10.07"
+date-released: "2026-10-07"
+repository-code: "https://github.com/trbot86/heaplens-artifact"

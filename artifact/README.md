@@ -214,7 +214,7 @@ bash artifact/run.sh experiment tpcc_bcco --variant baseline --profile paper --o
 bash artifact/run.sh gui --database artifact/results/fig3/tpcc_bcco.sqlite --label fig3
 ```
 
-Plan: 24 worker threads, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch; allow 30–120 min for generation/processing (estimate); no PMU required.
+Plan: 2 worker threads and 2 warehouses by default, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch; allow 30–120 min for generation/processing (estimate); no PMU required.
 
 Output: `artifact/results/fig3/tpcc_bcco.sqlite`. Expected: a populated TPC-C
 trace with database allocations and tree nodes. Use 2-MiB page mode and select
@@ -292,11 +292,21 @@ bash artifact/run.sh experiment tpcc_bcco --variant optimized --profile paper --
 bash artifact/run.sh gui --database artifact/results/fig6a/tpcc_bcco.sqlite --label fig6a
 ```
 
-Plan: 24 worker threads, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 30–120 min per trace (estimate); no PMU required.
+Plan: 2 worker threads and 2 warehouses by default, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 30–120 min per trace (estimate); no PMU required.
 
 Output: `artifact/results/fig6{a,b}/tpcc_bcco.sqlite`. Expected: BCCO nodes mixed
 with database allocations before, and denser node regions after segregation in
-the 2-MiB heatmap. Import `fig6b` in the same way. The optimized driver also packs
+the 2-MiB heatmap. Import `fig6b` in the same way.
+Select **Settings → Page settings → 2 MiB**, dismiss Settings and click
+**Resample**. Move the time marker well into the trace. Expand the visibility
+controls using the arrow in the type-table header, then right-click the middle
+(page) checkbox for `node_t<unsigned long, itemid_t*>` and select **Only this
+type**. The command now checks for typed 56-byte BCCO nodes and writes
+`node-coverage.json`; a database containing only other types fails this check.
+Both commands were validated locally in about 5.5 minutes combined; actual
+runtime depends on the machine. The baseline GUI and both recorded density
+patterns were checked; the optimized GUI was not separately inspected.
+See [release validation and remaining limits](RELEASE_NOTES_20261007.md). The optimized driver also packs
 the lock; this pair is not a segregation-only throughput attribution.
 
 ### Figure 7(a–b): mimalloc row layout
@@ -307,7 +317,7 @@ bash artifact/run.sh experiment tpcc_efrb --variant optimized --profile paper --
 bash artifact/run.sh gui --database artifact/results/fig7a/tpcc_efrb.sqlite --label fig7a
 ```
 
-Plan: 24 worker threads, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 30–120 min per trace (estimate); no PMU required.
+Plan: 2 worker threads and 2 warehouses by default, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 30–120 min per trace (estimate); no PMU required.
 
 Output: `artifact/results/fig7{a,b}/tpcc_efrb.sqlite`. Expected: 48-byte `row_t`
 objects with 64-byte alignment before, and padded 64-byte rows after. Import
