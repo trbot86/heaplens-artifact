@@ -1,6 +1,29 @@
 #ifndef HEAPLENS_MEMHOOK_NEW_H
 #define HEAPLENS_MEMHOOK_NEW_H
 
+// Capture the bound at its original evaluation position and with its original
+// signedness. In particular, do not turn a negative bound into an unsigned one
+// before the language's own new[] checks. The stamp reads the saved count only
+// after construction, irrespective of operator* operand evaluation order.
+template <class N>
+inline N memhook_capture_extent(size_t& count, N value) {
+    count = static_cast<size_t>(value);
+    return value;
+}
+struct MemPlacementArrayStamp : MemStamp {
+    const size_t& count;
+    MemPlacementArrayStamp(uint16_t f, int l, const size_t& n)
+        : MemStamp(f, l), count(n) {}
+};
+template <class T>
+inline T* operator*(const MemPlacementArrayStamp& stamp, T* p) {
+    memhook_info_t enclosing = unit_log;
+    if (stamp.count <= static_cast<size_t>(-1) / sizeof(T))
+        memhook_record_alloc(p, stamp.count * sizeof(T), typeid(T), stamp.filename, stamp.lineNum);
+    unit_log = enclosing;
+    return p;
+}
+
 // The annotator adds this argument only to standard global allocating new
 // expressions. Log the compiler-supplied allocation extent before invoking any
 // constructors, so nested construction cannot overwrite pending metadata.

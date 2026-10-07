@@ -265,11 +265,35 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
         if (Allocator->isReservedGlobalPlacementOperator()) {
 #ifdef ALLOCLOGGING_PLACEMENT_NEW
             // Preserve the standard placement allocation function and its ABI.
-            // Arrays need an independently captured element count; sizeof(T)
-            // would silently truncate them, so reject that unsupported case.
+            // Capture an array bound exactly once at its original position;
+            // replacing standard placement new[] can introduce an ABI cookie.
             if (node->isArray()) {
-                diag(node->getExprLoc(), "placement-new arrays require an explicit extent hook",
-                     DiagnosticIDs::Error);
+                const Expr *Bound = *node->getArraySize();
+                if (!Bound || Bound->getBeginLoc().isInvalid() || Bound->getEndLoc().isInvalid()) {
+                    diag(node->getExprLoc(), "implicit placement array bound requires an explicit extent hook",
+                         DiagnosticIDs::Error);
+                    return;
+                }
+                const std::string Count = "heaplens_array_count_" + std::to_string(SM.getFileOffset(node->getExprLoc()));
+                const bool Local = !match(cxxNewExpr(hasAncestor(functionDecl())), *node, *Result.Context).empty();
+                SourceLocation End = Lexer::getLocForEndOfToken(node->getEndLoc(), 0, SM, Result.Context->getLangOpts());
+                SourceLocation BoundEnd = Lexer::getLocForEndOfToken(Bound->getEndLoc(), 0, SM, Result.Context->getLangOpts());
+                // Clang 14 can give an instantiated, implicitly constructed
+                // array's new token as its expression end. Include at least
+                // the syntactically required closing bound bracket.
+                auto Closing = Lexer::findNextToken(Bound->getEndLoc(), SM, Result.Context->getLangOpts());
+                if (!Closing || !Closing->is(tok::r_square)) {
+                    diag(node->getExprLoc(), "cannot locate placement array bound end", DiagnosticIDs::Error);
+                    return;
+                }
+                SourceLocation ArrayEnd = Lexer::getLocForEndOfToken(Closing->getLocation(), 0, SM, Result.Context->getLangOpts());
+                if (SM.isBeforeInTranslationUnit(End, ArrayEnd)) End = ArrayEnd;
+                diag(node->getExprLoc(), "record placement array extent without changing its allocation function", DiagnosticIDs::Warning)
+                    << FixItHint::CreateInsertion(node->getExprLoc(),
+                        std::string("([") + (Local ? "&" : "") + "]() { size_t " + Count + " = 0; return (MemPlacementArrayStamp(" + Site + ", " + Count + ") * ")
+                    << FixItHint::CreateInsertion(Bound->getBeginLoc(), "memhook_capture_extent(" + Count + ", (")
+                    << FixItHint::CreateInsertion(BoundEnd, "))")
+                    << FixItHint::CreateInsertion(End, "); }())");
                 return;
             }
             SourceLocation End = Lexer::getLocForEndOfToken(

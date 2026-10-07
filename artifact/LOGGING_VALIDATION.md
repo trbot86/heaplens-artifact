@@ -6,8 +6,13 @@ the `MemhookNew<T>` allocation overload, including array storage. This avoids
 using a single pending allocation record across nested constructors. Matching
 delete overloads preserve cleanup when construction throws.
 
-Scalar placement new retains its original allocation function and records the
-returned object independently through `MemPlacementStamp`. It does not consume
+Placement new retains its original allocation function and records the
+returned object independently through `MemPlacementStamp`. Placement arrays
+capture their bound once at its original evaluation position, preserve its
+signedness, and record the complete constructed object range after successful
+construction. They retain standard placement-new array cookie behavior. An
+unsuccessful placement construction does not create a typed object event.
+This path does not consume
 an enclosing pending allocation. Recording a carved object and its backing
 allocation does not make their byte counts disjoint.
 
@@ -18,11 +23,11 @@ have native tests. Existing transformed sources using the legacy `MemStamp`
 expression must be regenerated to use this path; the legacy interface is not
 the correctness authority for nested construction.
 
-Unsupported custom allocation/deallocation functions, deduced `new auto`, and placement-new
-arrays are rejected with diagnostics instead of receiving guessed extents.
+Unsupported custom allocation/deallocation functions, deduced `new auto`, and
+implicit placement-array bounds are rejected with diagnostics instead of receiving guessed extents.
 In particular, substituting a custom placement allocation function for standard
 `new(storage) T[n]` can introduce an array cookie and change the storage ABI.
-Such cases need explicit allocation/region hooks. This is not a claim of
+Custom allocation functions need explicit allocation/region hooks. This is not a claim of
 complete C++ allocation interception.
 
 Run the native checks inside the artifact image:
