@@ -96,6 +96,10 @@ __attribute__((constructor)) static void init() {
     }
 
     global_fd = open(memhook_file_path, O_RDWR | O_APPEND | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
+    if (global_fd < 0) {
+        fprintf(stderr, "HeapLENS: trace output open failed; trace invalid (errno=%d)\n", errno);
+        _exit(94);
+    }
     initialized = 1;
     fprintf(stdout, "Done memhook constructor\n");
 }
@@ -121,10 +125,7 @@ static void memhook_write_tail(const void* data, size_t bytes) {
 
 memhook_memory_pool::~memhook_memory_pool(){
     cout << "MEMHOOK POOL DESTRUCTOR" << endl;
-	int total_byte_count = 0, status = 0;
-
-	//confirm this method works with trevor
-	struct thread_record_array * destructor_mem_array = &memory_pool[0];
+    int status = 0;
 
     // std::ofstream fileset;
 //   fileset.open(memhook_fileset_path, std::ofstream::out | std::ofstream::app);
@@ -132,13 +133,16 @@ memhook_memory_pool::~memhook_memory_pool(){
 	//instead of doing this, the memory_pool array can keep track of cumulative bytes
 
 	for (int i = 0; i < memory_pool.size(); i++) {
-		total_byte_count += memory_pool[i].buffer_size_nbytes;
 		memhook_write_tail(memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
 	}
 
 #ifdef USE_TEMPLATE
     std::ofstream typeset;
     typeset.open(memhook_typeset_path, std::ofstream::out | std::ofstream::app);
+    if (!typeset) {
+        fprintf(stderr, "HeapLENS: type dictionary open failed; trace invalid\n");
+        _exit(94);
+    }
 
     for(uint16_t i = 0; i < MEMHOOK_HASH_TABLE_SIZE; i++) {
         // if(typetable.bucket[i] != NULL) {
@@ -159,6 +163,10 @@ memhook_memory_pool::~memhook_memory_pool(){
 
     // fileset.close();
     typeset.close();
+    if (!typeset) {
+        fprintf(stderr, "HeapLENS: type dictionary write/close failed; trace invalid\n");
+        _exit(94);
+    }
 #endif
 }
 

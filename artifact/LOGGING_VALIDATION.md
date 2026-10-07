@@ -43,6 +43,9 @@ The final synchronous trace flush retries interrupted and short writes. A write
 error or zero-progress write exits with status 94 and marks the trace invalid,
 instead of allowing an incomplete trace to appear successful. This does not
 promise storage durability after a power failure; it verifies completed writes.
+Failure to open the binary output or open/write/close its type dictionary also
+marks the trace invalid and exits with status 94. A complete binary stream is
+insufficient if its type dictionary cannot be published.
 
 Run the native checks inside the artifact image:
 
