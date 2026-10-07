@@ -26,6 +26,23 @@ from lib.rocksdb_inline_regions import apply as annotate_inline, verify as verif
 
 
 class Workflows(unittest.TestCase):
+    def test_trace_worker_override_reaches_driver_and_receipt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            for threads in (2, 24):
+                output = folder/str(threads)
+                output.mkdir()
+                argv = ['ae.py', 'experiment', 'ascylib_efrb', '--profile', 'paper',
+                        '--threads', str(threads)]
+                with patch.object(sys, 'argv', argv):
+                    args = ae.parse_args()
+                with patch.object(ae, 'ART', folder), patch.object(ae, 'new_output', return_value=output), \
+                     patch.object(ae, 'run') as command:
+                    ae.experiment(args)
+                self.assertEqual(command.call_args.kwargs['env']['THREADS'], str(threads))
+                protocol = json.loads((output/'protocol.json').read_text())
+                self.assertEqual(protocol['settings']['THREADS'], str(threads))
+
     def test_host_paths_only_translate_files_inside_repository(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / 'repo'

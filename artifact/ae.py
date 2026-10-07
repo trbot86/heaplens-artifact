@@ -415,6 +415,8 @@ def experiment(args):
         if args.name in {"rocksdb_hsl", "rocksdb_isl"}:
             # Keep enough keys per hash bucket to expose the bucket layout.
             env.update(NUM_KEYS="20000", HASH_BUCKET_COUNT="1024")
+    if args.name in {"ascylib_efrb", "ascylib_dvy", "ascylib_hj"} and args.threads is not None:
+        env["THREADS"] = str(args.threads)
     if not args.name.endswith("_bench"):
         save(work / "protocol.json", {"arguments": vars(args), "variant": env["TRACE_VARIANT"],
              "settings": {key: env[key] for key in ("THREADS", "INITIAL", "RANGE", "RUN_SECONDS",
@@ -562,9 +564,12 @@ def parse_args(argv=None):
         p.error("threads/initial/range/duration-ms/dim must be positive")
     if args.update_pct is not None and not 0 <= args.update_pct <= 100: p.error("update-pct must be 0..100")
     bench = args.command in {"experiment", "legacy"} and args.name and args.name.endswith("_bench")
+    ascylib_trace = args.command in {"experiment", "legacy"} and args.name in {"ascylib_efrb", "ascylib_dvy", "ascylib_hj"}
     hnsw_command = args.command in {"hnsw", "hnsw-factorization"}
-    if (args.threads is not None or args.cpus is not None) and not (bench or args.command in {"rocksdb", "overhead"} or hnsw_command):
-        p.error("threads/cpus apply to individual ASCYLIB/TPC-C/RocksDB/HNSW performance experiments")
+    if args.threads is not None and not (ascylib_trace or bench or args.command in {"rocksdb", "overhead"} or hnsw_command):
+        p.error("threads applies to ASCYLIB traces and individual ASCYLIB/TPC-C/RocksDB/HNSW performance experiments")
+    if args.cpus is not None and not (bench or args.command in {"rocksdb", "overhead"} or hnsw_command):
+        p.error("cpus applies to individual ASCYLIB/TPC-C/RocksDB/HNSW performance experiments")
     if args.memory_policy and not (bench or args.command in {"rocksdb", "all-performance", "overhead"} or hnsw_command):
         p.error("memory-policy applies to performance experiments")
     if args.trial_order and not (bench or args.command in {"rocksdb", "all-performance", "hnsw"}):
