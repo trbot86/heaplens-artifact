@@ -2,10 +2,12 @@
 
 **Paper:** *HeapLENS: Heap Layout Evaluation & Navigation Suite*, paper 483.
 
-**Archived artifact:** [Zenodo release 2026.10.07](https://zenodo.org/records/23206285),
-DOI [10.5281/zenodo.23206285](https://doi.org/10.5281/zenodo.23206285).
-This archive includes the Figure 6 tracing fixes and corresponds to source
-revision [`ec1977f`](https://github.com/trbot86/heaplens-artifact/commit/ec1977f70925b656f881f715f4efdb6cf258696a).
+**Archived artifact:** [Zenodo release 2026.10.07.1](https://zenodo.org/records/23220668),
+DOI [10.5281/zenodo.23220668](https://doi.org/10.5281/zenodo.23220668).
+This archive adds the Figure 8 field-matching fix, memory guidance and GUI
+instructions to the earlier Figure 6 tracing fixes. See the
+[release notes](RELEASE_NOTES_20261007_FIG8.md) for validation scope.
+The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284) resolves to the latest release.
 It includes the pinned dependencies; follow the commands below after extraction.
 
 This guide follows the submitted paper's Table 1 and main figures. Each result
