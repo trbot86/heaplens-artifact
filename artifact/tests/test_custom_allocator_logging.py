@@ -65,7 +65,10 @@ int main() {
         (source/'main.cpp').write_text(cpp)
         flags=' -I/root/sifter/memhook main.cpp -L/root/sifter/memhook -Wl,-rpath=/root/sifter/memhook -lmemhook -ldl -pthread -o probe'
         (source/'Makefile').write_text('all:\n\tg++ -std=c++17 -O0'+flags+'\n')
-        before=run(['make'],source); (trial/'original-build.log').write_text(before)
+        # The uninstrumented reference must not depend on a logger left by an
+        # earlier test. sifter.sh builds the logger for the instrumented copy.
+        before=run(['g++','-std=c++17','-O0','main.cpp','-pthread','-o','probe'],source)
+        (trial/'original-build.log').write_text(before)
         original=run([str(source/'probe')],source); (trial/'original-output.txt').write_text(original)
         original_sizes=Counter((t,int(n)) for t,p,n in re.findall(r'EXPECT (\S+) (0x[0-9a-f]+) (\d+)',original))
         (trial/'driver.log').write_text(run(['bash','sifter.sh',str(source),str(target),'-t','--skip-refactor']))
