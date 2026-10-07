@@ -219,10 +219,16 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                 title={
                     hoverIdx != null ?
                     <table className='cacheOccTable' >
+                        <caption>
+                            {`Set ${hoverIdx}: ${totalData[bucketIdx][hoverIdx]} visible object-line overlaps`}
+                        </caption>
                         <colgroup>
                             <col style={{'width': '330px'}} />
                             <col style={{'width': '70px'}} />
                         </colgroup>
+                        <thead>
+                            <tr><th>Type</th><th>Count (share of this set)</th></tr>
+                        </thead>
                         <tbody>
                         {
                             cacheData.occ[bucketIdx].slice(hoverIdx*cacheData.idxToTpAndSt.length, (hoverIdx+1)*cacheData.idxToTpAndSt.length)

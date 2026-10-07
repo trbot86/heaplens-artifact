@@ -70,11 +70,19 @@ support and permitted PMU access. For throughput alone, replace
 Counter normalization and whole-process scope are explained in the
 [result schema](REPRODUCTION_CONFIGURATIONS.md#find-and-interpret-results).
 
+The **Plan** lines give memory/disk planning allowances, not measured minimums;
+disk is additional to the shared 20-GB installation. Times exclude the initial
+Docker-image build and vary by machine. Core counts describe the default
+placement; the [resource table](REPRODUCTION_CONFIGURATIONS.md#per-scenario-resource-planning)
+separates observed campaign times from estimates.
+
 ### ASCYLIB/EFRB
 
 ```bash
 HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_efrb_bench --profile paper
 ```
+
+Plan: 4 physical cores on node 0; 16 GiB free RAM; 5 GiB scratch; about 5–15 min; counters need kernel ≥5.8 and PMU access.
 
 Output: `artifact/results/ascylib_efrb_bench-<timestamp>/summary.txt`, comparison
 `d_both / a_default`. Expected: about **+29.62%**, using four threads and both
@@ -85,6 +93,8 @@ parallel prefill and object segregation. [Full configuration](REPRODUCTION_CONFI
 ```bash
 HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_dvy_bench --profile paper
 ```
+
+Plan: 8 physical cores on node 0; 16 GiB free RAM; 5 GiB scratch; about 5–15 min; counters need kernel ≥5.8 and PMU access; huge-page availability affects the comparison.
 
 Output: `artifact/results/ascylib_dvy_bench-<timestamp>/summary.txt`, compare
 `d_192B_pad / a_96B_default`. Expected: about **+18.42%** with equal huge-page
@@ -97,6 +107,8 @@ advice and observed backing; check `runs/dvy-page-checks/summary.json`.
 HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_hj_bench --profile paper
 ```
 
+Plan: 24 physical cores on node 0; 16 GiB free RAM; 5 GiB scratch; about 5–10 min; counters need kernel ≥5.8 and PMU access.
+
 Output: `artifact/results/ascylib_hj_bench-<timestamp>/summary.txt`, compare
 `glibc_malloc / jemalloc`. Expected: about **+5.46%**, with substantial variation,
 at 24 threads. [Full configuration](REPRODUCTION_CONFIGURATIONS.md#hj-allocator-comparison-at-24-threads).
@@ -106,6 +118,8 @@ at 24 threads. [Full configuration](REPRODUCTION_CONFIGURATIONS.md#hj-allocator-
 ```bash
 HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment tpcc_bcco_bench --profile paper
 ```
+
+Plan: 24 physical cores on node 0; 32 GiB free RAM; 10 GiB scratch; about 10–30 min; counters need kernel ≥5.8 and PMU access.
 
 Output: `artifact/results/tpcc_bcco_bench-<timestamp>/summary.txt`, comparison
 `c_seg_ds_pack_lock / a_default`. Expected: roughly **+16%**, the submission's
@@ -117,6 +131,8 @@ Table 1 target for segregation plus packed locks.
 ```bash
 HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment tpcc_efrb_bench --profile paper
 ```
+
+Plan: 24 physical cores on node 0; 32 GiB free RAM; 10 GiB scratch; about 15–45 min; counters need kernel ≥5.8 and PMU access.
 
 Output: `artifact/results/tpcc_efrb_bench-<timestamp>/summary.txt`, comparison
 `e_single_recmgr_mimalloc_fixed / b_mimalloc`. Expected: roughly **+20%**, the
@@ -130,6 +146,8 @@ holding mimalloc and tree segregation fixed.
 HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable prefix_hash --profile paper
 ```
 
+Plan: 2 NUMA nodes, 48 logical CPUs each (24 physical cores/node with 2-way SMT); 64 GiB free RAM; 100 GiB scratch; about 30–90 min; no PMU required.
+
 Output: `artifact/results/rocksdb-<timestamp>/summary.json`,
 `variants.optimized.change_percent_vs_baseline`. Expected: about **+7.51%** in
 the documented five-pair confirmation, using the native rate. New runs also
@@ -142,6 +160,8 @@ record reader-only rates and writer completion times; those are distinct metrics
 HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable skip_list --profile paper
 ```
 
+Plan: 20 physical cores on node 0; **64 GiB available RAM required by the runner**; 10 GiB scratch; about 45–120 min; no PMU required.
+
 Output: `artifact/results/rocksdb-<timestamp>/summary.json`,
 `variants.optimized.change_percent_vs_baseline`. Expected: about **+8.61%** for
 the memory-only configuration; every trial must pass its persistence check.
@@ -152,6 +172,8 @@ the memory-only configuration; every trial must pass its persistence check.
 ```bash
 HEAPLENS_NUMA=1 bash artifact/run.sh valkey --profile paper
 ```
+
+Plan: 24 physical cores on each of 2 NUMA nodes; 32 GiB free RAM; 10 GiB scratch; about 15–45 min; no PMU required.
 
 Output: `artifact/results/valkey-<timestamp>/summary.json`,
 `variants.B1C1_64.change_percent_vs_baseline`. Expected: about **+4.45%** mean
@@ -164,6 +186,8 @@ in the evaluator confirmation (historical mean +4.23%, maximum +5.9%).
 ```bash
 HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
 ```
+
+Plan: 24 physical cores on node 0; 32 GiB free RAM; 10 GiB scratch; about 3–6 hours for both dimensions; no PMU required; huge-page availability affects the comparison.
 
 Output: `artifact/results/hnsw-<timestamp>/summary.json`,
 `by_dimension["128"].variants.vector_huge.change_percent_vs_baseline` and the
@@ -190,6 +214,8 @@ bash artifact/run.sh experiment tpcc_bcco --variant baseline --profile paper --o
 bash artifact/run.sh gui --database artifact/results/fig3/tpcc_bcco.sqlite --label fig3
 ```
 
+Plan: 24 worker threads, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch; allow 30–120 min for generation/processing (estimate); no PMU required.
+
 Output: `artifact/results/fig3/tpcc_bcco.sqlite`. Expected: a populated TPC-C
 trace with database allocations and tree nodes. Use 2-MiB page mode and select
 a populated time to inspect the interface shown in the paper.
@@ -200,6 +226,8 @@ a populated time to inspect the interface shown in the paper.
 bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --out artifact/results/fig4
 bash artifact/run.sh gui --database artifact/results/fig4/ascylib_efrb.sqlite --label fig4
 ```
+
+Plan: 24 worker threads, without fixed NUMA placement; 16 GiB free RAM; 10 GiB scratch; allow 5–30 min (estimate); no PMU required. The same baseline database can serve Figure 5(a).
 
 Output: `artifact/results/fig4/ascylib_efrb.sqlite`. Expected: during prefill,
 repeated groups of three tree nodes and one operation descriptor. Inspect a
@@ -214,13 +242,47 @@ bash artifact/run.sh experiment ascylib_efrb --variant optimized --profile paper
 bash artifact/run.sh gui --database artifact/results/fig5a/ascylib_efrb.sqlite --label fig5a
 ```
 
-Output: `artifact/results/fig5{a,b,c}/ascylib_efrb.sqlite`. Expected: baseline
-node cache-set underuse in (a), parallel prefill alone in (b), and prefill plus
-separate node/descriptor arenas in (c), with more even node occupancy. Compare
-the cache occupancy view at populated times. Stop the GUI and repeat its command
+Plan: 24 worker threads, without fixed NUMA placement; 16 GiB free RAM; 10 GiB scratch per trace; allow 5–30 min per trace (estimate); no PMU required. Fewer physical cores can run these layout checks.
+
+Output: `artifact/results/fig5{a,b,c}/ascylib_efrb.sqlite`. These commands select
+baseline in (a), parallel prefill alone in (b), and prefill plus separate
+node/descriptor arenas in (c). Expected for (a): **during early prefill**, a
+repeating group of one empty (gray), two lower-occupancy (yellow) and one
+higher-occupancy (red) node set. A full-profile local trace reproduces this
+pattern before the allocator begins its second chunk. Inspect **only nodes**:
+
+1. Keep the modeled L1 geometry at 32 KiB, 8 ways, 64-byte lines (64 sets).
+2. Zoom into the beginning of the rising node-count curve. Move the timeline
+   handle **within early prefill**, before the curve reaches its plateau.
+   Keep the default 2,000 time buckets for fine control. In the local checked
+   trace, the pattern appears in buckets 1–30 of 2,000 (the first 1.5% of the
+   full timeline); the exact fraction depends on the run.
+3. Expand the type legend's visibility controls. Right-click the **third
+   checkbox (cache visibility)** on `node_t` and choose **Only this type**.
+   Keep `node_t` unexpanded; page visibility can still show both types.
+4. Compare node counts across sets. Including `info_t` descriptors can conceal
+   the node imbalance and make the entire grid red. Node-only filtering does
+   not guarantee empty sets later: the second allocator chunk shifts the
+   pattern and can fill the first chunk's gaps. See the
+   [trace investigation](REPRODUCTION_CONFIGURATIONS.md#figure-5-trace-correction).
+
+The tooltip percentage is a type's share of that set's visible object-line
+count, **not cache fullness**. Color represents the total visible count,
+normalized across sets at the selected time: zero is gray and the largest
+count is red. Thus 50% of one set and 100% of another can have the same color.
+Allocation alignment and chunk boundaries can change the aggregate pattern;
+a particular cell's color is not guaranteed. These are modeled address
+occupancies, not hardware-resident cache lines or measured misses.
+
+Stop the GUI and repeat its command
 with `fig5b`, then `fig5c`, to import each database; earlier imports remain listed.
+Inspect their prefill and populated intervals to compare the effects of each change.
 Each result's `trace-configuration.json` records the effective flags. The optional
 `segregation-only` variant exposes the fourth factor but is not a Figure 5 panel.
+
+For traces generated before the retirement-linkage fix, see the
+[Figure 5 trace correction](REPRODUCTION_CONFIGURATIONS.md#figure-5-trace-correction):
+filtering isolates node counts, but cannot recover missing retirement events.
 
 ### Figure 6(a–b): BCCO node density
 
@@ -229,6 +291,8 @@ bash artifact/run.sh experiment tpcc_bcco --variant baseline --profile paper --o
 bash artifact/run.sh experiment tpcc_bcco --variant optimized --profile paper --out artifact/results/fig6b
 bash artifact/run.sh gui --database artifact/results/fig6a/tpcc_bcco.sqlite --label fig6a
 ```
+
+Plan: 24 worker threads, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 30–120 min per trace (estimate); no PMU required.
 
 Output: `artifact/results/fig6{a,b}/tpcc_bcco.sqlite`. Expected: BCCO nodes mixed
 with database allocations before, and denser node regions after segregation in
@@ -243,6 +307,8 @@ bash artifact/run.sh experiment tpcc_efrb --variant optimized --profile paper --
 bash artifact/run.sh gui --database artifact/results/fig7a/tpcc_efrb.sqlite --label fig7a
 ```
 
+Plan: 24 worker threads, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 30–120 min per trace (estimate); no PMU required.
+
 Output: `artifact/results/fig7{a,b}/tpcc_efrb.sqlite`. Expected: 48-byte `row_t`
 objects with 64-byte alignment before, and padded 64-byte rows after. Import
 `fig7b` to compare. Shared reclamation also changes in the optimized variant.
@@ -254,6 +320,8 @@ bash artifact/run.sh experiment rocksdb_hsl --variant baseline --profile paper -
 bash artifact/run.sh experiment rocksdb_hsl --variant optimized --profile paper --out artifact/results/fig8b
 bash artifact/run.sh gui --database artifact/results/fig8a/rocksdb_hsl.sqlite --label fig8a
 ```
+
+Plan: 24 worker threads, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 1–3 hours per trace (estimate); no PMU required.
 
 Output: `artifact/results/fig8{a,b}/rocksdb_hsl.sqlite`. Expected: expand a bucket
 to see padding holes at offsets 36 and 52 before field reordering; the bucket

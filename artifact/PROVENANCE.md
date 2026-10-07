@@ -135,6 +135,17 @@ contains 16,414 allocation records; its accompanying README records settings.
   ASCYLIB suballocation records have missing source-file metadata and are
   discarded by the GUI. This affects newly generated diagnostic traces;
   the retained historical inputs are not rewritten.
+- Link diagnostic ASCYLIB builds to shared SSMEM so memhook can observe logical
+  retirements. Static SSMEM in the executable bypassed the hook even though
+  explicitly rewritten allocation calls were logged. Native retirement checks
+  cover the correction; existing databases remain unchanged. The shared driver
+  serves EFRB, DVY and HJ. Retained logging-overhead builds already used shared
+  SSMEM. See the Figure 5 investigation in `REPRODUCTION_CONFIGURATIONS.md` for
+  the verified early-prefill pattern and its change at an allocator boundary.
+- Correct the generic C `posix_memalign_s` wrapper to record the allocated block,
+  rather than its output-variable address. Both C and C++ aligned-allocation
+  wrappers now skip failed requests. Native tests verify exact allocation/free
+  pairs and failure behavior; no retained measurements were replaced.
 - Retain whole-process hardware-counter totals and normalize them by actual
   measured operation counts (committed transactions for TPC-C), including
   setup/teardown costs in the numerator. This corrects the original
