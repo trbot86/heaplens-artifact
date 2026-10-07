@@ -1,6 +1,10 @@
 # HeapLENS: Heap Layout Evaluation & Navigation Suite
 
 **ACM ATC 2026 artifact (paper 483): start with [artifact/README.md](artifact/README.md).**
+
+The [archived artifact release 2026.10.07](https://zenodo.org/records/23206285)
+is available at DOI [10.5281/zenodo.23206285](https://doi.org/10.5281/zenodo.23206285).
+
 It contains the container quick start, experiment-to-paper map, guided example,
 optional LLM workflow, and explicit verification status. The older developer
 instructions below are retained for reference; use the artifact entry point for evaluation.

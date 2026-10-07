@@ -1,6 +1,13 @@
 # HeapLENS — ACM ATC 2026 artifact
 
 **Paper:** *HeapLENS: Heap Layout Evaluation & Navigation Suite*, paper 483.
+
+**Archived artifact:** [Zenodo release 2026.10.07](https://zenodo.org/records/23206285),
+DOI [10.5281/zenodo.23206285](https://doi.org/10.5281/zenodo.23206285).
+This archive includes the Figure 6 tracing fixes and corresponds to source
+revision [`ec1977f`](https://github.com/trbot86/heaplens-artifact/commit/ec1977f70925b656f881f715f4efdb6cf258696a).
+It includes the pinned dependencies; follow the commands below after extraction.
+
 This guide follows the submitted paper's Table 1 and main figures. Each result
 below has a complete command, an output location and an expected observation.
 The [full configuration and reference guide](REPRODUCTION_CONFIGURATIONS.md)
