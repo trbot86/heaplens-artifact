@@ -105,6 +105,20 @@ memhook_memory_pool::memhook_memory_pool(){
   printf("memory_pool Constructor \n");
 }
 
+static void memhook_write_tail(const void* data, size_t bytes) {
+    const char* next = static_cast<const char*>(data);
+    while (bytes) {
+        ssize_t written = write(global_fd, next, bytes);
+        if (written < 0 && errno == EINTR) continue;
+        if (written <= 0) {
+            fprintf(stderr, "HeapLENS: final trace write failed; trace invalid (errno=%d)\n", written < 0 ? errno : EIO);
+            _exit(94);
+        }
+        next += written;
+        bytes -= static_cast<size_t>(written);
+    }
+}
+
 memhook_memory_pool::~memhook_memory_pool(){
     cout << "MEMHOOK POOL DESTRUCTOR" << endl;
 	int total_byte_count = 0, status = 0;
@@ -119,7 +133,7 @@ memhook_memory_pool::~memhook_memory_pool(){
 
 	for (int i = 0; i < memory_pool.size(); i++) {
 		total_byte_count += memory_pool[i].buffer_size_nbytes;
-		write(global_fd, memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
+		memhook_write_tail(memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
 	}
 
 #ifdef USE_TEMPLATE
