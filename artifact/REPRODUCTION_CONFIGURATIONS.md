@@ -480,6 +480,40 @@ filter, but is not evidence for the paper's yellow/red distribution. Existing
 results have not been replaced. Performance-only ASCYLIB builds are unchanged;
 the separate retained logging-overhead driver already uses shared SSMEM.
 
+## Figure 8 field metadata and memory
+
+The HSL bucket allocation type is
+`rocksdb::SkipList<char const*, rocksdb::MemTableRep::KeyComparator const&>`.
+Its field metadata uses the equivalent C++ spelling
+`rocksdb::SkipList<const char*, const rocksdb::MemTableRep::KeyComparator&>`.
+The GUI previously compared these names after removing spaces only. It
+therefore omitted the nine recorded fields from the bucket's expansion. The
+read-time correction recognizes this exact equivalent spelling and uses the
+database's actual field offsets; it does not manufacture fields or modify
+the database. Other template instantiations and pointer/const variants are
+not merged by this narrow alias. A general solution that gives both data
+sources consistent type names is tracked in the [tool TODO](TOOL_TODO.md).
+
+A native check of the pinned diagnostic source and field-reordering patch
+confirms a 56-byte baseline bucket with padding at bytes 36–39 and 52–55,
+and a 48-byte reordered bucket without these holes. The field extractor's
+nine baseline fields exactly match a retained HSL database. In a subsequent
+browser check using that database, the expanded baseline bucket visibly shows
+both padding gaps. This validates the native layouts, field association and
+baseline field display, not a fresh full optimized trace, optimized browser
+view, or the evaluator's own database.
+
+Select the full bucket type above, use its page-only filter **before**
+Resample, move to a populated time, and expand the bucket's fields. Enable
+the middle page checkbox for each indented field row; **Only this type** also
+disabled those field checkboxes. Scroll to a page with colored bucket objects,
+select it, and scroll upward over the byte-detail view to magnify its rows.
+`HashSkipListRep` and the type ending in `::Node` are different objects.
+The paper's offsets are relative to the bucket's start, not necessarily the
+cache-line origin. The main README gives both commands and memory guidance.
+If the bucket is absent or has a different recorded size, changing GUI
+memory settings cannot repair that; retain the original database for diagnosis.
+
 ## GUI and small benchmark checks
 
 
@@ -920,9 +954,13 @@ patch; this SET preload is for layout inspection, not the concurrent throughput
 measurement. The optimized instrumentation calls the patched allocators.
 
 If opening a trace exceeds the cache-view memory budget, use the error's
-**Retry with fewer time buckets** link. This reduces temporal resolution only
-when requested; it does not change cache geometry. Once loaded, the time-bucket
-setting is also available in Settings.
+**Retry with fewer time buckets** link, or restart the GUI with
+`HEAPLENS_CACHE_BUDGET_MB=12000 bash artifact/run.sh gui` and the same
+`--database`/`--label` options on a host with sufficient free memory. The
+variable is in MiB and controls a preflight estimate, not total process memory
+or the Docker/WSL limit. Reducing buckets changes temporal resolution; it
+does not change cache geometry, object sizes, or field layouts. Once loaded,
+the time-bucket setting is also available in Settings.
 
 HNSWLib traces use the performance source snapshot with semantic annotations for
 slabs, elements, vector payloads, links, and labels. The smoke profile builds

@@ -36,10 +36,15 @@ def check_cache_budget(buckets, sets, columns):
     estimate = (buckets + 2) * bytes_per_row
     if estimate > budget:
         max_buckets = budget // max(bytes_per_row, 1) - 2
+        required_mb = (estimate + 1024 * 1024 - 1) // (1024 * 1024)
         suggestion = (f"Try {max_buckets} or fewer time buckets in Settings. "
                       if max_buckets >= 1 else "This geometry exceeds the budget even at one time bucket. ")
         raise CacheBudgetExceeded(
             f"Cache view exceeds the configured memory budget: estimated {estimate / 2**30:.2f} GiB "
             f"for arrays and response data; budget {budget / 2**30:.2f} GiB. "
-            + suggestion + "The previous view is unchanged. Cache geometry and bucket count were not reduced automatically.")
+            + suggestion
+            + f"Alternatively, with sufficient free memory, restart the GUI with HEAPLENS_CACHE_BUDGET_MB={required_mb} "
+              "bash artifact/run.sh gui and your existing --database/--label options. "
+              "This raises the preflight budget only; allow additional memory for the server and browser. "
+              "The previous view is unchanged. Cache geometry and bucket count were not reduced automatically.")
     return estimate
