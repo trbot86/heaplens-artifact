@@ -30,6 +30,19 @@ In particular, substituting a custom placement allocation function for standard
 Custom allocation functions need explicit allocation/region hooks. This is not a claim of
 complete C++ allocation interception.
 
+RocksDB's pinned `StatisticsData` allocator now supplies explicit tag-taking
+new/delete overloads. They delegate to its original cache-line-aligned
+allocator, record the compiler-supplied extent before construction, and retain
+its cleanup when construction throws. The original allocation functions carry
+the `heaplens_tagged_allocation` Clang annotation to opt into this protocol.
+Unmarked custom allocators still fail with a diagnostic. The adapter is applied
+before source analysis, including for the generic `CoreLocalArray<T>` caller.
+
+The final synchronous trace flush retries interrupted and short writes. A write
+error or zero-progress write exits with status 94 and marks the trace invalid,
+instead of allowing an incomplete trace to appear successful. This does not
+promise storage durability after a power failure; it verifies completed writes.
+
 Run the native checks inside the artifact image:
 
 ```bash
@@ -37,7 +50,8 @@ cd artifact/tests
 HEAPLENS_RUN_INSTRUMENTATION_TESTS=1 python3 -m unittest -v \
   test_new_expression_logging test_header_edge_cases \
   test_project_header_logging test_tpcc_header_logging \
-  test_rocksdb_header_logging test_logger_lifecycle
+  test_rocksdb_header_logging test_custom_allocator_logging \
+  test_logger_lifecycle test_logger_tail
 ```
 
 The checks compare addresses, extents, type names, event multiplicity and

@@ -113,6 +113,9 @@ run_rocksdb_experiment() {
             fi ;;
         *) echo "Unknown TRACE_VARIANT" >&2; return 2 ;;
     esac
+    # Preserve the class-specific aligned allocator while giving the generic
+    # CoreLocalArray<T> annotation an explicit tag/exception-cleanup protocol.
+    python3 "$LIB_DIR/rocksdb_statistics_logging.py" "$SRC_COPY"
     # Two fixups needed only for RocksDB (ASCYLIB/setbench's Makefiles don't
     # hit either of these):
     #   - A Windows checkout of this repo's own artifact/vendor/rocksdb

@@ -8,6 +8,7 @@
 
 #include "AllocationLoggingCheck.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
@@ -319,14 +320,20 @@ void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &
                 Name = E->getDecl()->getQualifiedNameAsString();
             Standard &= Name == "std::nothrow_t" || Name == "std::align_val_t";
         }
-        if (!Standard) {
+        // Explicit adapters supply tag-taking allocation AND exception-cleanup
+        // overloads that delegate to the original class allocator. Never infer
+        // that protocol from a class name or redirect a custom allocator.
+        bool TaggedAdapter = false;
+        for (const auto *Attribute : Allocator->specific_attrs<AnnotateAttr>())
+            TaggedAdapter |= Attribute->getAnnotation() == "heaplens_tagged_allocation";
+        if (!Standard && !TaggedAdapter) {
             diag(node->getExprLoc(), "custom operator new requires an explicit allocation hook",
                  DiagnosticIDs::Error);
             return;
         }
         // A class-specific delete can hide the matching placement-delete
         // overload if construction throws. Do not change that cleanup lookup.
-        if (hasCustomDelete(node->getAllocatedType()->getAsCXXRecordDecl(), node->isArray())) {
+        if (!TaggedAdapter && hasCustomDelete(node->getAllocatedType()->getAsCXXRecordDecl(), node->isArray())) {
             diag(node->getExprLoc(), "class-specific operator delete requires an explicit allocation hook",
                  DiagnosticIDs::Error);
             return;
