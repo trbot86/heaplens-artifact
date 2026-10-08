@@ -12,6 +12,7 @@ static std::mutex io_mutex;
 static int submissions=0, reaps=0, waits=0, peak_buffers=0;
 static int operation_waits=0, drain_waits=0;
 static size_t peak_extra=0;
+static int copied_tails=0;
 static bool fail_growth=false;
 static thread_local bool draining=false;
 extern "C" void* __real_malloc(size_t);
@@ -59,9 +60,13 @@ memhook_memory_pool::memhook_memory_pool() {}
 memhook_memory_pool::~memhook_memory_pool() {}
 void memhook_memory_pool::add(memhook_info_t* p,int bytes) {
   std::lock_guard<std::mutex> guard(io_mutex);
+#if MEMHOOK_COMPACT_THREAD_TAIL
+  if (bytes) assert(p==allocation_log[0] || p==allocation_log[1]);
+#endif
+  // A tail must never alias an outstanding request, even during thread churn.
+  for (const auto& entry:requests) assert(entry.first->aio_buf!=p);
   assert(write(global_fd,p,bytes)==bytes);
-  // Match production ownership: this nonempty tail remains allocated until
-  // process exit, and any extra-buffer budget it owns remains reserved.
+  // Match production ownership: nonempty tails remain allocated until exit.
 }
 
 static void producer(int id,int count) {
@@ -79,7 +84,12 @@ static void producer(int id,int count) {
     assert(number_of_buffers<=MEMHOOK_MAX_BUFFERS);
   }
   draining=true;
+  bool extra_tail=log_index && buffer_index>=2;
   terminal.finish(); terminal.finish();
+  if (extra_tail) {
+    std::lock_guard<std::mutex> guard(io_mutex);
+    ++copied_tails;
+  }
 }
 
 static void completed_slot_control() {
@@ -119,7 +129,8 @@ int main(int argc,char** argv) {
     std::vector<std::thread> threads;
     for(int i=0;i<3;++i) threads.emplace_back(producer,wave*3+i,count);
     for(auto& thread:threads) thread.join();
-    if(count%MEMHOOK_MAX_BUFFER_SIZE==0) assert(memhook_extra_buffer_bytes.load()==0);
+    if(MEMHOOK_COMPACT_THREAD_TAIL || count%MEMHOOK_MAX_BUFFER_SIZE==0)
+      assert(memhook_extra_buffer_bytes.load()==0);
   }
   assert(requests.empty() && submissions==reaps);
   assert(lseek(global_fd,0,SEEK_END)==off_t(9*count*sizeof(memhook_info_t)));
@@ -135,7 +146,7 @@ int main(int argc,char** argv) {
      MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES>=sizeof(memhook_info_t)*MEMHOOK_MAX_BUFFER_SIZE)
     assert(peak_buffers>2);
   if(fail_growth) assert(peak_buffers<=2 && memhook_extra_buffer_bytes.load()==0);
-  printf("{\"records\":%zu,\"peak_buffers_per_thread\":%d,\"peak_extra_bytes\":%zu,\"retained_extra_bytes\":%zu,\"waits\":%d,\"operation_waits\":%d,\"drain_waits\":%d,\"submissions\":%d,\"reaps\":%d}\n",
-         rows.size(),peak_buffers,peak_extra,memhook_extra_buffer_bytes.load(),waits,operation_waits,drain_waits,submissions,reaps);
+  printf("{\"records\":%zu,\"peak_buffers_per_thread\":%d,\"peak_extra_bytes\":%zu,\"retained_extra_bytes\":%zu,\"extra_tails\":%d,\"waits\":%d,\"operation_waits\":%d,\"drain_waits\":%d,\"submissions\":%d,\"reaps\":%d}\n",
+         rows.size(),peak_buffers,peak_extra,memhook_extra_buffer_bytes.load(),copied_tails,waits,operation_waits,drain_waits,submissions,reaps);
   close(global_fd);
 }

@@ -23,13 +23,15 @@ class LoggerBuffers(unittest.TestCase):
                              capture_output=True,text=True,timeout=60)
             (folder/'build.log').write_text(p.stdout+p.stderr)
             self.assertEqual(p.returncode,0,p.stderr)
-            for count in (0,1,4,5,40,43):
+            for count in (0,1,4,5,9,11,40,43):
                 p=subprocess.run([str(binary),str(count),str(folder/f'pressure-{count}.bin')],
                                  capture_output=True,text=True,timeout=20,
                                  env={**os.environ,**({'MEMHOOK_TEST_FAIL_GROW':'1'} if fail_growth else {})})
                 (folder/f'pressure-{count}.log').write_text(p.stdout+p.stderr)
                 self.assertEqual(p.returncode,0,p.stderr)
-                reports.append(dict(slots=slots,budget=budget,count=count,fail_growth=fail_growth,scan=scan,**json.loads(p.stdout.strip().splitlines()[-1])))
+                report=json.loads(p.stdout.strip().splitlines()[-1])
+                self.assertEqual(report['retained_extra_bytes'],0)
+                reports.append(dict(slots=slots,budget=budget,count=count,fail_growth=fail_growth,scan=scan,**report))
             if fail_growth:continue
             binary=folder/'faults'
             p=subprocess.run(flags+[str(ROOT/'artifact/tests/fixtures/logger_lifecycle.cpp'),'-o',str(binary),
@@ -43,4 +45,5 @@ class LoggerBuffers(unittest.TestCase):
                 (folder/f'fault-{fault}.log').write_text(p.stdout+p.stderr)
                 self.assertEqual(p.returncode,0 if fault in (0,1) else 94,p.stderr)
                 if fault>=2:self.assertIn('trace invalid',p.stderr)
+        self.assertTrue(any(r['extra_tails'] for r in reports), 'Tail-compaction path was not exercised')
         (trial/'verification.json').write_text(json.dumps(dict(status='passed',cases=reports,real_aio_fault_cases=36),indent=2)+'\n')

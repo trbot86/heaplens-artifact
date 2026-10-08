@@ -45,6 +45,9 @@
 #ifndef MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES
 #define MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES (512ULL * 1024 * 1024)
 #endif
+#ifndef MEMHOOK_COMPACT_THREAD_TAIL
+#define MEMHOOK_COMPACT_THREAD_TAIL 1
+#endif
 static_assert(MEMHOOK_MAX_BUFFERS >= 2, "at least two logger buffers required");
 // Prototype: the aggregate cap includes extra buffers retained as thread tails.
 // Request/control arrays have fixed addresses while asynchronous I/O is active.
@@ -215,6 +218,15 @@ class ThreadExiter
         for (int i = 0; i < number_of_buffers; i++) memhook_finish_aio(i);
 
         int unfilled_buffer_size = sizeof(struct memhook_info_t)* log_index;
+#if MEMHOOK_COMPACT_THREAD_TAIL
+        // All writes are complete. Keep the tail in an original buffer so an
+        // exited producer cannot reserve extra capacity needed by later threads.
+        // This adds no allocation and leaves the final-drain timing unchanged.
+        if (unfilled_buffer_size && buffer_index >= 2) {
+          memcpy(allocation_log[0], allocation_log[buffer_index], unfilled_buffer_size);
+          buffer_index = 0;
+        }
+#endif
         //ADD FILE AND TYPES TO MEMPOOL OBJECT
         mem_pool_obj.add(allocation_log[buffer_index], unfilled_buffer_size);
         // The pool owns only the nonempty tail. Retire unused buffers at thread
