@@ -10,11 +10,13 @@ APPLICATIONS = ('ascylib_efrb','ascylib_dvy','ascylib_hj','tpcc_bcco','tpcc_efrb
                 'rocks_hsl','rocks_isl','valkey','hnsw128','hnsw1536')
 
 
-def schedule(apps=APPLICATIONS, repetitions=10):
+def schedule(apps=APPLICATIONS, repetitions=10, arms='both'):
     if not apps or len(set(apps))!=len(apps) or set(apps)-set(APPLICATIONS):
         raise ValueError('Select unique supported applications')
     if not 1 <= repetitions <= 10:
         raise ValueError('Repetitions must be between 1 and 10')
+    if arms not in ('both', 'plain'):
+        raise ValueError('Select both arms or plain only')
     cells=[]
     for family in ('ascylib','tpcc','rocks','valkey','hnsw'):
         selected=[a for a in APPLICATIONS if a in apps and a.startswith(family)]
@@ -23,6 +25,11 @@ def schedule(apps=APPLICATIONS, repetitions=10):
             offset=(rep-1)%4
             order=order[offset:]+order[:offset]
             if ((rep-1)//4)%2:order.reverse()
+            if arms == 'plain':
+                # Alternate AB/BA directly; filtering the four-arm rotation
+                # alone would give unequal first-position counts over ten blocks.
+                order=[('before','plain'),('after','plain')]
+                if rep % 2 == 0:order.reverse()
             for app in selected:
                 for variant,arm in order:
                     cells.append(dict(id=f'{app}-{variant}-{arm}-r{rep:02d}',application=app,

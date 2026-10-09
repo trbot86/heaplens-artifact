@@ -8,7 +8,9 @@ This archive adds the Figure 8 field-matching fix, memory guidance and GUI
 instructions to the earlier Figure 6 tracing fixes. See the
 [release notes](RELEASE_NOTES_20261007_FIG8.md) for validation scope.
 The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284) resolves to the latest release.
-It includes the pinned dependencies; follow the commands below after extraction.
+The archive includes the pinned dependencies. **The Table 1 entry point and
+two-worker EFRB instructions below require current GitHub main; they are newer
+than this Zenodo version.** Use the archive's bundled README for that version.
 
 This guide follows the submitted paper's Table 1 and main figures. Each result
 below has a complete command, an output location and an expected observation.
@@ -45,7 +47,8 @@ Valkey/HNSW variant, `Export OK`, and a new `artifact/results/smoke-<timestamp>/
 directory. This checks saved data and export functionality; it is not a new
 performance measurement.
 
-All result paths below are **host paths relative to the repository root**.
+Figure result paths below are **host paths relative to the repository root**.
+Table 1 uses explicitly selected absolute host directories.
 The same root is mounted at `/root/sifter` in the container; that prefix can
 still appear in raw command logs. The runner prints the corresponding absolute
 host result path. `--out artifact/results/NEW_NAME` chooses a new directory;
@@ -66,143 +69,181 @@ are optional.
 
 ## 3. Reproduce Table 1 performance comparisons
 
-Each command builds all its variants and uses ten repetitions per variant.
-Expect machine-dependent variation, not exact equality. The references below
-are the evaluator configuration confirmations documented in the linked guide;
-TPC-C entries explicitly retain the submission's approximate targets. They are
-not pooled with the separate camera-ready campaign. Gains are ratios of mean
-throughput, `100 * (after / before - 1)`.
+Use the host-side `artifact/table1.py` entry point below after building the Docker
+image in section 1. It selects the corrected, frozen drivers under
+`artifact/headline-pmu/reproduction`: **dynamic SSMEM in ASCYLIB, RTTI enabled in
+RocksDB, and workload-phase hardware counters**. Ten before/after pairs run in
+alternating order. No logging measurements run through this entry point.
 
-ASCYLIB/TPC-C counter commands require a Docker host kernel >=5.8, `PERFMON`
-support and permitted PMU access. For throughput alone, replace
-`HEAPLENS_PERF=1` with `PERFBENCH_PERF=off`. No host policies are changed.
-Counter normalization and whole-process scope are explained in the
-[result schema](REPRODUCTION_CONFIGURATIONS.md#find-and-interpret-results).
+Preview any selection without building or running workloads:
 
-The **Plan** lines give memory/disk planning allowances, not measured minimums;
-disk is additional to the shared 20-GB installation. Times exclude the initial
-Docker-image build and vary by machine. Core counts describe the default
-placement; the [resource table](REPRODUCTION_CONFIGURATIONS.md#per-scenario-resource-planning)
-separates observed campaign times from estimates.
+```bash
+python3 artifact/table1.py plan --apps ascylib_efrb
+```
+
+Expected: 20 cells, zero logging cells. `reproduce` performs preflight, builds,
+then runs serially; it stops on failure and preserves the attempt. Every example
+uses fresh absolute host paths outside the checkout. Change both paths to repeat
+an experiment. `--data-root` holds live results and RocksDB databases; the
+reference RocksDB database storage was NFS. `$HOME` is not necessarily NFS on
+another machine: choose and report the actual storage used.
+
+All rows require Linux, Python 3.10+, Docker, kernel >=5.8, permitted PMU access
+and NUMA support. The inherited storage checks are conservative: allow **250 GiB
+free when work, data and archives share one filesystem**, plus installation;
+with separate filesystems the runner checks each reserve. This is a safety
+allowance, not expected retained size. The existing build stage still prepares
+both plain and logging binaries; only plain binaries are measured here. Build
+pruning is not part of this release. Allow hours rather than the earlier short
+performance-only estimates; HNSW index construction can dominate. The full
+historical 400-cell campaign took 48 hours or more; these subsets have not been
+newly timed end to end. [Controller details and limits](headline-pmu/reproduction/README.md).
+
+Output for each command: `<out>/work/results.json`, whose
+`performance_comparisons` entry gives `before_mean`, `after_mean` and
+`throughput_gain_pct = 100 * (after_mean / before_mean - 1)`. Individual native
+logs, actual operation counts and phase-gated `perf.csv` files are under
+`--data-root`. CPU selection, source/binary hashes and build configuration are
+retained. Counter intervals/denominators are described in
+[the semantic review](headline-pmu/SEMANTIC_REVIEW.md).
+
+References below are the current paper's ten-run means: eight rows use the
+retained headline plain-PMU cohort; BCCO and Valkey use the later consistency
+cohort with the same named baseline/combined workload comparisons. These cohorts
+are not pooled. They are observations, not exact-value pass/fail thresholds.
+The [older evaluator/factor commands](HISTORICAL_PERFORMANCE_COMMANDS.md) remain
+available for their distinct configurations, including four-layout DVY diagnosis;
+they are no longer the main Table 1 instructions.
 
 ### ASCYLIB/EFRB
 
 ```bash
-HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_efrb_bench --profile paper
+python3 artifact/table1.py reproduce --apps ascylib_efrb \
+  --out /var/tmp/heaplens-table1-efrb \
+  --data-root "$HOME/heaplens-table1-efrb-data" --acknowledge-cost
 ```
 
-Plan: 4 physical cores on node 0; 16 GiB free RAM; 5 GiB scratch; about 5–15 min; counters need kernel ≥5.8 and PMU access.
+Plan: 4 physical cores on node 0; 16 GiB RAM; storage/build-time allowances and PMU requirements above.
 
-Output: `artifact/results/ascylib_efrb_bench-<timestamp>/summary.txt`, comparison
-`d_both / a_default`. Expected: about **+29.62%**, using four threads and both
-parallel prefill and object segregation. [Full configuration](REPRODUCTION_CONFIGURATIONS.md#standalone-efrb-four-threads).
+Output: `/var/tmp/heaplens-table1-efrb/work/results.json`, application `ascylib_efrb`.
+Reference gain: **+30.6%**. Four workers, 262144 initial keys, read-only for 5 s; parallel prefill plus segregation versus default.
 
 ### ASCYLIB/DVY
 
 ```bash
-HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_dvy_bench --profile paper
+python3 artifact/table1.py reproduce --apps ascylib_dvy \
+  --out /var/tmp/heaplens-table1-dvy \
+  --data-root "$HOME/heaplens-table1-dvy-data" --acknowledge-cost
 ```
 
-Plan: 8 physical cores on node 0; 16 GiB free RAM; 5 GiB scratch; about 5–15 min; counters need kernel ≥5.8 and PMU access; huge-page availability affects the comparison.
+Plan: 8 physical cores on node 0; 16 GiB RAM; storage/build-time allowances and PMU requirements above.
 
-Output: `artifact/results/ascylib_dvy_bench-<timestamp>/summary.txt`, compare
-`d_192B_pad / a_96B_default`. Expected: about **+18.42%** with equal huge-page
-advice and observed backing; check `runs/dvy-page-checks/summary.json`.
-[Full configuration and fallback behavior](REPRODUCTION_CONFIGURATIONS.md#dvy-equal-huge-page-advice-for-all-node-layouts).
+Output: `/var/tmp/heaplens-table1-dvy/work/results.json`, application `ascylib_dvy`.
+Reference gain: **+19.7%**. 192-B versus 96-B nodes, equal huge-page advice, 1048576 initial keys, read-only for 5 s. Huge-page backing and cache topology affect the result.
 
 ### ASCYLIB/HJ
 
 ```bash
-HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment ascylib_hj_bench --profile paper
+python3 artifact/table1.py reproduce --apps ascylib_hj \
+  --out /var/tmp/heaplens-table1-hj \
+  --data-root "$HOME/heaplens-table1-hj-data" --acknowledge-cost
 ```
 
-Plan: 24 physical cores on node 0; 16 GiB free RAM; 5 GiB scratch; about 5–10 min; counters need kernel ≥5.8 and PMU access.
+Plan: 24 physical cores on node 0; 16 GiB RAM; storage/build-time allowances and PMU requirements above.
 
-Output: `artifact/results/ascylib_hj_bench-<timestamp>/summary.txt`, compare
-`glibc_malloc / jemalloc`. Expected: about **+5.46%**, with substantial variation,
-at 24 threads. [Full configuration](REPRODUCTION_CONFIGURATIONS.md#hj-allocator-comparison-at-24-threads).
+Output: `/var/tmp/heaplens-table1-hj/work/results.json`, application `ascylib_hj`.
+Reference gain: **+6.5%**. glibc after versus jemalloc before, 1048576 initial keys, read-only for 5 s. Expect substantial machine-dependent variation.
 
 ### TPC-C/BCCO
 
 ```bash
-HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment tpcc_bcco_bench --profile paper
+python3 artifact/table1.py reproduce --apps tpcc_bcco \
+  --out /var/tmp/heaplens-table1-bcco \
+  --data-root "$HOME/heaplens-table1-bcco-data" --acknowledge-cost
 ```
 
-Plan: 24 physical cores on node 0; 32 GiB free RAM; 10 GiB scratch; about 10–30 min; counters need kernel ≥5.8 and PMU access.
+Plan: 24 physical cores on node 0; 32 GiB RAM; storage/build-time allowances and PMU requirements above.
 
-Output: `artifact/results/tpcc_bcco_bench-<timestamp>/summary.txt`, comparison
-`c_seg_ds_pack_lock / a_default`. Expected: roughly **+16%**, the submission's
-Table 1 target for segregation plus packed locks.
-[Workload and allocator details](REPRODUCTION_CONFIGURATIONS.md#hardware-and-workloads).
+Output: `/var/tmp/heaplens-table1-bcco/work/results.json`, application `tpcc_bcco`.
+Reference gain: **+15.5%**. 24 warehouses; segregation plus packed locks versus default, with jemalloc in both variants. This is not the additional shared-reclaimer variant.
 
 ### TPC-C/EFRB
 
 ```bash
-HEAPLENS_NUMA=1 HEAPLENS_PERF=1 bash artifact/run.sh experiment tpcc_efrb_bench --profile paper
+python3 artifact/table1.py reproduce --apps tpcc_efrb \
+  --out /var/tmp/heaplens-table1-tpcc-efrb \
+  --data-root "$HOME/heaplens-table1-tpcc-efrb-data" --acknowledge-cost
 ```
 
-Plan: 24 physical cores on node 0; 32 GiB free RAM; 10 GiB scratch; about 15–45 min; counters need kernel ≥5.8 and PMU access.
+Plan: 24 physical cores on node 0; 32 GiB RAM; storage/build-time allowances and PMU requirements above.
 
-Output: `artifact/results/tpcc_efrb_bench-<timestamp>/summary.txt`, comparison
-`e_single_recmgr_mimalloc_fixed / b_mimalloc`. Expected: roughly **+20%**, the
-submission's Table 1 target. This combines shared reclamation and padded rows,
-holding mimalloc and tree segregation fixed.
-[Comparison definitions](REPRODUCTION_CONFIGURATIONS.md#hardware-and-workloads).
+Output: `/var/tmp/heaplens-table1-tpcc-efrb/work/results.json`, application `tpcc_efrb`.
+Reference gain: **+20.7%**. 24 warehouses; shared reclamation plus row padding, holding mimalloc and tree segregation fixed.
 
 ### RocksDB/HashSkipList
 
 ```bash
-HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable prefix_hash --profile paper
+python3 artifact/table1.py reproduce --apps rocks_hsl \
+  --out /var/tmp/heaplens-table1-hsl \
+  --data-root "$HOME/heaplens-table1-hsl-data" --acknowledge-cost
 ```
 
-Plan: 2 NUMA nodes, 48 logical CPUs each (24 physical cores/node with 2-way SMT); 64 GiB free RAM; 100 GiB scratch; about 30–90 min; no PMU required.
+Plan: 2 NUMA nodes with 48 logical CPUs each; 64 GiB RAM; storage/build-time allowances and PMU requirements above.
 
-Output: `artifact/results/rocksdb-<timestamp>/summary.json`,
-`variants.optimized.change_percent_vs_baseline`. Expected: about **+7.51%** in
-the documented five-pair confirmation, using the native rate. New runs also
-record reader-only rates and writer completion times; those are distinct metrics.
-[Full configuration and timing definitions](REPRODUCTION_CONFIGURATIONS.md#rocksdb-hashskiplist-field-reordering).
+Output: `/var/tmp/heaplens-table1-hsl/work/results.json`, application `rocks_hsl`.
+Reference gain: **+8.4%**. 95 readers plus one writer; 10M keys, 32-B keys and 128-B values. Uses the native mixed-completion rate, not the separately defined reader-only rate. The application database was on NFS in the reference run; select matching storage with --data-root.
 
 ### RocksDB/InlineSkipList
 
 ```bash
-HEAPLENS_NUMA=1 bash artifact/run.sh rocksdb --memtable skip_list --profile paper
+python3 artifact/table1.py reproduce --apps rocks_isl \
+  --out /var/tmp/heaplens-table1-isl \
+  --data-root "$HOME/heaplens-table1-isl-data" --acknowledge-cost
 ```
 
-Plan: 20 physical cores on node 0; **64 GiB available RAM required by the runner**; 10 GiB scratch; about 45–120 min; no PMU required.
+Plan: 20 physical cores on node 0; 64 GiB available RAM; storage/build-time allowances and PMU requirements above.
 
-Output: `artifact/results/rocksdb-<timestamp>/summary.json`,
-`variants.optimized.change_percent_vs_baseline`. Expected: about **+8.61%** for
-the memory-only configuration; every trial must pass its persistence check.
-[Full configuration](REPRODUCTION_CONFIGURATIONS.md#rocksdb-inline-skiplist-memory-only).
+Output: `/var/tmp/heaplens-table1-isl/work/results.json`, application `rocks_isl`.
+Reference gain: **+8.5%**. 19 readers plus one writer, 10M keys; memory-only configuration. Each trial checks persistence settings.
 
 ### Valkey/string cache
 
 ```bash
-HEAPLENS_NUMA=1 bash artifact/run.sh valkey --profile paper
+python3 artifact/table1.py reproduce --apps valkey \
+  --out /var/tmp/heaplens-table1-valkey \
+  --data-root "$HOME/heaplens-table1-valkey-data" --acknowledge-cost
 ```
 
-Plan: 24 physical cores on each of 2 NUMA nodes; 32 GiB free RAM; 10 GiB scratch; about 15–45 min; no PMU required.
+Plan: 24 physical cores on each of two NUMA nodes; 32 GiB RAM; storage/build-time allowances and PMU requirements above.
 
-Output: `artifact/results/valkey-<timestamp>/summary.json`,
-`variants.B1C1_64.change_percent_vs_baseline`. Expected: about **+4.45%** mean
-in the evaluator confirmation (historical mean +4.23%, maximum +5.9%).
-[Workload](REPRODUCTION_CONFIGURATIONS.md#hardware-and-workloads) and
-[erratum](REPRODUCTION_CONFIGURATIONS.md#paper-corrections).
+Output: `/var/tmp/heaplens-table1-valkey/work/results.json`, application `valkey`.
+Reference gain: **+4.2%**. Combined B1C1_64 versus baseline; 4M keys, 128-B values, SET:GET 1:4, 30 s, 24 client threads, four clients per thread and pipeline 16.
 
-### HNSWLib
+### HNSWLib, 128 dimensions
 
 ```bash
-HEAPLENS_NUMA=1 bash artifact/run.sh hnsw --profile paper
+python3 artifact/table1.py reproduce --apps hnsw128 \
+  --out /var/tmp/heaplens-table1-hnsw128 \
+  --data-root "$HOME/heaplens-table1-hnsw128-data" --acknowledge-cost
 ```
 
-Plan: 24 physical cores on node 0; 32 GiB free RAM; 10 GiB scratch; about 3–6 hours for both dimensions; no PMU required; huge-page availability affects the comparison.
+Plan: 24 physical cores on node 0; 32 GiB RAM; storage/build-time allowances and PMU requirements above.
 
-Output: `artifact/results/hnsw-<timestamp>/summary.json`,
-`by_dimension["128"].variants.vector_huge.change_percent_vs_baseline` and the
-corresponding `"1536"` entry. Expected: about **+9.51% at 128 D** and **+6.56%
-at 1536 D** in the evaluator confirmations. Dimensions are reported separately.
-[Full configurations and attribution experiments](REPRODUCTION_CONFIGURATIONS.md#hnsw-dimension-and-huge-page-placement).
+Output: `/var/tmp/heaplens-table1-hnsw128/work/results.json`, application `hnsw128`.
+Reference gain: **+9.8%**. Separate vector allocation plus huge-page advice versus baseline; fresh 1M-element index, five measured 100K-query calls after warmup.
+
+### HNSWLib, 1536 dimensions
+
+```bash
+python3 artifact/table1.py reproduce --apps hnsw1536 \
+  --out /var/tmp/heaplens-table1-hnsw1536 \
+  --data-root "$HOME/heaplens-table1-hnsw1536-data" --acknowledge-cost
+```
+
+Plan: 24 physical cores on node 0; 32 GiB RAM; storage/build-time allowances and PMU requirements above.
+
+Output: `/var/tmp/heaplens-table1-hnsw1536/work/results.json`, application `hnsw1536`.
+Reference gain: **+6.1%**. The same indexed-query protocol at 1536 dimensions; index construction is outside the measured query interval.
 
 ## 4. Reproduce the main figure observations
 
@@ -232,11 +273,11 @@ a populated time to inspect the interface shown in the paper.
 ### Figure 4: EFRB prefill allocation pattern
 
 ```bash
-bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --out artifact/results/fig4
+bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --threads 2 --out artifact/results/fig4
 bash artifact/run.sh gui --database artifact/results/fig4/ascylib_efrb.sqlite --label fig4
 ```
 
-Plan: 24 worker threads, without fixed NUMA placement; 16 GiB free RAM; 10 GiB scratch; allow 5–30 min (estimate); no PMU required. The same baseline database can serve Figure 5(a).
+Plan: 2 worker threads, without fixed NUMA placement; 16 GiB free RAM; 10 GiB scratch; allow 5–30 min (estimate); no PMU required. The same baseline database can serve Figure 5(a).
 
 Output: `artifact/results/fig4/ascylib_efrb.sqlite`. Expected: during prefill,
 repeated groups of three tree nodes and one operation descriptor. Inspect a
@@ -245,13 +286,13 @@ repeated groups of three tree nodes and one operation descriptor. Inspect a
 ### Figure 5(a–c): EFRB cache occupancy
 
 ```bash
-bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --out artifact/results/fig5a
-bash artifact/run.sh experiment ascylib_efrb --variant prefill-only --profile paper --out artifact/results/fig5b
-bash artifact/run.sh experiment ascylib_efrb --variant optimized --profile paper --out artifact/results/fig5c
+bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --threads 2 --out artifact/results/fig5a
+bash artifact/run.sh experiment ascylib_efrb --variant prefill-only --profile paper --threads 2 --out artifact/results/fig5b
+bash artifact/run.sh experiment ascylib_efrb --variant optimized --profile paper --threads 2 --out artifact/results/fig5c
 bash artifact/run.sh gui --database artifact/results/fig5a/ascylib_efrb.sqlite --label fig5a
 ```
 
-Plan: 24 worker threads, without fixed NUMA placement; 16 GiB free RAM; 10 GiB scratch per trace; allow 5–30 min per trace (estimate); no PMU required. Fewer physical cores can run these layout checks.
+Plan: 2 worker threads, without fixed NUMA placement; 16 GiB free RAM; 10 GiB scratch per trace; allow 5–30 min per trace (estimate); no PMU required.
 
 Output: `artifact/results/fig5{a,b,c}/ascylib_efrb.sqlite`. These commands select
 baseline in (a), parallel prefill alone in (b), and prefill plus separate

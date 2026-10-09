@@ -1,5 +1,14 @@
 # Rebuild and run the historical headline PMU campaign
 
+For the current Table 1 performance instructions use
+[`artifact/table1.py` in the main guide](../../README.md#3-reproduce-table-1-performance-comparisons).
+It uses these corrected drivers with `--arms plain`: 20 alternating before/after
+measurements per application, no logging measurements. The historical default
+below remains `--arms both` and preserves the full 400-cell experiment.
+Builds still prepare the original paired binaries; plain-only selection reduces
+measurement/trace work, not the current build stage. Final `results.json` adds
+`performance_comparisons` with ratios of arithmetic-mean plain throughputs.
+
 This optional Linux host controller rebuilds the recorded workload and logger
 versions for ten comparisons, two layout variants, two logging arms and ten
 repetitions: **400 cells**. It runs the Python-binding HNSW workload at 128 and

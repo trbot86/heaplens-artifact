@@ -51,9 +51,10 @@ run_ascylib_experiment() {
     local INSTRUMENTED="${WORK}/instrumented"
     local MEMHOOK_DIR="$SIFTER_ROOT/memhook"
 
-    # Paper Section 6.2 methodology: 24 threads, tree prefilled with 2^18
-    # keys, 5s search-only workload. Override via env vars if needed.
-    local THREADS="${THREADS:-24}"
+    # EFRB diagnostic figures use two workers; Table 1 uses four separately.
+    local default_threads=24
+    [[ "$out_name" != ascylib_efrb ]] || default_threads=2
+    local THREADS="${THREADS:-$default_threads}"
     local INITIAL="${INITIAL:-262144}"   # 2^18
     local RANGE="${RANGE:-524288}"       # ASCYLIB convention: 2x initial
     local DURATION_MS="${DURATION_MS:-5000}"

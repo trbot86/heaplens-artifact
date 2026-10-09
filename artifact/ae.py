@@ -415,6 +415,10 @@ def experiment(args):
         if args.name in {"rocksdb_hsl", "rocksdb_isl"}:
             # Keep enough keys per hash bucket to expose the bucket layout.
             env.update(NUM_KEYS="20000", HASH_BUCKET_COUNT="1024")
+    if args.name in {"ascylib_efrb", "ascylib_dvy", "ascylib_hj"} and args.threads is not None:
+        env["THREADS"] = str(args.threads)
+    elif args.name == "ascylib_efrb":
+        env["THREADS"] = "2"
     if not args.name.endswith("_bench"):
         save(work / "protocol.json", {"arguments": vars(args), "variant": env["TRACE_VARIANT"],
              "settings": {key: env[key] for key in ("THREADS", "INITIAL", "RANGE", "RUN_SECONDS",
@@ -563,7 +567,10 @@ def parse_args(argv=None):
     if args.update_pct is not None and not 0 <= args.update_pct <= 100: p.error("update-pct must be 0..100")
     bench = args.command in {"experiment", "legacy"} and args.name and args.name.endswith("_bench")
     hnsw_command = args.command in {"hnsw", "hnsw-factorization"}
-    if (args.threads is not None or args.cpus is not None) and not (bench or args.command in {"rocksdb", "overhead"} or hnsw_command):
+    ascylib_trace = args.command in {"experiment", "legacy"} and args.name in {"ascylib_efrb", "ascylib_dvy", "ascylib_hj"}
+    if args.cpus is not None and ascylib_trace:
+        p.error("cpus does not apply to diagnostic traces")
+    if (args.threads is not None or args.cpus is not None) and not (bench or ascylib_trace or args.command in {"rocksdb", "overhead"} or hnsw_command):
         p.error("threads/cpus apply to individual ASCYLIB/TPC-C/RocksDB/HNSW performance experiments")
     if args.memory_policy and not (bench or args.command in {"rocksdb", "all-performance", "overhead"} or hnsw_command):
         p.error("memory-policy applies to performance experiments")
@@ -583,6 +590,11 @@ def parse_args(argv=None):
 
 def main():
     args = parse_args()
+    if args.profile == 'paper' and (args.command in {'all-performance', 'rocksdb', 'valkey', 'hnsw'}
+            or (args.command in {'experiment', 'legacy'} and args.name and args.name.endswith('_bench'))):
+        print('Historical evaluator/factor driver: for current Table 1 use the host command '
+              'python3 artifact/table1.py (see artifact/README.md). This driver retains its earlier '
+              'build and counter policies.', file=sys.stderr)
     if args.command == "doctor": doctor()
     elif args.command == "history": history()
     elif args.command == "gui": gui(args)

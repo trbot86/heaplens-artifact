@@ -140,12 +140,23 @@ def collect_summary(args,plan):
             arms={arm:[r['throughput'] for r in rows if (r['application'],r['variant'],r['arm'])==(app,variant,arm)]
                   for arm in ('plain','logging')}
             if not arms['plain']:continue
+            if not arms['logging']:continue
             if len(arms['plain'])!=len(arms['logging']):raise ValueError('Unbalanced comparison')
             plain,logged=(statistics.mean(arms[arm]) for arm in ('plain','logging'))
             comparisons.append(dict(application=app,variant=variant,repetitions=len(arms['plain']),
                 plain_mean=plain,logging_mean=logged,throughput_loss_pct=100*(1-logged/plain),raw=arms))
+    performance=[]
+    for app in APPLICATIONS:
+        rates={v:[r['throughput'] for r in rows if (r['application'],r['variant'],r['arm'])==(app,v,'plain')]
+               for v in ('before','after')}
+        if not rates['before']:continue
+        if len(rates['before'])!=len(rates['after']):raise ValueError('Unbalanced layout comparison')
+        before,after=(statistics.mean(rates[v]) for v in ('before','after'))
+        performance.append(dict(application=app,repetitions=len(rates['before']),before_mean=before,
+            after_mean=after,throughput_gain_pct=100*(after/before-1),raw=rates))
     save(args.work_root/'results.json',dict(scope='Fresh reproduction; never pooled with bundled observations',
-        hsl_metric='Reader operations per native mixed-workload completion interval',rows=rows,comparisons=comparisons))
+        hsl_metric='Reader operations per native mixed-workload completion interval',rows=rows,
+        comparisons=comparisons,performance_comparisons=performance))
 
 
 def main(argv=None):
@@ -153,6 +164,8 @@ def main(argv=None):
     parser.add_argument('action',choices=['plan','preflight','build','run'],nargs='?',default='plan')
     parser.add_argument('--apps',nargs='+',choices=APPLICATIONS,default=list(APPLICATIONS))
     parser.add_argument('--reps',type=int,default=10)
+    parser.add_argument('--arms',choices=['both','plain'],default='both',
+                        help='plain selects uninstrumented before/after performance only')
     for key in ('work-root','data-root','archive-root'):parser.add_argument('--'+key,type=Path)
     parser.add_argument('--image',default=os.environ.get('HEAPLENS_IMAGE','heaplens-atc26:submission'))
     parser.add_argument('--server-node',type=int,default=0)
@@ -161,10 +174,11 @@ def main(argv=None):
     parser.add_argument('--timeout-hours',type=float,default=72)
     parser.add_argument('--acknowledge-cost',action='store_true',help='Accept >=48 hours and large retained storage for a full run')
     args=parser.parse_args(argv)
-    plan=schedule(args.apps,args.reps)
+    plan=schedule(args.apps,args.reps,args.arms)
     if args.action=='plan':
-        print(json.dumps(dict(source_revision=REVISION,cells=len(plan),logging_cells=len(plan)//2,
-            full_campaign=len(plan)==400,method='plain+PMU versus historical logger+wait probe+PMU',
+        print(json.dumps(dict(source_revision=REVISION,cells=len(plan),logging_cells=sum(c['arm']=='logging' for c in plan),
+            full_campaign=len(plan)==400,method=('plain before/after with workload-phase PMU' if args.arms=='plain'
+                else 'plain+PMU versus historical logger+wait probe+PMU'),
             estimated_full_time='48 hours or more',observed_compressed_bytes=272941791880,
             sequence=plan),indent=2));return
     if sys.platform!='linux':parser.error('Run the controller in a Linux host shell')

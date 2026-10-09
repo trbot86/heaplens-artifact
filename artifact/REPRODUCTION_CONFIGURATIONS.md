@@ -1,3 +1,9 @@
+> Current Table 1 commands are in [the main guide](README.md#3-reproduce-table-1-performance-comparisons).
+> The older performance commands and confirmation numbers in this reference
+> document are historical; their static-SSMEM/whole-process-counter settings
+> are not the phase-gated Table 1 entry point. EFRB figures use two workers;
+> standalone EFRB Table 1 throughput uses four.
+
 # Full configurations and reference
 
 Return to the [step-by-step evaluator guide](README.md). Commands in that guide
@@ -300,10 +306,14 @@ Repeat the GUI command with `isl-after` for the optimized trace.
 
 ## EFRB diagnostic variant reference
 
-The diagnostic workload uses 24 threads and 262,144 initial keys in the paper
+The standalone EFRB diagnostic workload uses 2 threads and 262,144 initial keys in the paper
 profile; the Table 1 performance comparison uses four threads. Trace runs are
 not throughput measurements. Every ASCYLIB trace records `trace-configuration.json`
 with its effective make arguments and workload values.
+
+Use `--threads 24` to request the previous diagnostic worker count explicitly.
+The selected two-worker diagnostic traces show the early-prefill imbalance and
+its two improvements; this does not replace the four-worker performance result.
 
 | `--variant` | Performance variant counterpart | Additional make arguments | Figure 5 |
 | --- | --- | --- | --- |
