@@ -35,5 +35,6 @@ workflows. All 8,870 regular frozen source files were checked against the manife
 published source archive. This is source and orchestration validation, not a new
 full native performance campaign or regenerated figure trace.
 
-The Zenodo archive at version 2026.10.07.1 is unchanged. These additions are on
-GitHub; publishing a new archival version is a separate action.
+This update is archived as version 2026.10.09 at
+[DOI 10.5281/zenodo.23255614](https://doi.org/10.5281/zenodo.23255614).
+The earlier 2026.10.07.1 release and its files remain available.

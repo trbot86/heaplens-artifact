@@ -2,8 +2,8 @@
 
 **ACM ATC 2026 artifact (paper 483): start with [artifact/README.md](artifact/README.md).**
 
-The [archived artifact release 2026.10.07.1](https://zenodo.org/records/23220668)
-is available at DOI [10.5281/zenodo.23220668](https://doi.org/10.5281/zenodo.23220668).
+The [archived artifact release 2026.10.09](https://zenodo.org/records/23255614)
+is available at DOI [10.5281/zenodo.23255614](https://doi.org/10.5281/zenodo.23255614).
 The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284) resolves to the latest release.
 
 It contains the container quick start, experiment-to-paper map, guided example,

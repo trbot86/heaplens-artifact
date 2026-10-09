@@ -2,15 +2,13 @@
 
 **Paper:** *HeapLENS: Heap Layout Evaluation & Navigation Suite*, paper 483.
 
-**Archived artifact:** [Zenodo release 2026.10.07.1](https://zenodo.org/records/23220668),
-DOI [10.5281/zenodo.23220668](https://doi.org/10.5281/zenodo.23220668).
-This archive adds the Figure 8 field-matching fix, memory guidance and GUI
-instructions to the earlier Figure 6 tracing fixes. See the
-[release notes](RELEASE_NOTES_20261007_FIG8.md) for validation scope.
-The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284) resolves to the latest release.
-The archive includes the pinned dependencies. **The Table 1 entry point and
-two-worker EFRB instructions below require current GitHub main; they are newer
-than this Zenodo version.** Use the archive's bundled README for that version.
+**Archived artifact:** [Zenodo release 2026.10.09](https://zenodo.org/records/23255614),
+DOI [10.5281/zenodo.23255614](https://doi.org/10.5281/zenodo.23255614).
+This version includes the corrected Table 1 command routing, two-worker EFRB
+figure defaults, and frozen-source reconstruction repairs, together with the
+previous Figure 6/8 fixes. See the [release notes](RELEASE_NOTES_20261009_ROUTING.md)
+for validation scope. The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284)
+resolves to the latest release. Pinned dependencies are included in the archive.
 
 This guide follows the submitted paper's Table 1 and main figures. Each result
 below has a complete command, an output location and an expected observation.

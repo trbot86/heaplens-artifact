@@ -9,7 +9,7 @@ authors:
     given-names: Sean
   - family-names: Pathak
     given-names: Gautam
-version: "2026.10.07.1"
-doi: "10.5281/zenodo.23220668"
-date-released: "2026-10-07"
+version: "2026.10.09"
+doi: "10.5281/zenodo.23255614"
+date-released: "2026-10-09"
 repository-code: "https://github.com/trbot86/heaplens-artifact"
