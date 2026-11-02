@@ -260,7 +260,7 @@ Reference gain: **+6.1%**. The same indexed-query protocol at 1536 dimensions; i
 These are diagnostic traces, not throughput measurements. Use a fresh output
 directory for each command and run traces serially. Fresh allocation addresses
 and cluster IDs vary. Compare the stated layout property, not screenshot pixels.
-`--profile smoke` is smaller and need not show the paper's pattern. Figures 1–2
+`--profile smoke` is smaller and need not show the paper's pattern. Figures 1â€“2
 are explanatory diagrams and have no experiment command.
 
 The GUI defaults to 128 pages, one million display records and 2,000 buckets.
@@ -268,7 +268,7 @@ Unknown trace-clock frequency is shown as ticks. For a trace with a verified
 frequency, add `--timestamp-hz HZ` to its `gui --database` command; the value is
 saved per database. Do not use the rendering computer's CPU frequency.
 
-### Figures 3–5: TPC-C/HJ interface walkthrough
+### Figures 3â€“5: TPC-C/HJ interface walkthrough
 
 ```bash
 HEAPLENS_NUMA=1 bash artifact/run.sh experiment tpcc_hj --variant baseline --profile paper \
@@ -305,7 +305,7 @@ eleven lines; one has no allocation history. This is a retained matching
 capture for the same inspection, not a claim of pixel-identical paper artwork.
 [Marker meanings, exact addresses and lost-sample limits](perf-c2c-example/README.md).
 
-### Figure 7(a–c): EFRB cache occupancy, early and completed prefill
+### Figure 7(aâ€“c): EFRB cache occupancy, early and completed prefill
 
 ```bash
 HEAPLENS_NUMA=1 bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --threads 4 --cpus 0-3 --memory-policy interleave --out artifact/results/fig7a
@@ -315,7 +315,7 @@ bash artifact/run.sh gui --database artifact/results/fig7a/ascylib_efrb.sqlite -
 ```
 
 Plan: four physical cores on node 0, 16 GiB available RAM, 10 GiB scratch/trace;
-allow 5–30 minutes/trace (estimate); no PMU needed. 262144 initial keys, range
+allow 5â€“30 minutes/trace (estimate); no PMU needed. 262144 initial keys, range
 524288, five seconds of read-only work, glibc and dynamic SSMEM; native p=s=1.
 Output: `artifact/results/fig7{a,b,c}/ascylib_efrb.sqlite` and configuration receipts.
 The three variants are baseline, parallel prefill, and prefill plus separate arenas.
@@ -347,7 +347,7 @@ and one 64-byte descriptor. Keep that page selected and advance time: dark gray
 gaps show retired objects. Paper colors are blue nodes and yellow descriptors;
 the type legend identifies colors in a fresh session.
 
-### Figure 9(a–b): BCCO node density
+### Figure 9(aâ€“b): BCCO node density
 
 ```bash
 HEAPLENS_NUMA=1 bash artifact/run.sh experiment tpcc_bcco --variant baseline --bcco-figure --profile paper --threads 24 --cpus 0-23 --memory-policy bind --out artifact/results/fig9a
@@ -356,7 +356,7 @@ bash artifact/run.sh gui --database artifact/results/fig9a/tpcc_bcco.sqlite --la
 ```
 
 Plan: 24 physical cores on node 0, 32 GiB available RAM, 100 GiB local scratch/trace;
-allow 30–120 minutes/trace (estimate); no PMU needed. Linux 6.8+ and permitted
+allow 30â€“120 minutes/trace (estimate); no PMU needed. Linux 6.8+ and permitted
 `PAGEMAP_SCAN`/`MADV_COLLAPSE` are required by the backing check. A small preflight
 fails before the long build if independent jemalloc instances or backing checks
 are unavailable. The driver never changes host THP settings.
@@ -377,7 +377,7 @@ use the saved `backing/` receipts for that. The converter uses p=0.02, s=1,
 seed 20261010. The paper's saved UI pair had an additional whole-page subsample;
 fresh page counts/addresses are therefore not exact screenshot targets.
 
-### Figure 10(a–b): mimalloc row layout
+### Figure 10(aâ€“b): mimalloc row layout
 
 ```bash
 HEAPLENS_NUMA=1 bash artifact/run.sh experiment tpcc_efrb --variant baseline --profile paper --threads 24 --cpus 0-23 --memory-policy bind --out artifact/results/fig10a
@@ -386,13 +386,13 @@ bash artifact/run.sh gui --database artifact/results/fig10a/tpcc_efrb.sqlite --l
 ```
 
 Plan: 24 physical cores/node 0, 32 GiB free RAM, 100 GiB scratch/trace;
-allow 30–120 minutes/trace (estimate); no PMU needed.
+allow 30â€“120 minutes/trace (estimate); no PMU needed.
 Output: `artifact/results/fig10{a,b}/tpcc_efrb.sqlite`. Inspect `row_t`: 48-byte
 rows aligned to 64 bytes before, padded 64-byte rows after. The optimized
 variant also changes reclamation, so these traces do not isolate its throughput
 contribution. Import `fig10b` to compare the row layout.
 
-### Figure 11(a–b): HashSkipList bucket fields
+### Figure 11(aâ€“b): HashSkipList bucket fields
 
 ```bash
 bash artifact/run.sh experiment rocksdb_hsl --variant baseline --profile paper --out artifact/results/fig11a
@@ -401,7 +401,7 @@ HEAPLENS_CACHE_BUDGET_MB=12000 bash artifact/run.sh gui --database artifact/resu
 ```
 
 Plan: the retained diagnostic driver uses 24 workers; 32 GiB free RAM,
-100 GiB scratch/trace; allow 1–3 hours/trace (estimate); no PMU needed.
+100 GiB scratch/trace; allow 1â€“3 hours/trace (estimate); no PMU needed.
 This bounded field-layout diagnostic differs from Table 1's 96-worker mixed
 workload. It verifies the same 56-byte versus 48-byte bucket layout.
 

@@ -6,6 +6,10 @@ The [archived artifact release 2026.10.09](https://zenodo.org/records/23255614)
 is available at DOI [10.5281/zenodo.23255614](https://doi.org/10.5281/zenodo.23255614).
 The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284) resolves to the latest release.
 
+This checkout also contains the final-paper integration candidate described in
+[its validation record](artifact/integration/VALIDATION.md); those changes are
+not part of the linked October 9 archive.
+
 It contains the container quick start, experiment-to-paper map, guided example,
 optional LLM workflow, and explicit verification status. The older developer
 instructions below are retained for reference; use the artifact entry point for evaluation.

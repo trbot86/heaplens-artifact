@@ -1,4 +1,10 @@
-# Optional bounded logging buffers
+# Historical buffer prototype notes
+
+These notes describe the early prototype below, not this checkout's defaults.
+The final policy is two initial buffers, reuse of completed buffers, up to four
+buffers per thread and a 2-GiB aggregate extra-capacity limit, with compact
+thread-exit tails. See [the adopted results and definitions](final-paper/README.md).
+The original prototype description and observations remain below for provenance.
 
 This branch contains an experimental buffer policy, separate from the logger
 correctness candidate. It has not established an application speedup and is not

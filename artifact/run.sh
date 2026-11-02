@@ -7,7 +7,7 @@ if [[ "${1:-}" == build ]]; then
     exec docker build -f "$ROOT/artifact/Dockerfile" -t "$IMAGE" "$ROOT"
 fi
 if [[ $# == 0 ]]; then
-    echo 'Usage: bash artifact/run.sh build|doctor|history|smoke|export|gui|hnsw|hnsw-factorization|valkey|rocksdb|experiment|overhead|all-performance [options]'
+    echo 'Usage: bash artifact/run.sh build|doctor|history|smoke|export|gui|select-pages|hnsw|hnsw-factorization|valkey|rocksdb|experiment|overhead|all-performance [options]'
     exit 2
 fi
 driver=(python3 artifact/ae.py)
