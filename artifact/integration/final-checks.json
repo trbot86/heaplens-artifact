@@ -1,0 +1,59 @@
+{
+  "source_commit": "a816b341b4de17b77c3cd943054c6e627153bc56",
+  "image_id": "sha256:bc5b81e567754e0af2aa797fbc5a4022cc94525c6a9e1d9256d69d5ea67e4dab",
+  "image_build_seconds": 204.6513562000473,
+  "source_archive_sha256": "d6f2eb4d35cea9e458463797b28ccd26bca29e1062cd600f1d1a93fb41eda9d7",
+  "acceptance_passed": true,
+  "tests": {
+    "fresh-image-tests.log": {
+      "count": 273,
+      "seconds": 49.429,
+      "passed": true,
+      "skipped": 19
+    },
+    "fresh-native-headers.log": {
+      "count": 11,
+      "seconds": 140.567,
+      "passed": true,
+      "skipped": 0
+    },
+    "fresh-native-tpcc_custom_allocator.log": {
+      "count": 1,
+      "seconds": 6.939,
+      "passed": true,
+      "skipped": 0
+    },
+    "fresh-native-new_expression_logging.log": {
+      "count": 4,
+      "seconds": 28.542,
+      "passed": true,
+      "skipped": 0
+    },
+    "fresh-native-custom_allocator_logging.log": {
+      "count": 1,
+      "seconds": 6.483,
+      "passed": true,
+      "skipped": 0
+    }
+  },
+  "full_typecheck_passed": true,
+  "production_build_passed": true,
+  "remaining_hook_dependency_warnings": 8,
+  "selection": {
+    "paired_baseline_checks": 440,
+    "outputs": 3520,
+    "aggregate_cells_equal": 208,
+    "compressed_bytes": 1282735,
+    "input_database_count": 11,
+    "input_bytes": 66923515904,
+    "input_check": "Existence and size only; no database payload scans or transfers"
+  },
+  "pyke": {
+    "kernel": "6.8.0-137-generic",
+    "preflight_exit": 0,
+    "independent_allocators": true,
+    "small_then_huge_bytes": 2097152,
+    "shared_lock_released": true
+  },
+  "owned_test_containers_exited": true
+}

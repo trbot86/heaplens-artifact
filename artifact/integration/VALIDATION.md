@@ -1,58 +1,81 @@
-# Final-paper integration candidate
+# Final-paper integration validation
 
-Base: published main `89ec644`. Correctness/logger merge: `63e36fe`.
-CR/backend/UI/final-selector merge: `e2e66b86`. Existing main release fixes are
-retained; the earlier main checkout and development worktrees were not reset.
+Accepted implementation: `a816b341`, on `codex/final-paper-integration`, based
+on published main `89ec644` and CR `884fb19`. The November 2 checks below
+supersede the earlier frontend typecheck and local-kernel limitations.
 
-Completed checks before packaging:
+## Clean build and regression checks
 
-- 199 correctness tests passed (18 opt-in skips).
-- Native instrumentation: 11 header, one TPC-C custom-allocation, four C++
-  new-expression and one custom-allocator tests passed from an immutable source
-  archive with pinned dependencies.
-- 259 combined backend/selection tests passed (19 opt-in skips), including the
-  ordinary SQLite/backend/CLI route and exact executed-study equivalence.
-- Frontend helper tests passed: continuations, 2,649 current-bucket oracle
-  cases, 600 detail cases, million-record export/cancel/error and trace clocks.
-- Full TypeScript checking reports 51 diagnostics, the same diagnostic multiset
-  as the frozen CR frontend. This is a pre-existing limitation, not a clean
-  typecheck. The changed pure helper modules pass their focused compilation.
-- Converter regression: fourteen zero-extent/nested allocation cases passed.
-- Portable saved analysis reproduces all nine final logging rows, the BCCO
-  buffering ablation and all four final selection-table rows.
+- Built the actual artifact Dockerfile and dependency manifests from a fresh
+  minimal context in 205 seconds. Image ID:
+  `sha256:bc5b81e567754e0af2aa797fbc5a4022cc94525c6a9e1d9256d69d5ea67e4dab`.
+- Extracted the committed source, including pinned SetBench/RocksDB dependencies,
+  into that new image. The **273-test suite passed**, with 19 explicit opt-in
+  skips. Native instrumentation passed separately: eleven header tests, one
+  TPC-C custom-allocator test, four C++ new-expression tests and one custom-
+  allocator test, with no skips in these four suites.
+- Full TypeScript checking and the Next.js production build pass with no errors.
+  Eight React hook dependency warnings remain. Repairs include explicit React/D3
+  types, null handling, UTF-8 lint configuration, stable list keys, and shared
+  utilities moved out of Next.js page exports. Query parameters have a Suspense
+  boundary. Lint and type checking remain enabled.
+- All five frontend helper suites pass: continuation edges, 2,649 current-bucket
+  comparisons, 600 detail comparisons, million-record export/cancellation/error
+  cases, and per-trace clocks. Converter tests cover fourteen zero-extent and
+  nested allocation cases.
+- The saved-result summarizer reproduces the final logging and selection tables.
+  Native and reader-only HSL throughput and writer endpoints remain separate.
 
-The clean source package at `d2c6cf34` passed 269 tests (19 opt-in skips) and
-all five frontend helper suites. Saved-input acceptance passed on the bundled
-EFRB (16,404 objects) and Valkey (104,913 objects) databases: frozen-study
-fingerprints, all four selection methods, cluster memberships, ordinary CLI
-pages and previous/current cache outputs agreed exactly. Both input hashes are
-unchanged. Machine-readable receipts are in `saved-replay.json`.
+The tested scientific dependencies are NumPy 1.25.2, pandas 2.1.1, SciPy 1.15.3
+and scikit-learn 1.3.2. This is functional acceptance of the integrated source;
+historical timing measurements remain attributed to their original binaries.
 
-The new figure routes pass configuration/argument tests, including four-worker
-EFRB, HJ64 plus pinned jemalloc, segregation-only BCCO, phase boundaries and the
-explicit 2,000-bucket converter option. The native BCCO preflight confirmed two
-independent jemalloc 5.3 instances. Physical backing validation was unavailable
-on the local WSL kernel 6.6.87.2; its PAGEMAP_SCAN preflight stopped before any
-benchmark. The README requires a capable Linux 6.8+ host. Full application timing campaigns and large new figure captures
-are not acceptance tests for this source integration. Historical native results
-remain attributed to their original binaries. No visual browser/desktop control
-was used. An author visual check of the integrated GUI is still useful.
+## Native backing check
 
-Distribution limits: final selection summaries are packaged at the per-pattern
-twenty-trial aggregate level; the full eleven input databases and individual
-seed records are not part of this compact source candidate. Full frozen-study
-replay packaging and large-input distribution remain explicit release tasks.
-The README identifies diagnostic versus performance commands and historical
-versus final figure numbering. The referenced October 9 DOI has not been
-updated by this integration.
+The BCCO preflight passed on Pyke with Linux 6.8.0-137 under the shared experiment
+lock. It verified independent jemalloc 5.3 instances and used PAGEMAP_SCAN to
+confirm small-page backing followed by a 2-MiB huge page after process-local
+MADV_COLLAPSE. The preflight exited and released the lock. No system-wide
+settings or other processes were changed, and no full application was run.
 
-Final source-package acceptance at `8c45c330`: **270 tests passed**, with 19
-explicit opt-in skips. All frontend helper suites, shell syntax checks, the
-20-cell plain-only Table 1 plan, matching perf-c2c archive verifier, and frozen
-camera-ready saved-result verifier passed. This was a fresh source extraction
-with pinned SetBench/RocksDB dependencies, using the existing review image
-`sha256:71d89d37d0474134e1a1d024c61631214da5c14de889d29f7df2bbf84e6eb9ca`;
-it was not a fresh Docker image build. Runtime: Python 3.10.12, NumPy 1.25.2,
-pandas 2.1.1, SciPy 1.15.3, scikit-learn 1.3.2. SciPy is now pinned to the tested
-version alongside the existing pins. No implementation changed after this
-acceptance; later changes record evidence and this dependency constraint.
+## Saved inputs and GUI
+
+Saved EFRB (16,404 objects) and Valkey (104,913 objects) replay checks establish
+exact equality with frozen-study fingerprints, cluster memberships and pages
+for all four methods, ordinary CLI equality, and old/new cache equality.
+Input hashes remain unchanged; see `saved-replay.json`.
+
+The production GUI was exercised through an isolated in-app browser:
+
+- EFRB: 37 pages / 2,068 records / 7 represented clusters by default; resampling
+  with seed 2026100900 and a 32-page budget produces 32 / 1,748 / 7.
+- Valkey: 116 pages / 8,400 records / 58 represented clusters by default.
+- Time changes, selected-page detail, per-type page/cache visibility and
+  off-screen page rows render correctly. Unknown clocks are labelled in ticks.
+- An oversized Valkey L2 request is rejected with the memory-budget explanation;
+  the previous L1 view stays selected and usable, with no silent parameter changes.
+- Snapshot export completed and its downloaded file contains eight snapshots,
+  each covering all 37 selected EFRB pages. The button now uses the exporter's
+  snapshot-count constant instead of the stale five-snapshot label.
+
+The author handled the native save dialog. Temporary browser/service processes
+were closed; no existing user tabs or unrelated services were modified.
+
+## Scientific evidence and remaining release scope
+
+All **440** retained selection trial receipts agree with their paired full-method
+baseline receipts. All **3,520** method/budget outputs are present, and their
+per-seed values reproduce all **208** aggregate cells. The 1.3-MB compressed
+receipts and `artifact/final-paper/verify_selection.py` are included. No study
+was rerun or pooled with a different cohort.
+
+The eleven full study databases still exist remotely (62.3 GiB total); only
+their presence and sizes were checked. No large database was scanned or
+transferred. Public distribution of those inputs and full frozen-study replay
+packaging remain release tasks.
+
+Fresh full application performance campaigns and large figure captures were
+not repeated for this integration. Figure command/configuration/phase tests
+pass, including four-worker EFRB, HJ64 with pinned jemalloc, segregation-only
+BCCO, and explicit 2,000-bucket conversion. Main and Zenodo remain unchanged
+pending author review and publication authorization.
