@@ -1,5 +1,6 @@
 'use client';
-import { ChangeEvent, forwardRef, useEffect, useRef, useState } from 'react';
+import { TypeToColourMap, generateColours, getData, requestErrorMessage, getSubtypeName, getTypeName } from '../ui/appShared';
+import { Suspense, ChangeEvent, forwardRef, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import Legend, { SubtypeEntry } from '../ui/legendComponent';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
@@ -10,17 +11,13 @@ import { testCacheInfo, testColourOfType, testLineData, testMaxPointsPerLine, te
 import TimeGraph, { SIZE_UNIT_SUFF, SIZE_UNITS, SizePoint } from '../ui/timeGraphComponent';
 import CssBaseline from '@mui/material/CssBaseline';
 import CacheSets, { CacheInfoMap } from '../ui/cacheSetComponent';
-import { getNotesForFile, theme } from '../page';
+import { getNotesForFile, theme } from '../ui/appShared';
 import { useSearchParams } from 'next/navigation';
 import { Badge, Divider, FormControl, IconButton, InputLabel, LinearProgress, MenuItem, Paper, Popover, Select, Slider, Tab, Tabs, TextareaAutosize, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { flushSync } from 'react-dom';
 import { ArrowBack, Cached, Close, EditNote, Settings } from '@mui/icons-material';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import { Alert, Snackbar } from '@mui/material';
-
-export interface TypeToColourMap {
-    [ tp: string ]: d3.RGBColor | d3.HSLColor | null
-};
 
 interface LogBody {
     'myNotes': string,
@@ -44,24 +41,13 @@ const INIT_CLUSTER_ALG = 'mbkmeans';
 const INIT_CACHE_SIZE = 32768;
 const INIT_CACHE_ASSOC = 8;
 const INIT_TIME_RANGE = {min: 0, max: 1};
-const INIT_CACHE_INFO = {
+const INIT_CACHE_INFO: CacheInfoMap = {
     'L1': {size: 32768, assoc: 8},
     'L2': {size: 2097152, assoc: 8},
     'L3': {size: 4194304, assoc: 8}
 };
-const INIT_CACHE_DATA = {occ: [[]], idxToTpAndSt: [''], numSets: 1};
+const INIT_CACHE_DATA: {occ: number[][]; idxToTpAndSt: string[]; numSets: number} = {occ: [[]], idxToTpAndSt: [''], numSets: 1};
 const MAX_POINTS_PER_LINE = 3000;
-
-function getRand(min: number, max: number): number {
-    return min + Math.floor(Math.random() * (max - min + 1));
-}
-
-export function generateColours(types: string[]): TypeToColourMap {
-    return types.reduce((map: TypeToColourMap, tp: string) => {
-        map[tp] = d3.color(`hsl(${getRand(0, 360)}, ${getRand(20, 60)}%, ${getRand(35, 55)}%)`);
-        return map;
-    }, {});
-}
 
 async function logData(fname: string, logBody: LogBody) {
     const resp = await fetch(`http://localhost:5000/log-data/${fname}`, {
@@ -75,37 +61,6 @@ async function logData(fname: string, logBody: LogBody) {
     return resp;
 }
 
-export async function getData(url: string, postBody: {[tp: string]: boolean} | null) {
-    const data = await fetch(`http://localhost:5000/${url}`, {
-        method: postBody ? 'POST' : 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: postBody ? JSON.stringify(postBody) : null
-    });
-    if (!data.ok) {
-        const detail = await data.json().catch(() => null);
-        throw new Error(detail?.error || `The request failed (HTTP ${data.status}). Please try again.`);
-    }
-    return data;
-}
-
-export function requestErrorMessage(error: unknown): string {
-    return error instanceof TypeError
-        ? 'Could not reach the HeapLENS backend. Check that it is running, then try again. The previous view is unchanged.'
-        : error instanceof Error ? error.message : 'Could not prepare this view. Please try again.';
-}
-
-export function getSubtypeName(tp: string, st: string) {
-    return '>' + tp + '|' + st;
-}
-
-export function getTypeName(st: string) {
-    const tpReg = /^>([^|]+)|[^|]+/.exec(st);
-    return tpReg ? tpReg[1] : '';
-}
-
 function a11yProps(value: string) {
     return {
         id: `simple-tab-${value}`,
@@ -113,7 +68,7 @@ function a11yProps(value: string) {
     };
 }
 
-const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCluster, setMaxRunsPerCluster,
+const SettingsButton = forwardRef(function SettingsButton({ maxRunLength, setMaxRunLength, maxRunsPerCluster, setMaxRunsPerCluster,
                          clusterAlg, setClusterAlg, numBucketsSetting, setNumBucketsSetting,
                          pageSizeSetting, setPageSizeSetting, cacheInfoSetting, setCacheInfoSetting,
                          cacheLineSizeSetting, setCacheLineSizeSetting,
@@ -136,7 +91,7 @@ const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCl
         pageBudget: number, setPageBudget: (a: number) => void,
         recordBudget: number, setRecordBudget: (a: number) => void,
         selectionSeed: number, setSelectionSeed: (a: number) => void
-    }, ref) => {
+    }, ref: React.ForwardedRef<HTMLButtonElement>) {
     const [menuAnchor, setMenuAnchor] = useState<HTMLButtonElement | null>(null);
     const [tabValue, setTabValue] = useState<'sample' | 'pages' | 'cache'>('sample');
     const [cacheSizeUnitSetting, setCacheSizeUnitSetting] = useState(Object.keys(cacheInfoSetting).reduce((map: {[a: string]: 0 | 1 | 2}, cname: string) => {
@@ -246,7 +201,7 @@ const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCl
                                     step={1}
                                     min={1}
                                     max={20}
-                                    onChange={(e, v: number) => setMaxRunLength(v)} />
+                                    onChange={(e, v) => { if (typeof v === 'number') setMaxRunLength(v); }} />
                                 <Box>{maxRunLength}</Box>
                             </Box>
                         </Grid>
@@ -267,7 +222,7 @@ const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCl
                                     step={1}
                                     min={1}
                                     max={10}
-                                    onChange={(e, v: number) => setMaxRunsPerCluster(v)} />
+                                    onChange={(e, v) => { if (typeof v === 'number') setMaxRunsPerCluster(v); }} />
                                 <Box>{maxRunsPerCluster}</Box>
                             </Box>
                         </Grid>
@@ -380,7 +335,7 @@ const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCl
                                                                                                 setCacheSizeUnitSetting(newCacheSizeUnitSetting);
                                                                                             }} >
                                                                                             {
-                                                                                                SIZE_UNIT_SUFF.slice(0, 3).map((suff, i) => <ToggleButton value={i} >{suff}</ToggleButton>)
+                                                                                                SIZE_UNIT_SUFF.slice(0, 3).map((suff, i) => <ToggleButton key={suff} value={i} >{suff}</ToggleButton>)
                                                                                             }
                                                                                         </ToggleButtonGroup>
                                                                                         <Box>Associativity:</Box>
@@ -410,7 +365,7 @@ const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCl
     );
 });
 
-export default function VisPanels() {
+function VisPanels() {
     const shouldInitialize = useRef(true);
     const searchParams = useSearchParams();
     const fname = searchParams.get('fname');
@@ -440,7 +395,7 @@ export default function VisPanels() {
     const [sumClusterSizes, setSumClusterSizes] = useState<number>(0);
     const [numClusters, setNumClusters] = useState<number>(0);
     const [featuresData, setFeaturesData] = useState({});
-    const [perfData, setPerfData] = useState({});
+    const [perfData, setPerfData] = useState<PerfMap>({addrs: {}, avgAccesses: 0});
     const [cacheInfo, setCacheInfo] = useState(INIT_CACHE_INFO);
     const [cacheData, setCacheData] = useState(INIT_CACHE_DATA);
     const [numBuckets, setNumBuckets] = useState(initialBuckets);
@@ -474,7 +429,7 @@ export default function VisPanels() {
 
     /*  State and refs for notes. */
     const nodeRef = useRef(null);
-    const notesTextRef = useRef(null);
+    const notesTextRef = useRef<HTMLTextAreaElement>(null);
     const [notesOpen, setNotesOpen] = useState<boolean>(false);
     const [notesPosition, setNotesPosition] = useState({x: 0, y: 0});
     const [notesText, setNotesText] = useState<string>('');
@@ -677,7 +632,6 @@ export default function VisPanels() {
                         clusterAlg={clusterAlg}
                         maxRunLength={maxRunLength}
                         maxRunsPerCluster={maxRunsPerCluster}
-                        typesToSample={typesToSample}
                         pageVis={pageVis}
                         fieldsData={fieldsData}
                         expandedTypes={expandedTypes}
@@ -891,4 +845,8 @@ export default function VisPanels() {
             }
         </ThemeProvider>
     );
+}
+
+export default function VisPanelsPage() {
+    return <Suspense fallback={<div>Loading trace settings…</div>}><VisPanels /></Suspense>;
 }

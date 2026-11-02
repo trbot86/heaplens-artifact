@@ -2,13 +2,13 @@
 import { cache, forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './componentStyles.scss';
 import * as d3 from 'd3';
-import { getData, getSubtypeName, TypeToColourMap } from '../vispanels/page';
+import { getData, getSubtypeName, TypeToColourMap } from './appShared';
 import { Check, Dangerous, DangerousOutlined, LocalFireDepartment, LocalFireDepartmentOutlined, PlaylistAdd, PlaylistPlay, RadioButtonChecked, SentimentDissatisfied, SentimentDissatisfiedOutlined, SentimentDissatisfiedRounded, SentimentDissatisfiedSharp, SentimentDissatisfiedTwoTone, SentimentVeryDissatisfied, SentimentVeryDissatisfiedOutlined, SportsMma, SportsMmaOutlined, ZoomInMap, ZoomOutMap } from '@mui/icons-material';
 import { Box, Checkbox, Icon, IconButton, Stack, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { SubtypeEntry } from './legendComponent';
 import { HtmlTooltip } from './cacheSetComponent';
 import Grid from '@mui/material/Grid2';
-import { theme } from '../page';
+import { theme } from './appShared';
 import { getSlotDataAtBucket } from './currentBucket';
 import SnapshotExportButton from './snapshotExportButton';
 import { selectDetailEvents } from './detailEvents';
@@ -62,7 +62,7 @@ const SEL_AND_ZOOM_GRANULARITY = 4096;
 const MAX_HITM_ADDRS = 20;
 const PERF_INDICATOR_SIZE = 4;
 
-const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize, xScale, yScale,
+const SplitBlock = forwardRef(function SplitBlock({ obj, colourOfType, viewStartAddr, cacheLineSize, xScale, yScale,
                                  expanded, viewSize, invisible, ...props } : 
     {
         obj: MemoryObject,
@@ -74,7 +74,7 @@ const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize
         yScale: d3.ScaleLinear<number, number, never>,
         expanded: boolean,
         invisible?: boolean
-    }, ref) => {
+    }, ref: React.ForwardedRef<SVGGElement>) {
     return (
         <g
             {...props}
@@ -283,7 +283,7 @@ function HoverableSplitBlock({  event, colourOfType, viewStartAddr, viewSize,
                                                                 xScale={xScale}
                                                                 yScale={yScale}
                                                                 expanded={false}
-                                                                invisible={!expandedTypes[event.type.replace(/\s+/g, '')]} />
+                                                                invisible={!event.type || !expandedTypes[event.type.replace(/\s+/g, '')]} />
                                                         </HtmlTooltip>)
             }
             </>
@@ -313,7 +313,7 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
         hitmCutoff: number,
         currTs: number
     }) {
-    const objSVG = useRef(null);
+    const objSVG = useRef<SVGSVGElement>(null);
     const detailEvents = useMemo(() => selectDetailEvents(
         data, viewStartAddr, viewSize, currTs, pageVis, fieldsData, expandedTypes,
     ), [data, viewStartAddr, viewSize, currTs, pageVis, fieldsData, expandedTypes]);
@@ -332,27 +332,27 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
     const yAxis = d3.axisLeft(yScale)
                     .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 8)).tickFormat(d3.format('d'));
     const yAxisGrid = d3.axisLeft(yScale).tickSize(-OBJECT_LAYOUT_WIDTH)
-                        .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 1)).tickFormat('');
+                        .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 1)).tickFormat(() => '');
 
     useEffect(() => {
-        const curObjSVG = d3.select(objSVG.current);
+        const curObjSVG = d3.select(objSVG.current!);
         
-        curObjSVG.select('#objectXAxisGroup')
+        curObjSVG.select<SVGGElement>('#objectXAxisGroup')
             .call(xAxis);
-        curObjSVG.select('#objectYAxisGroup')
+        curObjSVG.select<SVGGElement>('#objectYAxisGroup')
             .call(yAxis);
-        curObjSVG.select('#objectYAxisGridGroup')
+        curObjSVG.select<SVGGElement>('#objectYAxisGridGroup')
             .call(yAxisGrid);
     }, [cacheLineSize, viewSize, yAxis]);
 
     useEffect(() => {
-        const zoom = d3.zoom()
+        const zoom = d3.zoom<SVGSVGElement, unknown>()
             .scaleExtent([1, 6])
             .translateExtent([[0, -OBJECT_LAYOUT_MARGIN], [OBJECT_LAYOUT_WIDTH, (OBJECT_LAYOUT_HEIGHT / cacheLineSize)*(viewSize / cacheLineSize) + OBJECT_LAYOUT_MARGIN]]) // I think the +30 comes from the relative position of the object svg in the css, but not sure
             .on('zoom', (event) => {
                 setYScale(() => event.transform.rescaleY(yScaleOrig));
             });
-        d3.select(objSVG.current)
+        d3.select(objSVG.current!)
             .call(zoom);
     }, [viewSize]);
     
@@ -417,7 +417,7 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
                                 .map((perfAddr) => parseInt(perfAddr))
                                 .filter((perfAddr) => perfAddr >= viewStartAddr && perfAddr <= viewStartAddr + viewSize &&
                                                         ((perf.addrs[perfAddr].hitm >= hitmCutoff && showHitm) || (perf.addrs[perfAddr].loads + perf.addrs[perfAddr].stores >= perf.avgAccesses && showHot)))
-                                .map((perfAddr) =>  <g>
+                                .map((perfAddr) =>  <g key={perfAddr}>
                                                         <circle
                                                             className='objectPerfIcon' 
                                                             cx={OBJECT_LAYOUT_WIDTH + 2*PERF_INDICATOR_SIZE}
@@ -541,12 +541,12 @@ function PageHeader({ sortMode, setSortMode, pageSize, selSize, setSelSize,
     );
 }
 
-const SizeIndicator = forwardRef(({ clusterSize, sumClusterSizes, maxClusterSize, ...props } :
+const SizeIndicator = forwardRef(function SizeIndicator({ clusterSize, sumClusterSizes, maxClusterSize, ...props } :
     {
         clusterSize: number,
         sumClusterSizes: number,
         maxClusterSize: number
-    }, ref) => {
+    }, ref: React.ForwardedRef<HTMLDivElement>) {
 
     const   maxWidth = 36,
             minWidth = 6,
@@ -650,7 +650,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                                                 y={0}
                                                 width={pageScale(ev.size)}
                                                 edges={continuationEdges(ev, addr, pageSize)}
-                                                fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'}
+                                                fill={(ev.type && colourOfType[ev.type]?.toString()) || 'black'}
                                                 isVis={(ev.type && pageVis[ev.type]) == true}
                                                 currTs={currTs}
                                                 allocTs={ev.allocTs}
@@ -667,7 +667,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                             .map((perfAddr) => parseInt(perfAddr))
                             .filter((perfAddr) => perfAddr >= addr && perfAddr < addr + pageSize &&
                                                     ((perf.addrs[perfAddr].hitm >= hitmCutoff && showHitm) || (perf.addrs[perfAddr].loads + perf.addrs[perfAddr].stores >= perf.avgAccesses && showHot)))
-                            .map((perfAddr) => <circle 
+                            .map((perfAddr) => <circle key={perfAddr}
                                                     cx={`${pageScale(perfAddr % pageSize) + 2*PERF_INDICATOR_SIZE + 1}`} // TODO: not sure why the extra shift is needed here
                                                     cy={`${PAGE_CARD_SVG_HEIGHT / 2}`}
                                                     r={`${PERF_INDICATOR_SIZE}`}
@@ -700,7 +700,7 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
         zoomedAddr: number
     }) {
     const ref = useRef(null);
-    const brushRef = useRef(null);
+    const brushRef = useRef<SVGGElement>(null);
     const pageScale = useMemo(() => d3.scaleLinear()
         .domain([0, zoomedSize || pageSize]).range([0, PAGE_CARD_BORDER_WIDTH]), [pageSize, zoomedSize]);
     // const pageBrush = d3.brushX()
@@ -723,7 +723,7 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
     const pageBrush = useMemo(() => d3.brushX()
         .on('end', 
             function(e: d3.D3BrushEvent<null> | null) {
-                if (e && e.sourceEvent && e.selection) {
+                if (e && e.sourceEvent && e.selection && typeof e.selection[0] === 'number' && typeof e.selection[1] === 'number') {
                     const startAddr = (zoomedSize > 0 ? zoomedAddr : addr) + pageScale.invert(Math.min(PAGE_CARD_BORDER_WIDTH, Math.max(0, e.selection[0])));
                     const endAddr = (zoomedSize > 0 ? zoomedAddr : addr) + pageScale.invert(Math.min(PAGE_CARD_BORDER_WIDTH, Math.max(0, e.selection[1])));
                     const startRounded = Math.round(startAddr / SEL_AND_ZOOM_GRANULARITY)*SEL_AND_ZOOM_GRANULARITY;
@@ -734,10 +734,10 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
             }), [pageScale, zoomedSize, zoomedAddr, addr, setSelPageAddr, setSelSize]);
 
     // console.log(`pageScale domain: ${pageScale.domain()[0]}, ${pageScale.domain()[1]}`);
-    const colScale = useMemo(() => d3.scaleLinear().domain([0, slotSize]).range(['rgb(51, 51, 51)', '#e33a2b']), [slotSize]);
+    const colScale = useMemo(() => d3.scaleLinear<string>().domain([0, slotSize]).range(['rgb(51, 51, 51)', '#e33a2b']), [slotSize]);
 
     useEffect(() => {
-        d3.select(brushRef.current)
+        d3.select(brushRef.current!)
             .call(pageBrush);
     }, [pageBrush]);
 
@@ -747,7 +747,7 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
             // console.log(`Bad useEffect, addr: ${addr}, selAddr: ${selAddr}, selSize: ${selSize}`);
             // console.log('Here is brushRef:');
             // console.log(brushRef);
-            d3.select(brushRef.current)
+            d3.select(brushRef.current!)
                 .call(pageBrush.clear);
         }
     }, [selAddr, addr, pageSize, pageBrush]);
@@ -756,9 +756,9 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
         // console.log('Here is pageBrush.current.clear');
         // console.log(pageBrush.current.clear);
         // console.log(brushRef.current);
-        d3.select(brushRef.current)
+        d3.select(brushRef.current!)
             .call(pageBrush.clear);
-        d3.select(brushRef.current)
+        d3.select(brushRef.current!)
             .call(pageBrush);
     }, [zoomedSize, pageBrush]);
 
@@ -792,7 +792,7 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
                                                     x={pageScale(ev.addr - zoomedAddr)}
                                                     y={0}
                                                     width={pageScale(ev.size)}
-                                                    fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'} />)
+                                                    fill={(ev.type && colourOfType[ev.type]?.toString()) || 'black'} />)
                     }
                 </>
                 }
@@ -824,7 +824,6 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
         selAddr: number,
         colourOfType: TypeToColourMap,
         setSelPageAddr: (a: number) => void,
-        setFocusData: (a: PageContents) => void,
         pageVis: {[tp: string]: boolean},
         showHot: boolean,
         showHitm: boolean,
@@ -896,7 +895,7 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
 }
 
 function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setSelPageAddr,
-                       numBuckets, setFocusData, setZoomedSize, getBucketIdx, selSize,
+                       numBuckets, setZoomedSize, getBucketIdx, selSize,
                        setSelSize, pageVis, zoomedSize, zoomedAddr, setZoomedAddr,
                        clusterSize, sumClusterSizes, maxClusterSize } : 
     {
@@ -911,7 +910,6 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
         selAddr: number,
         colourOfType: TypeToColourMap,
         setSelPageAddr: (a: number) => void,
-        setFocusData: (a: PageContents) => void,
         zoomedSize: number,
         setZoomedSize: (a: number) => void,
         getBucketIdx: (a: number) => number,

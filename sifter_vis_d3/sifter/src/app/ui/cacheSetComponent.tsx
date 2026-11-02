@@ -5,9 +5,9 @@ import { Alert, Snackbar, CircularProgress, IconButton, styled, Theme, ToggleBut
 import { useEffect, useMemo, useState } from "react";
 import * as d3 from 'd3';
 import { testCacheDataPerBucket, testMinAndMaxOccPerBucket } from "./testdata";
-import { getData, getTypeName, requestErrorMessage } from "../vispanels/page";
+import { getData, getTypeName, requestErrorMessage } from "./appShared";
 import React from "react";
-import { theme } from "../page";
+import { theme } from "./appShared";
 import { getCacheTotalsAtBucket } from './currentBucket';
 
 interface CacheInfo {

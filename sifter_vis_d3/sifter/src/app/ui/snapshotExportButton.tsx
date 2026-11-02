@@ -1,7 +1,7 @@
 'use client';
 import {useEffect, useRef, useState} from 'react';
 import {Box, Button} from '@mui/material';
-import {openSnapshotSink, writePageSnapshots, SnapshotPages, SnapshotClusters, SnapshotFields} from './snapshotExport';
+import {SNAPSHOT_COUNT, openSnapshotSink, writePageSnapshots, SnapshotPages, SnapshotClusters, SnapshotFields} from './snapshotExport';
 
 // Keep export progress local so it does not rerender every page row.
 export default function SnapshotExportButton({pages, clustersData, fieldsData, pageSize}: {
@@ -47,7 +47,7 @@ export default function SnapshotExportButton({pages, clustersData, fieldsData, p
         <Box sx={{display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap'}}>
             <Button size='small' onClick={exportSnapshots}
                 disabled={exportProgress !== null || !Object.keys(pages).length}>
-                Export 5 snapshots
+                Export {SNAPSHOT_COUNT} snapshots
             </Button>
             {exportProgress !== null && <>
                 <span role='status' style={{minWidth: 115, fontVariantNumeric: 'tabular-nums'}}>Exporting: {exportProgress}%</span>

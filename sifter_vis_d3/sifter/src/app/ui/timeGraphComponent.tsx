@@ -2,7 +2,7 @@
 import { forwardRef, MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from 'd3';
 import './componentStyles.scss';
-import { TypeToColourMap } from "../vispanels/page";
+import { TypeToColourMap } from "./appShared";
 import { Slider, styled, Tooltip } from "@mui/material";
 import { formatElapsedTimestamp } from './timestampClock';
 
@@ -118,7 +118,7 @@ function TimeSlider({ xScale, currTs, numLinePtsX, setCurrTs, timeRange, numBuck
                 step={Math.max(Math.floor(timeRange.max - timeRange.min) / numBuckets, 1)}
                 onChange={(e, val) => {
                     console.log(`Timestamp: ${val}`);
-                    setCurrTs(val);
+                    if (typeof val === 'number') setCurrTs(val);
                 }} />
         </div>
         // <g
@@ -141,12 +141,12 @@ function TimeSlider({ xScale, currTs, numLinePtsX, setCurrTs, timeRange, numBuck
     );
 }
 
-const LinePath = forwardRef(({ lineData, colour, lineGenerator, ...props } :
+const LinePath = forwardRef(function LinePath({ lineData, colour, lineGenerator, ...props } :
     {
         lineData: SizePoint[],
         colour: d3.RGBColor | d3.HSLColor | null,
         lineGenerator: d3.Line<SizePoint> | null
-    }, ref) => {
+    }, ref: React.ForwardedRef<SVGGElement>) {
     const pathRef = useRef(null);
 
     useEffect(() => {
@@ -179,7 +179,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
         lineVis: {[tp: string]: boolean},
         timestampHz: number | null,
     }) {
-    const SVGref = useRef(null);
+    const SVGref = useRef<SVGSVGElement>(null);
     const [thumbX, setThumbX] = useState<number>(LINE_GRAPH_Y_AXIS_WIDTH);
     // const xScale = useRef<d3.ScaleLinear<number, number, never> | null>(null);
     const lineGenerator = useRef<d3.Line<SizePoint> | null>(null);
@@ -215,21 +215,21 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
     }
     
     const yAxis = useMemo(() => d3.axisLeft(yScale).tickSize(3).tickValues(getSizeTickValues(maxSize ? maxSize : 1, 6))
-        .tickFormat((d: number) => `${d / SIZE_UNITS[getUnitIndex(maxSize ? maxSize : 1)]} ${SIZE_UNIT_SUFF[getUnitIndex(maxSize ? maxSize : 1)]}`)
+        .tickFormat((d) => `${Number(d) / SIZE_UNITS[getUnitIndex(maxSize ? maxSize : 1)]} ${SIZE_UNIT_SUFF[getUnitIndex(maxSize ? maxSize : 1)]}`)
     , [yScale]);
 
     useEffect(() => {
-        d3.select('#xAxisGroup').call(xAxis);
-        d3.select('#yAxisGroup').call(yAxis);
+        d3.select<SVGGElement, unknown>('#xAxisGroup').call(xAxis);
+        d3.select<SVGGElement, unknown>('#yAxisGroup').call(yAxis);
 
         if (xScale) {
-            d3.select('#xAxisGroup')
+            d3.select<SVGGElement, unknown>('#xAxisGroup')
                 .call(xAxis.scale(xScale));
         }
-        d3.selectAll('.timeGraphLine')
+        d3.selectAll<SVGPathElement, SizePoint[]>('.timeGraphLine')
                 .attr('d', lineGenerator.current);
 
-        const zoom = d3.zoom()
+        const zoom = d3.zoom<SVGSVGElement, unknown>()
             .scaleExtent([1, 10]) // TODO: get rid of constants
             .translateExtent([[0, 0], [LINE_GRAPH_WIDTH + LINE_GRAPH_RIGHT_PAD + LINE_GRAPH_Y_AXIS_WIDTH + (LINE_GRAPH_LINE_STROKE_WIDTH / 2), LINE_GRAPH_HEIGHT + 31]])
             .on('zoom', (event) => {
@@ -239,7 +239,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
                 // xScale.current = event.transform.rescaleX(xScaleOrig);
             });
         
-        d3.select(SVGref.current)
+        d3.select(SVGref.current!)
             .call(zoom);
 
         const thumbDrag = d3.drag()
@@ -257,7 +257,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
                 setThumbX(newX);
             });
 
-        d3.select('#timeThumb')
+        d3.select<Element, unknown>('#timeThumb')
             .call(thumbDrag);
     }, [lines, xScale, yAxis]);
     

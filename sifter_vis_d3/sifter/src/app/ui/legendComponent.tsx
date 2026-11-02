@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { Checkbox, IconButton, Menu, MenuItem, Paper, Popover, TextField, Tooltip, Typography } from '@mui/material';
 import './componentStyles.scss';
-import { generateColours, getSubtypeName, TypeToColourMap } from '../vispanels/page';
+import { generateColours, getSubtypeName, TypeToColourMap } from './appShared';
 import { BarChart, Casino, Close, InsertChart, KeyboardArrowLeft, KeyboardArrowRight, StackedLineChart, Window } from '@mui/icons-material';
 import { Box, styled } from '@mui/system';
 import { MaterialPicker, PhotoshopPicker, SketchPicker } from 'react-color';
@@ -417,7 +417,7 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
                                     sx={{
                                         width: '20px',
                                         height: '20px',
-                                        backgroundColor: colourOfType[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)] == null ? 'white' : colourOfType[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)].formatHex()
+                                        backgroundColor: colourOfType[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)]?.formatHex() ?? 'white'
                                     }} />
                             </div>
                         </td>
@@ -472,7 +472,7 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
                         .range([0, ALIGN_SIZE_WIDTH]);
         const xAxis = d3.axisBottom(xScale)
                         .tickSize(0);
-        d3.select('#alignXAxisGroup')
+        d3.select<SVGGElement, unknown>('#alignXAxisGroup')
             .style('transform', `translateY(${ALIGN_SIZE_HEIGHT}px)`)
             .call(xAxis);
 
@@ -487,11 +487,11 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
                         .domain([maxCount, 0])
                         .range([ALIGN_SIZE_MARGIN+10, ALIGN_SIZE_HEIGHT]);
         const yAxis = d3.axisLeft(yScale)
-                        .tickFormat((d: number) =>  d >= 1000000000 ? `${(d / 1000000000).toFixed(1)}B` :
+                        .tickFormat((value) => { const d = Number(value); return d >= 1000000000 ? `${(d / 1000000000).toFixed(1)}B` :
                                                     d >= 1000000 ? `${(d / 1000000).toFixed(1)}M` :
                                                     d >= 1000 ? `${(d / 1000).toFixed(1)}K` :
-                                                    `${d}`);
-        d3.select('#alignYAxisGroup')
+                                                    `${d}`; });
+        d3.select<SVGGElement, unknown>('#alignYAxisGroup')
             .call(yAxis);
 
         d3.select(barGroupRef.current)
@@ -500,13 +500,13 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
             .enter()
             .append('rect')
             .attr('class', 'alignBar')
-            .attr('x', (d) => xScale(d[0]) + (ALIGN_SIZE_BANDSPACE / 2))
+            .attr('x', (d) => (xScale(d[0]) ?? 0) + (ALIGN_SIZE_BANDSPACE / 2))
             .attr('y', (d) => yScale(0))
             .attr('width', xScale.bandwidth() - ALIGN_SIZE_BANDSPACE)
             .attr('height', 0)
             .attr('fill', colour.toString());
 
-        d3.selectAll('.alignBar')
+        d3.selectAll<SVGRectElement, [string, number]>('.alignBar')
             .transition()
             .duration(600)
             .attr('y', (d) => yScale(d[1]))
@@ -530,7 +530,7 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
                         data.map((d) => d.size)
                             .filter((val, ind, arr) => arr.indexOf(val) === ind)
                             .sort((a, b) => a - b)
-                            .map((d) => <div
+                            .map((d) => <div key={d}
                                             className='sizeListItem' >
                                             <Checkbox
                                                 className='sizeListItemCheckbox'
@@ -678,7 +678,7 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, lineV
                 data={alignData[alignTypeDisplay]}
                 setAlignTypeDisplay={setAlignTypeDisplay}
                 cacheLineSize={cacheLineSize}
-                colour={colourOfType[alignTypeDisplay] ? colourOfType[alignTypeDisplay] : d3.color('white')} />
+                colour={colourOfType[alignTypeDisplay] ?? d3.rgb('white')} />
             }
         </>
     );
