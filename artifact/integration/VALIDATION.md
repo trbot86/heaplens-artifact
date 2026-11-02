@@ -45,3 +45,14 @@ replay packaging and large-input distribution remain explicit release tasks.
 The README identifies diagnostic versus performance commands and historical
 versus final figure numbering. The referenced October 9 DOI has not been
 updated by this integration.
+
+Final source-package acceptance at `8c45c330`: **270 tests passed**, with 19
+explicit opt-in skips. All frontend helper suites, shell syntax checks, the
+20-cell plain-only Table 1 plan, matching perf-c2c archive verifier, and frozen
+camera-ready saved-result verifier passed. This was a fresh source extraction
+with pinned SetBench/RocksDB dependencies, using the existing review image
+`sha256:71d89d37d0474134e1a1d024c61631214da5c14de889d29f7df2bbf84e6eb9ca`;
+it was not a fresh Docker image build. Runtime: Python 3.10.12, NumPy 1.25.2,
+pandas 2.1.1, SciPy 1.15.3, scikit-learn 1.3.2. SciPy is now pinned to the tested
+version alongside the existing pins. No implementation changed after this
+acceptance; later changes record evidence and this dependency constraint.
