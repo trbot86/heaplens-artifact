@@ -30,6 +30,7 @@ def main():
         p.error('seed must be a nonnegative 32-bit integer')
     if args.out.exists() or args.out.resolve() == args.database.resolve():
         p.error('output must be a new file')
+    args.out.parent.mkdir(parents=True, exist_ok=True)
     sampler = Sampler(str(args.database), args.page_size, args.cache_line_size, args.buckets)
     result = sampler.get_sample_of_pages(-1, -1, {}, seed=args.seed, selection_mode=args.mode,
                                         page_budget=args.page_budget, record_budget=args.record_budget)

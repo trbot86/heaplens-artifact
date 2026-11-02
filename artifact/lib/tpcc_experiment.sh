@@ -4,7 +4,7 @@
 # as the DBx1000-derived TPC-C database index).
 #
 # Diagnostic only -- see artifact/lib/ascylib_experiment.sh for the
-# same caveat. This reproduces the sampled database behind e.g. Figure 6's
+# same caveat. This reproduces the sampled database behind e.g. Figure 9's
 # huge-page density heatmap, not the claimed +16%/+20% throughput numbers
 # (see the corresponding tpcc_bcco_bench/tpcc_efrb_bench experiments for
 # those).
@@ -56,16 +56,9 @@ run_tpcc_experiment() {
     # paper's reference run scripts, which only ever pass -pin and never
     # override warehouse count separately.
     #
-    # Defaults below (THREADS=2, RUN_SECONDS=10) are deliberately small:
-    # this experiment's purpose in this artifact is to demonstrate
-    # HeapLENS's instrumentation/sampling/visualization pipeline working
-    # end-to-end on the paper's actual TPC-C case study, not to reproduce
-    # Table 1's throughput numbers (see tpcc_bcco_bench/tpcc_efrb_bench for
-    # those). Warehouse count scales 1:1 with THREADS and dominates
-    # wall-clock time far more than RUN_SECONDS does, so THREADS is the
-    # main lever for a bigger (or paper-matching THREADS=24) run, e.g.
-    # `THREADS=24 RUN_SECONDS=30 artifact/experiments/tpcc_efrb/run.sh`.
-    local THREADS="${THREADS:-2}"
+    # The paper figure recipe has 24 workers/warehouses; ae.py selects two
+    # for --profile smoke. These are diagnostic traces, not timing results.
+    local THREADS="${THREADS:-24}"
     local RUN_SECONDS="${RUN_SECONDS:-10}"
 
     local SAMPLE_PROPORTION="${SAMPLE_PROPORTION:-0.2}"
@@ -87,14 +80,35 @@ run_tpcc_experiment() {
     cp -r "$SIFTER_ROOT/artifact/patches/setbench-tpcc/." "$SRC_COPY/"
     source "$SIFTER_ROOT/artifact/lib/tpcc_allocators.sh"
     tpcc_stage_allocators "$SIFTER_ROOT" "$SRC_COPY"
+    if [[ "$out_name" == tpcc_hj ]]; then
+        python3 "$SIFTER_ROOT/artifact/lib/hj_figure.py" "$SRC_COPY"
+    fi
     local trace_opts="" trace_allocator="libjemalloc.so"
     case "$out_name:${TRACE_VARIANT:-baseline}" in
+        tpcc_hj:baseline) ;;
         tpcc_bcco:baseline) ;;
+        tpcc_bcco:segregation-only) trace_opts="-DMEMHOOK_SEG_DS" ;;
         tpcc_bcco:optimized) trace_opts="-DMEMHOOK_SEG_DS -DMACROBENCH_PACK_LOCK" ;;
         tpcc_efrb:baseline) trace_opts="-DDEBRA_ORIGINAL_FREE -DMEMHOOK_SEG_DS"; trace_allocator="libmimalloc.so" ;;
         tpcc_efrb:optimized) trace_opts="-DDEBRA_ORIGINAL_FREE -DMEMHOOK_SEG_DS -DMACROBENCH_PAD_ROW_TO_ALIGN -DMACROBENCH_SINGLE_RECMGR -DBST_ELLEN"; trace_allocator="libmimalloc.so" ;;
         *) echo "Unsupported trace variant" >&2; return 2 ;;
     esac
+    if [[ "${HEAPLENS_BCCO_FIGURE:-0}" == 1 ]]; then
+        # Distinct files ensure distinct jemalloc instances. Never symlink them.
+        cp "$SRC_COPY/lib/libjemalloc-heaplens.so" "$SRC_COPY/lib/global-jemalloc53.so"
+        trace_allocator="global-jemalloc53.so"
+        # Fail before instrumenting the full application if backing cannot be audited.
+        g++ -std=c++17 -O2 "$SIFTER_ROOT/artifact/lib/bcco_figure_preflight.cpp" -ldl -o "$WORK/figure-preflight"
+        timeout 30 env GLIBC_TUNABLES=glibc.rtld.optional_static_tls=4194304 \
+            MALLOC_CONF=thp:always,metadata_thp:disabled HL_FIG9_THP=on \
+            HL_FIG9_GLOBAL="$SRC_COPY/lib/$trace_allocator" \
+            HL_FIG9_NODE="$SRC_COPY/lib/libjemalloc-heaplens.so" \
+            "$WORK/figure-preflight" > "$RUN_ROOT/figure-preflight.log" 2>&1 || {
+                cat "$RUN_ROOT/figure-preflight.log" >&2
+                echo "BCCO figure needs two independent jemalloc 5.3 instances and permitted Linux 6.8+ PAGEMAP_SCAN/MADV_COLLAPSE." >&2
+                return 1
+            }
+    fi
 
     echo "=== [$out_name] 2/7: build instrumentation toolchain + generate fixes.yaml ==="
     # setbench's macrobench is C++ (-std=c++17) -- use -t/--template so type
@@ -111,7 +125,7 @@ run_tpcc_experiment() {
         -t \
         -s "$MB_SUBDIR" \
         --skip-refactor \
-        --build "bear -- make THREAD_CNT=${THREADS} workload=TPCC data_structure_name=${ds_name} data_structure_opts='${trace_opts}'"
+        --build "bear -- make -j${JOBS:-4} THREAD_CNT=${THREADS} workload=TPCC data_structure_name=${ds_name} data_structure_opts='${trace_opts}'"
 
     echo "=== [$out_name] 3/7: apply clang-tidy fixes ==="
     (cd "$INSTRUMENTED" && clang-apply-replacements-14 ./)
@@ -125,6 +139,9 @@ run_tpcc_experiment() {
         return 1
     fi
     printf '65004|%s\n' "$INSTRUMENTED/common/recordmgr/allocator_new.h" >> "$INSTRUMENTED/$MB_SUBDIR/fileset_dump.txt"
+    if [[ "${HEAPLENS_BCCO_FIGURE:-0}" == 1 ]]; then
+        python3 "$SIFTER_ROOT/artifact/lib/bcco_figure.py" "$INSTRUMENTED/$MB_SUBDIR" "${TRACE_VARIANT:-baseline}"
+    fi
     # No separate mem_alloc::alloc patch step here -- it's already baked
     # into patches/setbench-tpcc/macrobench/system/mem_alloc.h (see the
     # file-header comment above) and was applied back in step 1.
@@ -142,7 +159,7 @@ run_tpcc_experiment() {
         # in here too: it's a compile-time constant sizing several fixed
         # per-thread arrays (config.h's default is 8), not just the
         # runtime -tINT override parser.cpp also accepts.
-        make THREAD_CNT="$THREADS" workload=TPCC data_structure_name="$ds_name" data_structure_opts="$trace_opts" \
+        make -j"${JOBS:-4}" THREAD_CNT="$THREADS" workload=TPCC data_structure_name="$ds_name" data_structure_opts="$trace_opts" \
             xargs="-DHEAPLENS_TPCC_TRACE=1 -DTHREAD_CNT=${THREADS} -I${MEMHOOK_DIR} -L${MEMHOOK_DIR} -Wl,-rpath=${MEMHOOK_DIR} -lmemhook -ldl"
     )
 
@@ -157,19 +174,35 @@ run_tpcc_experiment() {
         # phase) is deliberate: memhook logs every allocation, and
         # warehouse/table population alone is measurably slower under
         # instrumentation than stock, before the timed phase even starts.
-        timeout "$((RUN_SECONDS + 300))" env LD_PRELOAD="$MEMHOOK_DIR/libmemhook.so:$INSTRUMENTED/lib/$trace_allocator" \
-            "./bin/rundb_TPCC_${ds_name}" -pin "0-$((THREADS - 1))"
+        local placement=() runtime_env=("GLIBC_TUNABLES=glibc.rtld.optional_static_tls=4194304") pin="${TRACE_CPUS:-0-$((THREADS - 1))}" bound="$((RUN_SECONDS + 300))"
+        if [[ -n "${TRACE_CPUS:-}" ]]; then
+            placement=(numactl "--physcpubind=$TRACE_CPUS" "--${TRACE_MEMORY:-membind}=${TRACE_NODE:-0}")
+        fi
+        if [[ "${HEAPLENS_BCCO_FIGURE:-0}" == 1 ]]; then
+            mkdir "$RUN_ROOT/backing"
+            runtime_env=("GLIBC_TUNABLES=glibc.rtld.optional_static_tls=4194304"
+                "MALLOC_CONF=thp:always,metadata_thp:disabled" "HL_FIG9_THP=on"
+                "HL_FIG9_GLOBAL=$INSTRUMENTED/lib/$trace_allocator"
+                "HL_FIG9_NODE=$INSTRUMENTED/lib/libjemalloc-heaplens.so" "HL_FIG9_EVIDENCE=$RUN_ROOT/backing")
+            bound=1200
+        fi
+        timeout "$bound" "${placement[@]}" env "${runtime_env[@]}" LD_PRELOAD="$MEMHOOK_DIR/libmemhook.so:$INSTRUMENTED/lib/$trace_allocator" \
+            "./bin/rundb_TPCC_${ds_name}" -pin "$pin" |& tee "$RUN_ROOT/benchmark.log"
     )
     # Expected outputs in $INSTRUMENTED/$MB_SUBDIR: binary_dump.txt,
     # fileset_dump.txt, typeset_dump.txt, fielddump.txt
 
     echo "=== [$out_name] 7/7: sample into sqlite database ==="
     cd "$SIFTER_ROOT"
+    local seed_args=() page_size=2097152
+    [[ "$out_name" != tpcc_hj ]] || page_size=4096
+    [[ -z "${SAMPLE_SEED:-}" ]] || seed_args=(--seed "$SAMPLE_SEED")
     ./sifter.sh "$INSTRUMENTED" -d -s "$MB_SUBDIR" \
+        "${seed_args[@]}" \
         --sample "$SAMPLE_PROPORTION" \
         --pages-per-type "$PAGES_PER_TYPE" \
         --field-dump fielddump.txt \
-        --page-size 2097152
+        --page-size "$page_size"
 
     local RESULT_DB="$RUN_ROOT/${out_name}.sqlite"
     cp "$SIFTER_ROOT/type_analysis/allocs.sqlite" "$RESULT_DB"
@@ -180,5 +213,5 @@ run_tpcc_experiment() {
     fi
     echo "=== [$out_name] done. Database: $RESULT_DB ==="
     echo "    Open it in the visualizer in huge-page mode to inspect segregation of"
-    echo "    data-structure nodes vs. database rows (cf. paper Figure 6)."
+    echo "    data-structure nodes vs. database rows (cf. paper Figure 9)."
 }

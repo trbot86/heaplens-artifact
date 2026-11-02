@@ -1,0 +1,3830 @@
+{
+  "schema": 1,
+  "source": "unified-selection-20261009/results-summary-20261010.json",
+  "evidence_level": "Audited per-pattern means and success counts over 20 trials; not individual seed records.",
+  "protocol": {
+    "status": "author_requested_extensions",
+    "question": "Preservation of the visible layout observations behind the Table 1 fixes, plus the rare optimized InlineSkipList mixture",
+    "inputs": [
+      "ascylib_efrb",
+      "ascylib_dvy",
+      "ascylib_hj",
+      "tpcc_bcco",
+      "tpcc_efrb",
+      "rocks_hsl",
+      "rocks_isl",
+      "valkey",
+      "hnsw128",
+      "hnsw1536",
+      "rare-isl"
+    ],
+    "sampling": [
+      [
+        1,
+        1
+      ],
+      [
+        0.1,
+        1
+      ]
+    ],
+    "seeds": [
+      2026100900,
+      2026100901,
+      2026100902,
+      2026100903,
+      2026100904,
+      2026100905,
+      2026100906,
+      2026100907,
+      2026100908,
+      2026100909,
+      2026100910,
+      2026100911,
+      2026100912,
+      2026100913,
+      2026100914,
+      2026100915,
+      2026100916,
+      2026100917,
+      2026100918,
+      2026100919
+    ],
+    "page_budget": 128,
+    "record_budget": 1000000,
+    "display_buckets": 2000,
+    "fingerprint_times": 16,
+    "arms": [
+      "full",
+      "no_per_time",
+      "no_coverage_first",
+      "no_alternation"
+    ],
+    "pairing": "Same page sample and one history/per-time clustering pair for all eight method/budget combinations",
+    "backend_clock": "Each sample uses the existing backend's own event endpoints for per-time fingerprints and object endpoints for display-history reduction. Do not replace these silently with full-trace endpoints.",
+    "reference": "Complete input database before initial page sampling or display-history reduction. Identical full-input reference for every seed, sampling setting and arm.",
+    "metrics": [
+      "any-time survival",
+      "survival on fixed 2001-time execution grid"
+    ],
+    "grid": "The fixed grid spans the complete input's execution timestamps for every arm. It is a common evaluation grid, not a claim that every sample's default GUI slider has identical endpoints.",
+    "truth_guard": "Intersect displayed pattern intervals with full-reference intervals on the same page before counting success. Simultaneous occurrences on several pages count once.",
+    "bccosparse": "Keep existing thresholds: positive index-node union bytes at most one eighth of a 2 MiB page; total occupied union bytes at least one quarter; non-node union bytes at least node union bytes. Count byte unions, not allocation-size sums. Node and non-node occupied extents must be disjoint, so enclosing buffers cannot manufacture the pattern.",
+    "bccomutex": "At least one complete live 40-byte pthread_mutex_t allocated at the verified Row_lock site (file 16, line 25). This preserves the separately allocated mutex evidence, not pointer ownership or measured contention.",
+    "valkey": "At least one complete live crossing 40-byte robj at the patched site (file 11, object.c line 75). No radix-node claim or eight-object density requirement.",
+    "global_factors": "TPC-C/EFRB reclamation-block buildup is checked through globally preserved LINES/STATS data, not a page-local proxy. HNSW vector alignment is page-visible; physical huge-page backing is a separate performance factor, not inferable from these virtual-address traces.",
+    "absence": "An absent full-input target is reported as absent, never a preservation failure and never grounds to retune the predicate or choose another capture.",
+    "concurrency": "Ready applications run independently; 48 hardware threads on node0; memory may span NUMA nodes",
+    "duration_coverage": "Full-input union denominator once per input; computed independently",
+    "page_budgets": [
+      128,
+      32
+    ]
+  },
+  "cells": [
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9281611739627774,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.10469280083837262,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.8741202349240067,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9282748502851238,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.7220304952999045,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.007440928726877775,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.625606490601215,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.8641424394099179,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9713916082323241,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.0517131687943307,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.8252147051757321,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9700908469264192,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.8685355529216116,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.0517131687943307,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.7259781960995193,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_efrb",
+      "pattern": "interleaving",
+      "label": "ASCYLIB/EFRB: nodes and descriptors",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.7722660209356115,
+      "reference_duration_ticks": 11720311429,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9982481969445047,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.994453185542089,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9975531040266802,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9985423049950033,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9974398314431095,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.994453185542089,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9975531040266802,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9977716985901598,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.996291357604042,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9947833143070188,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9939727609017215,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9970162114494011,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.996291357604042,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9947833143070188,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9939727609017215,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_dvy",
+      "pattern": "search_field_lines",
+      "label": "ASCYLIB/DVY: search fields",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9970162114494011,
+      "reference_duration_ticks": 12685703413,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9978054383659701,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9973221877599814,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9958159528958305,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9977654722133901,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9947571107779709,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9966755697862336,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9956666051197983,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9928321607110806,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9975060760795692,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9971286656337603,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9965814450309021,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.997701480107508,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9975060760795692,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9971286656337603,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9965814450309021,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "ascylib_hj",
+      "pattern": "node_parity",
+      "label": "ASCYLIB/HJ: node placement",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.997701480107508,
+      "reference_duration_ticks": 13279652049,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.999214549681956,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998716696895473,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 1,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998335856412451,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 1,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9913860173096092,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9992273362031057,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998575055019984,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9952963335203148,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998740061699675,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9955136112431134,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998335856412451,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 1,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.95387701641099,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9844910788804535,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9990901519162344,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 1,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998795996675716,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 1,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.999886496923267,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 1,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9999030043230827,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 1,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9925481040107815,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 1,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998581902560837,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9996147793671941,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998789201482354,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 1,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9997312381359491,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "sparse_mixed",
+      "label": "TPC-C/BCCO: sparse mixed pages",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.992123887611371,
+      "reference_duration_ticks": 19755897405,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_bcco",
+      "pattern": "separate_mutex",
+      "label": "TPC-C/BCCO: separate mutexes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9923024307924475,
+      "reference_duration_ticks": 19637998935,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.995936070732083,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9942401347247509,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 14,
+      "grid": 14,
+      "duration_coverage_mean": 0.5638516532950958,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9965624597065604,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 18,
+      "grid": 18,
+      "duration_coverage_mean": 0.7180003142096698,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 14,
+      "grid": 14,
+      "duration_coverage_mean": 0.5335613674920244,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 5,
+      "grid": 5,
+      "duration_coverage_mean": 0.17187659686735096,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 19,
+      "grid": 19,
+      "duration_coverage_mean": 0.8469711654708089,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9964131482669792,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9948582648848701,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 19,
+      "grid": 19,
+      "duration_coverage_mean": 0.8781793296910175,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.995482761635359,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 18,
+      "grid": 18,
+      "duration_coverage_mean": 0.7464703106186169,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 17,
+      "grid": 17,
+      "duration_coverage_mean": 0.76187454758679,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 6,
+      "grid": 6,
+      "duration_coverage_mean": 0.28342750244061765,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "tpcc_efrb",
+      "pattern": "row_gaps",
+      "label": "TPC-C/EFRB: gaps between rows",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9227954336945947,
+      "reference_duration_ticks": 52691013643,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9999558713300015,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9997980886843255,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9999246068169549,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.999937162889862,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998595290611559,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9995962043967962,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 17,
+      "grid": 17,
+      "duration_coverage_mean": 0.7166063666947009,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9999118889510246,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9999564508275857,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998335057597654,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9999478411242005,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9999523520162235,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998702051216026,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9997365700159374,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9542550569593672,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_hsl",
+      "pattern": "bucket_padding",
+      "label": "RocksDB/prefix hash: bucket padding",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9998586834099392,
+      "reference_duration_ticks": 1121997084925,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9809432051005912,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9932862451059062,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9675852507023354,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9900349346252366,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9445605805016528,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9877055397583524,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9644039555943594,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.992428938901494,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.7462811572633374,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9264844376132542,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.8006881586358672,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9341704550323813,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 14,
+      "grid": 14,
+      "duration_coverage_mean": 0.5841651174561215,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 18,
+      "grid": 18,
+      "duration_coverage_mean": 0.8081917409067199,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 19,
+      "grid": 19,
+      "duration_coverage_mean": 0.788206960039651,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9409067680837001,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9728488580719331,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9944816964180605,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9664858529711655,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9890449217061908,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9559845125193027,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9873114497173114,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9601740417394913,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9893566071918913,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 18,
+      "grid": 18,
+      "duration_coverage_mean": 0.5896875867111967,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9202497139205471,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 17,
+      "grid": 17,
+      "duration_coverage_mean": 0.6668482732010219,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9356841606104511,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 19,
+      "grid": 19,
+      "duration_coverage_mean": 0.6300521579606568,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9306059096299197,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "prefix_crossing",
+      "label": "RocksDB/inline skiplist: line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.7868921489682525,
+      "reference_duration_ticks": 190411644453,
+      "pattern_absent": false
+    },
+    {
+      "application": "rocks_isl",
+      "pattern": "tall_short_mixed",
+      "label": "RocksDB/inline skiplist: tall/short nodes",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9651005486266826,
+      "reference_duration_ticks": 190411790163,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9984987765940447,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9944594374544448,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9900318458804133,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9996404511802259,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9945191365982454,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9924754302120011,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9856208106081017,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.995315280571243,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9949291256022358,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9796078148335635,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9890721955579705,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9960797495643219,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.990535196079924,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9794788845140878,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9890721955579705,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "valkey",
+      "pattern": "robj_crossing",
+      "label": "Valkey: object line crossings",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9914676012208954,
+      "reference_duration_ticks": 82029194863,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9973361225478975,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9934097088400489,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9947419069077558,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9966101013728338,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9893926068111867,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9815424351799891,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9667028537886218,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.97954048521863,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9970743644756395,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9956039060023935,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9967716015056313,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9968606798066724,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9823921357457903,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9868962265226854,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9848160224525632,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw128",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 128D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9836706046821473,
+      "reference_duration_ticks": 118684366186,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9972119075756103,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9971052293386548,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9966644557844646,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9979265261112487,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9847207705901188,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9894920951863468,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9851621469109106,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9744916798822733,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.998453045154239,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9960515594490588,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9974689705240625,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9984081167375759,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9865274567357817,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9893342430069462,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9911930967794339,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "hnsw1536",
+      "pattern": "vector_alignment",
+      "label": "HNSWLib 1536D: vector alignment",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 20,
+      "grid": 20,
+      "duration_coverage_mean": 0.9826368636372914,
+      "reference_duration_ticks": 1019274953384,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 17,
+      "grid": 17,
+      "duration_coverage_mean": 0.5254380157726735,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 15,
+      "grid": 15,
+      "duration_coverage_mean": 0.4636217786229471,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 11,
+      "grid": 11,
+      "duration_coverage_mean": 0.5118162371497263,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 5,
+      "grid": 5,
+      "duration_coverage_mean": 0.17363247429945253,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 13,
+      "grid": 13,
+      "duration_coverage_mean": 0.4018055414732208,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 14,
+      "grid": 14,
+      "duration_coverage_mean": 0.432713660048084,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 1,
+      "grid": 1,
+      "duration_coverage_mean": 0.030908118574863135,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        1.0,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 1,
+      "grid": 1,
+      "duration_coverage_mean": 0.030908118574863135,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 15,
+      "grid": 15,
+      "duration_coverage_mean": 0.33882731028347457,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 15,
+      "grid": 15,
+      "duration_coverage_mean": 0.33882731028347457,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 11,
+      "grid": 11,
+      "duration_coverage_mean": 0.2509653165697997,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 128,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 5,
+      "grid": 5,
+      "duration_coverage_mean": 0.10048265828489984,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "full",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 12,
+      "grid": 12,
+      "duration_coverage_mean": 0.26358598114102466,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_per_time",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 11,
+      "grid": 11,
+      "duration_coverage_mean": 0.21358598114102464,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_coverage_first",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 3,
+      "grid": 3,
+      "duration_coverage_mean": 0.11262066457122497,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    },
+    {
+      "application": "rare-isl",
+      "pattern": "tall_short_mixed",
+      "label": "Optimized inline skiplist: rare mixture",
+      "sampling": [
+        0.1,
+        1.0
+      ],
+      "page_budget": 32,
+      "arm": "no_alternation",
+      "completed": 20,
+      "expected": 20,
+      "any_time": 1,
+      "grid": 1,
+      "duration_coverage_mean": 0.01262066457122496,
+      "reference_duration_ticks": 6588425703,
+      "pattern_absent": false
+    }
+  ]
+}

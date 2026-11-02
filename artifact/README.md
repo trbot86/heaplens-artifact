@@ -4,13 +4,19 @@
 
 **Archived artifact:** [Zenodo release 2026.10.09](https://zenodo.org/records/23255614),
 DOI [10.5281/zenodo.23255614](https://doi.org/10.5281/zenodo.23255614).
-This version includes the corrected Table 1 command routing, two-worker EFRB
+The linked archive is the historical October 9 release, not this integration
+candidate. It includes the corrected Table 1 command routing, two-worker EFRB
 figure defaults, and frozen-source reconstruction repairs, together with the
 previous Figure 6/8 fixes. See the [release notes](RELEASE_NOTES_20261009_ROUTING.md)
 for validation scope. The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284)
 resolves to the latest release. Pinned dependencies are included in the archive.
 
-This guide follows the submitted paper's Table 1 and main figures. Each result
+This checkout targets the final camera-ready paper (October 16 source), including
+four-worker EFRB figures, corrected collection, adaptive buffering and final
+representative selection. [Integration validation](integration/VALIDATION.md)
+distinguishes completed checks from remaining release work.
+
+This guide follows that paper's Table 1 and main figures. Each result
 below has a complete command, an output location and an expected observation.
 The [full configuration and reference guide](REPRODUCTION_CONFIGURATIONS.md)
 contains workload parameters, NUMA placement, allocators, variants, sampling,
@@ -105,9 +111,10 @@ logs, actual operation counts and phase-gated `perf.csv` files are under
 retained. Counter intervals/denominators are described in
 [the semantic review](headline-pmu/SEMANTIC_REVIEW.md).
 
-References below are the current paper's ten-run means: eight rows use the
+References below are the final paper's ten-run means: seven rows use the
 retained headline plain-PMU cohort; BCCO and Valkey use the later consistency
-cohort with the same named baseline/combined workload comparisons. These cohorts
+cohort, and TPC-C/EFRB uses its factor cohort. The named baseline/combined
+workload comparisons are preserved. These cohorts
 are not pooled. They are observations, not exact-value pass/fail thresholds.
 The [older evaluator/factor commands](HISTORICAL_PERFORMANCE_COMMANDS.md) remain
 available for their distinct configurations, including four-layout DVY diagnosis;
@@ -176,7 +183,12 @@ python3 artifact/table1.py reproduce --apps tpcc_efrb \
 Plan: 24 physical cores on node 0; 32 GiB RAM; storage/build-time allowances and PMU requirements above.
 
 Output: `/var/tmp/heaplens-table1-tpcc-efrb/work/results.json`, application `tpcc_efrb`.
-Reference gain: **+20.7%**. 24 warehouses; shared reclamation plus row padding, holding mimalloc and tree segregation fixed.
+Final paper reference: **+21.1%**, from the retained factor cohort. This frozen
+headline driver's saved cohort gives **+20.7%** for the same named comparison;
+the two observations are not pooled. Both use 24 warehouses, shared reclamation
+plus row padding, with mimalloc and tree segregation fixed. For the complete
+command and saved **21.14%** factor calculation, see
+[TPC-C factors](camera-ready-reproduction/README.md#tpc-c-factors).
 
 ### RocksDB/HashSkipList
 
@@ -245,143 +257,153 @@ Reference gain: **+6.1%**. The same indexed-query protocol at 1536 dimensions; i
 
 ## 4. Reproduce the main figure observations
 
-These commands generate instrumented diagnostic traces. Their workloads differ
-from Table 1 timing runs; use them to inspect layouts. Trace timings are not
-throughput evidence. Full-size traces can take minutes or longer to build and
-need substantial storage. `--profile smoke` is a smaller functional check and
-may not exhibit the same pattern. Addresses, colors and occupancy vary across
-runs; compare the stated property rather than individual screenshot pixels.
+These are diagnostic traces, not throughput measurements. Use a fresh output
+directory for each command and run traces serially. Fresh allocation addresses
+and cluster IDs vary. Compare the stated layout property, not screenshot pixels.
+`--profile smoke` is smaller and need not show the paper's pattern. Figures 1–2
+are explanatory diagrams and have no experiment command.
 
-Figures 1 (components) and 2 (nested allocations) are explanatory illustrations:
-there is no measurement command or generated result to compare.
+The GUI defaults to 128 pages, one million display records and 2,000 buckets.
+Unknown trace-clock frequency is shown as ticks. For a trace with a verified
+frequency, add `--timestamp-hz HZ` to its `gui --database` command; the value is
+saved per database. Do not use the rendering computer's CPU frequency.
 
-### Figure 3: TPC-C interface screenshot
-
-```bash
-bash artifact/run.sh experiment tpcc_bcco --variant baseline --profile paper --out artifact/results/fig3
-bash artifact/run.sh gui --database artifact/results/fig3/tpcc_bcco.sqlite --label fig3
-```
-
-Plan: 2 worker threads and 2 warehouses by default, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch; allow 30â€“120 min for generation/processing (estimate); no PMU required.
-
-Output: `artifact/results/fig3/tpcc_bcco.sqlite`. Expected: a populated TPC-C
-trace with database allocations and tree nodes. Use 2-MiB page mode and select
-a populated time to inspect the interface shown in the paper.
-
-### Figure 4: EFRB prefill allocation pattern
+### Figures 3–5: TPC-C/HJ interface walkthrough
 
 ```bash
-bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --threads 2 --out artifact/results/fig4
-bash artifact/run.sh gui --database artifact/results/fig4/ascylib_efrb.sqlite --label fig4
+HEAPLENS_NUMA=1 bash artifact/run.sh experiment tpcc_hj --variant baseline --profile paper \
+  --threads 24 --cpus 0-23 --memory-policy bind --server-node 0 --out artifact/results/fig3-5
+bash artifact/run.sh gui --database artifact/results/fig3-5/tpcc_hj.sqlite --label fig3-5
 ```
 
-Plan: 2 worker threads, without fixed NUMA placement; 16 GiB free RAM; 10 GiB scratch; allow 5â€“30 min (estimate); no PMU required. The same baseline database can serve Figure 5(a).
+Plan: 24 physical cores on node 0, **160 GiB available RAM** for full conversion,
+100 GiB local scratch; allow hours (the integrated full capture is not newly
+timed); no PMU needed. This uses NO_WAIT, 24 warehouses, 64-byte HJ descriptors
+(`LARGE_DES` disabled), retained jemalloc 5.0.1, p=0.01, s=1 and seed 20261009.
 
-Output: `artifact/results/fig4/ascylib_efrb.sqlite`. Expected: during prefill,
-repeated groups of three tree nodes and one operation descriptor. Inspect a
-4-KiB page; the paper colors nodes blue and descriptors yellow.
+Output: `artifact/results/fig3-5/tpcc_hj.sqlite`. Figure 3 is the timeline/legend;
+Figure 4 is cache occupancy and cache-line detail; Figure 5 is the page view.
+At an early populated time, use 4-KiB pages and show only tree nodes in the
+**cache** visibility column while leaving all types visible in pages. Inspect
+pages containing the repeating descriptor64 / row48 plus line remainder /
+Row_lock64 / node64 sequence. Nodes then appear every fourth cache line.
+The final paper's 1.4-s time and page/cluster identifiers describe its saved
+capture; they are not universal selections. The final selector can choose
+different representative pages from the historical history-only UI capture.
 
-### Figure 5(aâ€“c): EFRB cache occupancy
+### Figure 6: HNSW measured cache-line markers
 
 ```bash
-bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --threads 2 --out artifact/results/fig5a
-bash artifact/run.sh experiment ascylib_efrb --variant prefill-only --profile paper --threads 2 --out artifact/results/fig5b
-bash artifact/run.sh experiment ascylib_efrb --variant optimized --profile paper --threads 2 --out artifact/results/fig5c
-bash artifact/run.sh gui --database artifact/results/fig5a/ascylib_efrb.sqlite --label fig5a
+python3 artifact/perf-c2c-example/example.py prepare --out artifact/results/fig6
+bash artifact/run.sh gui --database artifact/results/fig6/hnsw-perf-c2c.sqlite --label fig6
 ```
 
-Plan: 2 worker threads, without fixed NUMA placement; 16 GiB free RAM; 10 GiB scratch per trace; allow 5â€“30 min per trace (estimate); no PMU required.
+Plan: saved input; no PMU or native rebuild, 8 GiB RAM and 400 MB disk; minutes.
+Output: matching database/report and `summary.json`. Enable **Show HITMs**:
+expect ten imported cache lines across three directed pages. The report has
+eleven lines; one has no allocation history. This is a retained matching
+capture for the same inspection, not a claim of pixel-identical paper artwork.
+[Marker meanings, exact addresses and lost-sample limits](perf-c2c-example/README.md).
 
-Output: `artifact/results/fig5{a,b,c}/ascylib_efrb.sqlite`. These commands select
-baseline in (a), parallel prefill alone in (b), and prefill plus separate
-node/descriptor arenas in (c). Expected for (a): **during early prefill**, a
-repeating group of one empty (gray), two lower-occupancy (yellow) and one
-higher-occupancy (red) node set. A full-profile local trace reproduces this
-pattern before the allocator begins its second chunk. Inspect **only nodes**:
-
-1. Keep the modeled L1 geometry at 32 KiB, 8 ways, 64-byte lines (64 sets).
-2. Zoom into the beginning of the rising node-count curve. Move the timeline
-   handle **within early prefill**, before the curve reaches its plateau.
-   Keep the default 2,000 time buckets for fine control. In the local checked
-   trace, the pattern appears in buckets 1â€“30 of 2,000 (the first 1.5% of the
-   full timeline); the exact fraction depends on the run.
-3. Expand the type legend's visibility controls. Right-click the **third
-   checkbox (cache visibility)** on `node_t` and choose **Only this type**.
-   Keep `node_t` unexpanded; page visibility can still show both types.
-4. Compare node counts across sets. Including `info_t` descriptors can conceal
-   the node imbalance and make the entire grid red. Node-only filtering does
-   not guarantee empty sets later: the second allocator chunk shifts the
-   pattern and can fill the first chunk's gaps. See the
-   [trace investigation](REPRODUCTION_CONFIGURATIONS.md#figure-5-trace-correction).
-
-The tooltip percentage is a type's share of that set's visible object-line
-count, **not cache fullness**. Color represents the total visible count,
-normalized across sets at the selected time: zero is gray and the largest
-count is red. Thus 50% of one set and 100% of another can have the same color.
-Allocation alignment and chunk boundaries can change the aggregate pattern;
-a particular cell's color is not guaranteed. These are modeled address
-occupancies, not hardware-resident cache lines or measured misses.
-
-Stop the GUI and repeat its command
-with `fig5b`, then `fig5c`, to import each database; earlier imports remain listed.
-Inspect their prefill and populated intervals to compare the effects of each change.
-Each result's `trace-configuration.json` records the effective flags. The optional
-`segregation-only` variant exposes the fourth factor but is not a Figure 5 panel.
-
-For traces generated before the retirement-linkage fix, see the
-[Figure 5 trace correction](REPRODUCTION_CONFIGURATIONS.md#figure-5-trace-correction):
-filtering isolates node counts, but cannot recover missing retirement events.
-
-### Figure 6(aâ€“b): BCCO node density
+### Figure 7(a–c): EFRB cache occupancy, early and completed prefill
 
 ```bash
-bash artifact/run.sh experiment tpcc_bcco --variant baseline --profile paper --out artifact/results/fig6a
-bash artifact/run.sh experiment tpcc_bcco --variant optimized --profile paper --out artifact/results/fig6b
-bash artifact/run.sh gui --database artifact/results/fig6a/tpcc_bcco.sqlite --label fig6a
+HEAPLENS_NUMA=1 bash artifact/run.sh experiment ascylib_efrb --variant baseline --profile paper --threads 4 --cpus 0-3 --memory-policy interleave --out artifact/results/fig7a
+HEAPLENS_NUMA=1 bash artifact/run.sh experiment ascylib_efrb --variant prefill-only --profile paper --threads 4 --cpus 0-3 --memory-policy interleave --out artifact/results/fig7b
+HEAPLENS_NUMA=1 bash artifact/run.sh experiment ascylib_efrb --variant optimized --profile paper --threads 4 --cpus 0-3 --memory-policy interleave --out artifact/results/fig7c
+bash artifact/run.sh gui --database artifact/results/fig7a/ascylib_efrb.sqlite --label fig7a
 ```
 
-Plan: 2 worker threads and 2 warehouses by default, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 30â€“120 min per trace (estimate); no PMU required.
+Plan: four physical cores on node 0, 16 GiB available RAM, 10 GiB scratch/trace;
+allow 5–30 minutes/trace (estimate); no PMU needed. 262144 initial keys, range
+524288, five seconds of read-only work, glibc and dynamic SSMEM; native p=s=1.
+Output: `artifact/results/fig7{a,b,c}/ascylib_efrb.sqlite` and configuration receipts.
+The three variants are baseline, parallel prefill, and prefill plus separate arenas.
 
-Output: `artifact/results/fig6{a,b}/tpcc_bcco.sqlite`. Expected: BCCO nodes mixed
-with database allocations before, and denser node regions after segregation in
-the 2-MiB heatmap. Import `fig6b` in the same way.
-Select **Settings â†’ Page settings â†’ 2 MiB** and dismiss Settings. Expand the visibility
-controls using the arrow in the type-table header, then right-click the middle
-(page) checkbox for `node_t<unsigned long, itemid_t*>` and select **Only this
-type**. Now click **Resample**, then move the time marker well into the trace.
-Resampling after choosing the node type selects node-containing pages; merely
-hiding other types leaves the previous mixed-type sample, which can omit the
-separate node regions. The command now checks for typed 56-byte BCCO nodes and writes
-`node-coverage.json`; a database containing only other types fails this check.
-Both commands were validated locally in about 5.5 minutes combined; actual
-runtime depends on the machine. Both recorded density patterns and both GUI
-views were checked, including node-only resampling at 2 MiB.
-See [release validation and remaining limits](RELEASE_NOTES_20261007.md). The optimized driver also packs
-the lock; this pair is not a segregation-only throughput attribution.
+1. Keep modeled L1 at 32 KiB, eight ways and 64-byte lines (64 sets).
+2. Zoom into the beginning of the rising node-count curve; choose **early
+   prefill**, before the plateau. Keep 2,000 buckets for fine time control.
+3. Expand the legend's visibility controls. Right-click `node_t`'s **third
+   (cache)** checkbox and choose **Only this type**. Keep the type unexpanded;
+   page visibility can still show both nodes and descriptors.
+4. Compare early and completed prefill. In the paper's baseline early snapshot,
+   15 sets are empty and one has one node. Later allocator chunks fill those
+   gaps: completed occupancy is uneven, not partly empty. The changed variants
+   make completed occupancy progressively more uniform. Fresh exact counts vary.
 
-### Figure 7(aâ€“b): mimalloc row layout
+Tooltip percentages are each type's share of the set's visible object-line
+count, **not cache fullness**. Color is the total visible count normalized
+across sets at the selected time: zero gray, maximum red. Including descriptors
+can conceal the node imbalance. These are modeled address occupancies, not
+hardware-resident lines or measured misses. Import `fig7b` and `fig7c` with the
+same GUI command to compare. [Earlier trace corrections](REPRODUCTION_CONFIGURATIONS.md#figure-5-trace-correction)
+remain documented under their historical figure number.
+
+### Figure 8: EFRB page during and after prefill
+
+Reuse the `fig7a` database and GUI command above; no additional capture is needed.
+Output: the 4-KiB page view. Early prefill shows groups of three 64-byte nodes
+and one 64-byte descriptor. Keep that page selected and advance time: dark gray
+gaps show retired objects. Paper colors are blue nodes and yellow descriptors;
+the type legend identifies colors in a fresh session.
+
+### Figure 9(a–b): BCCO node density
 
 ```bash
-bash artifact/run.sh experiment tpcc_efrb --variant baseline --profile paper --out artifact/results/fig7a
-bash artifact/run.sh experiment tpcc_efrb --variant optimized --profile paper --out artifact/results/fig7b
-bash artifact/run.sh gui --database artifact/results/fig7a/tpcc_efrb.sqlite --label fig7a
+HEAPLENS_NUMA=1 bash artifact/run.sh experiment tpcc_bcco --variant baseline --bcco-figure --profile paper --threads 24 --cpus 0-23 --memory-policy bind --out artifact/results/fig9a
+HEAPLENS_NUMA=1 bash artifact/run.sh experiment tpcc_bcco --variant segregation-only --bcco-figure --profile paper --threads 24 --cpus 0-23 --memory-policy bind --out artifact/results/fig9b
+bash artifact/run.sh gui --database artifact/results/fig9a/tpcc_bcco.sqlite --label fig9a
 ```
 
-Plan: 2 worker threads and 2 warehouses by default, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 30â€“120 min per trace (estimate); no PMU required.
+Plan: 24 physical cores on node 0, 32 GiB available RAM, 100 GiB local scratch/trace;
+allow 30–120 minutes/trace (estimate); no PMU needed. Linux 6.8+ and permitted
+`PAGEMAP_SCAN`/`MADV_COLLAPSE` are required by the backing check. A small preflight
+fails before the long build if independent jemalloc instances or backing checks
+are unavailable. The driver never changes host THP settings.
 
-Output: `artifact/results/fig7{a,b}/tpcc_efrb.sqlite`. Expected: 48-byte `row_t`
-objects with 64-byte alignment before, and padded 64-byte rows after. Import
-`fig7b` to compare. Shared reclamation also changes in the optimized variant.
+Output: `artifact/results/fig9{a,b}/tpcc_bcco.sqlite`, typed-node coverage and
+allocator/backing receipts. Both arms use jemalloc 5.3.0; the second loads a
+distinct instance for nodes. This pair changes segregation only, without packed
+locks or shared reclamation. Twenty-four warehouses match twenty-four workers.
+Process-local huge-page advice/collapse and mapping snapshots occur outside the
+native measured interval. This is diagnostic evidence, not the Table 1 pair.
 
-### Figure 8(aâ€“b): HashSkipList bucket fields
+Select 2-MiB page mode, right-click the **page** visibility checkbox for
+`node_t<unsigned long, itemid_t*>`, choose **Only this type**, and **Resample**.
+Move to a populated time: expect dispersed low-density node regions before and
+fewer denser regions after. Gray means no visible node, not necessarily free
+memory. Virtual 2-MiB grouping alone does not prove physical huge-page backing;
+use the saved `backing/` receipts for that. The converter uses p=0.02, s=1,
+seed 20261010. The paper's saved UI pair had an additional whole-page subsample;
+fresh page counts/addresses are therefore not exact screenshot targets.
+
+### Figure 10(a–b): mimalloc row layout
 
 ```bash
-bash artifact/run.sh experiment rocksdb_hsl --variant baseline --profile paper --out artifact/results/fig8a
-bash artifact/run.sh experiment rocksdb_hsl --variant optimized --profile paper --out artifact/results/fig8b
-HEAPLENS_CACHE_BUDGET_MB=12000 bash artifact/run.sh gui --database artifact/results/fig8a/rocksdb_hsl.sqlite --label fig8a
+HEAPLENS_NUMA=1 bash artifact/run.sh experiment tpcc_efrb --variant baseline --profile paper --threads 24 --cpus 0-23 --memory-policy bind --out artifact/results/fig10a
+HEAPLENS_NUMA=1 bash artifact/run.sh experiment tpcc_efrb --variant optimized --profile paper --threads 24 --cpus 0-23 --memory-policy bind --out artifact/results/fig10b
+bash artifact/run.sh gui --database artifact/results/fig10a/tpcc_efrb.sqlite --label fig10a
 ```
 
-Plan: 24 worker threads, without fixed NUMA placement; 32 GiB free RAM; 100 GiB scratch per trace; allow 1â€“3 hours per trace (estimate); no PMU required.
+Plan: 24 physical cores/node 0, 32 GiB free RAM, 100 GiB scratch/trace;
+allow 30–120 minutes/trace (estimate); no PMU needed.
+Output: `artifact/results/fig10{a,b}/tpcc_efrb.sqlite`. Inspect `row_t`: 48-byte
+rows aligned to 64 bytes before, padded 64-byte rows after. The optimized
+variant also changes reclamation, so these traces do not isolate its throughput
+contribution. Import `fig10b` to compare the row layout.
+
+### Figure 11(a–b): HashSkipList bucket fields
+
+```bash
+bash artifact/run.sh experiment rocksdb_hsl --variant baseline --profile paper --out artifact/results/fig11a
+bash artifact/run.sh experiment rocksdb_hsl --variant optimized --profile paper --out artifact/results/fig11b
+HEAPLENS_CACHE_BUDGET_MB=12000 bash artifact/run.sh gui --database artifact/results/fig11a/rocksdb_hsl.sqlite --label fig11a
+```
+
+Plan: the retained diagnostic driver uses 24 workers; 32 GiB free RAM,
+100 GiB scratch/trace; allow 1–3 hours/trace (estimate); no PMU needed.
+This bounded field-layout diagnostic differs from Table 1's 96-worker mixed
+workload. It verifies the same 56-byte versus 48-byte bucket layout.
 
 The GUI command raises the cache-view preflight budget from 4 GiB to about
 11.7 GiB (12,000 MiB). One evaluator's trace needed an estimated 5.63 GiB for
@@ -391,7 +413,7 @@ allowance above. With less memory, reduce time buckets as the error suggests.
 That changes temporal resolution, not object sizes or field offsets. Raising
 this budget does not increase a Docker/WSL memory limit.
 
-Output: `artifact/results/fig8{a,b}/rocksdb_hsl.sqlite`. To inspect the bucket:
+Output: `artifact/results/fig11{a,b}/rocksdb_hsl.sqlite`. To inspect the bucket:
 
 1. Find **`rocksdb::SkipList<char const*, rocksdb::MemTableRep::KeyComparator const&>`**
    in the type table. The shorter `HashSkipListRep` name denotes its owner;
@@ -406,19 +428,30 @@ Output: `artifact/results/fig8{a,b}/rocksdb_hsl.sqlite`. To inspect the bucket:
    over that detail view to magnify the rows. Before reordering, the object is
    56 bytes with four-byte padding regions at **36â€“39** and **52â€“55**. Offsets
    are relative to the object's start, which need not be cache-line aligned.
-4. Stop the GUI and repeat the GUI command with `fig8b` in both paths/labels.
+4. Stop the GUI and repeat the GUI command with `fig11b` in both paths/labels.
    The reordered object is **48 bytes**: `prev_height_` is at offset 36 and
    `prev_` is at offset 40, with neither padding region.
 
 The GUI matches the equivalent `const char*`/`char const*` bucket spellings
 used by compiler field metadata and runtime type names. Earlier GUI versions
 could show the bucket without attaching its recorded fields. See the
-[Figure 8 field and memory notes](REPRODUCTION_CONFIGURATIONS.md#figure-8-field-metadata-and-memory).
+[Historical field and memory notes](REPRODUCTION_CONFIGURATIONS.md#figure-8-field-metadata-and-memory).
 The trace driver
 uses the upstream diagnostic snapshot; Table 1 performance uses the historical
 snapshot. [Trace scope and all appendix figures](REPRODUCTION_CONFIGURATIONS.md#appendix-figure-and-table-index).
 
-## 5. Check saved results and additional camera-ready results
+## 5. Reproduce logging, selection and engineering results
+
+```bash
+python3 artifact/final-paper/summarize.py
+```
+
+Output: final Table 3's nine logging rows, the 18.1% adaptive-buffering gain,
+and Table 4's four selection rows. This runs in seconds from small saved
+evidence with standard Python. [Definitions, cohort boundaries, full JSON
+output, selection replay and limits](final-paper/README.md).
+
+The commands below retain the earlier release's observations and validation:
 
 ```bash
 bash artifact/run.sh history

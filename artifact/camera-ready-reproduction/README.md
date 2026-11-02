@@ -1,5 +1,11 @@
 # Camera-ready result reproduction
 
+This guide preserves frozen engineering/factor measurements and their original
+numbering. Use [final-paper results](../final-paper/README.md) for the adopted
+logging and selection tables, and [the main README](../README.md) for final
+figure numbering/configuration. The older sampling/stock-logger sections here
+remain historical comparisons, not current selection/default settings.
+
 Run commands from the repository root. This guide adds the backend preparation,
 browser latency, sampling and controlled-factor results to the
 [Table 1 and figure guide](../README.md). Every study has a command, an output

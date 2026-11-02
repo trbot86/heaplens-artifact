@@ -1,4 +1,12 @@
 > Current Table 1 commands are in [the main guide](README.md#3-reproduce-table-1-performance-comparisons).
+
+This reference retains the October 9 release's figure numbering and historical
+configurations. The [main README](README.md#4-reproduce-the-main-figure-observations)
+is authoritative for the final paper: old EFRB cache/page Figures 5/4 are now 7/8,
+BCCO 6 is now 9, mimalloc 7 is now 10, and HSL 8 is now 11. Final EFRB uses four
+workers; BCCO uses 24 workers with matched jemalloc 5.3 and segregation only.
+Figures 3–5 now use the corrected TPC-C/HJ walkthrough. The saved older checks
+below are provenance, not certification of every newly assembled command.
 > The older performance commands and confirmation numbers in this reference
 > document are historical; their static-SSMEM/whole-process-counter settings
 > are not the phase-gated Table 1 entry point. EFRB figures use two workers;

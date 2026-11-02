@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "artifact"
 VENDOR = ART / "vendor"
 IGNORE = shutil.ignore_patterns(".git", "__pycache__", "*.pyc", "*.o", "*.so", "build", ".cache")
-EXPERIMENTS = ["ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_efrb", "rocksdb_hsl", "rocksdb_isl", "valkey_trace", "hnsw_trace",
+EXPERIMENTS = ["ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_efrb", "tpcc_hj", "rocksdb_hsl", "rocksdb_isl", "valkey_trace", "hnsw_trace",
           "ascylib_efrb_bench", "ascylib_dvy_bench", "ascylib_hj_bench", "tpcc_bcco_bench", "tpcc_efrb_bench"]
 
 def save(path, value):
@@ -427,14 +427,25 @@ def experiment(args):
         if args.name in {"rocksdb_hsl", "rocksdb_isl"}:
             # Keep enough keys per hash bucket to expose the bucket layout.
             env.update(NUM_KEYS="20000", HASH_BUCKET_COUNT="1024")
-    if args.name in {"ascylib_efrb", "ascylib_dvy", "ascylib_hj"} and args.threads is not None:
+    if args.name in {"ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_efrb", "tpcc_hj"} and args.threads is not None:
         env["THREADS"] = str(args.threads)
     elif args.name == "ascylib_efrb":
-        env["THREADS"] = "2"
+        env["THREADS"] = "4" if args.profile == "paper" else "2"
+    elif args.name in {"tpcc_bcco", "tpcc_efrb", "tpcc_hj"}:
+        env["THREADS"] = "24" if args.profile == "paper" else "2"
+    if args.name == "tpcc_hj":
+        env.update(SAMPLE_PROPORTION="0.01", SAMPLE_SEED="20261009")
+    if args.bcco_figure:
+        env.update(HEAPLENS_BCCO_FIGURE="1", SAMPLE_PROPORTION="0.02", SAMPLE_SEED="20261010")
+    if args.name in {"ascylib_efrb", "ascylib_dvy", "ascylib_hj", "tpcc_bcco", "tpcc_efrb", "tpcc_hj"} and (args.cpus or args.memory_policy or args.bcco_figure or args.name == "tpcc_hj"):
+        threads = int(env.get("THREADS", "24"))
+        env.update(TRACE_CPUS=",".join(map(str, node_cpus(args.server_node, threads, args.cpus))),
+                   TRACE_MEMORY=memory_option(args), TRACE_NODE=str(args.server_node))
     if not args.name.endswith("_bench"):
         save(work / "protocol.json", {"arguments": vars(args), "variant": env["TRACE_VARIANT"],
              "settings": {key: env[key] for key in ("THREADS", "INITIAL", "RANGE", "RUN_SECONDS",
-                 "DURATION_MS", "NUM_KEYS", "HASH_BUCKET_COUNT", "PAGES_PER_TYPE") if key in env}})
+                 "DURATION_MS", "NUM_KEYS", "HASH_BUCKET_COUNT", "PAGES_PER_TYPE", "TRACE_CPUS",
+                 "TRACE_MEMORY", "TRACE_NODE", "HEAPLENS_BCCO_FIGURE", "SAMPLE_PROPORTION", "SAMPLE_SEED") if key in env}})
     if args.name.endswith("_bench"):
         smoke = args.profile == "smoke"
         default_threads = {"ascylib_efrb_bench": 4, "ascylib_dvy_bench": 8}.get(args.name, 24)
@@ -535,6 +546,8 @@ def parse_args(argv=None):
     p.add_argument("--reps", type=int)
     p.add_argument('--tpcc-factors', choices=['standard','full'],
                    help='TPC-C performance only: include the controlled lock/padding/reclaimer factor cells')
+    p.add_argument('--bcco-figure', action='store_true',
+                   help='TPC-C/BCCO diagnostic: matched jemalloc 5.3 instances and audited process-local huge-page backing (Linux >=6.8)')
     p.add_argument("--threads", type=int, help="ASCYLIB/TPC-C workers; RocksDB readers plus writer; HNSW build/query threads")
     p.add_argument("--cpus", help="Performance-run CPU list (e.g. 0-7); HashSkipList allows SMT across two nodes; other benchmarks use distinct physical cores")
     p.add_argument("--memory-policy", choices=["bind", "interleave"], help="Memory placement (default: bind; standalone EFRB/DVY: interleave on --server-node; HashSkipList: interleave across --rocks-nodes)")
@@ -567,9 +580,13 @@ def parse_args(argv=None):
             p.error('timestamp-hz must be positive and finite')
     if args.label and not args.database: p.error('label requires database')
     if args.variant and not (args.command in {'experiment','legacy'} and args.name in
-                            {'ascylib_efrb','ascylib_dvy','ascylib_hj','tpcc_bcco','tpcc_efrb','rocksdb_hsl','rocksdb_isl','valkey_trace','hnsw_trace'}):
+                            {'ascylib_efrb','ascylib_dvy','ascylib_hj','tpcc_bcco','tpcc_efrb','tpcc_hj','rocksdb_hsl','rocksdb_isl','valkey_trace','hnsw_trace'}):
         p.error('variant is supported for named diagnostic traces')
-    if args.variant in {'segregation-only', 'prefill-only'} and args.name != 'ascylib_efrb':
+    if args.name == 'tpcc_hj' and args.variant not in {None,'baseline'}:
+        p.error('tpcc_hj is a baseline HJ64 walkthrough diagnostic')
+    if args.bcco_figure and not (args.command in {'experiment','legacy'} and args.name == 'tpcc_bcco' and args.variant in {None,'baseline','segregation-only'}):
+        p.error('bcco-figure requires a baseline or segregation-only tpcc_bcco diagnostic')
+    if args.variant in {'segregation-only', 'prefill-only'} and args.name != 'ascylib_efrb' and not (args.name == 'tpcc_bcco' and args.variant == 'segregation-only'):
         p.error('intermediate variants apply only to the ascylib_efrb diagnostic trace')
     if args.overhead_trees and args.command != 'overhead': p.error('overhead-trees applies only to overhead')
     if args.out and args.command == 'all-performance': p.error('all-performance creates a separate directory per experiment; omit --out')
@@ -587,11 +604,10 @@ def parse_args(argv=None):
     bench = args.command in {"experiment", "legacy"} and args.name and args.name.endswith("_bench")
     hnsw_command = args.command in {"hnsw", "hnsw-factorization"}
     ascylib_trace = args.command in {"experiment", "legacy"} and args.name in {"ascylib_efrb", "ascylib_dvy", "ascylib_hj"}
-    if args.cpus is not None and ascylib_trace:
-        p.error("cpus does not apply to diagnostic traces")
-    if (args.threads is not None or args.cpus is not None) and not (bench or ascylib_trace or args.command in {"rocksdb", "overhead"} or hnsw_command):
+    tpcc_trace = args.command in {"experiment", "legacy"} and args.name in {"tpcc_bcco", "tpcc_efrb", "tpcc_hj"}
+    if (args.threads is not None or args.cpus is not None) and not (bench or ascylib_trace or tpcc_trace or args.command in {"rocksdb", "overhead"} or hnsw_command):
         p.error("threads/cpus apply to individual ASCYLIB/TPC-C/RocksDB/HNSW performance experiments")
-    if args.memory_policy and not (bench or args.command in {"rocksdb", "all-performance", "overhead"} or hnsw_command):
+    if args.memory_policy and not (bench or ascylib_trace or tpcc_trace or args.command in {"rocksdb", "all-performance", "overhead"} or hnsw_command):
         p.error("memory-policy applies to performance experiments")
     if args.trial_order and not (bench or args.command in {"rocksdb", "all-performance", "hnsw"}):
         p.error("trial-order applies to ASCYLIB/TPC-C/RocksDB/HNSW; factorization uses its fixed design")

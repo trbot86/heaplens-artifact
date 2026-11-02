@@ -77,7 +77,7 @@ class Workflows(unittest.TestCase):
     def test_hj_before_uses_jemalloc_and_after_uses_glibc(self):
         source = (ART/'lib/ascylib_experiment.sh').read_text()
         start = source.index('        local preload=')
-        end = source.index('        LD_PRELOAD=', start)
+        end = source.index('        local placement=', start)
         selection = source[start:end].replace('local preload=', 'preload=')
         for variant, expected in [('baseline', '/fixture/memhook/libmemhook.so:/fixture/artifact/vendor/heaplens-allocators/libjemalloc-heaplens.so'),
                                   ('optimized', '/fixture/memhook/libmemhook.so')]:
