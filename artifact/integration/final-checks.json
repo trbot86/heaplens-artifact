@@ -55,5 +55,45 @@
     "small_then_huge_bytes": 2097152,
     "shared_lock_released": true
   },
-  "owned_test_containers_exited": true
+  "owned_test_containers_exited": true,
+  "supplemental_native": {
+    "tests": {
+      "fresh-native-logger_tail.log": {
+        "count": 1,
+        "seconds": 2.036,
+        "passed": true,
+        "skipped": 0
+      },
+      "fresh-native-retirement_order.log": {
+        "count": 1,
+        "seconds": 1.8,
+        "passed": true,
+        "skipped": 0
+      },
+      "fresh-native2-ascylib_readonly.log": {
+        "count": 1,
+        "seconds": 0.305,
+        "passed": true,
+        "skipped": 0
+      },
+      "fresh-native2-valkey_terminal.log": {
+        "count": 3,
+        "seconds": 11.898,
+        "passed": true,
+        "skipped": 0
+      }
+    },
+    "default_suite_skipped": 19,
+    "previous_followup_covered_skips": 15,
+    "supplemental_covered_skips": 4,
+    "all_default_skips_exercised": true,
+    "unique_tests_exercised": 273,
+    "owned_test_containers_exited": true,
+    "ascylib_setup": {
+      "first_attempt": "Missing submodule in test snapshot; failure preserved in fresh-native-ascylib_readonly.log",
+      "pinned_commit": "3c2d1a231eac3518a4167d7d4a709cb22a3cff6b",
+      "archive_sha256": "aa47e3444df1e46cc8a5d865b4008dc90df153fde577811a2cb2ec50a7fcacf0",
+      "implementation_changed": false
+    }
+  }
 }

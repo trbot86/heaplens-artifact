@@ -10,12 +10,19 @@ supersede the earlier frontend typecheck and local-kernel limitations.
   minimal context in 205 seconds. Image ID:
   `sha256:bc5b81e567754e0af2aa797fbc5a4022cc94525c6a9e1d9256d69d5ea67e4dab`.
 - Extracted the committed source, including pinned SetBench/RocksDB dependencies,
-  into that new image. The **273-test suite passed**, with 19 explicit opt-in
-  skips. Native instrumentation passed separately: eleven header tests, one
-  TPC-C custom-allocator test, four C++ new-expression tests and one custom-
-  allocator test, with no skips in these four suites.
+  into that new image. The default **273-test suite executed 254 tests**, with
+  19 explicit opt-in skips. Separate native runs now exercise **all 19 skipped
+  tests successfully**. The initial 17-test follow-up covered 15 of those skips
+  and repeated two ordinary header tests. The supplemental run covers final log
+  writes, retirement ordering, ASCYLIB's read-only boundary, and Valkey worker
+  flushing (plus two repeated Valkey source tests). No opt-in checks remain
+  unexecuted. The first supplemental ASCYLIB attempt lacked its submodule in
+  the test snapshot; adding the exact pinned `3c2d1a23` dependency resolved that
+  setup error without changing the implementation. Its failed log is preserved.
 - Full TypeScript checking and the Next.js production build pass with no errors.
-  Eight React hook dependency warnings remain. Repairs include explicit React/D3
+  Eight React hook dependency warnings remain and need a focused state-update
+  review; the successful GUI checks do not establish that every omitted
+  dependency is harmless. Repairs include explicit React/D3
   types, null handling, UTF-8 lint configuration, stable list keys, and shared
   utilities moved out of Next.js page exports. Query parameters have a Suspense
   boundary. Lint and type checking remain enabled.
