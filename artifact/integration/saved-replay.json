@@ -1,0 +1,64 @@
+[
+  {
+    "input": "artifact/data/efrb/allocs.sqlite",
+    "sha256": "643b7a5a0992d2b3a9cec219e205b49539e5ddd174e09dda4a04a433e2bda7e4",
+    "objects": 16404,
+    "fingerprints_equal": true,
+    "cache_equal": true,
+    "cli_equal": true,
+    "input_unchanged": true,
+    "arms": {
+      "full": {
+        "pages": 35,
+        "records": 1940,
+        "selection_equal": true
+      },
+      "no_per_time": {
+        "pages": 22,
+        "records": 1108,
+        "selection_equal": true
+      },
+      "no_coverage_first": {
+        "pages": 20,
+        "records": 1106,
+        "selection_equal": true
+      },
+      "no_alternation": {
+        "pages": 30,
+        "records": 1620,
+        "selection_equal": true
+      }
+    }
+  },
+  {
+    "input": "artifact/data/valkey/allocs.sqlite",
+    "sha256": "7b1a0b909f255efc944ec326212cdf68eb58c4afd3a69e4f73c7ca58ad57ec98",
+    "objects": 104913,
+    "fingerprints_equal": true,
+    "cache_equal": true,
+    "cli_equal": true,
+    "input_unchanged": true,
+    "arms": {
+      "full": {
+        "pages": 116,
+        "records": 8401,
+        "selection_equal": true
+      },
+      "no_per_time": {
+        "pages": 97,
+        "records": 6849,
+        "selection_equal": true
+      },
+      "no_coverage_first": {
+        "pages": 91,
+        "records": 6327,
+        "selection_equal": true
+      },
+      "no_alternation": {
+        "pages": 114,
+        "records": 8194,
+        "selection_equal": true
+      }
+    }
+  }
+]

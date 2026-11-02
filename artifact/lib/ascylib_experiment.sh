@@ -173,6 +173,7 @@ PY
     echo "=== [$out_name] 7/7: sample into sqlite database ==="
     cd "$SIFTER_ROOT"
     ./sifter.sh "$INSTRUMENTED" -d -s "$tree_src_dir" \
+        --num-buckets 2000 \
         --sample "$SAMPLE_PROPORTION" \
         --pages-per-type "$PAGES_PER_TYPE" \
         --field-dump fielddump.txt

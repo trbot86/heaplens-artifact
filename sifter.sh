@@ -16,6 +16,7 @@ fielddump=""
 pagespertype=""
 sample=""
 samplingSeed=()
+numBuckets=()
 cutoff=""
 threads=1
 pageSize="--page-size 4096"
@@ -92,6 +93,14 @@ while [ $# -gt 0 ]; do
                 exit 1
             fi
             samplingSeed=(--seed "$2")
+            shift
+        ;;
+        --num-buckets)
+            if ! [[ "$2" =~ ^[1-9][0-9]*$ ]]; then
+                echo "Must specify a positive integer with option --num-buckets." >&2
+                exit 1
+            fi
+            numBuckets=(--num-buckets "$2")
             shift
         ;;
         --sample)
@@ -203,8 +212,8 @@ elif [ "$database" = true ]; then
     cd type_analysis || exit 1
     rm -f allocs.sqlite
     make bin/convert_to_db || exit 1
-    echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran ${samplingSeed[*]}"
-    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran "${samplingSeed[@]}" "${containerArgs[@]}"
+    echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran ${samplingSeed[*]} ${numBuckets[*]}"
+    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran "${samplingSeed[@]}" "${containerArgs[@]}" "${numBuckets[@]}"
     exit $?
 elif [ "$includesOnly" = true ]; then
     add_includes "$indir"

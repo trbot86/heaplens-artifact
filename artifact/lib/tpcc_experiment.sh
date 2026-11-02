@@ -199,6 +199,7 @@ run_tpcc_experiment() {
     [[ -z "${SAMPLE_SEED:-}" ]] || seed_args=(--seed "$SAMPLE_SEED")
     ./sifter.sh "$INSTRUMENTED" -d -s "$MB_SUBDIR" \
         "${seed_args[@]}" \
+        --num-buckets 2000 \
         --sample "$SAMPLE_PROPORTION" \
         --pages-per-type "$PAGES_PER_TYPE" \
         --field-dump fielddump.txt \

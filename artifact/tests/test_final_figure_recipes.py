@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -15,6 +16,14 @@ from lib.hj_figure import apply as apply_hj
 
 
 class FigureRecipes(unittest.TestCase):
+    def test_converter_bucket_argument_is_forwarded_and_validated(self):
+        parser=(ROOT/'sifter.sh').read_text().split('add_includes ()',1)[0]
+        script=parser+'\nprintf "%s\\n" "${numBuckets[@]}"\n'
+        got=subprocess.run(['bash','-c',script,'sifter','--num-buckets','2000'],capture_output=True,text=True,check=True)
+        self.assertEqual(got.stdout.splitlines(),['--num-buckets','2000'])
+        for value in ('0','-1','abc'):
+            bad=subprocess.run(['bash','-c',script,'sifter','--num-buckets',value],capture_output=True)
+            self.assertNotEqual(bad.returncode,0)
     def command(self, argv, folder):
         with patch.object(sys,'argv',['ae.py',*argv]): args=ae.parse_args()
         with patch.object(ae,'new_output',return_value=folder),patch.object(ae,'ART',folder),patch.object(ae,'run') as run,\

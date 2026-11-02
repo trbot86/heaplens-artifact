@@ -21,8 +21,19 @@ Completed checks before packaging:
 - Portable saved analysis reproduces all nine final logging rows, the BCCO
   buffering ablation and all four final selection-table rows.
 
-The final assembled package and saved-input replay checks are recorded below
-when completed. Full application timing campaigns and large new figure captures
+The clean source package at `d2c6cf34` passed 269 tests (19 opt-in skips) and
+all five frontend helper suites. Saved-input acceptance passed on the bundled
+EFRB (16,404 objects) and Valkey (104,913 objects) databases: frozen-study
+fingerprints, all four selection methods, cluster memberships, ordinary CLI
+pages and previous/current cache outputs agreed exactly. Both input hashes are
+unchanged. Machine-readable receipts are in `saved-replay.json`.
+
+The new figure routes pass configuration/argument tests, including four-worker
+EFRB, HJ64 plus pinned jemalloc, segregation-only BCCO, phase boundaries and the
+explicit 2,000-bucket converter option. The native BCCO preflight confirmed two
+independent jemalloc 5.3 instances. Physical backing validation was unavailable
+on the local WSL kernel 6.6.87.2; its PAGEMAP_SCAN preflight stopped before any
+benchmark. The README requires a capable Linux 6.8+ host. Full application timing campaigns and large new figure captures
 are not acceptance tests for this source integration. Historical native results
 remain attributed to their original binaries. No visual browser/desktop control
 was used. An author visual check of the integrated GUI is still useful.
