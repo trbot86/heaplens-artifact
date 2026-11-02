@@ -1,0 +1,186 @@
+{
+  "metric": "Input-handler entry to second animation-frame callback; not compositor-present latency",
+  "aggregation": "Median of three within-trial medians. P95 is the median of within-trial nearest-rank p95 values.",
+  "cases": [
+    {
+      "name": "dense64k",
+      "trials": 1,
+      "complete": 1,
+      "failures": [],
+      "uncaught_errors": [],
+      "ready_ms": 1002.5999999046326,
+      "initial_heap_mib": 171.49374389648438,
+      "initial_elements": 1433,
+      "actions": {
+        "slider": {
+          "median_ms": 20.09999990463257,
+          "p95_ms": 27,
+          "max_ms": 27.699999809265137,
+          "controller_ms": 374.35069999999996,
+          "max_sampled_heap_mib": 190.04130172729492,
+          "max_elements": 1433,
+          "per_trial": [
+            {
+              "rep": 0,
+              "event_count": 33,
+              "median_ms": 20.09999990463257,
+              "p95_ms": 27,
+              "max_ms": 27.699999809265137,
+              "controller_ms": 374.35069999999996,
+              "max_sampled_heap_mib": 190.04130172729492,
+              "max_elements": 1433,
+              "max_detail_rects": 2
+            }
+          ]
+        },
+        "page_visibility": {
+          "median_ms": 44.700000047683716,
+          "p95_ms": 47.30000019073486,
+          "max_ms": 47.30000019073486,
+          "controller_ms": 111.17829999999981,
+          "max_sampled_heap_mib": 189.7152862548828,
+          "max_elements": 2140,
+          "per_trial": [
+            {
+              "rep": 0,
+              "event_count": 2,
+              "median_ms": 44.700000047683716,
+              "p95_ms": 47.30000019073486,
+              "max_ms": 47.30000019073486,
+              "controller_ms": 111.17829999999981,
+              "max_sampled_heap_mib": 189.7152862548828,
+              "max_elements": 2140,
+              "max_detail_rects": 2
+            }
+          ]
+        },
+        "cache_visibility": {
+          "median_ms": 44.14999985694885,
+          "p95_ms": 47.799999713897705,
+          "max_ms": 47.799999713897705,
+          "controller_ms": 107.80564999999979,
+          "max_sampled_heap_mib": 215.14625930786133,
+          "max_elements": 2139,
+          "per_trial": [
+            {
+              "rep": 0,
+              "event_count": 2,
+              "median_ms": 44.14999985694885,
+              "p95_ms": 47.799999713897705,
+              "max_ms": 47.799999713897705,
+              "controller_ms": 107.80564999999979,
+              "max_sampled_heap_mib": 215.14625930786133,
+              "max_elements": 2139,
+              "max_detail_rects": 2
+            }
+          ]
+        },
+        "filter": {
+          "median_ms": 35.44999980926514,
+          "p95_ms": 52.799999713897705,
+          "max_ms": 52.799999713897705,
+          "controller_ms": 61.14150000000018,
+          "max_sampled_heap_mib": 214.5259132385254,
+          "max_elements": 2140,
+          "per_trial": [
+            {
+              "rep": 0,
+              "event_count": 2,
+              "median_ms": 35.44999980926514,
+              "p95_ms": 52.799999713897705,
+              "max_ms": 52.799999713897705,
+              "controller_ms": 61.14150000000018,
+              "max_sampled_heap_mib": 214.5259132385254,
+              "max_elements": 2140,
+              "max_detail_rects": 2
+            }
+          ]
+        },
+        "scroll": {
+          "median_ms": 16.699999809265137,
+          "p95_ms": 16.699999809265137,
+          "max_ms": 16.699999809265137,
+          "controller_ms": 72.5574000000006,
+          "max_sampled_heap_mib": 214.95645904541016,
+          "max_elements": 2140,
+          "per_trial": [
+            {
+              "rep": 0,
+              "event_count": 1,
+              "median_ms": 16.699999809265137,
+              "p95_ms": 16.699999809265137,
+              "max_ms": 16.699999809265137,
+              "controller_ms": 72.5574000000006,
+              "max_sampled_heap_mib": 214.95645904541016,
+              "max_elements": 2140,
+              "max_detail_rects": 2
+            }
+          ]
+        },
+        "brush": {
+          "median_ms": 16663.800000190735,
+          "p95_ms": 16663.800000190735,
+          "max_ms": 16663.800000190735,
+          "controller_ms": 16751.3316,
+          "max_sampled_heap_mib": 1890.5571975708008,
+          "max_elements": 264794,
+          "per_trial": [
+            {
+              "rep": 0,
+              "event_count": 1,
+              "median_ms": 16663.800000190735,
+              "p95_ms": 16663.800000190735,
+              "max_ms": 16663.800000190735,
+              "controller_ms": 16751.3316,
+              "max_sampled_heap_mib": 1890.5571975708008,
+              "max_elements": 264794,
+              "max_detail_rects": 65538
+            }
+          ]
+        },
+        "zoom_in": {
+          "median_ms": 902.9000000953674,
+          "p95_ms": 902.9000000953674,
+          "max_ms": 902.9000000953674,
+          "controller_ms": 1162.247299999999,
+          "max_sampled_heap_mib": 1930.280834197998,
+          "max_elements": 4188,
+          "per_trial": [
+            {
+              "rep": 0,
+              "event_count": 1,
+              "median_ms": 902.9000000953674,
+              "p95_ms": 902.9000000953674,
+              "max_ms": 902.9000000953674,
+              "controller_ms": 1162.247299999999,
+              "max_sampled_heap_mib": 1930.280834197998,
+              "max_elements": 4188,
+              "max_detail_rects": 2
+            }
+          ]
+        },
+        "zoom_out": {
+          "median_ms": 27.799999713897705,
+          "p95_ms": 27.799999713897705,
+          "max_ms": 27.799999713897705,
+          "controller_ms": 88.8875999999982,
+          "max_sampled_heap_mib": 1933.3528900146484,
+          "max_elements": 2140,
+          "per_trial": [
+            {
+              "rep": 0,
+              "event_count": 1,
+              "median_ms": 27.799999713897705,
+              "p95_ms": 27.799999713897705,
+              "max_ms": 27.799999713897705,
+              "controller_ms": 88.8875999999982,
+              "max_sampled_heap_mib": 1933.3528900146484,
+              "max_elements": 2140,
+              "max_detail_rects": 2
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

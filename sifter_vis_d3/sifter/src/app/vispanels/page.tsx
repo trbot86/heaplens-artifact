@@ -38,6 +38,8 @@ const INIT_CACHELINE_SIZE = 64;
 const INIT_NUM_BUCKETS = 2000;
 const INIT_MAX_RUN_LENGTH = 5;
 const INIT_MAX_RUNS_PER_CLUSTER = 3;
+const INIT_PAGE_BUDGET = 128;
+const INIT_RECORD_BUDGET = 1000000;
 const INIT_CLUSTER_ALG = 'mbkmeans';
 const INIT_CACHE_SIZE = 32768;
 const INIT_CACHE_ASSOC = 8;
@@ -114,7 +116,8 @@ function a11yProps(value: string) {
 const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCluster, setMaxRunsPerCluster,
                          clusterAlg, setClusterAlg, numBucketsSetting, setNumBucketsSetting,
                          pageSizeSetting, setPageSizeSetting, cacheInfoSetting, setCacheInfoSetting,
-                         cacheLineSizeSetting, setCacheLineSizeSetting, ...props } : 
+                         cacheLineSizeSetting, setCacheLineSizeSetting,
+                         pageBudget, setPageBudget, recordBudget, setRecordBudget, selectionSeed, setSelectionSeed, ...props } :
     {
         maxRunLength: number,
         setMaxRunLength: (a: number) => void,
@@ -129,7 +132,10 @@ const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCl
         cacheInfoSetting: CacheInfoMap,
         setCacheInfoSetting: (a: CacheInfoMap) => void,
         cacheLineSizeSetting: number,
-        setCacheLineSizeSetting: (a: number) => void
+        setCacheLineSizeSetting: (a: number) => void,
+        pageBudget: number, setPageBudget: (a: number) => void,
+        recordBudget: number, setRecordBudget: (a: number) => void,
+        selectionSeed: number, setSelectionSeed: (a: number) => void
     }, ref) => {
     const [menuAnchor, setMenuAnchor] = useState<HTMLButtonElement | null>(null);
     const [tabValue, setTabValue] = useState<'sample' | 'pages' | 'cache'>('sample');
@@ -182,6 +188,24 @@ const SettingsButton = forwardRef(({ maxRunLength, setMaxRunLength, maxRunsPerCl
                         spacing={2}
                         id={'simple-tabpanel-sample'}
                         aria-labelledby={'simple-tab-sample'} >
+                        <Grid size={6}>
+                            <TextField label='Maximum pages' type='number' value={pageBudget}
+                                inputProps={{min: 1, step: 1}}
+                                onChange={e => setPageBudget(Number(e.target.value))} />
+                        </Grid>
+                        <Grid size={6}>
+                            <TextField label='Maximum history records' type='number' value={recordBudget}
+                                inputProps={{min: 1, step: 1}}
+                                onChange={e => setRecordBudget(Number(e.target.value))} />
+                        </Grid>
+                        <Grid size={6}>
+                            <TextField label='Selection seed' type='number' value={selectionSeed}
+                                inputProps={{min: 0, max: 4294967295, step: 1}}
+                                onChange={e => setSelectionSeed(Number(e.target.value))} />
+                        </Grid>
+                        <Grid size={12}>
+                            Both limits apply on Resample. Paper settings: 128 pages, 1,000,000 records, 2000 time buckets. Perf-directed pages are retained even if they exceed a limit.
+                        </Grid>
                         <Grid
                             className='settingsTextLabel'
                             size={6}>
@@ -406,6 +430,12 @@ export default function VisPanels() {
     const [fieldsData, setFieldsData] = useState<{[tp: string]: SubtypeEntry[]}>({});
     const [countsData, setCountsData] = useState({});
     const [pageData, setPageData] = useState({});
+    const [selection, setSelection] = useState<{
+        selected_pages: number; selected_records: number; page_budget: number; record_budget: number;
+        represented_clusters: number; available_clusters: number; omitted_types: string[];
+        perf_budget_excess: number; perf_record_budget_excess: number;
+        omitted_history_extremes: {cluster: number; end: string; records: number}[];
+    } | null>(null);
     const [clustersData, setClustersData] = useState({});
     const [sumClusterSizes, setSumClusterSizes] = useState<number>(0);
     const [numClusters, setNumClusters] = useState<number>(0);
@@ -415,6 +445,7 @@ export default function VisPanels() {
     const [cacheData, setCacheData] = useState(INIT_CACHE_DATA);
     const [numBuckets, setNumBuckets] = useState(initialBuckets);
     const [timeRange, setTimeRange] = useState(INIT_TIME_RANGE);
+    const [timestampHz, setTimestampHz] = useState<number | null>(null);
     const [getBucketIdx, setGetBucketTs] = useState(() => (ts: number) => 0);
     const [typesToSample, setTypesToSample] = useState({});
     const [alignData, setAlignData] = useState({});
@@ -437,6 +468,9 @@ export default function VisPanels() {
     const [pageSizeSetting, setPageSizeSetting] = useState(INIT_PAGE_SIZE);
     const [cacheInfoSetting, setCacheInfoSetting] = useState(INIT_CACHE_INFO);
     const [cacheLineSizeSetting, setCacheLineSizeSetting] = useState(INIT_CACHELINE_SIZE);
+    const [pageBudget, setPageBudget] = useState(INIT_PAGE_BUDGET);
+    const [recordBudget, setRecordBudget] = useState(INIT_RECORD_BUDGET);
+    const [selectionSeed, setSelectionSeed] = useState(0);
 
     /*  State and refs for notes. */
     const nodeRef = useRef(null);
@@ -448,7 +482,7 @@ export default function VisPanels() {
     useEffect(() => {
         if (shouldInitialize.current) {
             shouldInitialize.current = false;
-            getData(`init-app/${fname}-${pageSize}-${cacheLineSize}-${numBuckets}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${Object.values(INIT_CACHE_INFO)[0].size}-${Object.values(INIT_CACHE_INFO)[0].assoc}`, null)
+            getData(`init-app/${fname}-${pageSize}-${cacheLineSize}-${numBuckets}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${Object.values(INIT_CACHE_INFO)[0].size}-${Object.values(INIT_CACHE_INFO)[0].assoc}?page_budget=${pageBudget}&record_budget=${recordBudget}&seed=${selectionSeed}`, null)
                     .then((resp) => resp.json())
                     .then(async (allData) => {
                         // setTypesToSample(allData['types'].reduce((map: {[a: string]: boolean}, tp: string) => {
@@ -529,6 +563,7 @@ export default function VisPanels() {
                             }
                         });
                         setCurrTs(minTs);
+                        setTimestampHz(allData['traceClock']?.timestamp_hz ?? null);
                         setLineData(allData['linesAndStats']['pts']);
                         setStatsData(allData['linesAndStats']['stats']);
                         setFieldsData(allData['linesAndStats']['fields']);
@@ -559,6 +594,7 @@ export default function VisPanels() {
                         setPerfData(retPerfData);
 
                         setPageData(allData['pagesData']['page_num_events']);
+                        setSelection(allData['pagesData']['selection'] ?? null);
                         setClustersData(allData['pagesData']['clusters']);
                         setSumClusterSizes(allData['pagesData']['sum_cluster_sizes']);
                         setNumClusters(allData['pagesData']['num_clusters']);
@@ -613,7 +649,20 @@ export default function VisPanels() {
                 columnSpacing={2} >
                 <Grid 
                     className='visPanel'
-                    size={8.5} >
+                    size={8.5} sx={{flexDirection: 'column', alignItems: 'stretch'}} >
+                    {selection && <Alert severity={
+                        selection.represented_clusters < selection.available_clusters || selection.omitted_types.length > 0 ||
+                        selection.perf_budget_excess > 0 || selection.perf_record_budget_excess > 0 ? 'warning' : 'info'}>
+                        Showing {selection.selected_pages}/{selection.page_budget} pages and {selection.selected_records?.toLocaleString()}
+                        /{selection.record_budget?.toLocaleString()} history records; {selection.represented_clusters}/{selection.available_clusters} clusters.
+                        {selection.omitted_types.length > 0 && ` ${selection.omitted_types.length} types are not represented.`}
+                        {(selection.perf_budget_excess > 0 || selection.perf_record_budget_excess > 0) &&
+                            ' Mandatory perf-directed pages exceed the limits.'}
+                        {(selection.omitted_history_extremes?.length ?? 0) > 0 &&
+                            ` ${selection.omitted_history_extremes.length} within-cluster history-count extremes are not represented.`}
+                        {selection.represented_clusters < selection.available_clusters &&
+                            ' Increase the limits in Sample settings to inspect more clusters.'}
+                    </Alert>}
                     <Pages
                         pages={pageData}
                         clustersData={clustersData}
@@ -666,6 +715,7 @@ export default function VisPanels() {
                         currTs={currTs}
                         setCurrTs={setCurrTs}
                         timeRange={timeRange}
+                        timestampHz={timestampHz}
                         numBuckets={numBuckets}
                         lineVis={lineVis} />
                 </Grid>
@@ -730,7 +780,7 @@ export default function VisPanels() {
                                         const fname = searchParams.get('fname');
                                         setRequestError(null);
                                         setResampling(true);
-                                        getData(`get-pages-and-cache-data/${fname}-${pageSizeSetting}-${cacheLineSizeSetting}-${numBucketsSetting}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${cacheInfoSetting[selCacheName].size}-${cacheInfoSetting[selCacheName].assoc}`, pageVis)
+                                        getData(`get-pages-and-cache-data/${fname}-${pageSizeSetting}-${cacheLineSizeSetting}-${numBucketsSetting}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${cacheInfoSetting[selCacheName].size}-${cacheInfoSetting[selCacheName].assoc}?page_budget=${pageBudget}&record_budget=${recordBudget}&seed=${selectionSeed}`, pageVis)
                                                 .then((resp) => resp.json())
                                                 .then((allData) => {
                                                     setNumBuckets(numBucketsSetting);
@@ -743,6 +793,7 @@ export default function VisPanels() {
                                                     setPageSize(pageSizeSetting);
                                                     setCacheLineSize(cacheLineSizeSetting);
                                                     setPageData(allData['pagesData']['page_num_events']);
+                                                    setSelection(allData['pagesData']['selection'] ?? null);
                                                     setClustersData(allData['pagesData']['clusters']);
                                                     setSumClusterSizes(allData['pagesData']['sum_cluster_sizes']);
                                                     setNumClusters(allData['pagesData']['num_clusters']);
@@ -774,6 +825,9 @@ export default function VisPanels() {
                             title={'Settings'}
                             placement='top' >
                             <SettingsButton
+                                pageBudget={pageBudget} setPageBudget={setPageBudget}
+                                recordBudget={recordBudget} setRecordBudget={setRecordBudget}
+                                selectionSeed={selectionSeed} setSelectionSeed={setSelectionSeed}
                                 maxRunLength={maxRunLength}
                                 setMaxRunLength={setMaxRunLength}
                                 maxRunsPerCluster={maxRunsPerCluster}

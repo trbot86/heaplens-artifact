@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import './componentStyles.scss';
 import { TypeToColourMap } from "../vispanels/page";
 import { Slider, styled, Tooltip } from "@mui/material";
+import { formatElapsedTimestamp } from './timestampClock';
 
 export interface SizePoint {
     bucket: number,
@@ -167,7 +168,7 @@ const LinePath = forwardRef(({ lineData, colour, lineGenerator, ...props } :
 });
 
 function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
-                             numBuckets, lineVis } :
+                             numBuckets, lineVis, timestampHz } :
     {
         lines: LineData,
         colourOfType: TypeToColourMap,
@@ -176,6 +177,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
         timeRange: {min: number, max: number},
         numBuckets: number,
         lineVis: {[tp: string]: boolean},
+        timestampHz: number | null,
     }) {
     const SVGref = useRef(null);
     const [thumbX, setThumbX] = useState<number>(LINE_GRAPH_Y_AXIS_WIDTH);
@@ -204,12 +206,12 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
     if (!xScale) {
         lineGenerator.current = d3.line((pt: SizePoint) => xScaleOrig(pt.bucket), (pt: SizePoint) => yScale(pt.size));
         xAxis = d3.axisBottom(xScaleOrig).tickSize(9).tickValues(new Array(10).fill(0).map((d, i) => i*Math.floor(numLinePtsX / 10)))
-            .tickFormat((d) => `${((xPtToTsScale(d) - timeRange.min) / 1000000000).toFixed(2)} s`);
+            .tickFormat((d) => formatElapsedTimestamp(xPtToTsScale(d) - timeRange.min, timestampHz));
     }
     else {
         lineGenerator.current = d3.line((pt: SizePoint) => xScale(pt.bucket), (pt: SizePoint) => yScale(pt.size));
         xAxis = d3.axisBottom(xScale).tickSize(9).tickValues(new Array(10).fill(0).map((d, i) => i*Math.floor(numLinePtsX / 10)))
-            .tickFormat((d) => `${((xPtToTsScale(d) - timeRange.min) / 1000000000).toFixed(2)} s`);
+            .tickFormat((d) => formatElapsedTimestamp(xPtToTsScale(d) - timeRange.min, timestampHz));
     }
     
     const yAxis = useMemo(() => d3.axisLeft(yScale).tickSize(3).tickValues(getSizeTickValues(maxSize ? maxSize : 1, 6))
@@ -305,7 +307,7 @@ function ZoomableLineGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
 }
 
 export default function TimeGraph({ lines, colourOfType, currTs, setCurrTs, timeRange,
-                                    numBuckets, lineVis } :
+                                    numBuckets, lineVis, timestampHz } :
     {
         lines: LineData,
         colourOfType: TypeToColourMap,
@@ -313,7 +315,8 @@ export default function TimeGraph({ lines, colourOfType, currTs, setCurrTs, time
         setCurrTs: (a: number) => void,
         timeRange: {min: number, max: number},
         numBuckets: number,
-        lineVis: {[tp: string]: boolean}
+        lineVis: {[tp: string]: boolean},
+        timestampHz: number | null
     }) {
     // const sampledAndSortedLines = Object.keys(lines).reduce((retLines: LineData, tp: string) => {
     //     retLines[tp] = getSampledLine(lines[tp], maxPointsPerLine);
@@ -337,6 +340,6 @@ export default function TimeGraph({ lines, colourOfType, currTs, setCurrTs, time
             setCurrTs={setCurrTs}
             timeRange={timeRange}
             numBuckets={numBuckets}
-            lineVis={lineVis} />
+            lineVis={lineVis} timestampHz={timestampHz} />
     );
 }

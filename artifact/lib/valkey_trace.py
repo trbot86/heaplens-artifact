@@ -99,7 +99,7 @@ def execute(args,out,api):
     api.save(out/'protocol.json',dict(variant=variant,allocator='jemalloc',keys=keys,value_bytes=128,
              scope='Instrumented preload for visualization; not a throughput comparison'))
     with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
-    command=[str(work/'src/valkey-server'),'--bind','127.0.0.1','--port',str(port),'--save','','--appendonly','no','--daemonize','no','--dir',str(trial)]
+    command=[str(work/'src/valkey-server'),'--bind','127.0.0.1','--port',str(port),'--save','','--appendonly','no','--daemonize','no','--dir',str(trial),'--enable-debug-command','yes']
     env=dict(os.environ,LD_PRELOAD=str(tool/'memhook/libmemhook.so'),MEMHOOK_OUTPUT_DUMP_FILE=str(trial/'binary_dump.txt'))
     with (trial/'server.log').open('w') as log:
         proc=subprocess.Popen(command,env=env,cwd=trial,stdout=log,stderr=subprocess.STDOUT)
@@ -124,6 +124,7 @@ def execute(args,out,api):
                     client.sendall(b''.join(batch))
                     for _ in batch:
                         if reader.readline()!=b'+OK\r\n':raise RuntimeError('Preload failed')
+            support.finish_trace_producers(port,proc)
             api.run([work/'src/valkey-cli','-p',str(port),'shutdown','nosave'],log=trial/'shutdown.log')
             if proc.wait(timeout=120)!=0:raise RuntimeError('Valkey shutdown failed')
         finally:

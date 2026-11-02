@@ -6,6 +6,7 @@ import csv
 import datetime as dt
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -269,6 +270,17 @@ def import_gui_database(args):
             if hashlib.sha256(target.read_bytes()).digest()!=hashlib.sha256(selected.read_bytes()).digest():
                 raise ValueError(f'Refusing to replace {target}; choose another --label')
         else: shutil.copy2(selected,target)
+        sys.path.insert(0, str(ROOT/'sifter_vis_d3/server'))
+        from trace_clock import clock_path, read_clock, validate_timestamp_hz
+        hz = getattr(args, 'timestamp_hz', None)
+        metadata = (dict(timestamp_hz=validate_timestamp_hz(hz), source='explicit GUI import')
+                    if hz is not None else read_clock(selected))
+        if metadata['timestamp_hz'] is not None:
+            dest_clock = clock_path(target)
+            if dest_clock.exists() and read_clock(target)['timestamp_hz'] != metadata['timestamp_hz']:
+                raise ValueError('Conflicting trace clock metadata; choose another --label')
+            if not dest_clock.exists():
+                save(dest_clock, metadata)
         print(f'Select {target.name} in the GUI', flush=True)
         return target
     return None
@@ -514,6 +526,8 @@ def parse_args(argv=None):
     p.add_argument("--jobs", type=int, default=4)
     p.add_argument('--database', help='For gui: import a generated SQLite trace into the database selector')
     p.add_argument('--label', help='For gui --database: unique selector name, e.g. tpcc-bcco-after')
+    p.add_argument('--timestamp-hz', type=float,
+                   help='For gui --database: known timestamp ticks/second on the trace-producing host; otherwise axes show ticks')
     p.add_argument('--variant', choices=['baseline','segregation-only','prefill-only','optimized'],
                    help='Diagnostic layout; EFRB also supports segregation-only and prefill-only')
     p.add_argument("--overhead-trees", nargs='+', choices=['efrb','dvy','bcco'],
@@ -546,6 +560,11 @@ def parse_args(argv=None):
     if args.tpcc_factors and not (args.command in {'experiment','legacy'} and args.name in {'tpcc_bcco_bench','tpcc_efrb_bench'}):
         p.error('tpcc-factors applies only to TPC-C performance experiments')
     if (args.database or args.label) and args.command != 'gui': p.error('database/label apply only to gui')
+    if args.timestamp_hz is not None:
+        if args.command != 'gui' or not args.database:
+            p.error('timestamp-hz requires gui --database')
+        if not math.isfinite(args.timestamp_hz) or args.timestamp_hz <= 0:
+            p.error('timestamp-hz must be positive and finite')
     if args.label and not args.database: p.error('label requires database')
     if args.variant and not (args.command in {'experiment','legacy'} and args.name in
                             {'ascylib_efrb','ascylib_dvy','ascylib_hj','tpcc_bcco','tpcc_efrb','rocksdb_hsl','rocksdb_isl','valkey_trace','hnsw_trace'}):

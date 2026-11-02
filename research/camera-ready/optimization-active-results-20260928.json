@@ -1,0 +1,225 @@
+{
+  "baseline_commit": "e45d924",
+  "backend": [
+    {
+      "case": "valkey-full",
+      "complete_payload_equal": true,
+      "summary": {
+        "baseline": {
+          "n": 3,
+          "total_seconds": 11.900910586118698,
+          "total_seconds_raw": [
+            12.28189700981602,
+            11.808017360977829,
+            11.900910586118698
+          ],
+          "cache_seconds": 6.830547966063023
+        },
+        "optimized": {
+          "n": 3,
+          "total_seconds": 8.699162961915135,
+          "total_seconds_raw": [
+            8.78183590201661,
+            8.699162961915135,
+            8.65994303394109
+          ],
+          "cache_seconds": 3.5568873290903866
+        }
+      }
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "complete_payload_equal": true,
+      "summary": {
+        "baseline": {
+          "n": 3,
+          "total_seconds": 27.19562072213739,
+          "total_seconds_raw": [
+            27.193962903227657,
+            27.387800673022866,
+            27.19562072213739
+          ],
+          "cache_seconds": 22.243471499998122
+        },
+        "optimized": {
+          "n": 3,
+          "total_seconds": 12.042581411078572,
+          "total_seconds_raw": [
+            12.100664025172591,
+            12.034680129028857,
+            12.042581411078572
+          ],
+          "cache_seconds": 7.0927283386699855
+        }
+      }
+    }
+  ],
+  "browser": [
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 128,
+      "policies": {
+        "baseline": {
+          "n": 3,
+          "ready_median_ms": 2156.300000190735,
+          "ready_raw_ms": [
+            2112.699999809265,
+            2156.300000190735,
+            2218.699999809265
+          ],
+          "actions": {
+            "slider_drag": {
+              "median_of_trial_medians_ms": 107.29999995231628,
+              "trial_medians_ms": [
+                107.29999995231628,
+                106.90000009536743,
+                108.2999997138977
+              ],
+              "samples_per_trial": [
+                60,
+                60,
+                60
+              ]
+            },
+            "page_visibility": {
+              "median_of_trial_medians_ms": 444.2999999523163,
+              "trial_medians_ms": [
+                445.34999990463257,
+                442.2999999523163,
+                444.2999999523163
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "cache_visibility": {
+              "median_of_trial_medians_ms": 574.0499999523163,
+              "trial_medians_ms": [
+                574.0499999523163,
+                573.0499999523163,
+                574.1499998569489
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "type_filter": {
+              "median_of_trial_medians_ms": 35.299999952316284,
+              "trial_medians_ms": [
+                35.299999952316284,
+                34.799999952316284,
+                36.65000009536743
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "scroll": {
+              "median_of_trial_medians_ms": 16.299999713897705,
+              "trial_medians_ms": [
+                16.09999990463257,
+                16.299999713897705,
+                16.5
+              ],
+              "samples_per_trial": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        },
+        "optimized": {
+          "n": 3,
+          "ready_median_ms": 1507.1999998092651,
+          "ready_raw_ms": [
+            1507.1999998092651,
+            1499.6999998092651,
+            1525.1999998092651
+          ],
+          "actions": {
+            "slider_drag": {
+              "median_of_trial_medians_ms": 108.64999985694885,
+              "trial_medians_ms": [
+                109.09999990463257,
+                108.64999985694885,
+                108.5499997138977
+              ],
+              "samples_per_trial": [
+                60,
+                60,
+                60
+              ]
+            },
+            "page_visibility": {
+              "median_of_trial_medians_ms": 226.10000014305115,
+              "trial_medians_ms": [
+                226.10000014305115,
+                229.80000019073486,
+                224.15000009536743
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "cache_visibility": {
+              "median_of_trial_medians_ms": 136.20000004768372,
+              "trial_medians_ms": [
+                136.20000004768372,
+                136.75,
+                135.25
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "type_filter": {
+              "median_of_trial_medians_ms": 36.15000009536743,
+              "trial_medians_ms": [
+                35.64999985694885,
+                37.299999952316284,
+                36.15000009536743
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "scroll": {
+              "median_of_trial_medians_ms": 16.40000009536743,
+              "trial_medians_ms": [
+                16.40000009536743,
+                16.199999809265137,
+                16.5
+              ],
+              "samples_per_trial": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "equality": {
+    "paired_trials": 3,
+    "states_equal": true,
+    "exports_equal": true,
+    "page_errors": 0
+  },
+  "browser_version": "154.0.4258.37",
+  "scope": "Three paired trials per input. Browser replay excludes backend preparation. Interaction metric is input-handler entry to second animation frame, not compositor-present latency."
+}
