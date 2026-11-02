@@ -18,7 +18,9 @@
       "source": "artifact-sampling-work-20261007/sifter_vis_d3/sifter/src/app/ui/pagesComponent.tsx",
       "source_sha256": "1f871716ac7d2f3e694aad3544d27c7b57b3897487524af27537493cf573ce17",
       "target": "sifter_vis_d3/sifter/src/app/ui/pagesComponent.tsx",
-      "target_sha256": "1f871716ac7d2f3e694aad3544d27c7b57b3897487524af27537493cf573ce17"
+      "target_sha256": "be95ea69e6bb126016e874c22bdf5be41d7ea56d7384a5eb8e0311fe1cd71ad2",
+      "imported_target_sha256": "1f871716ac7d2f3e694aad3544d27c7b57b3897487524af27537493cf573ce17",
+      "post_import_change": "Production frontend type/build repairs; shared client utilities moved out of Next page exports; behavior checked in GUI."
     },
     {
       "source": "artifact-sampling-work-20261007/sifter_vis_d3/sifter/src/app/ui/componentStyles.scss",

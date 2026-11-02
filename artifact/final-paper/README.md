@@ -11,6 +11,7 @@ From the repository root:
 ```bash
 python3 artifact/final-paper/summarize.py
 python3 artifact/final-paper/summarize.py --json > final-paper-summary.json
+python3 artifact/final-paper/verify_selection.py
 ```
 
 Output: Table 3's nine logging rows, the BCCO buffer comparison, Table 4's
@@ -55,10 +56,19 @@ remain; this package does not advertise the discarded traces as downloads.
 cells from the completed study: thirteen patterns, two initial page-sampling
 settings, two page budgets and four algorithms. Each cell contains the mean
 and success counts from twenty trials. The study comprised 440 shared-input
-groups and 3520 algorithm/budget outputs. This compact package contains audited
-per-pattern summaries, **not individual seed records**; the command regenerates
-paper aggregation from those summaries, not the underlying trial measurements.
-The full eleven database inputs and individual trial records are not bundled.
+groups and 3520 algorithm/budget outputs. `selection-trials.json.gz` contains
+all 440 individual trial receipts, including selected pages, per-pattern scores,
+seeds and full-input duration denominators (1.3 MB compressed). The verifier
+recomputes all 208 aggregate cells from those receipts, checks every expected
+trial identity, and rejects missing/duplicate seeds or changed aggregates.
+These are retained measurements, not new runs. Each exported receipt records
+the SHA-256 of its original JSON; the export also checked every full-method
+result against the separately retained paired baseline.
+
+The eleven full database inputs remain outside this compact source package.
+Their recorded paths and sizes were checked on November 2; no large database
+was transferred or scanned during this check. Their public distribution and
+full frozen-study replay packaging remain release tasks.
 
 Table 4 uses twelve patterns from the ten Table 1 baselines. The ablation prose
 also includes a thirteenth rare optimized-InlineSkipList mixture. Keep those

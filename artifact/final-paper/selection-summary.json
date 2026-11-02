@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "source": "unified-selection-20261009/results-summary-20261010.json",
-  "evidence_level": "Audited per-pattern means and success counts over 20 trials; not individual seed records.",
+  "evidence_level": "Audited per-pattern means and success counts over 20 trials, independently recomputable from selection-trials.json.gz.",
   "protocol": {
     "status": "author_requested_extensions",
     "question": "Preservation of the visible layout observations behind the Table 1 fixes, plus the rare optimized InlineSkipList mixture",
