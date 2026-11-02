@@ -46,6 +46,18 @@ def get_bucket(min_ts, max_ts, num_buckets, ts):
     return math.ceil((ts - min_ts) / size_of_bucket)
 
 
+def normalized_type_names(names):
+    """Share normalized names without padding every row to the longest type.
+
+    NumPy fixed-width Unicode arrays cost rows * longest_name * 4 bytes.
+    Project headers can introduce long C++ template names even when almost
+    every allocation has a short type. Keep one string per distinct type.
+    """
+    normalized = {name: str(name).replace(' ', '') for name in set(names)}
+    return np.fromiter((normalized[name] for name in names), dtype=object,
+                       count=len(names))
+
+
 class Sampler:
 
     def __init__(self, dbfile, page_size=4096, cache_line_size=64, num_buckets=2000):
@@ -608,7 +620,7 @@ class Sampler:
 
         print("rows.shape:", rows.shape)
 
-        clean_types = np.char.replace(rows[:, TYPE_IND].astype(str), ' ', '')
+        clean_types = normalized_type_names(rows[:, TYPE_IND])
         type_no_space_ind = rows.shape[1]
         rows = np.column_stack([rows, clean_types])
         print("Done removing spaces from type names")

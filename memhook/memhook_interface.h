@@ -143,6 +143,15 @@ extern void memhook_record_alloc(void *ptr, size_t size, const std::type_info &t
                                  uint16_t file, int line);
 extern void memhook_record_free(void *ptr, uint16_t file, int line);
 
+template <class T>
+inline T* operator*(const MemPlacementStamp &stamp, T* p)
+{
+    // Keep compatibility with callers that still have a pending MemStamp.
+    const memhook_info_t enclosing = unit_log;
+    memhook_record_alloc(p, sizeof(T), typeid(T), stamp.filename, stamp.lineNum);
+    unit_log = enclosing;
+    return p;
+}
 
 template <class T>
 inline T* operator*(const MemStamp &stamp, T* p)
@@ -233,5 +242,6 @@ void* malloc(size_t size) {
     return ptr;
 }
 
+#include "memhook_new.h"
 #endif // __cplusplus
 #endif //__MEMHOOK_INTERFACE_H

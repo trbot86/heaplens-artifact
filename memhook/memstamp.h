@@ -14,7 +14,7 @@ struct memhook_info_t {
     uint16_t tindex_name;
     bool typeofop;
 
-    memhook_info_t() : file(0), tindex_name(0), line(0), timestamp(0), size(0), addr(nullptr) {
+    memhook_info_t() : file(0), tindex_name(0), line(0), timestamp(0), size(0), addr(nullptr), typeofop(false) {
         (void) 0;
     }
 };
@@ -26,6 +26,13 @@ public:
     int const lineNum;
 
     MemStamp(uint16_t fn, int ln) : filename(fn), lineNum(ln) {}
+};
+
+// A placement construction is a logical object inside supplied storage, not
+// the pending physical allocation left by an enclosing operator new.
+class MemPlacementStamp : public MemStamp {
+public:
+    MemPlacementStamp(uint16_t fn, int ln) : MemStamp(fn, ln) {}
 };
 
 class MemStampCollector {

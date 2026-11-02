@@ -34,17 +34,18 @@ public:
     void * alloc(uint64_t size, uint64_t part_id);
 #ifdef __MEMHOOK_INTERFACE_H
     // HeapLENS/sifter instrumentation hook. AllocationLoggingCheck's
-    // MATCH_FUNCTIONS list targets "alloc" by bare name (same mechanism
-    // ASCYLIB's ssalloc()/ssmem_alloc() and setbench's own std::malloc use),
+    // MATCH_FUNCTIONS registers the qualified name ::mem_alloc::alloc,
+    // not every factory or arena method named alloc,
     // so `mem_allocator.alloc(size, part_id)` call sites get rewritten to
     // `mem_allocator.alloc<Type, __LINE__, fileID>(size, part_id)`. That
     // requires a matching template overload to exist, which the stock class
     // above doesn't have. This delegates straight to memhook_interface.h's
     // own malloc<T,line,filename> template (rather than duplicating its
-    // unit_log/typetable/memhookCollector logic here) -- mem_alloc's own
-    // per-arena pooling is bypassed in favor of a plain logged malloc, which
-    // is fine for this pipeline's purposes since mem_alloc is itself just a
-    // thin arena wrapper around malloc, not a placement-sensitive allocator.
+    // unit_log/typetable/memhookCollector logic here). In the pinned TPC-C
+    // source, mem_alloc::alloc unconditionally calls malloc(size); its pooling
+    // branches are commented out. This wrapper preserves that allocation path
+    // while recording the caller's type and source location exactly once.
+    // Revalidate this wrapper if the underlying allocator implementation changes.
     // Guarded on __MEMHOOK_INTERFACE_H (memhook_interface.h's own include
     // guard macro) rather than an ad hoc flag: sifter.sh's --includes-only
     // step prepends `#include "memhook_interface.h"` as the literal first

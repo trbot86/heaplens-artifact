@@ -8,13 +8,16 @@
 
 #include "AllocationLoggingCheck.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
+#include "clang/Lex/Lexer.h"
 
 #include <iostream>
 
 #define MATCH_FUNCTIONS allOf(anyOf(hasName("_mm_malloc"), \
-                                    hasName("alloc"), \
+                                    hasName("::mem_alloc::alloc"), \
                                     hasName("malloc"), \
                                     hasName("ssmem_alloc"), \
                                     hasName("ssalloc"), \
@@ -49,15 +52,15 @@ StatementMatcher sizeofMallocMatcher = expr(sizeOfExpr(allOf(
 // matches malloc lhs without explicit casts
 StatementMatcher lhsofMallocMatcher = binaryOperator(
     hasOperatorName("="),
-    anyOf(hasDescendant(callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fdecllhsmalloc")))
+    anyOf(hasDescendant(callExpr(unless(isInTemplateInstantiation()), callee(functionDecl(MATCH_FUNCTIONS).bind("fdecllhsmalloc")))
                             .bind("lhsmalloc")),
-        hasRHS(hasDescendant(callExpr(callee(functionDecl(MATCH_FUNCTIONS)))
+        hasRHS(hasDescendant(callExpr(unless(isInTemplateInstantiation()), callee(functionDecl(MATCH_FUNCTIONS)))
                                    .bind("lhsmalloc")))),
     hasLHS(hasType(type().bind("lhs-type"))));
 
 DeclarationMatcher declMallocMatcher = varDecl(
     hasDescendant(
-        callExpr(callee(functionDecl(MATCH_FUNCTIONS).bind("fdeclmalloc"))).bind("declmalloc")),
+        callExpr(unless(isInTemplateInstantiation()), callee(functionDecl(MATCH_FUNCTIONS).bind("fdeclmalloc"))).bind("declmalloc")),
     hasType(type().bind("decltype")));
 
 StatementMatcher returnMallocMatcher = returnStmt(
@@ -134,6 +137,19 @@ void AllocationLoggingCheck::registerMatchers(MatchFinder *Finder) {
 #endif
 }
 
+bool AllocationLoggingCheck::isProjectLocation(SourceLocation Loc, const SourceManager &SM) const {
+    // The driver supplies a canonical project root, including headers above a
+    // selected build subdirectory. Do not rewrite external or system headers.
+    if (Loc.isInvalid() || Loc.isMacroID() || SM.isInSystemHeader(Loc)) return false;
+    const char *Root = std::getenv("HEAPLENS_ANNOTATION_ROOT");
+    if (!Root || !*Root) return true; // Preserve standalone clang-tidy filtering.
+    const FileEntry *File = SM.getFileEntryForID(SM.getFileID(Loc));
+    if (!File) return false;
+    StringRef Path = File->tryGetRealPathName();
+    std::string Prefix = std::string(Root) + "/";
+    return Path.startswith(Prefix);
+}
+
 void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResult &Result, std::string allocnodebind, std::string typenodebind, std::string declnodebind) {
     const clang::CallExpr *mnode =
         Result.Nodes.getNodeAs<clang::CallExpr>(allocnodebind);
@@ -142,13 +158,23 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
     const clang::Type *typenode =
         Result.Nodes.getNodeAs<clang::Type>(typenodebind);
 
-    if(mnode) {
+    SourceLocation CalleeLoc;
+    if (mnode) {
+        CalleeLoc = mnode->getExprLoc();
+        const Expr *Callee = mnode->getCallee()->IgnoreParenImpCasts();
+        if (const auto *Ref = dyn_cast<DeclRefExpr>(Callee))
+            CalleeLoc = Ref->getLocation();
+        else if (const auto *Member = dyn_cast<MemberExpr>(Callee))
+            CalleeLoc = Member->getMemberLoc();
+    }
+    if(mnode && isProjectLocation(CalleeLoc, *Result.SourceManager)) {
         if(declnode) {
             std::string type;
 
             static PrintingPolicy print_policy((Result.Context)->getLangOpts());
             print_policy.FullyQualifiedName = 0;
             print_policy.SuppressScope = 1;
+            print_policy.SuppressTagKeyword = 1;
 
             if (typenode->isBuiltinType()) {
                 type = typenode->getAs<clang::BuiltinType>()->getNameAsCString(print_policy);
@@ -157,7 +183,11 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
                 type = typenode->getAsRecordDecl()->getQualifiedNameAsString();
             }
             else if (typenode->isPointerType()) {
-                type = typenode->getPointeeType().getAsString();
+                // Preserve names as visible inside the original template,
+                // rather than spelling a concrete instantiation into a header.
+                type = typenode->isDependentType()
+                    ? typenode->getPointeeType().getAsString(print_policy)
+                    : typenode->getPointeeType().getAsString();
             }
 #ifndef ALLOCLOGGING_TEMPLATE
             if (typemap.find(type) == typemap.end()) {
@@ -165,10 +195,11 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
             }
 #endif
 
-            FullSourceLoc fsrcloc = Result.Context->getFullLoc(mnode->getExprLoc());
+            FullSourceLoc fsrcloc = Result.Context->getFullLoc(CalleeLoc);
             /* TODO: get the following to work will allocations performed in macro defs */
             if (!fsrcloc.isMacroID()) {
-                std::string FileName = fsrcloc.getFileEntry()->getName().str();
+                std::string FileName = fsrcloc.getFileEntry()->tryGetRealPathName().str();
+                if (FileName.empty()) FileName = fsrcloc.getFileEntry()->getName().str();
                 if (filemap.find(FileName) == filemap.end()) {
                     filemap[FileName] = filemap.size();
                 }
@@ -183,16 +214,16 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
                 int offset = declnode->getNameAsString().size();
 
     #ifdef ALLOCLOGGING_TEMPLATE
-                diag(mnode->getExprLoc().getLocWithOffset(offset), "insert type here",
+                diag(CalleeLoc.getLocWithOffset(offset), "insert type here",
                     DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(
-                        mnode->getExprLoc().getLocWithOffset(offset),
+                        CalleeLoc.getLocWithOffset(offset),
                         "<" + type + ", " + std::to_string(line) + ", " + std::to_string(filemap[FileName]) + ">");
     #else    
-                diag(mnode->getExprLoc().getLocWithOffset(offset), "insert _s here",
+                diag(CalleeLoc.getLocWithOffset(offset), "insert _s here",
                     DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(
-                        mnode->getExprLoc().getLocWithOffset(offset), "_s");
+                        CalleeLoc.getLocWithOffset(offset), "_s");
                 diag(mnode->getEndLoc(), "insert file name, line number, and type",
                     DiagnosticIDs::Warning)
                     << FixItHint::CreateInsertion(
@@ -204,36 +235,150 @@ void AllocationLoggingCheck::emitDiagnosticsMalloc(const MatchFinder::MatchResul
     }
 }
 
+static bool hasCustomDelete(const CXXRecordDecl *Record, bool Array) {
+    if (!Record || !Record->hasDefinition()) return false;
+    Record = Record->getDefinition();
+    for (const Decl *D : Record->decls()) {
+        const auto *F = dyn_cast<FunctionDecl>(D);
+        if (F && F->isOverloadedOperator() &&
+            F->getOverloadedOperator() == (Array ? OO_Array_Delete : OO_Delete))
+            return true;
+    }
+    for (const auto &Base : Record->bases())
+        if (hasCustomDelete(Base.getType()->getAsCXXRecordDecl(), Array)) return true;
+    return false;
+}
+
 void AllocationLoggingCheck::emitDiagnosticsNew(const MatchFinder::MatchResult &Result, std::string newbind) {
     const clang::CXXNewExpr* node =
         Result.Nodes.getNodeAs<clang::CXXNewExpr>(newbind);
 
-    if (node) {
+    if (node && isProjectLocation(node->getExprLoc(), *Result.SourceManager)) {
         auto &SM = Result.Context->getSourceManager();
-        std::string FileName = SM.getFilename(node->getExprLoc()).str();
+        const FileEntry *File = SM.getFileEntryForID(SM.getFileID(node->getExprLoc()));
+        std::string FileName = File ? File->tryGetRealPathName().str() : "";
+        if (FileName.empty()) FileName = SM.getFilename(node->getExprLoc()).str();
         if (filemap.find(FileName) == filemap.end()) {
             filemap[FileName] = filemap.size();
         }
-        if (node->getNumPlacementArgs() == 0) {
-            diag(node->getExprLoc(), "insert MemStamp",
-                DiagnosticIDs::Warning)
-                << FixItHint::CreateInsertion(
-                        node->getExprLoc(),
-                        "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * ");
+        const FunctionDecl *Allocator = node->getOperatorNew();
+        if (!Allocator) return;
+        SourceLocation NewToken = node->getBeginLoc();
+        if (node->isGlobalNew()) {
+            auto Token = Lexer::findNextToken(NewToken, SM, Result.Context->getLangOpts());
+            if (!Token) return;
+            NewToken = Token->getLocation();
         }
+        const std::string Site = std::to_string(filemap[FileName]) + ", (__LINE__)";
+        if (Allocator->isReservedGlobalPlacementOperator()) {
 #ifdef ALLOCLOGGING_PLACEMENT_NEW
-        // TODO: if dereference on same line, need to put parentheses around like *(MemStamp() * (T*) new () T())
-        else if (node->getNumPlacementArgs() > 0) {
-            std::string type = node->getAllocatedType().getUnqualifiedType().getAsString();
-            // std::string type = node->getAllocatedType().getTypePtr()->getAs<clang::RecordType>()->getDecl()->getNameAsString();
-            std::string out = "MemStamp(" + std::to_string(filemap[FileName]) + ", (__LINE__)) * (" + type + "*) ";
-            diag(node->getExprLoc(), "insert MemStamp (placement new)",
+            // Preserve the standard placement allocation function and its ABI.
+            // Capture an array bound exactly once at its original position;
+            // replacing standard placement new[] can introduce an ABI cookie.
+            if (node->isArray()) {
+                const Expr *Bound = *node->getArraySize();
+                if (!Bound || Bound->getBeginLoc().isInvalid() || Bound->getEndLoc().isInvalid()) {
+                    diag(node->getExprLoc(), "implicit placement array bound requires an explicit extent hook",
+                         DiagnosticIDs::Error);
+                    return;
+                }
+                const Expr *WrittenBound = Bound->IgnoreUnlessSpelledInSource();
+                if (!WrittenBound->getType()->isIntegralOrEnumerationType() &&
+                    !WrittenBound->getType()->isDependentType()) {
+                    diag(node->getExprLoc(), "class-valued placement array bound requires an explicit extent hook", DiagnosticIDs::Error);
+                    return;
+                }
+                const std::string Count = "heaplens_array_count_" + std::to_string(SM.getFileOffset(node->getExprLoc()));
+                const bool Local = !match(cxxNewExpr(hasAncestor(functionDecl())), *node, *Result.Context).empty();
+                SourceLocation End = Lexer::getLocForEndOfToken(node->getEndLoc(), 0, SM, Result.Context->getLangOpts());
+                SourceLocation BoundEnd = Lexer::getLocForEndOfToken(Bound->getEndLoc(), 0, SM, Result.Context->getLangOpts());
+                // Clang 14 can give an instantiated, implicitly constructed
+                // array's new token as its expression end. Include at least
+                // the syntactically required closing bound bracket.
+                auto Closing = Lexer::findNextToken(Bound->getEndLoc(), SM, Result.Context->getLangOpts());
+                if (!Closing || !Closing->is(tok::r_square)) {
+                    diag(node->getExprLoc(), "cannot locate placement array bound end", DiagnosticIDs::Error);
+                    return;
+                }
+                SourceLocation ArrayEnd = Lexer::getLocForEndOfToken(Closing->getLocation(), 0, SM, Result.Context->getLangOpts());
+                if (SM.isBeforeInTranslationUnit(End, ArrayEnd)) End = ArrayEnd;
+                if (node->getDirectInitRange().getEnd().isValid()) {
+                    SourceLocation InitEnd = Lexer::getLocForEndOfToken(node->getDirectInitRange().getEnd(), 0, SM, Result.Context->getLangOpts());
+                    if (SM.isBeforeInTranslationUnit(End, InitEnd)) End = InitEnd;
+                }
+                diag(node->getExprLoc(), "record placement array extent without changing its allocation function", DiagnosticIDs::Warning)
+                    << FixItHint::CreateInsertion(node->getExprLoc(),
+                        std::string("([") + (Local ? "&" : "") + "]() { size_t " + Count + " = 0; return (MemPlacementArrayStamp(" + Site + ", " + Count + ") * ")
+                    << FixItHint::CreateInsertion(Bound->getBeginLoc(), "memhook_capture_extent(" + Count + ", (")
+                    << FixItHint::CreateInsertion(BoundEnd, "))")
+                    << FixItHint::CreateInsertion(End, "); }())");
+                return;
+            }
+            SourceLocation End = Lexer::getLocForEndOfToken(
+                node->getEndLoc(), 0, SM, Result.Context->getLangOpts());
+            diag(node->getExprLoc(), "record placement object independently",
                 DiagnosticIDs::Warning)
-                << FixItHint::CreateInsertion(
-                        node->getExprLoc(),
-                        out);
-        }
+                << FixItHint::CreateInsertion(node->getExprLoc(),
+                    "(MemPlacementStamp(" + Site + ") * ")
+                << FixItHint::CreateInsertion(End, ")");
 #endif
+            return;
+        }
+
+        // Do not redirect class-specific or custom arena allocation functions.
+        bool Standard = Allocator->getDeclContext()->getRedeclContext()->isTranslationUnit();
+        for (unsigned I = 1; I < Allocator->getNumParams(); ++I) {
+            QualType Arg = Allocator->getParamDecl(I)->getType()
+                               .getNonReferenceType().getUnqualifiedType();
+            std::string Name;
+            if (const auto *R = Arg->getAs<RecordType>())
+                Name = R->getDecl()->getQualifiedNameAsString();
+            else if (const auto *E = Arg->getAs<EnumType>())
+                Name = E->getDecl()->getQualifiedNameAsString();
+            Standard &= Name == "std::nothrow_t" || Name == "std::align_val_t";
+        }
+        // Explicit adapters supply tag-taking allocation AND exception-cleanup
+        // overloads that delegate to the original class allocator. Never infer
+        // that protocol from a class name or redirect a custom allocator.
+        bool TaggedAdapter = false;
+        for (const auto *Attribute : Allocator->specific_attrs<AnnotateAttr>())
+            TaggedAdapter |= Attribute->getAnnotation() == "heaplens_tagged_allocation";
+        if (!Standard && !TaggedAdapter) {
+            diag(node->getExprLoc(), "custom operator new requires an explicit allocation hook",
+                 DiagnosticIDs::Error);
+            return;
+        }
+        // A class-specific delete can hide the matching placement-delete
+        // overload if construction throws. Do not change that cleanup lookup.
+        if (!TaggedAdapter && !node->isGlobalNew() && hasCustomDelete(node->getAllocatedType()->getAsCXXRecordDecl(), node->isArray())) {
+            diag(node->getExprLoc(), "class-specific operator delete requires an explicit allocation hook",
+                 DiagnosticIDs::Error);
+            return;
+        }
+        // Use the spelling in the shared header, not a concrete template
+        // instantiation from this translation unit (e.g. Node<K>, not Node<1>).
+        const TypeSourceInfo *Info = node->getAllocatedTypeSourceInfo();
+        std::string Type = Lexer::getSourceText(
+            CharSourceRange::getTokenRange(Info->getTypeLoc().getSourceRange()),
+            SM, Result.Context->getLangOpts()).str();
+        if (Type.empty() || node->getAllocatedType()->getContainedAutoType()) {
+            diag(node->getExprLoc(), "deduced new type requires an explicit allocation hook",
+                 DiagnosticIDs::Error);
+            return;
+        }
+        std::string Tag = "MemhookNew<" + Type + ">(" + Site + ")";
+        SourceLocation Insert;
+        std::string Text;
+        if (node->getNumPlacementArgs()) {
+            Insert = node->getPlacementArg(0)->getBeginLoc();
+            Text = Tag + ", ";
+        } else {
+            Insert = Lexer::getLocForEndOfToken(NewToken, 0, SM,
+                                                Result.Context->getLangOpts());
+            Text = " (" + Tag + ")";
+        }
+        diag(Insert, "record allocation before constructor activity", DiagnosticIDs::Warning)
+            << FixItHint::CreateInsertion(Insert, Text);
     }
 }
 

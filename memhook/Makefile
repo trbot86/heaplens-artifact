@@ -3,7 +3,7 @@ CFLAGS= -fPIC -ftls-model=initial-exec -g -O2
 Includes= /usr/lib/llvm-6.0/include/
 Libs=
 OBJ= memhook.o hash.o
-DEPS=hash.h memhook.h memhook_interface.h memstamp.h memhook_xoshiro256p.h
+DEPS=hash.h memhook.h memhook_interface.h memstamp.h memhook_new.h memhook_xoshiro256p.h
 
 ifdef MEMHOOK_ASCYLIB
 	CFLAGS += -DMEMHOOK_ASCYLIB
@@ -11,6 +11,22 @@ endif
 
 ifdef USE_TEMPLATE
 	CFLAGS += -DUSE_TEMPLATE
+endif
+
+ifdef MEMHOOK_MAX_BUFFERS
+	CFLAGS += -DMEMHOOK_MAX_BUFFERS=$(MEMHOOK_MAX_BUFFERS)
+endif
+ifdef MEMHOOK_REUSE_COMPLETED_BUFFERS
+	CFLAGS += -DMEMHOOK_REUSE_COMPLETED_BUFFERS=$(MEMHOOK_REUSE_COMPLETED_BUFFERS)
+endif
+ifdef MEMHOOK_COMPACT_THREAD_TAIL
+	CFLAGS += -DMEMHOOK_COMPACT_THREAD_TAIL=$(MEMHOOK_COMPACT_THREAD_TAIL)
+endif
+ifdef MEMHOOK_MAX_BUFFER_SIZE
+	CFLAGS += -DMEMHOOK_MAX_BUFFER_SIZE=$(MEMHOOK_MAX_BUFFER_SIZE)
+endif
+ifdef MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES
+	CFLAGS += -DMEMHOOK_EXTRA_BUFFER_BUDGET_BYTES=$(MEMHOOK_EXTRA_BUFFER_BUDGET_BYTES)
 endif
 
 ifdef MEMHOOK_C_LOG

@@ -96,6 +96,10 @@ __attribute__((constructor)) static void init() {
     }
 
     global_fd = open(memhook_file_path, O_RDWR | O_APPEND | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
+    if (global_fd < 0) {
+        fprintf(stderr, "HeapLENS: trace output open failed; trace invalid (errno=%d)\n", errno);
+        _exit(94);
+    }
     initialized = 1;
     fprintf(stdout, "Done memhook constructor\n");
 }
@@ -105,12 +109,23 @@ memhook_memory_pool::memhook_memory_pool(){
   printf("memory_pool Constructor \n");
 }
 
+static void memhook_write_tail(const void* data, size_t bytes) {
+    const char* next = static_cast<const char*>(data);
+    while (bytes) {
+        ssize_t written = write(global_fd, next, bytes);
+        if (written < 0 && errno == EINTR) continue;
+        if (written <= 0) {
+            fprintf(stderr, "HeapLENS: final trace write failed; trace invalid (errno=%d)\n", written < 0 ? errno : EIO);
+            _exit(94);
+        }
+        next += written;
+        bytes -= static_cast<size_t>(written);
+    }
+}
+
 memhook_memory_pool::~memhook_memory_pool(){
     cout << "MEMHOOK POOL DESTRUCTOR" << endl;
-	int total_byte_count = 0, status = 0;
-
-	//confirm this method works with trevor
-	struct thread_record_array * destructor_mem_array = &memory_pool[0];
+    int status = 0;
 
     // std::ofstream fileset;
 //   fileset.open(memhook_fileset_path, std::ofstream::out | std::ofstream::app);
@@ -118,13 +133,16 @@ memhook_memory_pool::~memhook_memory_pool(){
 	//instead of doing this, the memory_pool array can keep track of cumulative bytes
 
 	for (int i = 0; i < memory_pool.size(); i++) {
-		total_byte_count += memory_pool[i].buffer_size_nbytes;
-		write(global_fd, memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
+		memhook_write_tail(memory_pool[i].allocation_log, memory_pool[i].buffer_size_nbytes);
 	}
 
 #ifdef USE_TEMPLATE
     std::ofstream typeset;
     typeset.open(memhook_typeset_path, std::ofstream::out | std::ofstream::app);
+    if (!typeset) {
+        fprintf(stderr, "HeapLENS: type dictionary open failed; trace invalid\n");
+        _exit(94);
+    }
 
     for(uint16_t i = 0; i < MEMHOOK_HASH_TABLE_SIZE; i++) {
         // if(typetable.bucket[i] != NULL) {
@@ -145,6 +163,10 @@ memhook_memory_pool::~memhook_memory_pool(){
 
     // fileset.close();
     typeset.close();
+    if (!typeset) {
+        fprintf(stderr, "HeapLENS: type dictionary write/close failed; trace invalid\n");
+        _exit(94);
+    }
 #endif
 }
 
@@ -220,29 +242,25 @@ void *memhook_malloc(size_t size, int line = 0, bool log = true) {
 }
 
 void memhook_free(void *ptr, int line = 0, bool log = false) {
+    if (!ptr || !initialized ||
+        (ptr >= (void*) tmpbuff && ptr <= (void*)(tmpbuff + tmppos))) return;
     if (!setup) {
         exiter.add();
         setup = true;
     }
     
-    if (!initialized || (ptr >= (void*) tmpbuff && ptr <= (void*)(tmpbuff + tmppos))) { // possible off-by-one error at right endpoint...
-        // fprintf(stdout, "freeing temp memory\n");
-        return;
-    }
-
     // if (!next_free) next_free = (void (*)(void *))dlsym(RTLD_NEXT, "free");
     // if (!next_free) fprintf(stdout, "failed to find next free\n");
+    // Publish retirement before the allocator can hand this address to another
+    // producer. Keep a separate event so allocator callbacks cannot overwrite
+    // it, and do not disturb an enclosing pending allocation.
+    memhook_info_t event;
+    memset(&event, 0, sizeof(event));
+    event.timestamp = memhook_get_server_clock();
+    event.addr = ptr;
+    event.line = line;
+    memhookCollector.copy(event);
     next_free(ptr);
-
-    unit_log.timestamp = memhook_get_server_clock();
-    unit_log.size = 0;
-    unit_log.addr = ptr;
-    unit_log.typeofop = false;
-    unit_log.line = line;
-    // if (log) {
-    //     unit_log.file = file;
-    //     unit_log.line = line;
-    // }
 }
 
 
@@ -300,19 +318,15 @@ extern "C" {
     }
 
     void free(void* ptr) {
-        if (!ptr) return;
         memhook_free(ptr, 0, false);
-        if (initialized) {
-            memhookCollector.copy(unit_log);
-        }
     }
 
     #ifdef USE_RALLOC
     void RP_free(void* ptr) {
         if (!next_RP_free) next_RP_free = (void (*)(void *))dlsym(RTLD_NEXT, "RP_free");
         if (!next_RP_free) fprintf(stdout, "failed to find next RP_free\n");
-        next_RP_free(ptr);
         MEMHOOK_LOG_FREE(ptr)
+        next_RP_free(ptr);
     }
     #endif
 
@@ -355,9 +369,8 @@ extern "C" {
         if (!next_ssmem_free) next_ssmem_free = (void (*)(ssmem_allocator_t*, void*))dlsym(RTLD_NEXT, "ssmem_free");
         if (!next_ssmem_free) fprintf(stdout, "failed to find next ssmem free\n");
 
-        next_ssmem_free(a, ptr);
-        
         MEMHOOK_LOG_FREE(ptr)
+        next_ssmem_free(a, ptr);
         #endif
     }
 
@@ -465,12 +478,10 @@ void *operator new[] (size_t size) {
 
 void operator delete(void * mem) _GLIBCXX_USE_NOEXCEPT {
     memhook_free(mem, 0, false);
-    memhookCollector.copy(unit_log);
     return;
 }
 
 void operator delete[](void *mem)  _GLIBCXX_USE_NOEXCEPT {
     memhook_free(mem, 0, false);
-    memhookCollector.copy(unit_log);
     return;
 }

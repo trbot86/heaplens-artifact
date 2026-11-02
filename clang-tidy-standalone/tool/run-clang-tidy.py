@@ -108,16 +108,34 @@ def get_tidy_invocation(f, clang_tidy_binary, checks, tmpdir, build_path,
 def merge_no_duplicates(tmpdir, mergefile):
   """Merge all replacement files in directory into a single file
   and remove all duplicate fixes"""
-  added = set()
+  added = {}
   fixes = []
-  for replacefile in glob.iglob(os.path.join(tmpdir, '*.yaml')):
-    filecontent = yaml.safe_load(open(replacefile, 'r'))
+  for replacefile in sorted(glob.glob(os.path.join(tmpdir, '*.yaml'))):
+    with open(replacefile, 'r') as stream:
+      filecontent = yaml.safe_load(stream)
     if filecontent is not None:
       content = filecontent.get("Diagnostics", [])
       for fix in content:
         info = fix["DiagnosticMessage"]
-        if re.search(".*memhook/.*", info["FilePath"]) is None and (info["FilePath"], info["FileOffset"]) not in added:
-          added.add((info["FilePath"], info["FileOffset"]))
+        if re.search(".*memhook/.*", info["FilePath"]) is not None:
+          continue
+        replacements = info.get('Replacements', [])
+        if not replacements:
+          continue
+        unique = []
+        for replacement in replacements:
+          key = (os.path.realpath(replacement['FilePath']),
+                 replacement['Offset'], replacement['Length'])
+          value = replacement['ReplacementText']
+          if key in added:
+            if added[key] != value:
+              raise RuntimeError('Conflicting annotations at {}:{}: {!r} versus {!r}'
+                                 .format(key[0], key[1], added[key], value))
+            continue
+          added[key] = value
+          unique.append(replacement)
+        if unique:
+          info['Replacements'] = unique
           fixes.append(fix)
 
   if fixes:
@@ -176,7 +194,7 @@ def apply_fixes(args, fixes_path):
   if args.style:
     invocation.append('-style=' + args.style)
   invocation.append(fixes_path)
-  subprocess.call(invocation)
+  subprocess.check_call(invocation)
 
 
 def run_tidy(args, tmpdir, build_path, queue, lock, failed_files):
@@ -326,8 +344,25 @@ def main():
       shutil.rmtree(tmpdir)
     os.kill(0, 9)
 
-  tmp_merged_path = "/tmp/merged-replacements.yaml"
-  merge_no_duplicates(tmpdir, tmp_merged_path)
+  # Never export or apply a partial annotation set after a failed translation
+  # unit. Retain its diagnostics for inspection.
+  if return_code:
+    print('Annotation failed; no edits applied. Diagnostics retained at {}'
+          .format(tmpdir), file=sys.stderr)
+    sys.exit(return_code)
+  if tmpdir is None:
+    sys.exit(0)
+
+  # clang-apply-replacements consumes a directory. Keep only the merged file
+  # in that directory, so duplicate per-TU header edits are not applied twice.
+  merged_dir = tempfile.mkdtemp(prefix='heaplens-fixes-')
+  tmp_merged_path = os.path.join(merged_dir, 'merged-replacements.yaml')
+  try:
+    merge_no_duplicates(tmpdir, tmp_merged_path)
+  except RuntimeError as exc:
+    print('{}; no edits applied. Diagnostics retained at {}'.format(exc, tmpdir),
+          file=sys.stderr)
+    sys.exit(1)
 
   if yaml and args.export_fixes:
     print('Writing fixes to ' + args.export_fixes + ' ...')
@@ -342,14 +377,14 @@ def main():
   if args.fix:
     print('Applying fixes ...')
     try:
-      apply_fixes(args, tmp_merged_path)
+      apply_fixes(args, merged_dir)
     except:
       print('Error applying fixes.\n', file=sys.stderr)
       traceback.print_exc()
       return_code=1
 
   # print("Here is tmpdir: {}".format(tmpdir))
-  os.remove(tmp_merged_path)
+  shutil.rmtree(merged_dir)
   if tmpdir:
     shutil.rmtree(tmpdir)
   sys.exit(return_code)
