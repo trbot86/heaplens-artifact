@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { Checkbox, IconButton, Menu, MenuItem, Paper, Popover, TextField, Tooltip, Typography } from '@mui/material';
 import './componentStyles.scss';
-import { generateColours, getSubtypeName, TypeToColourMap } from '../vispanels/page';
+import { generateColours, getSubtypeName, TypeToColourMap } from './appShared';
 import { BarChart, Casino, Close, InsertChart, KeyboardArrowLeft, KeyboardArrowRight, StackedLineChart, Window } from '@mui/icons-material';
 import { Box, styled } from '@mui/system';
 import { MaterialPicker, PhotoshopPicker, SketchPicker } from 'react-color';
@@ -37,7 +37,7 @@ const VisCheckbox = styled(Checkbox)({
     padding: '2.5px',
 });
 
-function LegendTableHeader({ visExpanded, setVisExpanded, currSortMode, setCurrSortMode } : 
+function LegendTableHeader({ visExpanded, setVisExpanded, currSortMode, setCurrSortMode } :
     {
         visExpanded: boolean,
         setVisExpanded: (a: boolean) => void,
@@ -51,20 +51,20 @@ function LegendTableHeader({ visExpanded, setVisExpanded, currSortMode, setCurrS
                 visExpanded &&
                 <th>
                     <div id='visibilityHeaders' >
-                        <Tooltip 
+                        <Tooltip
                             title='Line graph visibility'
                             placement='top' >
                             <StackedLineChart />
                         </Tooltip>
-                        <Tooltip 
+                        <Tooltip
                             title='Pages visibility'
                             placement='top' >
-                            <BarChart 
+                            <BarChart
                                 sx={{
                                     transform: 'rotate(90deg)'
                                 }} />
                         </Tooltip>
-                        <Tooltip 
+                        <Tooltip
                             title='Cache visibility'
                             placement='top' >
                             <Window />
@@ -73,7 +73,7 @@ function LegendTableHeader({ visExpanded, setVisExpanded, currSortMode, setCurrS
                 </th>
                 }
                 <th>
-                    <IconButton 
+                    <IconButton
                         className='centerTableCell'
                         onClick={() => setVisExpanded(!visExpanded)} >
                         {
@@ -118,7 +118,7 @@ function LegendTableHeader({ visExpanded, setVisExpanded, currSortMode, setCurrS
     );
 }
 
-function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded } : 
+function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded } :
     {
         types: string[],
         setFilterText: (a: string) => void,
@@ -134,10 +134,10 @@ function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded 
                 }
                 <td>
                     <div className='centerTableCell' >
-                        <Tooltip 
+                        <Tooltip
                             title='Randomize colours'
                             placement='bottom' >
-                            <IconButton 
+                            <IconButton
                                 id='randColours'
                                 onClick={() => setColourOfType(generateColours(types))} >
                                 <Casino />
@@ -148,7 +148,7 @@ function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded 
                 <td />
                 <td />
                 <td>
-                    <TextField 
+                    <TextField
                             id='typeFilter'
                             label='Filter types'
                             variant='filled'
@@ -165,7 +165,7 @@ function LegendTableFooter({ types, setFilterText, setColourOfType, visExpanded 
 }
 
 function VisRightClickMenu({ rightClickAnchor, setRightClickAnchor, label, visMatrix,
-                             typeName, setVisMatrix } : 
+                             typeName, setVisMatrix } :
     {
         rightClickAnchor: HTMLElement | null,
         setRightClickAnchor: (a: HTMLElement | null) => void,
@@ -209,8 +209,8 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
                      setLineVis, setPageVis, setCacheVis, fields, expandedTypes,
                      setExpandedTypes, colourOfType, setColourOfType,
                      setColourMenuAnchor, setSelMenuType, setCurrColourSel,
-                     hasAlignData, setAlignTypeDisplay } : 
-    {   
+                     hasAlignData, setAlignTypeDisplay } :
+    {
         typeName: string,
         colourOfType: {[tp: string]: d3.RGBColor | d3.HSLColor | null},
         setColourOfType: (a: TypeToColourMap) => void,
@@ -363,7 +363,7 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
             <>
                 {
                     fields.filter((field, i) => fields.findIndex((fd) => fd.subtype == field.subtype) === i)
-                        .map((field) => 
+                        .map((field) =>
                     <tr key={`str-${typeName}-${field.name}`} >
                         {
                         visExpanded &&
@@ -417,7 +417,7 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
                                     sx={{
                                         width: '20px',
                                         height: '20px',
-                                        backgroundColor: colourOfType[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)] == null ? 'white' : colourOfType[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)].formatHex()
+                                        backgroundColor: colourOfType[getSubtypeName(typeName.replace(/\s+/g, ''), field.subtype)]?.formatHex() ?? 'white'
                                     }} />
                             </div>
                         </td>
@@ -438,81 +438,46 @@ function LegendRow({ typeName, visExpanded, stats, lineVis, pageVis, cacheVis,
     );
 }
 
-function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } : 
-    {   
+export function AlignAndSize({ data, setAlignTypeDisplay, colour } :
+    {
         data: {size: number, align: number, count: number}[],
         setAlignTypeDisplay: (a: string | null) => void,
-        cacheLineSize: number,
         colour: d3.Color
     }) {
-    const barGroupRef = useRef(null);
-    const [sizesToShow, setSizesToShow] = useState<Set<number>>(
-        data.reduce((acc, curr) => {
-            acc.add(curr.size);
-            return acc;
-        }, new Set<number>())
-    );
+    const barGroupRef = useRef<SVGGElement>(null);
+    const svgRef = useRef<SVGSVGElement>(null);
+    const [hiddenSizes, setHiddenSizes] = useState<Set<number>>(new Set());
 
     useEffect(() => {
-        const gcd: (a: number, b: number) => number =
-            (a, b) => (b == 0 ? a : gcd(a, a % b));
-        const gran = data.reduce((acc: number, curr: {size: number, align: number, count: number}) => gcd(acc, curr.align), 8);
-        const barData: {[align: string]: number} = new Array(cacheLineSize / gran).fill(0)
-                            .reduce((map, curr, i) => {
-                                map[`${i*gran}`] = 0;
-                                return map;
-                            }, {});
-        data.forEach((entry: {size: number, align: number, count: number}) => {
-            if (sizesToShow.has(entry.size))
-                barData[`${entry.align}`] += entry.count;
-        });
-        const xScale = d3.scaleBand()
-                        .domain(new Array(cacheLineSize / gran).fill(0)
-                                    .map((d, i) => `${i*gran}`))
-                        .range([0, ALIGN_SIZE_WIDTH]);
-        const xAxis = d3.axisBottom(xScale)
-                        .tickSize(0);
-        d3.select('#alignXAxisGroup')
-            .style('transform', `translateY(${ALIGN_SIZE_HEIGHT}px)`)
-            .call(xAxis);
-
-        const maxCount = Object.values(data.reduce((map: {[align: number]: number}, curr: {size: number, align: number, count: number}) => {
-                                        if (!(curr.align in map))
-                                            map[curr.align] = 0;
-                                        map[curr.align] += curr.count;
-                                        return map;
-                                    }, {}))
-                                    .reduce((acc: number, curr: number) => Math.max(acc, curr), 0);
-        const yScale = d3.scaleLinear()
-                        .domain([maxCount, 0])
-                        .range([ALIGN_SIZE_MARGIN+10, ALIGN_SIZE_HEIGHT]);
-        const yAxis = d3.axisLeft(yScale)
-                        .tickFormat((d: number) =>  d >= 1000000000 ? `${(d / 1000000000).toFixed(1)}B` :
-                                                    d >= 1000000 ? `${(d / 1000000).toFixed(1)}M` :
-                                                    d >= 1000 ? `${(d / 1000).toFixed(1)}K` :
-                                                    `${d}`);
-        d3.select('#alignYAxisGroup')
-            .call(yAxis);
-
-        d3.select(barGroupRef.current)
-            .selectAll('.alignBar')
-            .data(Object.entries(barData))
-            .enter()
-            .append('rect')
-            .attr('class', 'alignBar')
-            .attr('x', (d) => xScale(d[0]) + (ALIGN_SIZE_BANDSPACE / 2))
-            .attr('y', (d) => yScale(0))
-            .attr('width', xScale.bandwidth() - ALIGN_SIZE_BANDSPACE)
-            .attr('height', 0)
+        // ALIGNMENT is a capture-time histogram. Its offsets cannot be
+        // reinterpreted at a different cache-line size without the raw input.
+        const offsets = Array.from(new Set(data.map(entry => entry.align))).sort((a, b) => a - b);
+        const counts = new Map(offsets.map(offset => [offset, 0]));
+        const totals = new Map(counts);
+        for (const entry of data) {
+            totals.set(entry.align, totals.get(entry.align)! + entry.count);
+            if (!hiddenSizes.has(entry.size)) counts.set(entry.align, counts.get(entry.align)! + entry.count);
+        }
+        const bars = Array.from(counts);
+        const xScale = d3.scaleBand<number>().domain(offsets).range([0, ALIGN_SIZE_WIDTH]);
+        const yScale = d3.scaleLinear().domain([d3.max(totals.values()) || 1, 0])
+            .range([ALIGN_SIZE_MARGIN + 10, ALIGN_SIZE_HEIGHT]);
+        const svg = d3.select(svgRef.current!);
+        svg.select<SVGGElement>('#alignXAxisGroup').attr('transform', `translate(0,${ALIGN_SIZE_HEIGHT})`)
+            .call(d3.axisBottom(xScale).tickSize(0));
+        svg.select<SVGGElement>('#alignYAxisGroup').call(d3.axisLeft(yScale).tickFormat(value => {
+            const count = Number(value);
+            return count >= 1e9 ? `${(count / 1e9).toFixed(1)}B` : count >= 1e6 ? `${(count / 1e6).toFixed(1)}M`
+                : count >= 1e3 ? `${(count / 1e3).toFixed(1)}K` : `${count}`;
+        }));
+        d3.select(barGroupRef.current!).selectAll<SVGRectElement, [number, number]>('.alignBar')
+            .data(bars, entry => entry[0]).join('rect').attr('class', 'alignBar')
+            .attr('x', entry => xScale(entry[0])! + ALIGN_SIZE_BANDSPACE / 2)
+            .attr('y', entry => yScale(entry[1]))
+            .attr('width', Math.max(0, xScale.bandwidth() - ALIGN_SIZE_BANDSPACE))
+            .attr('height', entry => ALIGN_SIZE_HEIGHT - yScale(entry[1]))
             .attr('fill', colour.toString());
-
-        d3.selectAll('.alignBar')
-            .transition()
-            .duration(600)
-            .attr('y', (d) => yScale(d[1]))
-            .attr('height', (d) => ALIGN_SIZE_HEIGHT - yScale(d[1]))
-            .delay((d, i) => i*70);
-    }, [data, sizesToShow]);
+    }, [data, hiddenSizes, colour]);
 
     return (
         <div
@@ -530,17 +495,17 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
                         data.map((d) => d.size)
                             .filter((val, ind, arr) => arr.indexOf(val) === ind)
                             .sort((a, b) => a - b)
-                            .map((d) => <div
+                            .map((d) => <div key={d}
                                             className='sizeListItem' >
                                             <Checkbox
                                                 className='sizeListItemCheckbox'
-                                                defaultChecked
+                                                checked={!hiddenSizes.has(d)}
                                                 size='small'
                                                 onChange={() => {
-                                                    const newSizesToShow = structuredClone(sizesToShow);
+                                                    const newSizesToShow = new Set(hiddenSizes);
                                                     if (!newSizesToShow.delete(d))
                                                         newSizesToShow.add(d);
-                                                    setSizesToShow(newSizesToShow);
+                                                    setHiddenSizes(newSizesToShow);
                                                 }} />
                                             <Typography fontSize='10pt' >{d}</Typography>
                                         </div>)
@@ -552,12 +517,12 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
                 <Typography
                     textAlign='center'
                     variant='h6' >
-                        Alignments
+                        Recorded offsets (bytes)
                 </Typography>
                 <svg
-                    id='alignSVG'
+                    id='alignSVG' ref={svgRef}
                     viewBox={`${-ALIGN_SIZE_MARGIN} ${ALIGN_SIZE_MARGIN} ${ALIGN_SIZE_WIDTH} ${ALIGN_SIZE_HEIGHT}`} >
-                    <g 
+                    <g
                         id='barGroup'
                         ref={barGroupRef} />
                     <g id='alignXAxisGroup' />
@@ -576,8 +541,8 @@ function AlignAndSize({ data, setAlignTypeDisplay, cacheLineSize, colour } :
 export default function Legend({ colourOfType, setColourOfType, typeStats, lineVis,
                                  pageVis, cacheVis, setLineVis, setPageVis, setCacheVis,
                                  fieldsData, expandedTypes, setExpandedTypes, alignData,
-                                 cacheLineSize } : 
-    {   
+                                 cacheLineSize } :
+    {
         colourOfType: TypeToColourMap,
         setColourOfType: (a: TypeToColourMap) => void,
         typeStats: TypeToStatsMap,
@@ -674,11 +639,10 @@ export default function Legend({ colourOfType, setColourOfType, typeStats, lineV
                     setColourOfType={setColourOfType}
                     visExpanded={visExpanded} />
             </table> :
-            <AlignAndSize
+            <AlignAndSize key={alignTypeDisplay}
                 data={alignData[alignTypeDisplay]}
                 setAlignTypeDisplay={setAlignTypeDisplay}
-                cacheLineSize={cacheLineSize}
-                colour={colourOfType[alignTypeDisplay] ? colourOfType[alignTypeDisplay] : d3.color('white')} />
+                colour={colourOfType[alignTypeDisplay] ?? d3.rgb('white')} />
             }
         </>
     );

@@ -1,0 +1,27 @@
+{
+  "base": "89ec644c80b05e87e2c4a750ce2e770ba02c5141",
+  "logger_merge": "0e2d53568fb24fdd8205d378f3f12ff7e4988add",
+  "source_imports": [
+    {
+      "source": "artifact-typefix-work-20261009/clang-tidy-standalone/misc/AllocationLoggingCheck.cpp",
+      "target": "clang-tidy-standalone/misc/AllocationLoggingCheck.cpp",
+      "sha256": "980b488197e1e6c8f3d6f79e6b1d56d3953f1e7fd2658958220e22a2de92fa93"
+    },
+    {
+      "source": "artifact-typefix-work-20261009/artifact/patches/setbench-tpcc/macrobench/system/mem_alloc.h",
+      "target": "artifact/patches/setbench-tpcc/macrobench/system/mem_alloc.h",
+      "sha256": "9f1df340979cac1500fb85be0f1a61e3f7091433c6220b2360f10800ec654c82"
+    },
+    {
+      "source": "artifact-typefix-work-20261009/artifact/tests/test_tpcc_custom_allocator.py",
+      "target": "artifact/tests/test_tpcc_custom_allocator.py",
+      "sha256": "95d1aa64f7428bf6f7728479124e5be3893c3c4bf56d0b1c8c5380f6e2e8eab0"
+    },
+    {
+      "source": "artifact-tools/unified-selection-20261009/zero-extent-fix1/io_handler.cpp",
+      "target": "type_analysis/convert_to_db/io_handler.cpp",
+      "sha256": "5efb36044805b18e9f2e408eba8e9b60dd188bb890d1b2f195ffe1e44b406224"
+    }
+  ],
+  "policy": "Measured compact2048 flags are now defaults; fixed2 keeps completed-buffer reuse."
+}

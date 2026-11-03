@@ -1,0 +1,541 @@
+{
+  "baseline_commit": "e45d924",
+  "backend": [
+    {
+      "case": "valkey-full",
+      "complete_payload_equal": true,
+      "summary": {
+        "baseline": {
+          "n": 3,
+          "total_seconds": 11.900910586118698,
+          "total_seconds_raw": [
+            12.28189700981602,
+            11.808017360977829,
+            11.900910586118698
+          ],
+          "cache_seconds": 6.830547966063023
+        },
+        "optimized": {
+          "n": 3,
+          "total_seconds": 8.699162961915135,
+          "total_seconds_raw": [
+            8.78183590201661,
+            8.699162961915135,
+            8.65994303394109
+          ],
+          "cache_seconds": 3.5568873290903866
+        }
+      }
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "complete_payload_equal": true,
+      "summary": {
+        "baseline": {
+          "n": 3,
+          "total_seconds": 27.19562072213739,
+          "total_seconds_raw": [
+            27.193962903227657,
+            27.387800673022866,
+            27.19562072213739
+          ],
+          "cache_seconds": 22.243471499998122
+        },
+        "optimized": {
+          "n": 3,
+          "total_seconds": 12.042581411078572,
+          "total_seconds_raw": [
+            12.100664025172591,
+            12.034680129028857,
+            12.042581411078572
+          ],
+          "cache_seconds": 7.0927283386699855
+        }
+      }
+    }
+  ],
+  "browser": [
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 17,
+      "policies": {
+        "baseline": {
+          "n": 3,
+          "ready_median_ms": 1591.7999997138977,
+          "ready_raw_ms": [
+            1605,
+            1591.7999997138977,
+            1571.7000002861023
+          ],
+          "actions": {
+            "slider_drag": {
+              "median_of_trial_medians_ms": 28.699999809265137,
+              "trial_medians_ms": [
+                28.799999713897705,
+                28.699999809265137,
+                28.600000143051147
+              ],
+              "samples_per_trial": [
+                60,
+                60,
+                60
+              ]
+            },
+            "page_visibility": {
+              "median_of_trial_medians_ms": 80.35000014305115,
+              "trial_medians_ms": [
+                81.40000009536743,
+                80.35000014305115,
+                78.49999976158142
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "cache_visibility": {
+              "median_of_trial_medians_ms": 487.9999997615814,
+              "trial_medians_ms": [
+                491.89999985694885,
+                486.5000002384186,
+                487.9999997615814
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "type_filter": {
+              "median_of_trial_medians_ms": 34.700000047683716,
+              "trial_medians_ms": [
+                36.5,
+                34.700000047683716,
+                30.0
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "scroll": {
+              "median_of_trial_medians_ms": 16.200000286102295,
+              "trial_medians_ms": [
+                16.199999809265137,
+                16.300000190734863,
+                16.200000286102295
+              ],
+              "samples_per_trial": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        },
+        "optimized": {
+          "n": 3,
+          "ready_median_ms": 1141.9000000953674,
+          "ready_raw_ms": [
+            1141.9000000953674,
+            1230.5999999046326,
+            1125.4000000953674
+          ],
+          "actions": {
+            "slider_drag": {
+              "median_of_trial_medians_ms": 29.049999952316284,
+              "trial_medians_ms": [
+                29.0,
+                29.049999952316284,
+                29.200000286102295
+              ],
+              "samples_per_trial": [
+                60,
+                60,
+                60
+              ]
+            },
+            "page_visibility": {
+              "median_of_trial_medians_ms": 54.700000047683716,
+              "trial_medians_ms": [
+                54.700000047683716,
+                53.799999713897705,
+                56.34999990463257
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "cache_visibility": {
+              "median_of_trial_medians_ms": 52.09999990463257,
+              "trial_medians_ms": [
+                54.90000009536743,
+                51.90000009536743,
+                52.09999990463257
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "type_filter": {
+              "median_of_trial_medians_ms": 30.59999990463257,
+              "trial_medians_ms": [
+                30.59999990463257,
+                29.549999952316284,
+                30.950000286102295
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "scroll": {
+              "median_of_trial_medians_ms": 16.199999809265137,
+              "trial_medians_ms": [
+                15.900000095367432,
+                16.199999809265137,
+                16.40000009536743
+              ],
+              "samples_per_trial": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "case": "tpcc-bcco-2m",
+      "budget": 128,
+      "policies": {
+        "baseline": {
+          "n": 3,
+          "ready_median_ms": 2139.5,
+          "ready_raw_ms": [
+            2105.300000190735,
+            2165.5999999046326,
+            2139.5
+          ],
+          "actions": {
+            "slider_drag": {
+              "median_of_trial_medians_ms": 108.29999995231628,
+              "trial_medians_ms": [
+                108.25,
+                108.69999980926514,
+                108.29999995231628
+              ],
+              "samples_per_trial": [
+                60,
+                60,
+                60
+              ]
+            },
+            "page_visibility": {
+              "median_of_trial_medians_ms": 446.0499999523163,
+              "trial_medians_ms": [
+                431.35000014305115,
+                446.9500000476837,
+                446.0499999523163
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "cache_visibility": {
+              "median_of_trial_medians_ms": 570.5999999046326,
+              "trial_medians_ms": [
+                570.5999999046326,
+                569.9500000476837,
+                573.2499997615814
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "type_filter": {
+              "median_of_trial_medians_ms": 35.84999990463257,
+              "trial_medians_ms": [
+                34.89999985694885,
+                36.10000014305115,
+                35.84999990463257
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "scroll": {
+              "median_of_trial_medians_ms": 16.299999713897705,
+              "trial_medians_ms": [
+                16.299999713897705,
+                16.299999713897705,
+                16.200000286102295
+              ],
+              "samples_per_trial": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        },
+        "optimized": {
+          "n": 3,
+          "ready_median_ms": 1509.0999999046326,
+          "ready_raw_ms": [
+            1509.0999999046326,
+            1491.9000000953674,
+            1587.3000001907349
+          ],
+          "actions": {
+            "slider_drag": {
+              "median_of_trial_medians_ms": 109.40000009536743,
+              "trial_medians_ms": [
+                109.64999961853027,
+                107.55000019073486,
+                109.40000009536743
+              ],
+              "samples_per_trial": [
+                60,
+                60,
+                60
+              ]
+            },
+            "page_visibility": {
+              "median_of_trial_medians_ms": 226.75,
+              "trial_medians_ms": [
+                226.75,
+                229.59999990463257,
+                225.25
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "cache_visibility": {
+              "median_of_trial_medians_ms": 136.54999995231628,
+              "trial_medians_ms": [
+                135.19999980926514,
+                136.90000009536743,
+                136.54999995231628
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "type_filter": {
+              "median_of_trial_medians_ms": 36.10000014305115,
+              "trial_medians_ms": [
+                37.049999952316284,
+                35.549999952316284,
+                36.10000014305115
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "scroll": {
+              "median_of_trial_medians_ms": 16.300000190734863,
+              "trial_medians_ms": [
+                16,
+                16.300000190734863,
+                16.40000009536743
+              ],
+              "samples_per_trial": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "case": "valkey-full",
+      "budget": 52,
+      "policies": {
+        "baseline": {
+          "n": 3,
+          "ready_median_ms": 1720.2999997138977,
+          "ready_raw_ms": [
+            1993.4000000953674,
+            1720.2999997138977,
+            1701.7000002861023
+          ],
+          "actions": {
+            "slider_drag": {
+              "median_of_trial_medians_ms": 54.10000014305115,
+              "trial_medians_ms": [
+                54.10000014305115,
+                53.85000014305115,
+                54.200000047683716
+              ],
+              "samples_per_trial": [
+                60,
+                60,
+                60
+              ]
+            },
+            "page_visibility": {
+              "median_of_trial_medians_ms": 85.90000009536743,
+              "trial_medians_ms": [
+                85.90000009536743,
+                84.99999976158142,
+                88.45000004768372
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "cache_visibility": {
+              "median_of_trial_medians_ms": 568.4500000476837,
+              "trial_medians_ms": [
+                578.4000000953674,
+                568.4500000476837,
+                564.4499998092651
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "type_filter": {
+              "median_of_trial_medians_ms": 29.90000009536743,
+              "trial_medians_ms": [
+                29.90000009536743,
+                30.950000047683716,
+                28.950000047683716
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "scroll": {
+              "median_of_trial_medians_ms": 16.699999809265137,
+              "trial_medians_ms": [
+                16.699999809265137,
+                16.699999809265137,
+                16.600000381469727
+              ],
+              "samples_per_trial": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        },
+        "optimized": {
+          "n": 3,
+          "ready_median_ms": 1236.5,
+          "ready_raw_ms": [
+            1379.4000000953674,
+            1231.5,
+            1236.5
+          ],
+          "actions": {
+            "slider_drag": {
+              "median_of_trial_medians_ms": 54.19999980926514,
+              "trial_medians_ms": [
+                54.30000019073486,
+                53.84999990463257,
+                54.19999980926514
+              ],
+              "samples_per_trial": [
+                60,
+                60,
+                60
+              ]
+            },
+            "page_visibility": {
+              "median_of_trial_medians_ms": 87.20000004768372,
+              "trial_medians_ms": [
+                86.45000004768372,
+                87.20000004768372,
+                87.95000004768372
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "cache_visibility": {
+              "median_of_trial_medians_ms": 78.45000004768372,
+              "trial_medians_ms": [
+                82.20000004768372,
+                76.89999985694885,
+                78.45000004768372
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "type_filter": {
+              "median_of_trial_medians_ms": 37.65000009536743,
+              "trial_medians_ms": [
+                36.89999985694885,
+                38.700000047683716,
+                37.65000009536743
+              ],
+              "samples_per_trial": [
+                2,
+                2,
+                2
+              ]
+            },
+            "scroll": {
+              "median_of_trial_medians_ms": 16.59999990463257,
+              "trial_medians_ms": [
+                16.59999990463257,
+                16.59999990463257,
+                16.5
+              ],
+              "samples_per_trial": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "equality": {
+    "paired_trials": 9,
+    "states_equal": true,
+    "exports_equal": true,
+    "page_errors": 0
+  },
+  "browser_version": "154.0.4258.37",
+  "scope": "Three paired trials per input. Browser replay excludes backend preparation. Interaction metric is input-handler entry to second animation frame, not compositor-present latency."
+}

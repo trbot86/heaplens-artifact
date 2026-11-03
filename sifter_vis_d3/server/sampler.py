@@ -14,6 +14,9 @@ import os
 from random import randint, shuffle
 from cache_limits import validate_cache_geometry, check_cache_budget
 from field_type_aliases import match_field_types
+from page_selection import select_pages, DEFAULT_PAGE_BUDGET, DEFAULT_RECORD_BUDGET
+from representative_selection import sample_pages
+from cache_ranges import add_cache_range
 
 MAX_PAGE_PROP = 7560
 MAX_OBJ_STATS = 1000000
@@ -44,6 +47,18 @@ def get_sub_tname(t, st):
 def get_bucket(min_ts, max_ts, num_buckets, ts):
     size_of_bucket = max(math.floor(max_ts - min_ts) / num_buckets, 1)
     return math.ceil((ts - min_ts) / size_of_bucket)
+
+
+def normalized_type_names(names):
+    """Share normalized names without padding every row to the longest type.
+
+    NumPy fixed-width Unicode arrays cost rows * longest_name * 4 bytes.
+    Project headers can introduce long C++ template names even when almost
+    every allocation has a short type. Keep one string per distinct type.
+    """
+    normalized = {name: str(name).replace(' ', '') for name in set(names)}
+    return np.fromiter((normalized[name] for name in names), dtype=object,
+                       count=len(names))
 
 
 class Sampler:
@@ -277,8 +292,12 @@ class Sampler:
         # #         'coloc': {k: {pair[1]: v['count'] for pair, v in g.to_dict(orient='index').items()} for k, g in sums.groupby(level=0)}}
         
     def get_last_object_per_bucket(self, df):
+        if df.empty:
+            return df.copy()
         min_ts = df[['allocTs', 'freeTs']].min().min()
         max_ts = df[['allocTs', 'freeTs']].max().max()
+        if max_ts <= min_ts:
+            return df.copy()
         bucket_size = (max_ts - min_ts) / self.num_buckets
         df.loc[:,'bucket'] = ((df['allocTs'] - min_ts) // bucket_size).astype('Int64')
 
@@ -497,41 +516,33 @@ class Sampler:
 
         return labeled, merged, perf_df
 
-    def get_sample_of_pages(self, start_ts, end_ts, type_data, cluster_alg='dbscan', 
-                            max_run_length=3, max_runs_from_cluster=2, include_all_noise=True):
+    def get_sample_of_pages(self, start_ts, end_ts, type_data, cluster_alg='mbkmeans',
+                            max_run_length=5, max_runs_from_cluster=3, include_all_noise=True,
+                            page_budget=DEFAULT_PAGE_BUDGET, record_budget=DEFAULT_RECORD_BUDGET,
+                            seed=0, selection_mode='full'):
+        if cluster_alg == 'mbkmeans':
+            return sample_pages(self, start_ts, end_ts, type_data, event_labels,
+                                page_budget, record_budget, seed, selection_mode,
+                                max_run_length, max_runs_from_cluster)
+        # Explicit legacy clustering choices remain available for exploration.
         print("starting to sample pages")
         sys.stdout.flush()
         labeled_data, features, perf_df = self.get_clusters_of_pages(start_ts, end_ts, type_data, alg=cluster_alg)
         # .reset_index().set_index('cluster')
         clusters = labeled_data.groupby('cluster', sort=False).groups
 
-        max_pages = math.floor(MAX_PAGE_PROP / pow(math.log(self.page_size, 2), 2))
-        # max_pages = 1 # DEBUGGING
-        sampled_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
-        # sampled_pages.add(34127647253)
-        # sampled_pages.add(0x7f028df4e000 // 4096)
-
-        print("about to start sampling loop")
-        sys.stdout.flush()
-
-        taken = 0
-        cluster_keys = list(clusters.keys())
-        shuffle(cluster_keys)
-        for c in cluster_keys:
-            if taken >= max_pages:
-                break
-            if len(clusters[c]) <= max_runs_from_cluster * max_run_length:
-                sampled_pages.update(clusters[c])
-                taken += len(clusters[c])
-            else:
-                for _ in range(max_runs_from_cluster):
-                    start = randint(0, len(clusters[c]) - 1)
-                    sampled_pages.add(clusters[c][start])
-                    num_s = 1
-                    while start + num_s < len(clusters[c]) and clusters[c][start + num_s] == clusters[c][start + num_s - 1] + 1 and num_s < max_run_length:
-                        sampled_pages.add(clusters[c][start + num_s])
-                        num_s += 1
-                    taken += num_s
+        max_pages = (math.floor(MAX_PAGE_PROP / pow(math.log(self.page_size, 2), 2))
+                     if page_budget is None else page_budget)
+        forced_pages = set(perf_df[perf_df['page_num'].isin(labeled_data.index)]['page_num'].tolist())
+        page_types = {page: {event[TYPE_IND] for event in events if isinstance(event[TYPE_IND], str)}
+                      for page, events in labeled_data[0].items()}
+        coverage_types = {tp for types in page_types.values() for tp in types
+                          if type_data.get(tp, True)}
+        sampled_pages, selection_info = select_pages(
+            clusters, page_types, max_pages, max_run_length, max_runs_from_cluster,
+            forced_pages=forced_pages, coverage_types=coverage_types,
+            page_records={page: len(events) for page, events in labeled_data[0].items()},
+            record_budget=record_budget)
         # print(sampled_pages)
         print("Done sampling loop")
         sys.stdout.flush()
@@ -566,6 +577,7 @@ class Sampler:
                 'clusters': {c: {'pages': cluster_pages[c], 'size': cluster_sizes[c]} for c in cluster_pages.keys()},
                 'sum_cluster_sizes': sum([len(clusters[c]) for c in clusters.keys()]),
                 'num_clusters': len(clusters.keys()),
+                'selection': selection_info,
                 'features': {pn: {tp: int(val) for tp, val in v.items() if val > 0} for pn, v in features.set_index('page_num').drop(columns=['cluster']).to_dict(orient='index').items()}}
 
     def get_cache_data(self, size, assoc):
@@ -608,7 +620,7 @@ class Sampler:
 
         print("rows.shape:", rows.shape)
 
-        clean_types = np.char.replace(rows[:, TYPE_IND].astype(str), ' ', '')
+        clean_types = normalized_type_names(rows[:, TYPE_IND])
         type_no_space_ind = rows.shape[1]
         rows = np.column_stack([rows, clean_types])
         print("Done removing spaces from type names")
@@ -635,23 +647,13 @@ class Sampler:
                 # if entry[TYPE_IND] == "leanstore::storage::btree::BTreeVI::ChainedTuple":
                 #     print("alloc bucket: {}, free bucket: {}".format(alloc_time_bucket, free_time_bucket))
                 try:
-                    cache_sets = (start_set + np.arange(n_sets)) % num_cache_sets
-                    np.add.at(
-                        data,
-                        (np.full(n_sets, alloc_time_bucket),
-                         cache_sets,
-                         np.full(n_sets, tp_and_st_to_idx[entry[TYPE_IND]])),
-                        1
-                    )
+                    type_idx = tp_and_st_to_idx[entry[TYPE_IND]]
+                    add_cache_range(data, alloc_time_bucket, start_set, type_idx,
+                                    n_sets, num_cache_sets, 1)
 
                     if free_time_bucket >= 0:
-                        np.add.at(
-                            data,
-                            (np.full(n_sets, free_time_bucket),
-                             cache_sets,
-                             np.full(n_sets, tp_and_st_to_idx[entry[TYPE_IND]])),
-                            -1
-                        )
+                        add_cache_range(data, free_time_bucket, start_set, type_idx,
+                                        n_sets, num_cache_sets, -1)
 
                 except KeyError:
                     print('KEY ERROR!!!')

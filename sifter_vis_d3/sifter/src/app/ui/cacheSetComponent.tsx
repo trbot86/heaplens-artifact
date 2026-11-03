@@ -5,9 +5,10 @@ import { Alert, Snackbar, CircularProgress, IconButton, styled, Theme, ToggleBut
 import { useEffect, useMemo, useState } from "react";
 import * as d3 from 'd3';
 import { testCacheDataPerBucket, testMinAndMaxOccPerBucket } from "./testdata";
-import { getData, getTypeName, requestErrorMessage } from "../vispanels/page";
+import { getData, getTypeName, requestErrorMessage } from "./appShared";
 import React from "react";
-import { theme } from "../page";
+import { theme } from "./appShared";
+import { getCacheTotalsAtBucket } from './currentBucket';
 
 interface CacheInfo {
     size: number,
@@ -163,31 +164,12 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                     (!isSubType(cacheData, i) && cacheVis[tp] && !expandedTypes[tp.replace(/\s+/g, '')]) ||
                     (isSubType(cacheData, i) && cacheVis[tp] && expandedTypes[getTypeName(tp)]));
     }, [cacheData, cacheVis, expandedTypes]);
-    const totalData: number[][] = useMemo(() => {
-        console.log('Recomputing totalData');
-        console.log('Here is visibleTypes:');
-        console.log(visibleTypes);
-        return  cacheData.occ.map((bucket) => {
-                    // console.log('Here is bucket:');
-                    // console.log(bucket);
-                    return  bucket.reduce((res, v, i) => {
-                                    res[Math.floor(i / cacheData.idxToTpAndSt.length)] += (visibleTypes[i % cacheData.idxToTpAndSt.length] ?
-                                        v : 0);
-                                    return res;
-                                }, new Array(cacheData.numSets).fill(0));
-                });
-    }, [cacheData, visibleTypes]);
-    const aggDataPerBucket: {min: number, max: number}[] = useMemo(() => {
-        console.log('Recomputing aggDataPerBucket');
-        console.log(totalData);
-        return totalData.map((bucket: number[]) => {
-            return bucket.reduce((res: {min: number, max: number}, v: number) => {
-                res.min = Math.min(res.min, v);
-                res.max = Math.max(res.max, v);
-                return res;
-            }, {min: Infinity, max: 0});
-        });
-    }, [totalData]); // TODO changed this from cacheData to totalData - might be wrong
+    const totalData = useMemo(() => getCacheTotalsAtBucket(cacheData.occ[bucketIdx],
+        cacheData.numSets, cacheData.idxToTpAndSt.length, visibleTypes),
+        [cacheData, visibleTypes, bucketIdx]);
+    const aggData = useMemo(() => totalData.reduce((res, v) => ({
+        min: Math.min(res.min, v), max: Math.max(res.max, v)
+    }), {min: Infinity, max: 0}), [totalData]);
     const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
     return (
@@ -220,7 +202,7 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                     hoverIdx != null ?
                     <table className='cacheOccTable' >
                         <caption>
-                            {`Set ${hoverIdx}: ${totalData[bucketIdx][hoverIdx]} visible object-line overlaps`}
+                            {`Set ${hoverIdx}: ${totalData[hoverIdx]} visible object-line overlaps`}
                         </caption>
                         <colgroup>
                             <col style={{'width': '330px'}} />
@@ -241,7 +223,7 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                                                                                         {cacheData.idxToTpAndSt[v.tidx]}
                                                                                     </Typography>
                                                                                 </td>
-                                                                                <td>{`${v.val} (${(v.val*100 / totalData[bucketIdx][hoverIdx]).toFixed(2)}%)`}</td>
+                                                                                <td>{`${v.val} (${(v.val*100 / totalData[hoverIdx]).toFixed(2)}%)`}</td>
                                                                             </tr>)
                         }
                         </tbody>
@@ -256,9 +238,9 @@ function CacheBoxArray({ selCacheName, cacheData, bucketIdx, cacheWidth,
                             .fill(undefined)
                             .map((e, i) =>  <CacheBox
                                                 key={i}
-                                                totalData={totalData[bucketIdx][i]}
-                                                minOcc={aggDataPerBucket[bucketIdx].min}
-                                                maxOcc={aggDataPerBucket[bucketIdx].max}
+                                                totalData={totalData[i]}
+                                                minOcc={aggData.min}
+                                                maxOcc={aggData.max}
                                                 idx={i}
                                                 x={i % cacheWidth.curr}
                                                 y={Math.floor(i / cacheWidth.curr)}

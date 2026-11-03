@@ -283,6 +283,14 @@ size_t IOHandler::sort_and_add_overlap_frees(memory_event_t* event_list, size_t 
 
     for (size_t i = 0; i < init_num_events; i++) {
         stats.outer_loop++;
+        // An empty allocation occupies no address interval. In particular,
+        // repeated zero-length placement arrays may have the same address.
+        // Keep the event for aggregate allocation statistics, but do not let
+        // it replace, contain, or obstruct a nonempty allocation. Frees still
+        // need processing even when their logged size is zero.
+        if (event_list[i].typeofop && event_list[i].size == 0) {
+            continue;
+        }
         // printf("Here is i: %lu, num_allocs: %lu, num_frees: %lu\n", i, num_allocs, num_frees);
         // printf("\t size of alloc_intervals: %lu\n", alloc_intervals.size());
 
@@ -547,6 +555,12 @@ std::pair<memory_event_t*, size_t> IOHandler::get_all_events(bool use_container)
     std::unordered_map<uintptr_t, memory_event_t*> last_alloc{};
     for (int i = 0; i < input_file_bytes / sizeof(memory_event_t); i++) {
         memory_event_t* event = filemap + i;
+        // Do not let an empty allocation claim the address used to identify
+        // a later free of a nonempty object at that address. Its raw event is
+        // preserved; only occupied-range lifetime bookkeeping ignores it.
+        if (event->typeofop && event->size == 0) {
+            continue;
+        }
         uintptr_t event_addr = reinterpret_cast<uintptr_t>(event->addr);
 
         // printf("\t event dets: addr: %lx, size: %lu, tindex: %p\n", event_addr, event->size, event->tindex_name);

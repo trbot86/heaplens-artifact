@@ -1,0 +1,156 @@
+{
+  "source_commit": "a816b341b4de17b77c3cd943054c6e627153bc56",
+  "image_id": "sha256:bc5b81e567754e0af2aa797fbc5a4022cc94525c6a9e1d9256d69d5ea67e4dab",
+  "image_build_seconds": 204.6513562000473,
+  "source_archive_sha256": "d6f2eb4d35cea9e458463797b28ccd26bca29e1062cd600f1d1a93fb41eda9d7",
+  "acceptance_passed": true,
+  "tests": {
+    "fresh-image-tests.log": {
+      "count": 273,
+      "seconds": 49.429,
+      "passed": true,
+      "skipped": 19
+    },
+    "fresh-native-headers.log": {
+      "count": 11,
+      "seconds": 140.567,
+      "passed": true,
+      "skipped": 0
+    },
+    "fresh-native-tpcc_custom_allocator.log": {
+      "count": 1,
+      "seconds": 6.939,
+      "passed": true,
+      "skipped": 0
+    },
+    "fresh-native-new_expression_logging.log": {
+      "count": 4,
+      "seconds": 28.542,
+      "passed": true,
+      "skipped": 0
+    },
+    "fresh-native-custom_allocator_logging.log": {
+      "count": 1,
+      "seconds": 6.483,
+      "passed": true,
+      "skipped": 0
+    }
+  },
+  "full_typecheck_passed": true,
+  "production_build_passed": true,
+  "remaining_hook_dependency_warnings": 0,
+  "selection": {
+    "paired_baseline_checks": 440,
+    "outputs": 3520,
+    "aggregate_cells_equal": 208,
+    "compressed_bytes": 1282735,
+    "input_database_count": 11,
+    "input_bytes": 66923515904,
+    "input_check": "Existence and size only; no database payload scans or transfers"
+  },
+  "pyke": {
+    "kernel": "6.8.0-137-generic",
+    "preflight_exit": 0,
+    "independent_allocators": true,
+    "small_then_huge_bytes": 2097152,
+    "shared_lock_released": true
+  },
+  "owned_test_containers_exited": true,
+  "supplemental_native": {
+    "tests": {
+      "fresh-native-logger_tail.log": {
+        "count": 1,
+        "seconds": 2.036,
+        "passed": true,
+        "skipped": 0
+      },
+      "fresh-native-retirement_order.log": {
+        "count": 1,
+        "seconds": 1.8,
+        "passed": true,
+        "skipped": 0
+      },
+      "fresh-native2-ascylib_readonly.log": {
+        "count": 1,
+        "seconds": 0.305,
+        "passed": true,
+        "skipped": 0
+      },
+      "fresh-native2-valkey_terminal.log": {
+        "count": 3,
+        "seconds": 11.898,
+        "passed": true,
+        "skipped": 0
+      }
+    },
+    "default_suite_skipped": 19,
+    "previous_followup_covered_skips": 15,
+    "supplemental_covered_skips": 4,
+    "all_default_skips_exercised": true,
+    "unique_tests_exercised": 273,
+    "owned_test_containers_exited": true,
+    "ascylib_setup": {
+      "first_attempt": "Missing submodule in test snapshot; failure preserved in fresh-native-ascylib_readonly.log",
+      "pinned_commit": "3c2d1a231eac3518a4167d7d4a709cb22a3cff6b",
+      "archive_sha256": "aa47e3444df1e46cc8a5d865b4008dc90df153fde577811a2cb2ec50a7fcacf0",
+      "implementation_changed": false
+    }
+  },
+  "gui_state_followup": {
+    "typecheck_passed": true,
+    "production_build_passed": true,
+    "react_hook_warnings": 0,
+    "focused_browser_assertions": 18,
+    "assertions": [
+      "external time moves cursor",
+      "same-type data replacement redraws curve",
+      "new data updates y scale",
+      "new trace clock updates labels",
+      "existing curve changes colour",
+      "removed bars disappear",
+      "existing bars change colour",
+      "replacement histogram uses new offsets",
+      "new detail geometry updates x ticks",
+      "drag uses replacement time range",
+      "zoom preserves selected time",
+      "drag after zoom uses current scale",
+      "detail zoom changes grid",
+      "geometry reset removes stale detail transform",
+      "size filter updates existing bars",
+      "empty graph is safe",
+      "empty graph recovers",
+      "new selected region resets detail zoom"
+    ],
+    "frontend_helper_suites_passed": 5,
+    "code_sha256": {
+      "sifter_vis_d3\\sifter\\src\\app\\ui\\timeGraphComponent.tsx": "8c585cf86fc05d8773c18576df9cfa84c198378669165b701509ddc3bd77bdd8",
+      "sifter_vis_d3\\sifter\\src\\app\\ui\\pagesComponent.tsx": "ac7fc689deea31dcc2a3eef9ecfe25dd52b120967956b6c2a9409b1d9234e18e",
+      "sifter_vis_d3\\sifter\\src\\app\\ui\\legendComponent.tsx": "65e13d680a3d09f8ed8037502cb5d81866a2aeb6d9eecdd702bff3767859bbba",
+      "sifter_vis_d3\\sifter\\src\\app\\vispanels\\page.tsx": "308daaad30c01f51fa724d36d5140c6fa436336451fb9c636e2f41f8298fcd1e"
+    },
+    "normal_ui": {
+      "efrbAfterResample": {
+        "banner": "Showing 32/32 pages and 1,748/1,000,000 history records; 8/8 clusters.",
+        "detailAxis": "0163248648096112128",
+        "thumb": "575.4191284876518"
+      },
+      "valkeyAfterSwitch": {
+        "banner": "Showing 116/128 pages and 8,400/1,000,000 history records; 58/58 clusters.",
+        "detailAxis": "0816243240485664",
+        "thumb": "50"
+      },
+      "consoleErrors": []
+    },
+    "request_counts": {
+      "init_app": 2,
+      "resample": 1
+    },
+    "cleanup": {
+      "owned_container": "heaplens-hook-check-20261102",
+      "intentional_docker_stop": true,
+      "container_absent_after_stop": true,
+      "owned_browser_tab_closed": true,
+      "user_github_tab_preserved": true
+    }
+  }
+}

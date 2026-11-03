@@ -6,6 +6,10 @@ The [archived artifact release 2026.10.09](https://zenodo.org/records/23255614)
 is available at DOI [10.5281/zenodo.23255614](https://doi.org/10.5281/zenodo.23255614).
 The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284) resolves to the latest release.
 
+This checkout also contains the final-paper integration candidate described in
+[its validation record](artifact/integration/VALIDATION.md); those changes are
+not part of the linked October 9 archive.
+
 It contains the container quick start, experiment-to-paper map, guided example,
 optional LLM workflow, and explicit verification status. The older developer
 instructions below are retained for reference; use the artifact entry point for evaluation.
@@ -44,7 +48,11 @@ This step uses clang-tidy to add logging instructions to the target application.
 
 	If the target application is compiled by simply calling 'make', then you do not need to specify the build command.
 
-	Note: currently, you must use the --skip-refactor flag. Hypothetically, excluding the flag does the remaining refactoring in a single step, but this isn't working right now...
+	The tool considers source files and included headers inside the copied project. The `-s` option selects a build subdirectory without excluding headers elsewhere in that project. System headers and headers outside the copied project are excluded.
+
+	Omit `--skip-refactor` to apply the edits and add the logger includes immediately; then skip the manual steps 4 and 6 below. Both paths have [focused native regression tests](artifact/PROJECT_HEADER_VALIDATION.md).
+
+	For an allocation site that already records its own typed event, add `// NOLINT(misc-allocation-logging)` on that allocation's line to prevent a second automatic record. Custom function-pointer allocation paths still need explicit tracing support.
 
 	To add custom logging, use the ```MEMHOOK_LOG_ALLOC``` and ```MEMHOOK_LOG_FREE``` macros in memhook_interface.h as follows:
 
@@ -137,3 +145,41 @@ You will need Python 3 along with the venv module (which you should already have
 		sudo docker cp sifter:/root/sifter/[new-dir-name]/type_analysis/allocs.sqlite sifter_vis_d3/
 
 8. Open 'localhost:3000' in your web browser. Note that it can take a few minutes to load a database in the visualization app. If it takes too long, you may want to choose a lower sampling proportion value in the sampling step.
+
+### Representative pages and text export
+
+In **Settings → Sample settings**, set **Maximum pages** and **Maximum history
+records**, then click **Resample**. The GUI defaults to at most 128 pages and
+100,000 prepared history records, for either 4-KiB or huge-page views. A history
+record describes an allocation lifetime or prepared fragment, not necessarily
+an object live at the selected time. Both limits apply to the displayed pages;
+they do not reduce the source database or bound database/cache preparation.
+
+Selection prioritizes cluster coverage, then requested types, then large
+within-cluster differences in history size, before adding page runs. The view
+reports its selected counts and any omitted clusters/types. Perf-directed
+pages remain mandatory: if they alone exceed a limit, the view warns about the
+exception. Raise the limits to examine omitted layouts; lower them if the
+selected histories make interaction slow. These are configurable working
+limits, not a guarantee of responsiveness on every computer or trace.
+
+Click **Export 5 snapshots** above the page view to save
+`page_layout_snapshots.txt`. Loading or resampling no longer downloads a file
+automatically. The file includes the selected pages, their cluster membership,
+type/field metadata, and five evenly spaced snapshots from the earliest to
+latest allocation timestamp in those pages. It includes both endpoints (and
+repeated timestamps if the range is zero); an entirely empty history has one
+empty snapshot. Export uses the selected pages' full prepared histories, not
+the current slider position or visibility toggles.
+
+Export shows progress and can be cancelled. Chrome/Edge on localhost or HTTPS
+can write incrementally to a file chosen in the save dialog. Other browsers
+download the completed file using a memory-limited fallback; exports above
+64 MiB stop with an explanation instead of downloading truncated data. Use
+direct file saving or select fewer pages for a larger export. Cancellation
+aborts the write and does not intentionally save a partial export; a browser
+may leave an empty placeholder for a newly chosen file.
+
+The separate command-line pipeline, `bash artifact/run.sh export`, still
+generates the packaged LLM workflow's raw/compact exports. Its snapshot count
+and page-selection defaults are unchanged by the GUI's five-snapshot export.

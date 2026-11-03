@@ -2,15 +2,18 @@
 import { cache, forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './componentStyles.scss';
 import * as d3 from 'd3';
-import { getData, getSubtypeName, TypeToColourMap } from '../vispanels/page';
+import { getData, getSubtypeName, TypeToColourMap } from './appShared';
 import { Check, Dangerous, DangerousOutlined, LocalFireDepartment, LocalFireDepartmentOutlined, PlaylistAdd, PlaylistPlay, RadioButtonChecked, SentimentDissatisfied, SentimentDissatisfiedOutlined, SentimentDissatisfiedRounded, SentimentDissatisfiedSharp, SentimentDissatisfiedTwoTone, SentimentVeryDissatisfied, SentimentVeryDissatisfiedOutlined, SportsMma, SportsMmaOutlined, ZoomInMap, ZoomOutMap } from '@mui/icons-material';
 import { Box, Checkbox, Icon, IconButton, Stack, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { SubtypeEntry } from './legendComponent';
 import { HtmlTooltip } from './cacheSetComponent';
 import Grid from '@mui/material/Grid2';
-import { theme } from '../page';
-
+import { theme } from './appShared';
+import { getSlotDataAtBucket } from './currentBucket';
+import SnapshotExportButton from './snapshotExportButton';
+import { selectDetailEvents } from './detailEvents';
 import { continuationEdges, visiblePageContinuation } from './continuationEdges';
+import VisiblePageRow from './visiblePageRow';
 
 interface MemoryObject {
     file: string | null,
@@ -59,177 +62,7 @@ const SEL_AND_ZOOM_GRANULARITY = 4096;
 const MAX_HITM_ADDRS = 20;
 const PERF_INDICATOR_SIZE = 4;
 
-const SNAPSHOT_INTERVALS = 8; // number of intervals between earliest event and latest event
-const SNAPSHOT_FILE_NAME = 'page_layout_snapshots.txt';
-
-interface SnapshotObject {
-    type: string,
-    start_addr: number,
-    size: number,
-    alloc_ts: number,
-    free_ts: number | null,
-    actual_addr?: number
-}
-
-interface SnapshotPage {
-    page_addr: number,
-    cluster: number,
-    objects: SnapshotObject[]
-}
-
-function getSnapshotTimes(pages: PageMap): number[] {
-    const allEvents = Object.values(pages).flatMap((page) => page.events);
-    if (allEvents.length === 0) {
-        return [0];
-    }
-    const minTs = Math.min(...allEvents.map((e) => e.allocTs));
-    const maxTs = Math.max(...allEvents.map((e) => e.allocTs));
-    const step = (maxTs - minTs) / SNAPSHOT_INTERVALS;
-    return Array.from({ length: SNAPSHOT_INTERVALS + 1 }, (_, i) => Number((minTs + step * i).toFixed(3)));
-}
-
-function serializeFieldsData(fieldsData: { [tp: string]: SubtypeEntry[] }): string {
-    const lines: string[] = ['FIELDS_DATA:'];
-    const types = Object.keys(fieldsData).sort();
-    if (types.length === 0) {
-        lines.push('  NONE');
-        return lines.join('\n');
-    }
-    for (const type of types) {
-        lines.push(`- type: ${type}`);
-        const entries = fieldsData[type];
-        if (!entries || entries.length === 0) {
-            lines.push('  subtypes: []');
-            continue;
-        }
-        lines.push('  subtypes:');
-        for (const entry of entries) {
-            lines.push(`    - name: ${entry.name}`);
-            lines.push(`      subtype: ${entry.subtype}`);
-            lines.push(`      offset: ${entry.offset}`);
-            lines.push(`      size: ${entry.size}`);
-        }
-    }
-    return lines.join('\n');
-}
-
-function serializeClusterData(clustersData: ClustersInfo): string {
-    const lines: string[] = ['CLUSTERS:'];
-    const clusterIds = Object.keys(clustersData).map((k) => parseInt(k)).sort((a, b) => a - b);
-    if (clusterIds.length === 0) {
-        lines.push('  NONE');
-        return lines.join('\n');
-    }
-    for (const clusterId of clusterIds) {
-        const cluster = clustersData[clusterId];
-        const pageEntries = cluster.pages;
-        let pageList: number[] = [];
-        if (Array.isArray(pageEntries)) {
-            pageList = pageEntries;
-        } else if (pageEntries && typeof pageEntries[Symbol.iterator] === 'function') {
-            pageList = Array.from(pageEntries as Iterable<number>);
-        } else if (pageEntries && typeof pageEntries === 'object') {
-            pageList = Object.values(pageEntries as Record<string, number>);
-        }
-        pageList = pageList.sort((a, b) => a - b);
-        lines.push(`- cluster_id: ${clusterId}`);
-        lines.push(`  size: ${cluster.size}`);
-        lines.push(`  page_count: ${pageList.length}`);
-        lines.push(`  pages: [${pageList.join(', ')}]`);
-    }
-    return lines.join('\n');
-}
-
-function buildPageSnapshotText(pages: PageMap, clustersData: ClustersInfo, fieldsData: { [tp: string]: SubtypeEntry[] }, pageSize: number): string {
-    const pageAddrs = Object.keys(pages).map((addr) => parseInt(addr)).sort((a, b) => a - b);
-    const snapshotTimes = getSnapshotTimes(pages);
-    const lines: string[] = [];
-
-    lines.push('MEMORY PAGE LAYOUT SNAPSHOTS');
-    lines.push(`SNAPSHOT_INTERVALS: ${SNAPSHOT_INTERVALS}`);
-    lines.push(`PAGE_SIZE: ${pageSize}`);
-    lines.push(`TOTAL_PAGES: ${pageAddrs.length}`);
-    lines.push(`GENERATED_AT: ${new Date().toISOString()}`);
-    lines.push('');
-    lines.push('');
-    lines.push(serializeFieldsData(fieldsData));
-    lines.push('');
-    lines.push(serializeClusterData(clustersData));
-    lines.push('');
-    lines.push('SNAPSHOTS:');
-
-    for (let i = 0; i < snapshotTimes.length; i++) {
-        const ts = snapshotTimes[i];
-        lines.push(`- snapshot_index: ${i}`);
-        lines.push(`  time: ${ts}`);
-        lines.push('  pages:');
-        for (const pageAddr of pageAddrs) {
-            const page = pages[pageAddr];
-            const visibleObjects = page.events.filter((obj) => obj.allocTs <= ts && (obj.freeTs === null || obj.freeTs >= ts));
-            lines.push(`  - page_addr: ${pageAddr}`);
-            lines.push(`    cluster: ${page.cluster}`);
-            lines.push(`    object_count: ${visibleObjects.length}`);
-            if (visibleObjects.length === 0) {
-                lines.push('    objects: []');
-                continue;
-            }
-            lines.push('    objects:');
-            for (const obj of visibleObjects) {
-                lines.push('      -');
-                lines.push(`        type: ${obj.type ?? 'UNKNOWN'}`);
-                lines.push(`        size: ${obj.size}`);
-                lines.push(`        actual_addr: ${obj.actualAddr ?? obj.addr}`);
-            }
-        }
-    }
-
-    return lines.join('\n');
-}
-
-function downloadTextFile(text: string, fileName: string): void {
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-}
-
-/*  TODO: Currently, this function just looks at the starting address of each
-    event, without considering events crossing slot/page boundaries. This
-    should be fine to give an approximate overview in most cases. */
-function getSlotDataPerBucket(  events: MemoryObject[], pageAddr: number, pageSize: number, numSlots: number,
-                                numBuckets: number, getBucketIdx: (ts: number) => number,
-                                pageVis: {[tp: string]: boolean}) {
-    const ret: number[][] = Array(numBuckets + 2).fill(undefined).map(() => Array(numSlots).fill(0));
-    const slotSize = Math.floor(pageSize / numSlots);
-
-    events.filter((event) => event.type && pageVis[event.type])
-        .forEach((event) => {
-        const eventAddr = event.actualAddr ? event.actualAddr : event.addr;
-        if (Math.floor(eventAddr / pageSize) == Math.floor(pageAddr / pageSize)) {
-            const eventSlot = Math.floor((eventAddr % pageSize) / slotSize);
-            ret[getBucketIdx(event.allocTs)][eventSlot] += event.size;
-            if (event.freeTs)
-                ret[getBucketIdx(event.freeTs)][eventSlot] -= event.size;
-        }
-    });
-
-    ret.forEach((bucket, i) => {
-        bucket.forEach((slot, j) => {
-            if (i != 0) {
-                ret[i][j] = slot + ret[i-1][j];
-            }
-        });
-    });
-    return ret;
-}
-
-const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize, xScale, yScale,
+const SplitBlock = forwardRef(function SplitBlock({ obj, colourOfType, viewStartAddr, cacheLineSize, xScale, yScale,
                                  expanded, viewSize, invisible, ...props } : 
     {
         obj: MemoryObject,
@@ -241,7 +74,7 @@ const SplitBlock = forwardRef(({ obj, colourOfType, viewStartAddr, cacheLineSize
         yScale: d3.ScaleLinear<number, number, never>,
         expanded: boolean,
         invisible?: boolean
-    }, ref) => {
+    }, ref: React.ForwardedRef<SVGGElement>) {
     return (
         <g
             {...props}
@@ -412,7 +245,7 @@ function HoverableSplitBlock({  event, colourOfType, viewStartAddr, viewSize,
                     expanded={event.type ? expandedTypes[event.type.replace(/\s+/g, '')] : false} />
             </HtmlTooltip>
             {
-            (event.type && fieldsData[event.type.replace(/\s+/g, '')]) &&
+            (event.type && expandedTypes[event.type.replace(/\s+/g, '')] && fieldsData[event.type.replace(/\s+/g, '')]) &&
             <>
             {
                 fieldsData[event.type.replace(/\s+/g, '')].map((field) =>   
@@ -450,7 +283,7 @@ function HoverableSplitBlock({  event, colourOfType, viewStartAddr, viewSize,
                                                                 xScale={xScale}
                                                                 yScale={yScale}
                                                                 expanded={false}
-                                                                invisible={!expandedTypes[event.type.replace(/\s+/g, '')]} />
+                                                                invisible={!event.type || !expandedTypes[event.type.replace(/\s+/g, '')]} />
                                                         </HtmlTooltip>)
             }
             </>
@@ -461,7 +294,7 @@ function HoverableSplitBlock({  event, colourOfType, viewStartAddr, viewSize,
     );
 }
 
-function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData, expandedTypes,
+export function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData, expandedTypes,
                         setExpandedTypes, viewStartAddr, showHot, showHitm, pageVis, perf, currTs,
                         hitmCutoff } :
     {
@@ -480,7 +313,10 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
         hitmCutoff: number,
         currTs: number
     }) {
-    const objSVG = useRef(null);
+    const objSVG = useRef<SVGSVGElement>(null);
+    const detailEvents = useMemo(() => selectDetailEvents(
+        data, viewStartAddr, viewSize, currTs, pageVis, fieldsData, expandedTypes,
+    ), [data, viewStartAddr, viewSize, currTs, pageVis, fieldsData, expandedTypes]);
     // const [hoveredType, setHoveredType] = useState<string | null>(null);
 
     // console.log(`Here is data in object layout:`);
@@ -488,38 +324,34 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
     // console.log('Here is perf in object layout:');
     // console.log(perf);
 
-    const xScale = d3.scaleLinear().domain([0, cacheLineSize]).range([0, OBJECT_LAYOUT_WIDTH]);
-    const yScaleOrig = d3.scaleLinear().domain([0, Math.floor(viewSize / cacheLineSize)]).range([0, (OBJECT_LAYOUT_HEIGHT / cacheLineSize)*(viewSize / cacheLineSize)]);
-    const [yScale, setYScale] = useState<d3.ScaleLinear<number, number, never>>(() => yScaleOrig);
-    const xAxis = d3.axisTop(xScale)
-                    .tickValues(d3.range(0, cacheLineSize + 1, Math.floor(cacheLineSize / 8))).tickFormat(d3.format('d'));
-    const yAxis = d3.axisLeft(yScale)
-                    .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 8)).tickFormat(d3.format('d'));
-    const yAxisGrid = d3.axisLeft(yScale).tickSize(-OBJECT_LAYOUT_WIDTH)
-                        .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 1)).tickFormat('');
+    const [zoomTransform, setZoomTransform] = useState(d3.zoomIdentity);
+    const xScale = useMemo(() => d3.scaleLinear().domain([0, cacheLineSize])
+        .range([0, OBJECT_LAYOUT_WIDTH]), [cacheLineSize]);
+    const yScaleOrig = useMemo(() => d3.scaleLinear().domain([0, Math.floor(viewSize / cacheLineSize)])
+        .range([0, (OBJECT_LAYOUT_HEIGHT / cacheLineSize) * (viewSize / cacheLineSize)]), [viewSize, cacheLineSize]);
+    const yScale = useMemo(() => zoomTransform.rescaleY(yScaleOrig), [zoomTransform, yScaleOrig]);
 
     useEffect(() => {
-        const curObjSVG = d3.select(objSVG.current);
-        
-        curObjSVG.select('#objectXAxisGroup')
-            .call(xAxis);
-        curObjSVG.select('#objectYAxisGroup')
-            .call(yAxis);
-        curObjSVG.select('#objectYAxisGridGroup')
-            .call(yAxisGrid);
-    }, [cacheLineSize, viewSize, yAxis]);
+        const svg = d3.select(objSVG.current!);
+        svg.select<SVGGElement>('#objectXAxisGroup').call(d3.axisTop(xScale)
+            .tickValues(d3.range(0, cacheLineSize + 1, Math.max(1, Math.floor(cacheLineSize / 8))))
+            .tickFormat(d3.format('d')));
+        svg.select<SVGGElement>('#objectYAxisGroup').call(d3.axisLeft(yScale)
+            .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 8)).tickFormat(d3.format('d')));
+        svg.select<SVGGElement>('#objectYAxisGridGroup').call(d3.axisLeft(yScale).tickSize(-OBJECT_LAYOUT_WIDTH)
+            .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 1)).tickFormat(() => ''));
+    }, [cacheLineSize, viewSize, xScale, yScale]);
 
     useEffect(() => {
-        const zoom = d3.zoom()
-            .scaleExtent([1, 6])
-            .translateExtent([[0, -OBJECT_LAYOUT_MARGIN], [OBJECT_LAYOUT_WIDTH, (OBJECT_LAYOUT_HEIGHT / cacheLineSize)*(viewSize / cacheLineSize) + OBJECT_LAYOUT_MARGIN]]) // I think the +30 comes from the relative position of the object svg in the css, but not sure
-            .on('zoom', (event) => {
-                setYScale(() => event.transform.rescaleY(yScaleOrig));
-            });
-        d3.select(objSVG.current)
-            .call(zoom);
-    }, [viewSize]);
-    
+        const svg = d3.select(objSVG.current!);
+        const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([1, 6])
+            .translateExtent([[0, -OBJECT_LAYOUT_MARGIN], [OBJECT_LAYOUT_WIDTH,
+                (OBJECT_LAYOUT_HEIGHT / cacheLineSize) * (viewSize / cacheLineSize) + OBJECT_LAYOUT_MARGIN]])
+            .on('zoom', event => setZoomTransform(event.transform));
+        svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
+        return () => { svg.on('.zoom', null); };
+    }, [viewSize, cacheLineSize, viewStartAddr]);
+
     return (
         <div id='objectLayoutDiv' >
             <svg
@@ -551,8 +383,7 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
                         id='objectGroup'
                         clipPath='url(#objectLayoutClip)' >
                         {
-                            data.sort((a: MemoryObject, b: MemoryObject) => a.allocTs - b.allocTs)
-                                .map((event: MemoryObject) =>   <HoverableSplitBlock
+                            detailEvents.map((event: MemoryObject) =>   <HoverableSplitBlock
                                                                     key={`${event.addr}-${event.allocTs}`}
                                                                     event={event}
                                                                     colourOfType={colourOfType}
@@ -582,7 +413,7 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
                                 .map((perfAddr) => parseInt(perfAddr))
                                 .filter((perfAddr) => perfAddr >= viewStartAddr && perfAddr <= viewStartAddr + viewSize &&
                                                         ((perf.addrs[perfAddr].hitm >= hitmCutoff && showHitm) || (perf.addrs[perfAddr].loads + perf.addrs[perfAddr].stores >= perf.avgAccesses && showHot)))
-                                .map((perfAddr) =>  <g>
+                                .map((perfAddr) =>  <g key={perfAddr}>
                                                         <circle
                                                             className='objectPerfIcon' 
                                                             cx={OBJECT_LAYOUT_WIDTH + 2*PERF_INDICATOR_SIZE}
@@ -706,12 +537,12 @@ function PageHeader({ sortMode, setSortMode, pageSize, selSize, setSelSize,
     );
 }
 
-const SizeIndicator = forwardRef(({ clusterSize, sumClusterSizes, maxClusterSize, ...props } :
+const SizeIndicator = forwardRef(function SizeIndicator({ clusterSize, sumClusterSizes, maxClusterSize, ...props } :
     {
         clusterSize: number,
         sumClusterSizes: number,
         maxClusterSize: number
-    }, ref) => {
+    }, ref: React.ForwardedRef<HTMLDivElement>) {
 
     const   maxWidth = 36,
             minWidth = 6,
@@ -815,7 +646,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                                                 y={0}
                                                 width={pageScale(ev.size)}
                                                 edges={continuationEdges(ev, addr, pageSize)}
-                                                fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'}
+                                                fill={(ev.type && colourOfType[ev.type]?.toString()) || 'black'}
                                                 isVis={(ev.type && pageVis[ev.type]) == true}
                                                 currTs={currTs}
                                                 allocTs={ev.allocTs}
@@ -832,7 +663,7 @@ function PageCard({ addr, selAddr, pageSize, objectData, setSelPageAddr, colourO
                             .map((perfAddr) => parseInt(perfAddr))
                             .filter((perfAddr) => perfAddr >= addr && perfAddr < addr + pageSize &&
                                                     ((perf.addrs[perfAddr].hitm >= hitmCutoff && showHitm) || (perf.addrs[perfAddr].loads + perf.addrs[perfAddr].stores >= perf.avgAccesses && showHot)))
-                            .map((perfAddr) => <circle 
+                            .map((perfAddr) => <circle key={perfAddr}
                                                     cx={`${pageScale(perfAddr % pageSize) + 2*PERF_INDICATOR_SIZE + 1}`} // TODO: not sure why the extra shift is needed here
                                                     cy={`${PAGE_CARD_SVG_HEIGHT / 2}`}
                                                     r={`${PERF_INDICATOR_SIZE}`}
@@ -865,9 +696,9 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
         zoomedAddr: number
     }) {
     const ref = useRef(null);
-    const brushRef = useRef(null);
-    const pageScale = zoomedSize == 0 ? d3.scaleLinear().domain([0, pageSize]).range([0, PAGE_CARD_BORDER_WIDTH])
-                                        : d3.scaleLinear().domain([0, zoomedSize]).range([0, PAGE_CARD_BORDER_WIDTH]);
+    const brushRef = useRef<SVGGElement>(null);
+    const pageScale = useMemo(() => d3.scaleLinear()
+        .domain([0, zoomedSize || pageSize]).range([0, PAGE_CARD_BORDER_WIDTH]), [pageSize, zoomedSize]);
     // const pageBrush = d3.brushX()
     //                     .on('end', handleBrushEnd(pageScale));
 
@@ -885,36 +716,26 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
     //         }
     //     }, [pageSize]);
 
-    if (zoomedSize > 0) {
-        console.log('HERE IS THE OBJ DATA IN ZOOMED HUGE PAGE:');
-        console.log(objData);
-        console.log(`Here is the domain of the page scale: ${pageScale.domain()[0]}, ${pageScale.domain()[1]}`);
-    }
-
     const pageBrush = useMemo(() => d3.brushX()
         .on('end', 
             function(e: d3.D3BrushEvent<null> | null) {
-                console.log(`Handle brush end page scale domain: ${pageScale.domain()[0]}, ${pageScale.domain()[1]}`);
-                if (e && e.selection) {
-                    console.log('Here is the selection:');
-                    console.log(e.selection);
+                if (e && e.sourceEvent && e.selection && typeof e.selection[0] === 'number' && typeof e.selection[1] === 'number') {
                     const startAddr = (zoomedSize > 0 ? zoomedAddr : addr) + pageScale.invert(Math.min(PAGE_CARD_BORDER_WIDTH, Math.max(0, e.selection[0])));
                     const endAddr = (zoomedSize > 0 ? zoomedAddr : addr) + pageScale.invert(Math.min(PAGE_CARD_BORDER_WIDTH, Math.max(0, e.selection[1])));
                     const startRounded = Math.round(startAddr / SEL_AND_ZOOM_GRANULARITY)*SEL_AND_ZOOM_GRANULARITY;
                     const endRounded = Math.round(endAddr / SEL_AND_ZOOM_GRANULARITY)*SEL_AND_ZOOM_GRANULARITY;
                     setSelPageAddr(startRounded);
                     setSelSize(endRounded - startRounded);
-                    console.log(`startRounded=${startRounded}, endRounded=${endRounded}, selSize=${endRounded - startRounded}`);
                 }
-            }), [pageScale]);
+            }), [pageScale, zoomedSize, zoomedAddr, addr, setSelPageAddr, setSelSize]);
 
     // console.log(`pageScale domain: ${pageScale.domain()[0]}, ${pageScale.domain()[1]}`);
-    const colScale = useMemo(() => d3.scaleLinear().domain([0, slotSize]).range(['rgb(51, 51, 51)', '#e33a2b']), []);
+    const colScale = useMemo(() => d3.scaleLinear<string>().domain([0, slotSize]).range(['rgb(51, 51, 51)', '#e33a2b']), [slotSize]);
 
     useEffect(() => {
-        d3.select(brushRef.current)
+        d3.select(brushRef.current!)
             .call(pageBrush);
-    }, [pageScale]);
+    }, [pageBrush]);
 
     useEffect(() => {
         // console.log(`My addr: ${addr}, page num: ${Math.floor(addr / pageSize)}, selAddr page num: ${Math.floor(selAddr / pageSize)}, selAddr: ${selAddr}`);
@@ -922,20 +743,20 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
             // console.log(`Bad useEffect, addr: ${addr}, selAddr: ${selAddr}, selSize: ${selSize}`);
             // console.log('Here is brushRef:');
             // console.log(brushRef);
-            d3.select(brushRef.current)
+            d3.select(brushRef.current!)
                 .call(pageBrush.clear);
         }
-    }, [selAddr]);
+    }, [selAddr, addr, pageSize, pageBrush]);
 
     useEffect(() => {
         // console.log('Here is pageBrush.current.clear');
         // console.log(pageBrush.current.clear);
         // console.log(brushRef.current);
-        d3.select(brushRef.current)
+        d3.select(brushRef.current!)
             .call(pageBrush.clear);
-        d3.select(brushRef.current)
+        d3.select(brushRef.current!)
             .call(pageBrush);
-    }, [zoomedSize]);
+    }, [zoomedSize, pageBrush]);
 
     return (
         <svg
@@ -967,7 +788,7 @@ function HugePageCard({ addr, selAddr, pageSize, slotSize, slotData, setSelPageA
                                                     x={pageScale(ev.addr - zoomedAddr)}
                                                     y={0}
                                                     width={pageScale(ev.size)}
-                                                    fill={ev.type && colourOfType[ev.type] ? colourOfType[ev.type].toString() : 'black'} />)
+                                                    fill={(ev.type && colourOfType[ev.type]?.toString()) || 'black'} />)
                     }
                 </>
                 }
@@ -999,7 +820,6 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
         selAddr: number,
         colourOfType: TypeToColourMap,
         setSelPageAddr: (a: number) => void,
-        setFocusData: (a: PageContents) => void,
         pageVis: {[tp: string]: boolean},
         showHot: boolean,
         showHitm: boolean,
@@ -1071,7 +891,7 @@ function PageRow({  pageSize, addr, data, currTs, selAddr, colourOfType,
 }
 
 function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setSelPageAddr,
-                       numBuckets, setFocusData, setZoomedSize, getBucketIdx, selSize,
+                       numBuckets, setZoomedSize, getBucketIdx, selSize,
                        setSelSize, pageVis, zoomedSize, zoomedAddr, setZoomedAddr,
                        clusterSize, sumClusterSizes, maxClusterSize } : 
     {
@@ -1086,7 +906,6 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
         selAddr: number,
         colourOfType: TypeToColourMap,
         setSelPageAddr: (a: number) => void,
-        setFocusData: (a: PageContents) => void,
         zoomedSize: number,
         setZoomedSize: (a: number) => void,
         getBucketIdx: (a: number) => number,
@@ -1096,42 +915,30 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
         zoomedAddr: number,
         setZoomedAddr: (a: number) => void
     }) {
-    const [currData, setCurrData] = useState(data);
-    const dataPerBucket = useMemo(() => {
-        return getSlotDataPerBucket(data.events, addr, pageSize, NUM_SLOTS_HUGEPAGE, numBuckets, getBucketIdx, pageVis);
-    }, [data, pageVis]);
-
+    const bucketIdx = getBucketIdx(currTs);
     const continuationEvents = useMemo(() => data.events.filter(event => {
         const ends = continuationEdges(event, addr, pageSize);
         return ends.before || ends.after;
     }), [data, addr, pageSize]);
     const edges = useMemo(() => visiblePageContinuation(continuationEvents, addr, pageSize, currTs, pageVis),
         [continuationEvents, addr, pageSize, currTs, pageVis]);
+    const slotData = useMemo(() => {
+        if (zoomedSize > 0) return [];
+        return getSlotDataAtBucket(data.events, addr, pageSize, NUM_SLOTS_HUGEPAGE,
+                                   getBucketIdx, pageVis, bucketIdx);
+    }, [data, addr, pageSize, getBucketIdx, pageVis, bucketIdx, zoomedSize]);
 
-    useEffect(() => {
-        const filtered = {
-            events: data.events.filter((obj) => obj.addr + obj.size > (zoomedSize > 0 ? zoomedAddr : selAddr) &&
-                                                obj.addr < (zoomedSize > 0 ? zoomedAddr + zoomedSize : selAddr + selSize) &&
+    // Only the zoomed card consumes individual objects. Compute its list in
+    // the same render, without an effect/setState pass over every overview row.
+    const currData = useMemo(() => ({
+            events: zoomedSize > 0 ? data.events.filter((obj) => obj.addr + obj.size > zoomedAddr &&
+                                                obj.addr < zoomedAddr + zoomedSize &&
                                                 obj.allocTs <= currTs && 
                                                 (obj.freeTs == null || obj.freeTs >= currTs) &&
                                                 obj.type &&
-                                                pageVis[obj.type]),
+                                                pageVis[obj.type]) : [],
             cluster: data.cluster
-        };
-        setCurrData(filtered);
-        if (zoomedSize > 0) {
-            console.log('Before filtering again:');
-            console.log(filtered);
-            console.log(`Here is zoomedAddr: ${zoomedAddr}, zoomedSize: ${zoomedSize}`);
-        }
-        // if (Math.floor(selAddr / pageSize) == Math.floor(addr / pageSize)) {
-
-        //     setFocusData({
-        //         events: filtered.events.filter((obj: MemoryObject) => obj.addr < selAddr + selSize && selAddr < obj.addr + obj.size),
-        //         cluster: filtered.cluster
-        //     });
-        // }
-    }, [currTs, selAddr, data, pageVis, zoomedSize]);
+        }), [currTs, data, pageVis, zoomedAddr, zoomedSize]);
 
     return (
         <div className={`pageRow${zoomedSize > 0 ? ' pageRowZoomed' : ''}`} >
@@ -1140,8 +947,8 @@ function HugePageRow({ pageSize, addr, data, currTs, selAddr, colourOfType, setS
                 selAddr={selAddr}
                 pageSize={pageSize}
                 objData={currData}
-                slotData={dataPerBucket[getBucketIdx(currTs)]}
                 edges={edges}
+                slotData={slotData}
                 setSelPageAddr={setSelPageAddr}
                 colourOfType={colourOfType}
                 zoomedAddr={zoomedAddr}
@@ -1218,19 +1025,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
     const [zoomedSize, setZoomedSize] = useState<number>(0);
     const [showHot, setShowHot] = useState<boolean>(false);
     const [showHitm, setShowHitm] = useState<boolean>(false);
-    const snapshotSavedRef = useRef(false);
-
-    useEffect(() => {
-        if (snapshotSavedRef.current) {
-            return;
-        }
-        if (!pages || Object.keys(pages).length === 0) {
-            return;
-        }
-        const snapshotText = buildPageSnapshotText(pages, clustersData, fieldsData, pageSize);
-        downloadTextFile(snapshotText, SNAPSHOT_FILE_NAME);
-        snapshotSavedRef.current = true;
-    }, [pages, clustersData, fieldsData, pageSize]);
+    const rowContainer = useRef<HTMLDivElement>(null);
 
     const maxClusterSize = Object.values(clustersData).reduce((size: number, curr: {'pages': number[], 'size': number}) => Math.max(size, curr['size']), 0);
     const focusData = useMemo(() => {
@@ -1246,6 +1041,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
     return (
         <div id='pageAndObjectVis'>
             <div id='pageVis'>
+                <SnapshotExportButton pages={pages} clustersData={clustersData} fieldsData={fieldsData} pageSize={pageSize} />
                 <PageHeader
                     sortMode={sortMode}
                     setSortMode={setSortMode}
@@ -1260,7 +1056,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                     showHitm={showHitm}
                     setShowHitm={setShowHitm}
                     selAddr={selPageAddr} />
-                <div id='pageRowContainer'>
+                <div id='pageRowContainer' ref={rowContainer}>
                     {
                     pageSize == 4 * 2**10 ?
                     <>
@@ -1268,7 +1064,8 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                     Object.keys(pages)
                         .toSorted((ad1: string, ad2: string) => sortMode == 'addr' ? parseInt(ad1) - parseInt(ad2) : 
                                                 sortMode == 'cluster' ? pages[parseInt(ad1)].cluster - pages[parseInt(ad2)].cluster : 0)
-                        .map((addr: string) =>  <PageRow
+                        .map((addr: string) => <VisiblePageRow key={addr} address={addr} root={rowContainer}
+                                                    selected={parseInt(addr) === selPageAddr} expanded={false}><PageRow
                                                     key={addr}
                                                     clusterSize={clustersData[pages[parseInt(addr)].cluster]['size']}
                                                     sumClusterSizes={sumClusterSizes}
@@ -1285,7 +1082,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                                                     showHot={showHot}
                                                     showHitm={showHitm}
                                                     perf={perf}
-                                                    hitmCutoff={hitmCutoff} />)
+                                                    hitmCutoff={hitmCutoff} /></VisiblePageRow>)
                     }
                     </>
                     :
@@ -1295,7 +1092,9 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                         .toSorted((ad1: string, ad2: string) => sortMode == 'addr' ? parseInt(ad1) - parseInt(ad2) : 
                                                 sortMode == 'cluster' ? pages[parseInt(ad1)].cluster - pages[parseInt(ad2)].cluster : 0)
                         .filter((addr: string) => zoomedSize == 0 || Math.floor(parseInt(addr) / pageSize) == Math.floor(selPageAddr / pageSize))
-                        .map((addr: string) =>  <HugePageRow
+                        .map((addr: string) => <VisiblePageRow key={addr} address={addr} root={rowContainer}
+                                                    selected={Math.floor(parseInt(addr) / pageSize) === Math.floor(selPageAddr / pageSize)}
+                                                    expanded={zoomedSize > 0}><HugePageRow
                                                     key={addr}
                                                     clusterSize={clustersData[pages[parseInt(addr)].cluster]['size']}
                                                     sumClusterSizes={sumClusterSizes}
@@ -1316,7 +1115,7 @@ export default function Pages({ pages, clustersData, sumClusterSizes, numCluster
                                                     numBuckets={numBuckets}
                                                     selSize={selSize}
                                                     setSelSize={setSelSize}
-                                                    pageVis={pageVis} />)
+                                                    pageVis={pageVis} /></VisiblePageRow>)
                     }
                     </>
                     }

@@ -42,6 +42,11 @@ To regenerate the text export from the supplied SQLite trace:
 bash artifact/run.sh export
 ```
 
+For an interactive investigation, the GUI's **Export 5 snapshots** button saves
+the selected representative pages as `page_layout_snapshots.txt`; it does not
+download automatically on loading. This simpler GUI export is separate from
+the raw/compact command-line export used below, whose protocol is unchanged.
+
 The printed results directory contains raw snapshots, compact snapshots,
 and analysis text. Representative pages and cluster IDs can change when
 the trace is resampled.

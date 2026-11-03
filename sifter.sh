@@ -16,6 +16,7 @@ fielddump=""
 pagespertype=""
 sample=""
 samplingSeed=()
+numBuckets=()
 cutoff=""
 threads=1
 pageSize="--page-size 4096"
@@ -94,6 +95,14 @@ while [ $# -gt 0 ]; do
             samplingSeed=(--seed "$2")
             shift
         ;;
+        --num-buckets)
+            if ! [[ "$2" =~ ^[1-9][0-9]*$ ]]; then
+                echo "Must specify a positive integer with option --num-buckets." >&2
+                exit 1
+            fi
+            numBuckets=(--num-buckets "$2")
+            shift
+        ;;
         --sample)
             if [[ -z "$2" || "$2" == -* ]]; then
                 echo "Must specify a number between 0.0 and 1.0 with option --sample." >&2
@@ -156,15 +165,15 @@ add_includes () {
     # into every source file in the repository, including vendored/unrelated
     # ones. `cd -- "$1"` works for both relative and absolute paths.
     cd -- "$1" || { echo "ERROR: add_includes: cannot cd to '$1'" >&2; exit 1; }
-    for f in $(for t in '*.h' '*.cpp' '*.c' '*.hpp' '*.cc' '*.hh' ; do find . -name "$t" ; done) ; do
-        if [[ "$f" =~ .*memhook.* ]] || grep -q '#include "memhook_interface.h"' $f; then
+    while IFS= read -r -d '' f; do
+        if [[ "$f" =~ .*memhook.* ]] || grep -q '#include "memhook_interface.h"' "$f"; then
             echo "   skipping file $f..."
             continue
         fi
         echo '#include "memhook_interface.h"' >> TEMP_MEMHOOK_INCLUDE
-        cat $f >> TEMP_MEMHOOK_INCLUDE
-        mv TEMP_MEMHOOK_INCLUDE $f
-    done
+        cat -- "$f" >> TEMP_MEMHOOK_INCLUDE
+        mv -- TEMP_MEMHOOK_INCLUDE "$f"
+    done < <(find . -type f \( -name '*.h' -o -name '*.cpp' -o -name '*.c' -o -name '*.hpp' -o -name '*.cc' -o -name '*.hh' \) -print0)
     echo "    Done."
     echo ""
 }
@@ -203,11 +212,11 @@ elif [ "$database" = true ]; then
     cd type_analysis || exit 1
     rm -f allocs.sqlite
     make bin/convert_to_db || exit 1
-    echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran ${samplingSeed[*]}"
-    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran "${samplingSeed[@]}" "${containerArgs[@]}"
+    echo "./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran ${samplingSeed[*]} ${numBuckets[*]}"
+    ./bin/convert_to_db -j $threads $pageSize $perffile $fielddump $pagespertype $sample $cutoff $fragGran "${samplingSeed[@]}" "${containerArgs[@]}" "${numBuckets[@]}"
     exit $?
 elif [ "$includesOnly" = true ]; then
-    add_includes $indir
+    add_includes "$indir"
     exit 0
 fi
 
@@ -232,8 +241,8 @@ else
     cmakeOptions="$cmakeOptions -DCPP_PLACEMENT_NEW=OFF"
 fi
 
-cmake $cmakeOptions ..
-cmake --build .
+cmake $cmakeOptions .. || { echo "ERROR configuring clang-tidy" >&2; exit 1; }
+cmake --build . || { echo "ERROR building clang-tidy" >&2; exit 1; }
 cd ../..
 echo "Done building clang-tidy"
 echo ""
@@ -264,6 +273,12 @@ if [[ -e "$outdir" ]]; then
     exit 1
 fi
 cp -r "$indir" "$outdir"
+# Include the whole copied project, including headers above a selected build
+# subdirectory. Use a canonical filesystem boundary, not a path regex.
+outdir=$(realpath -- "$outdir")
+# Clang may spell included headers relative to the build directory. Let the
+# allocation check enforce the canonical project boundary before emitting fixes.
+export HEAPLENS_ANNOTATION_ROOT="$outdir"
 
 echo ""
 echo "codebase copied to $outdir"
@@ -271,7 +286,7 @@ echo ""
 echo "next step: we will navigate to $outdir/$subdirectory and build your application using $buildcmd"
 echo "           to generate a compilation_commands.json file."
 
-cd $outdir/$subdirectory
+cd -- "$outdir/$subdirectory"
 eval "$buildcmd"
 if [ "$?" -ne 0 ]; then echo "ERROR running build command" ; exit 1 ; fi
 echo ""
@@ -288,20 +303,22 @@ else
     echo "replacing malloc with malloc_s..."
 fi
 if [ "$skipRefactor" = true ]; then
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build-heaplens/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -export-fixes=fixes.yaml
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build-heaplens/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging '-header-filter=.*' -export-fixes=fixes.yaml
+    if [ "$?" -ne 0 ]; then echo "ERROR annotating allocations" >&2; exit 1; fi
     echo "skipped refactoring step - fixes written to fixes.yaml"
 else
-    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build-heaplens/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging -fix
+    python3 /root/sifter/clang-tidy-standalone/tool/run-clang-tidy.py -j 1 -clang-tidy-binary /root/sifter/clang-tidy-standalone/build-heaplens/tool/clang-tidy -clang-apply-replacements-binary clang-apply-replacements-14 -checks=-*,misc-allocation-logging '-header-filter=.*' -fix
+    if [ "$?" -ne 0 ]; then echo "ERROR annotating allocations" >&2; exit 1; fi
     echo "performed refactoring with clang-tidy"
-    add_includes $outdir
+    add_includes "$outdir"
 fi
 if [ "$?" -ne 0 ]; then echo "ERROR templating mallocs" ; exit 1 ; fi
 echo ""
 
 cd /root/sifter
-cp type_analysis/fileset_dump.txt $outdir/$subdirectory
+cp type_analysis/fileset_dump.txt "$outdir/$subdirectory"
 if [ "$template" = false ]; then
-    cp type_analysis/typeset_dump.txt $outdir/$subdirectory
+    cp type_analysis/typeset_dump.txt "$outdir/$subdirectory"
 fi
 
 echo "You need to include the memhook library in your Makefile:"

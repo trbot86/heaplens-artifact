@@ -1,0 +1,542 @@
+{
+  "page_budget": 128,
+  "coverage": [
+    {
+      "name": "efrb-illustrative",
+      "page_size": 4096,
+      "max_page_records": 64,
+      "results": [
+        {
+          "record_budget": null,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            18,
+            22
+          ],
+          "selected_records_range": [
+            852,
+            1108
+          ],
+          "selection_ms_median": 0.1706150360405445
+        },
+        {
+          "record_budget": 25000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            18,
+            22
+          ],
+          "selected_records_range": [
+            852,
+            1108
+          ],
+          "selection_ms_median": 0.21561910398304462
+        },
+        {
+          "record_budget": 50000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            18,
+            22
+          ],
+          "selected_records_range": [
+            852,
+            1108
+          ],
+          "selection_ms_median": 0.19921781495213509
+        },
+        {
+          "record_budget": 100000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            18,
+            22
+          ],
+          "selected_records_range": [
+            852,
+            1108
+          ],
+          "selection_ms_median": 0.19396701827645302
+        }
+      ]
+    },
+    {
+      "name": "hnsw-c2c-retained",
+      "page_size": 4096,
+      "max_page_records": 60,
+      "results": [
+        {
+          "record_budget": null,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            121,
+            128
+          ],
+          "selected_records_range": [
+            3522,
+            4027
+          ],
+          "selection_ms_median": 18.813311820849776
+        },
+        {
+          "record_budget": 25000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            125,
+            128
+          ],
+          "selected_records_range": [
+            3481,
+            3929
+          ],
+          "selection_ms_median": 27.659751242026687
+        },
+        {
+          "record_budget": 50000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            125,
+            128
+          ],
+          "selected_records_range": [
+            3481,
+            3929
+          ],
+          "selection_ms_median": 28.04435254074633
+        },
+        {
+          "record_budget": 100000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            125,
+            128
+          ],
+          "selected_records_range": [
+            3481,
+            3929
+          ],
+          "selection_ms_median": 28.1659122556448
+        }
+      ]
+    },
+    {
+      "name": "hnsw-nasus-retained",
+      "page_size": 4096,
+      "max_page_records": 53,
+      "results": [
+        {
+          "record_budget": null,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            120,
+            128
+          ],
+          "selected_records_range": [
+            3412,
+            3980
+          ],
+          "selection_ms_median": 9.554392891004682
+        },
+        {
+          "record_budget": 25000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            126,
+            128
+          ],
+          "selected_records_range": [
+            3553,
+            4007
+          ],
+          "selection_ms_median": 14.145797584205866
+        },
+        {
+          "record_budget": 50000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            126,
+            128
+          ],
+          "selected_records_range": [
+            3553,
+            4007
+          ],
+          "selection_ms_median": 14.13254626095295
+        },
+        {
+          "record_budget": 100000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            126,
+            128
+          ],
+          "selected_records_range": [
+            3553,
+            4007
+          ],
+          "selection_ms_median": 14.229054562747478
+        }
+      ]
+    },
+    {
+      "name": "tpcc-bcco-2m",
+      "page_size": 2097152,
+      "max_page_records": 1102,
+      "results": [
+        {
+          "record_budget": null,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            34254,
+            46269
+          ],
+          "selection_ms_median": 0.877076992765069
+        },
+        {
+          "record_budget": 25000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            82,
+            100
+          ],
+          "selected_records_range": [
+            24996,
+            25000
+          ],
+          "selection_ms_median": 1.5500360168516636
+        },
+        {
+          "record_budget": 50000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            34460,
+            45047
+          ],
+          "selection_ms_median": 1.4925806317478418
+        },
+        {
+          "record_budget": 100000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            34460,
+            45047
+          ],
+          "selection_ms_median": 1.4872797764837742
+        }
+      ]
+    },
+    {
+      "name": "tpcc-bcco-retained",
+      "page_size": 4096,
+      "max_page_records": 512,
+      "results": [
+        {
+          "record_budget": null,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            5315,
+            8577
+          ],
+          "selection_ms_median": 4.958572564646602
+        },
+        {
+          "record_budget": 25000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            5186,
+            8489
+          ],
+          "selection_ms_median": 7.677554851397872
+        },
+        {
+          "record_budget": 50000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            5186,
+            8489
+          ],
+          "selection_ms_median": 7.588397478684783
+        },
+        {
+          "record_budget": 100000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            5186,
+            8489
+          ],
+          "selection_ms_median": 7.627600338310003
+        }
+      ]
+    },
+    {
+      "name": "valkey-full",
+      "page_size": 4096,
+      "max_page_records": 256,
+      "results": [
+        {
+          "record_budget": null,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            3526,
+            9607
+          ],
+          "selection_ms_median": 4.888623021543026,
+          "genuine_rax_successes": 20
+        },
+        {
+          "record_budget": 25000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            3373,
+            9605
+          ],
+          "selection_ms_median": 7.880031364038587,
+          "genuine_rax_successes": 20
+        },
+        {
+          "record_budget": 50000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            3373,
+            9605
+          ],
+          "selection_ms_median": 7.811074843630195,
+          "genuine_rax_successes": 20
+        },
+        {
+          "record_budget": 100000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            128,
+            128
+          ],
+          "selected_records_range": [
+            3373,
+            9605
+          ],
+          "selection_ms_median": 7.811724906787276,
+          "genuine_rax_successes": 20
+        }
+      ]
+    },
+    {
+      "name": "valkey-packaged",
+      "page_size": 4096,
+      "max_page_records": 256,
+      "results": [
+        {
+          "record_budget": null,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            93,
+            99
+          ],
+          "selected_records_range": [
+            6746,
+            6851
+          ],
+          "selection_ms_median": 0.7935205940157175
+        },
+        {
+          "record_budget": 25000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            93,
+            100
+          ],
+          "selected_records_range": [
+            6745,
+            6852
+          ],
+          "selection_ms_median": 1.1080480180680752
+        },
+        {
+          "record_budget": 50000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            93,
+            100
+          ],
+          "selected_records_range": [
+            6745,
+            6852
+          ],
+          "selection_ms_median": 1.084645977243781
+        },
+        {
+          "record_budget": 100000,
+          "trials": 20,
+          "all_clusters": 20,
+          "all_types": 20,
+          "selected_pages_range": [
+            93,
+            100
+          ],
+          "selected_records_range": [
+            6745,
+            6852
+          ],
+          "selection_ms_median": 1.0756449773907661
+        }
+      ]
+    }
+  ],
+  "browser_stress": [
+    {
+      "records": 50000,
+      "kind": "live",
+      "trials": 3,
+      "transport": [
+        "playwright-route"
+      ],
+      "ready_ms_median": 1990,
+      "slider_proxy_ms_median": 112,
+      "slider_proxy_ms_max": 128.90000009536743,
+      "errors": 0
+    },
+    {
+      "records": 50000,
+      "kind": "churn",
+      "trials": 3,
+      "transport": [
+        "playwright-route"
+      ],
+      "ready_ms_median": 1961.2999997138977,
+      "slider_proxy_ms_median": 106.5,
+      "slider_proxy_ms_max": 125.89999961853027,
+      "errors": 0
+    },
+    {
+      "records": 100000,
+      "kind": "live",
+      "trials": 3,
+      "transport": [
+        "playwright-route"
+      ],
+      "ready_ms_median": 2076.8999996185303,
+      "slider_proxy_ms_median": 112.90000009536743,
+      "slider_proxy_ms_max": 125.30000019073486,
+      "errors": 0
+    },
+    {
+      "records": 100000,
+      "kind": "churn",
+      "trials": 3,
+      "transport": [
+        "playwright-route"
+      ],
+      "ready_ms_median": 2123.800000190735,
+      "slider_proxy_ms_median": 112.19999980926514,
+      "slider_proxy_ms_max": 124.80000019073486,
+      "errors": 0
+    },
+    {
+      "records": 250000,
+      "kind": "live",
+      "trials": 1,
+      "transport": [
+        "http"
+      ],
+      "ready_ms_median": 1732.1999998092651,
+      "slider_proxy_ms_median": 117.2000002861023,
+      "slider_proxy_ms_max": 132.40000009536743,
+      "errors": 0
+    }
+  ],
+  "browser_scope": "128 two-MiB rows; synthetic live/churn histories; fixed real cache/statistics payload; no dense full-page zoom claim",
+  "response_metric": "input-handler entry to second requestAnimationFrame, not paint latency or FPS"
+}

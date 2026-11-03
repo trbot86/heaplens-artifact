@@ -96,7 +96,7 @@ class Table1Routing(unittest.TestCase):
 
     @unittest.skipUnless(sys.platform == 'linux', 'Uses the existing POSIX checkout lock')
     def test_efrb_figure_default_override_and_performance_remain_distinct(self):
-        for name,override,expected in [('ascylib_efrb',None,'2'),('ascylib_efrb',7,'7'),
+        for name,override,expected in [('ascylib_efrb',None,'4'),('ascylib_efrb',7,'7'),
                                        ('ascylib_efrb_bench',None,'4')]:
             with tempfile.TemporaryDirectory() as tmp:
                 root=Path(tmp)

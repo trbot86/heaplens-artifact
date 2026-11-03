@@ -1,0 +1,15 @@
+{
+  "original_sha256": "6647b4cd6acee31c6df754a3bc62cbd401c33ff8a877312308274228e1a4d702",
+  "pre_optimization_sha256": "7760f0f5c266edfb4b16d976923cba5e40a6becce3166fc7162654c6e8d2c366",
+  "executed_sha256": "73d1a4545a92e411173c3cd4afa19251d01581d727e30e1e85a029e258120ffa",
+  "default_changes": {
+    "record_budget": 1000000
+  },
+  "source": "unified-selection-20261009/fast-selection-v1/deployment.json",
+  "imported_paths": [
+    "sifter_vis_d3/server/temporal_fingerprints.py",
+    "sifter_vis_d3/server/cluster_priority.py",
+    "artifact/tests/test_temporal_fingerprints.py",
+    "artifact/tests/test_cluster_priority.py"
+  ]
+}

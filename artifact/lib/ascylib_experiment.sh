@@ -51,9 +51,9 @@ run_ascylib_experiment() {
     local INSTRUMENTED="${WORK}/instrumented"
     local MEMHOOK_DIR="$SIFTER_ROOT/memhook"
 
-    # EFRB diagnostic figures use two workers; Table 1 uses four separately.
+    # Final EFRB figures and Table 1 both use four workers (smoke overrides two).
     local default_threads=24
-    [[ "$out_name" != ascylib_efrb ]] || default_threads=2
+    [[ "$out_name" != ascylib_efrb ]] || default_threads=4
     local THREADS="${THREADS:-$default_threads}"
     local INITIAL="${INITIAL:-262144}"   # 2^18
     local RANGE="${RANGE:-524288}"       # ASCYLIB convention: 2x initial
@@ -79,6 +79,7 @@ PY
     cp -r "$ASCYLIB_SRC" "$SRC_COPY"
     source "$SIFTER_ROOT/artifact/lib/prepare_ascylib.sh"
     prepare_ascylib "$SIFTER_ROOT" "$SRC_COPY"
+    python3 "$SIFTER_ROOT/artifact/lib/ascylib_readonly.py" "$SRC_COPY"
     local SSMEM_LIB_DIR="$WORK/trace-ssmem"
     prepare_ascylib_trace_ssmem "$SIFTER_ROOT" "$SSMEM_LIB_DIR"
     # Clang rejects GCC's legacy cast-as-lvalue assembly output operands.
@@ -160,7 +161,11 @@ PY
         if [[ "$out_name" == ascylib_hj && "$variant" == baseline ]]; then
             preload+=":$SIFTER_ROOT/artifact/vendor/heaplens-allocators/libjemalloc-heaplens.so"
         fi
-        LD_PRELOAD="$preload" "../../bin/${binary_name}" -i "$INITIAL" -r "$RANGE" -n "$THREADS" -u "$UPDATE_PCT" -d "$DURATION_MS"
+        local placement=()
+        if [[ -n "${TRACE_CPUS:-}" ]]; then
+            placement=(numactl "--physcpubind=$TRACE_CPUS" "--${TRACE_MEMORY:-membind}=${TRACE_NODE:-0}")
+        fi
+        "${placement[@]}" env LD_PRELOAD="$preload" "../../bin/${binary_name}" -i "$INITIAL" -r "$RANGE" -n "$THREADS" -u "$UPDATE_PCT" -d "$DURATION_MS"
     )
     # Expected outputs in $INSTRUMENTED/$tree_src_dir: binary_dump.txt,
     # fileset_dump.txt, typeset_dump.txt, fielddump.txt
@@ -168,6 +173,7 @@ PY
     echo "=== [$out_name] 7/7: sample into sqlite database ==="
     cd "$SIFTER_ROOT"
     ./sifter.sh "$INSTRUMENTED" -d -s "$tree_src_dir" \
+        --num-buckets 2000 \
         --sample "$SAMPLE_PROPORTION" \
         --pages-per-type "$PAGES_PER_TYPE" \
         --field-dump fielddump.txt

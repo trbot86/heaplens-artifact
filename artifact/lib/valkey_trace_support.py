@@ -11,6 +11,7 @@ import re
 import shlex
 import shutil
 import signal
+import socket
 import sqlite3
 import subprocess
 import sys
@@ -889,6 +890,11 @@ def instrument_valkey(
 
     print("==> Adding Valkey semantic allocator logging shims")
     patch_valkey_semantic_allocators(instrumented_dir)
+    if __package__:
+        from .valkey_terminal import patch_source
+    else:
+        from valkey_terminal import patch_source
+    patch_source(instrumented_dir)
 
     for name in ("compile_commands.json", "fielddump.txt", "fileset_dump.txt", "typeset_dump.txt", "fixes.yaml"):
         copy_if_exists(instrumented_dir / name, run_dir / name)
@@ -938,6 +944,9 @@ def build_baseline_valkey(
     print("==> Building no-HeapLENS Valkey for measured throughput")
     copy_clean_valkey(source_dir, baseline_dir)
     clean_instrumented_build(baseline_dir, build_log)
+    jemalloc_dir = baseline_dir / "deps" / "jemalloc"
+    if malloc_backend == "jemalloc" and not (jemalloc_dir / "configure").is_file():
+        run_stream(["autoconf"], build_log, cwd=jemalloc_dir, echo=False, mode="a")
     run_stream(
         valkey_make_cmd(jobs, with_memhook=False, malloc_backend=malloc_backend),
         build_log,
@@ -972,6 +981,25 @@ def wait_for_server(
             raise BenchmarkError(f"Valkey server exited during startup. See {server_log}")
         time.sleep(0.1)
     raise BenchmarkError(f"Valkey server did not become ready on port {port}. See {server_log}")
+
+
+def finish_trace_producers(port: int, server_proc: subprocess.Popen[str]) -> None:
+    """Seal every persistent producer after load; failure forbids conversion."""
+    deadline = time.monotonic() + 90
+    with socket.create_connection(("127.0.0.1", port), timeout=5) as sock:
+        stream = sock.makefile("rb")
+        while time.monotonic() < deadline:
+            if server_proc.poll() is not None:
+                raise BenchmarkError("trace server exited before producer finalization")
+            sock.settimeout(max(0.1, deadline - time.monotonic()))
+            sock.sendall(b"*2\r\n$5\r\nDEBUG\r\n$15\r\nheaplens-finish\r\n")
+            reply = stream.readline(4096)
+            if reply == b"+OK\r\n":
+                return
+            if not reply.startswith(b"-ERR HeapLENS producers not quiescent"):
+                raise BenchmarkError(f"trace finalization rejected: {reply!r}")
+            time.sleep(0.1)
+    raise BenchmarkError("trace producer finalization timed out; trace invalid")
 
 
 def shutdown_server(
@@ -1362,6 +1390,7 @@ def run_inside_container(args: argparse.Namespace) -> None:
         server_cpus,
         no_numa_pin=args.no_numa_pin,
     )
+    server_cmd += ["--enable-debug-command", "yes"]
     client_prefix = pin_prefix(client_cpus, CLIENT_NUMA_NODE, no_numa_pin=args.no_numa_pin)
     cli_env = runtime_env(cli_dump)
     server_env = runtime_env(binary_dump)
@@ -1409,10 +1438,13 @@ def run_inside_container(args: argparse.Namespace) -> None:
                 run([str(cli), "-h", "127.0.0.1", "-p", str(args.port), "info", "stats"], env=cli_env, check=False).stdout,
                 encoding="utf-8",
             )
+        finish_trace_producers(args.port, server_proc)
     finally:
         print("==> Shutting down instrumented Valkey")
         shutdown_server(cli, args.port, server_proc, cli_env)
 
+    if server_proc.returncode != 0:
+        raise BenchmarkError("trace server did not exit successfully; refusing conversion")
     db_path = convert_trace(run_dir, args)
     viz_link = link_for_visualization(run_dir, db_path)
 

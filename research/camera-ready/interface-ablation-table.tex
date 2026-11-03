@@ -1,0 +1,22 @@
+% Compact option: two distinct mechanisms, two representative operations.
+% Full six-row table and detailed methods are in PAPER_PROCESSING_OPTIMIZATIONS.md.
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrr}
+\hline
+Operation & Before (s) & After (s) \\
+\hline
+Cache-type toggle, 128 huge pages & 0.571 & 0.137 \\
+64-KiB selection, one dense page & 18.751 & 0.381 \\
+\hline
+\end{tabular}
+\caption{Frontend responsiveness with identical input payloads, reporting
+medians from three interleaved trials per implementation. The first row
+compares all-bucket with selected-bucket summaries (including removal of debug
+logging in the replaced aggregation); the second compares constructing all
+page details with filtering histories to the selected region before component
+construction. Response time ends at a second animation-frame callback, not
+physical display presentation. Backend preparation is excluded.}
+\label{tab:heaplens-interface-ablation}
+\end{table}

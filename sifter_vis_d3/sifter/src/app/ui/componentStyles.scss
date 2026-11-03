@@ -96,6 +96,13 @@ $timeGraphSliderThumbWidth: 12px;
     height: $pageCardSVGHeight;
 }
 
+.pageRowSlot {
+    // Match the fixed row height, including while its contents are unmounted.
+    height: $pageCardSVGHeight;
+    flex: 0 0 $pageCardSVGHeight;
+    width: 100%;
+}
+
 .pageCardDiv {
     display: inline;
     overflow: visible;

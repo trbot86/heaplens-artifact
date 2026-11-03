@@ -1,0 +1,79 @@
+{
+  "base": "89ec644c80b05e87e2c4a750ce2e770ba02c5141",
+  "camera_ready": "884fb19ccc519932203e7fcc5d5b4261bcc7cbfb",
+  "imports": [
+    {
+      "source": "artifact-sampling-work-20261007/sifter_vis_d3/server/temporal_fingerprints.py",
+      "source_sha256": "27d48de94cf1966115a9bdf607f52c2b695d379dd5985e758b2dcafb19e5d149",
+      "target": "sifter_vis_d3/server/temporal_fingerprints.py",
+      "target_sha256": "6bcd07a1d321422578608e3a95bef6a7b2748f9ea18c5dfba1374fd0c2703c37"
+    },
+    {
+      "source": "artifact-sampling-work-20261007/sifter_vis_d3/server/cluster_priority.py",
+      "source_sha256": "1f69e20bd8a4d9d1c06377c90676cd100d9d2331a8fbef5062c9adb0d4fda236",
+      "target": "sifter_vis_d3/server/cluster_priority.py",
+      "target_sha256": "1f69e20bd8a4d9d1c06377c90676cd100d9d2331a8fbef5062c9adb0d4fda236"
+    },
+    {
+      "source": "artifact-sampling-work-20261007/sifter_vis_d3/sifter/src/app/ui/pagesComponent.tsx",
+      "source_sha256": "1f871716ac7d2f3e694aad3544d27c7b57b3897487524af27537493cf573ce17",
+      "target": "sifter_vis_d3/sifter/src/app/ui/pagesComponent.tsx",
+      "target_sha256": "ac7fc689deea31dcc2a3eef9ecfe25dd52b120967956b6c2a9409b1d9234e18e",
+      "imported_target_sha256": "1f871716ac7d2f3e694aad3544d27c7b57b3897487524af27537493cf573ce17",
+      "post_import_change": "Production frontend type/build repairs and state-update fixes: explicit detail zoom dependencies, reset on geometry/region change, and scoped D3 cleanup; verified in browser."
+    },
+    {
+      "source": "artifact-sampling-work-20261007/sifter_vis_d3/sifter/src/app/ui/componentStyles.scss",
+      "source_sha256": "883e367908dbe6434c3be657a3fc25c059f8e74d572f5a11d7e144eb82a50146",
+      "target": "sifter_vis_d3/sifter/src/app/ui/componentStyles.scss",
+      "target_sha256": "883e367908dbe6434c3be657a3fc25c059f8e74d572f5a11d7e144eb82a50146"
+    },
+    {
+      "source": "artifact-sampling-work-20261007/sifter_vis_d3/sifter/src/app/ui/visiblePageRow.tsx",
+      "source_sha256": "eaa2ac432920dd1d386b24fda7264eb449a2197ad75d66c99b8426216a240bac",
+      "target": "sifter_vis_d3/sifter/src/app/ui/visiblePageRow.tsx",
+      "target_sha256": "eaa2ac432920dd1d386b24fda7264eb449a2197ad75d66c99b8426216a240bac"
+    },
+    {
+      "source": "artifact-tools/walkthrough-layout-20261009/actual-tpcc-hj64/frontend/src/app/ui/timestampClock.ts",
+      "source_sha256": "6fe68d87460a785a560f37b211f764801554d61d24ef532003572a23175c92c2",
+      "target": "sifter_vis_d3/sifter/src/app/ui/timestampClock.ts",
+      "target_sha256": "6fe68d87460a785a560f37b211f764801554d61d24ef532003572a23175c92c2"
+    },
+    {
+      "source": "artifact-tools/bcco-jemalloc53-thp-20261010/downloaded/fig9_probe.h",
+      "source_sha256": "8b8a442c422d8851425bd55c597aa81bbefd21b744f50b72bf434d6c2f2f90f6",
+      "target": "artifact/lib/bcco_figure_probe.h",
+      "target_sha256": "8b8a442c422d8851425bd55c597aa81bbefd21b744f50b72bf434d6c2f2f90f6"
+    },
+    {
+      "source": "artifact-tools/bcco-jemalloc53-thp-20261010/downloaded/probe.cpp",
+      "source_sha256": "165ef8ab2ce6c7e73e2f727a9ac2bb4fc467e2929365c8c7a7c505a364bb0320",
+      "target": "artifact/lib/bcco_figure_preflight.cpp",
+      "target_sha256": "62ac1cdc7a13424ce86aec12c02e79c4a9ce3cbc261d6f3541aab586003b48db"
+    }
+  ],
+  "unchanged_main_files": {
+    "artifact/table1.py": "7692934195353610f6b37e6e0993820fd8a75c24e2d0378b3f0964d998890d7a",
+    "artifact/headline-pmu/reproduction/launch.py": "4d822f84678ec70f50dc763b4a075a7659838d4465b3a82fa63b351e6ae68e83",
+    "artifact/headline-pmu/reproduction/protocol.py": "b88d0e5a30aaa0b3b63fb3dd1dec463101aed7747f553fb34c117fa3da836fbd",
+    "artifact/headline-pmu/reproduction/source-manifest.json": "07dd7e642cfb678d473b3d571de259296e55ce63e29018a43103f8d45e3dd002",
+    "sifter_vis_d3/server/field_type_aliases.py": "6e3c24366b437af4f6b8c221dab7b124ee2c89ec16dc92dcd65d730575c00bb8",
+    "sifter_vis_d3/server/cache_limits.py": "af5acc052cbd451bf130c92280cc85ee8f162072d0e39c792fc32678c3d5d2f8",
+    "artifact/lib/rocksdb_timing.py": "003bd441d747eefe383560b940a8aa64424fb15fe4589be8ba691a79ff5478f8"
+  },
+  "new_adapters": [
+    "representative_selection.py",
+    "trace_clock.py",
+    "artifact/select_pages.py",
+    "artifact/lib/hj_figure.py",
+    "artifact/lib/bcco_figure.py",
+    "artifact/final-paper/summarize.py"
+  ],
+  "excluded_prototypes": [
+    "max_fill",
+    "concatenated_fingerprints",
+    "balanced25 default"
+  ],
+  "conflict_choices": "Retain main Table 1 routes, HSL aliases, stable lifetime order, cache budget checks and truthful cache tooltip; merge CR counting/UI changes around them."
+}

@@ -7,11 +7,16 @@ if [[ "${1:-}" == build ]]; then
     exec docker build -f "$ROOT/artifact/Dockerfile" -t "$IMAGE" "$ROOT"
 fi
 if [[ $# == 0 ]]; then
-    echo 'Usage: bash artifact/run.sh build|doctor|history|smoke|export|gui|hnsw|hnsw-factorization|valkey|rocksdb|experiment|overhead|all-performance [options]'
+    echo 'Usage: bash artifact/run.sh build|doctor|history|smoke|export|gui|select-pages|hnsw|hnsw-factorization|valkey|rocksdb|experiment|overhead|all-performance [options]'
     exit 2
 fi
+driver=(python3 artifact/ae.py)
+if [[ "$1" == select-pages ]]; then
+    driver=(python3 artifact/select_pages.py)
+    shift
+fi
 extra=()
-if [[ "$1" == gui ]]; then extra=(-p 127.0.0.1:3000:3000 -p 127.0.0.1:5000:5000); fi
+if [[ "${1:-}" == gui ]]; then extra=(-p 127.0.0.1:3000:3000 -p 127.0.0.1:5000:5000); fi
 # Optional narrowly scoped permissions for NUMA/perf on dedicated Linux hosts.
 # Smoke/GUI/export do not need these. Never pass --privileged by default.
 if [[ "${HEAPLENS_NUMA:-0}" == 1 ]]; then extra+=(--security-opt seccomp=unconfined); fi
@@ -34,4 +39,4 @@ exec docker run --rm -i --init "${extra[@]}" -e NEXT_TELEMETRY_DISABLED=1 \
     -e HEAPLENS_CACHE_BUDGET_MB="${HEAPLENS_CACHE_BUDGET_MB:-4096}" \
     -e HEAPLENS_HOST_ROOT="$ROOT" \
     -e PERFBENCH_PERF="${PERFBENCH_PERF:-on}" \
-    -v "$ROOT:/root/sifter" -w /root/sifter "$IMAGE" python3 artifact/ae.py "$@"
+    -v "$ROOT:/root/sifter" -w /root/sifter "$IMAGE" "${driver[@]}" "$@"

@@ -1,7 +1,8 @@
 'use client';
 import { Avatar, CssBaseline, List, ListItem, ListItemAvatar, ListItemText, ListItemButton, TextField, Paper } from '@mui/material';
-import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import './page.scss';
+import { theme, getNotesForFile } from './ui/appShared';
 import { useEffect, useState } from 'react';
 import { EditNote, KeyboardArrowRight, Storage } from '@mui/icons-material';
 import Box from '@mui/material/Box';
@@ -28,38 +29,6 @@ async function getLogFiles() {
     });
     return data;
 }
-
-export async function getNotesForFile(fname: string) {
-    const data = await fetch(`http://localhost:5000/log-data/get-notes/${fname}`, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-    });
-    const json = await data.json();
-    return [fname, json];
-}
-
-export const theme: Theme = createTheme({
-    palette: {
-        mode: 'dark',
-        primary: {
-            main: '#e0e0e0',
-            contrastText: '#e9e7e5',
-        },
-        secondary: {
-            main: '#bea7da',
-        },
-        background: {
-            default: '#282828',
-            paper: '#212121',
-        },
-        success: {
-            main: '#42c947',
-        },
-    },
-});
 
 export default function FileSelect() {
     const [files, setFiles] = useState([]);
