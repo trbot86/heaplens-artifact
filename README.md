@@ -2,13 +2,15 @@
 
 **ACM ATC 2026 artifact (paper 483): start with [artifact/README.md](artifact/README.md).**
 
-The [archived artifact release 2026.10.09](https://zenodo.org/records/23255614)
-is available at DOI [10.5281/zenodo.23255614](https://doi.org/10.5281/zenodo.23255614).
+The latest archived artifact is [release 2026.11.02](https://zenodo.org/records/23905628),
+DOI [10.5281/zenodo.23905628](https://doi.org/10.5281/zenodo.23905628).
 The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284) resolves to the latest release.
 
-This checkout also contains the final-paper integration candidate described in
-[its validation record](artifact/integration/VALIDATION.md); those changes are
-not part of the linked October 9 archive.
+[Version 2026.10.09](https://zenodo.org/records/23255614) was accepted through
+artifact evaluation for the claims in the submitted paper. This update supports
+the expanded claims in the accepted paper and includes fixes for missing
+allocation records, retirement ordering, complete log writes, and GUI views
+that could display stale data. See the [integration validation record](artifact/integration/VALIDATION.md).
 
 It contains the container quick start, experiment-to-paper map, guided example,
 optional LLM workflow, and explicit verification status. The older developer

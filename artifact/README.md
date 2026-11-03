@@ -2,14 +2,16 @@
 
 **Paper:** *HeapLENS: Heap Layout Evaluation & Navigation Suite*, paper 483.
 
-**Archived artifact:** [Zenodo release 2026.10.09](https://zenodo.org/records/23255614),
-DOI [10.5281/zenodo.23255614](https://doi.org/10.5281/zenodo.23255614).
-The linked archive is the historical October 9 release, not this integration
-candidate. It includes the corrected Table 1 command routing, two-worker EFRB
-figure defaults, and frozen-source reconstruction repairs, together with the
-previous Figure 6/8 fixes. See the [release notes](RELEASE_NOTES_20261009_ROUTING.md)
-for validation scope. The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284)
+**Latest archived artifact:** [Zenodo release 2026.11.02](https://zenodo.org/records/23905628),
+DOI [10.5281/zenodo.23905628](https://doi.org/10.5281/zenodo.23905628).
+The [all-versions DOI](https://doi.org/10.5281/zenodo.23206284)
 resolves to the latest release. Pinned dependencies are included in the archive.
+
+[Version 2026.10.09](https://zenodo.org/records/23255614) was accepted through
+artifact evaluation for the claims in the submitted paper. This update supports
+the expanded claims in the accepted paper and includes fixes for missing
+allocation records, retirement ordering, complete log writes, and GUI views
+that could display stale data.
 
 This checkout targets the final camera-ready paper (October 16 source), including
 four-worker EFRB figures, corrected collection, adaptive buffering and final
