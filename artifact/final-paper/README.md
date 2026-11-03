@@ -66,9 +66,12 @@ the SHA-256 of its original JSON; the export also checked every full-method
 result against the separately retained paired baseline.
 
 The eleven full database inputs remain outside this compact source package.
-Their recorded paths and sizes were checked on November 2; no large database
-was transferred or scanned during this check. Their public distribution and
-full frozen-study replay packaging remain release tasks.
+Together they occupy 62.3 GiB as SQLite files, before any archive compression;
+a compressed archive size has not been measured. They are retained by the authors.
+This release distributes the compact per-trial evidence and small runnable
+examples, without requiring a bulk database download. The verifier checks saved
+results; it does not rerun the full study. Exact full-study replay requires
+those retained inputs and the frozen study environment.
 
 Table 4 uses twelve patterns from the ten Table 1 baselines. The ablation prose
 also includes a thirteenth rare optimized-InlineSkipList mixture. Keep those
@@ -116,9 +119,10 @@ tests compare the normal path with them across all four methods and seeded cases
 
 Full raw reconstruction is an expensive optional activity, not part of this
 check: the recorded HSL stage reached about 202 GiB process-group RSS and took
-46 minutes; TPC-C/EFRB feature preparation took 2.3 hours. Large input distribution
-and a complete frozen-study replay package remain separate release tasks. Do not
-substitute later BCCO/ASCYLIB captures for the fixed study inputs.
+46 minutes; TPC-C/EFRB feature preparation took 2.3 hours. Full study inputs are
+not included in the compact release. Do not substitute later BCCO/ASCYLIB
+captures for the fixed study inputs or treat a small example as an exact replay
+of the full study.
 
 ## Other results
 

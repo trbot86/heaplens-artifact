@@ -1,6 +1,6 @@
 'use client';
 import { TypeToColourMap, generateColours, getData, requestErrorMessage, getSubtypeName, getTypeName } from '../ui/appShared';
-import { Suspense, ChangeEvent, forwardRef, useEffect, useRef, useState } from 'react';
+import { Fragment, Suspense, ChangeEvent, forwardRef, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import Legend, { SubtypeEntry } from '../ui/legendComponent';
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
@@ -266,7 +266,7 @@ const SettingsButton = forwardRef(function SettingsButton({ maxRunLength, setMax
                             <ToggleButtonGroup 
                                 value={pageSizeSetting}
                                 exclusive
-                                onChange={(e, v) => setPageSizeSetting(v)} >
+                                onChange={(e, v) => { if (v !== null) setPageSizeSetting(v); }} >
                                 <ToggleButton value={4096} >4 KiB</ToggleButton>
                                 <ToggleButton value={2097152} >2 MiB</ToggleButton>
                             </ToggleButtonGroup>
@@ -293,7 +293,7 @@ const SettingsButton = forwardRef(function SettingsButton({ maxRunLength, setMax
                                 value={cacheLineSizeSetting}
                                 exclusive
                                 size='small'
-                                onChange={(e, v) => setCacheLineSizeSetting(v)} >
+                                onChange={(e, v) => { if (v !== null) setCacheLineSizeSetting(v); }} >
                                 <ToggleButton value={16} >16 B</ToggleButton>
                                 <ToggleButton value={32} >32 B</ToggleButton>
                                 <ToggleButton value={64} >64 B</ToggleButton>
@@ -302,7 +302,7 @@ const SettingsButton = forwardRef(function SettingsButton({ maxRunLength, setMax
                             </ToggleButtonGroup>
                         </Grid>
                         {
-                            Object.keys(cacheInfoSetting).map((cname) =>    <>
+                            Object.keys(cacheInfoSetting).map((cname) =>    <Fragment key={cname}>
                                                                                 <Grid
                                                                                     className='settingsTextLabel'
                                                                                     size={3}>
@@ -330,6 +330,7 @@ const SettingsButton = forwardRef(function SettingsButton({ maxRunLength, setMax
                                                                                             exclusive
                                                                                             size='small'
                                                                                             onChange={(e, v) => {
+                                                                                                if (v === null) return;
                                                                                                 const newCacheSizeUnitSetting = structuredClone(cacheSizeUnitSetting);
                                                                                                 newCacheSizeUnitSetting[cname] = v;
                                                                                                 setCacheSizeUnitSetting(newCacheSizeUnitSetting);
@@ -354,7 +355,7 @@ const SettingsButton = forwardRef(function SettingsButton({ maxRunLength, setMax
                                                                                             }} />
                                                                                     </Box>
                                                                                 </Grid>
-                                                                            </>)
+                                                                            </Fragment>)
                         }
                     </Grid>
                     }
@@ -365,13 +366,7 @@ const SettingsButton = forwardRef(function SettingsButton({ maxRunLength, setMax
     );
 });
 
-function VisPanels() {
-    const shouldInitialize = useRef(true);
-    const searchParams = useSearchParams();
-    const fname = searchParams.get('fname');
-    const requestedBuckets = Number(searchParams.get('buckets'));
-    const initialBuckets = Number.isInteger(requestedBuckets) && requestedBuckets >= 1 && requestedBuckets <= INIT_NUM_BUCKETS
-        ? requestedBuckets : INIT_NUM_BUCKETS;
+function VisPanels({fname, initialBuckets}: {fname: string | null; initialBuckets: number}) {
     const [loading, setLoading] = useState(true);
     const [initialized, setInitialized] = useState(false);
     const [requestError, setRequestError] = useState<string | null>(null);
@@ -435,146 +430,77 @@ function VisPanels() {
     const [notesText, setNotesText] = useState<string>('');
 
     useEffect(() => {
-        if (shouldInitialize.current) {
-            shouldInitialize.current = false;
-            getData(`init-app/${fname}-${pageSize}-${cacheLineSize}-${numBuckets}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${Object.values(INIT_CACHE_INFO)[0].size}-${Object.values(INIT_CACHE_INFO)[0].assoc}?page_budget=${pageBudget}&record_budget=${recordBudget}&seed=${selectionSeed}`, null)
-                    .then((resp) => resp.json())
-                    .then(async (allData) => {
-                        // setTypesToSample(allData['types'].reduce((map: {[a: string]: boolean}, tp: string) => {
-                        //     map[tp] = true;
-                        //     return map;
-                        // }, {}));
-                        const allFieldNames: string[] = [];
-                        Object.keys(allData['linesAndStats']['fields']).forEach((tp: string) => {
-                            allData['linesAndStats']['fields'][tp].forEach((field: SubtypeEntry) => allFieldNames.push(getSubtypeName(tp, field.subtype)));
-                        });
-                        const allMaps = allData['types'].concat(allFieldNames)
-                            .reduce((map: {[tp: string]: boolean}, tp: string) => {
-                                map[tp] = true;
-                                return map;
-                            }, {});
-                        // setTypeVisMatrix(allTypeNames
-                        //     .reduce((map: {[tp: string]: {lineVis: boolean, pageVis: boolean, cacheVis: boolean}}, tp: string) => {
-                        //         map[tp] = {lineVis: true, pageVis: true, cacheVis: true};
-                        //         return map;
-                        // }, {}));
-                        setLineVis(allMaps);
-                        setPageVis(allMaps);
-                        setCacheVis(allMaps);
-                        setExpandedTypes(allData['types'].reduce((map: {[tp: string]: boolean}, tp: string) => {
-                            map[tp.replace(/\s+/g, '')] = false;
-                            return map;
-                        }, {}));
-
-                        await getData(`log-data/get-colours/${fname}`, null).then((resp) => resp.json())
-                            .then((json) => {
-                                let newColourMap = null;
-                                if (json.length > 0) {
-                                    newColourMap = json.reduce((map: TypeToColourMap, entry: {'type': string, 'colour': string}) => {
-                                                            map[entry['type']] = d3.color(entry['colour']);
-                                                            return map;
-                                                        }, {});
-                                }
-                                else {
-                                    newColourMap = generateColours(allData['types'].concat(allFieldNames));
-                                }
-                                setColourOfType(newColourMap);
-                                console.log("Here is the new colour map:");
-                                console.log(newColourMap);
-                                console.log("allData[types] =");
-                                console.log(allData['types']);
-                            })
-                            .catch((error: unknown) => {
-                                setColourOfType(generateColours(allData['types'].concat(allFieldNames)));
-                                setRequestError(requestErrorMessage(error));
-                            });
-
-                        // const numLinePts = allData['linesAndStats']['pts'].reduce((maxBucket: number, curr: LinePoint) => Math.max(curr['bucket'], maxBucket), 0);
-                        // const sortedLineData = allData['linesAndStats']['pts'].reduce((lineMap: {[tp: string]: {bucket: number, size: number}[]}, curr: LinePoint) => {
-                        //     if (!lineMap[curr['type']])
-                        //         lineMap[curr['type']] = new Array(numLinePts);
-                        //     lineMap[curr['type']][curr['bucket']] = {bucket: curr['bucket'], size: curr['size']};
-                        // }, {});
-                        // const sortedLineData = Object.keys(allData['linesAndStats']['pts']).reduce((map: {[tp: string]: SizePoint[]}, tp: string) => {
-                        //     map[tp] = allData['linesAndStats']['pts'][tp].toSorted((a: SizePoint, b: SizePoint) => a.ts - b.ts)
-                        //                 .filter((sp: SizePoint, i: number) => i == allData['linesAndStats']['pts'][tp].length - 1 || sp.ts < allData['linesAndStats']['pts'][tp][i+1].ts);
-                        //     return map;
-                        // }, {});
-
-                        const minTs: number = allData['linesAndStats']['minTs'];
-                        const maxTs: number = allData['linesAndStats']['maxTs'];
-
-                        // sortedLineData["void"] = [
-                        //     {size: 33554432, ts: minTs + 9213287},
-                        //     {size: 67108864, ts: minTs + 714029707},
-                        //     {size: 134217728, ts: minTs + 1948610102},
-                        //     {size: 268435456, ts: minTs + 5564825068}
-                        // ]; // TODO REMOVE THIS PLACEHOLDER DATA
-                        setTimeRange({min: minTs, max: maxTs});
-                        setGetBucketTs(() => {
-                            return (ts: number) => {
-                                const sizeOfBucket = Math.max(Math.floor((maxTs - minTs) / numBuckets), 1);
-                                return Math.ceil((ts - minTs) / sizeOfBucket);
-                            }
-                        });
-                        setCurrTs(minTs);
-                        setTimestampHz(allData['traceClock']?.timestamp_hz ?? null);
-                        setLineData(allData['linesAndStats']['pts']);
-                        setStatsData(allData['linesAndStats']['stats']);
-                        setFieldsData(allData['linesAndStats']['fields']);
-                        setCountsData(allData['linesAndStats']['counts']);
-
-                        const allAlignData = allData['linesAndStats']['align'].reduce(
-                            (map: {[tp: string]: {size: number, align: number, count: number}[]}, 
-                            entry: {'type': string, 'size': number, 'align': number, 'count': number}) => {
-                                if (!(entry['type'] in map))
-                                    map[entry['type']] = [];
-                                map[entry['type']].push({size: entry['size'], align: entry['align'], count: entry['count']});
-                                return map;
-                            }, {});
-                        setAlignData(allAlignData);
-                        const retPerfData: PerfMap = Object.keys(allData['linesAndStats']['perf'])
-                            .map((straddr: string) => parseInt(straddr))
-                            .filter((addr) => addr >= 0)
-                            .sort((a, b) => allData['linesAndStats']['perf'][b] - allData['linesAndStats']['perf'][a])
-                            .reduce((map: PerfMap, addr) => {
-                                map.addrs[addr] = allData['linesAndStats']['perf'][addr];
-                                if (!map.addrs[addr].stores)
-                                    map.addrs[addr].stores = 0;
-                                if (!map.addrs[addr].loads)
-                                    map.addrs[addr].loads = 0;
-                                map.avgAccesses += (map.addrs[addr].stores + map.addrs[addr].loads) / Object.keys(allData['linesAndStats']['perf']).length;
-                                return map;
-                            }, {addrs: {}, avgAccesses: 0});
-                        setPerfData(retPerfData);
-
-                        setPageData(allData['pagesData']['page_num_events']);
-                        setSelection(allData['pagesData']['selection'] ?? null);
-                        setClustersData(allData['pagesData']['clusters']);
-                        setSumClusterSizes(allData['pagesData']['sum_cluster_sizes']);
-                        setNumClusters(allData['pagesData']['num_clusters']);
-                        setFeaturesData(allData['pagesData']['features']);
-
-                        setCacheData(allData['cacheData']);
-                        setInitialized(true);
-                        console.log(`cache sets in settings: ${Math.floor(cacheInfoSetting[selCacheName].size / cacheLineSizeSetting)}, cache sets in data: ${allData['cacheData'].numSets}`);
-                        console.log(`cache info size: ${cacheInfoSetting[selCacheName].size}, cachelinesize setting: ${cacheLineSizeSetting}`);
-
-                        if (fname) {
-                            return getNotesForFile(fname)
-                                .then((resp: string[]) => {
-                                    setNotesText(resp[1]);
-                                    setLoading(false);
-                                });
-                        }
-                        else {
-                            setLoading(false);
-                        }
-                    })
-                    .catch((error: unknown) => setRequestError(requestErrorMessage(error)))
-                    .finally(() => setLoading(false));
+        let cancelled = false;
+        async function initialize() {
+            try {
+                if (!fname) throw new Error('Select a trace to open.');
+                // Initial settings belong to this trace. Editing settings later
+                // only takes effect through the explicit Resample action.
+                const resp = await getData(`init-app/${fname}-${INIT_PAGE_SIZE}-${INIT_CACHELINE_SIZE}-${initialBuckets}-${INIT_CLUSTER_ALG}-${INIT_MAX_RUN_LENGTH}-${INIT_MAX_RUNS_PER_CLUSTER}-${INIT_CACHE_INFO.L1.size}-${INIT_CACHE_INFO.L1.assoc}?page_budget=${INIT_PAGE_BUDGET}&record_budget=${INIT_RECORD_BUDGET}&seed=0`, null);
+                const allData = await resp.json();
+                if (cancelled) return;
+                const allFieldNames: string[] = [];
+                Object.keys(allData.linesAndStats.fields).forEach(tp => {
+                    allData.linesAndStats.fields[tp].forEach((field: SubtypeEntry) => allFieldNames.push(getSubtypeName(tp, field.subtype)));
+                });
+                const typeNames: string[] = allData.types.concat(allFieldNames);
+                let colours = generateColours(typeNames);
+                let notes = '';
+                try {
+                    const [savedColours, savedNotes] = await Promise.all([
+                        getData(`log-data/get-colours/${fname}`, null).then(response => response.json()),
+                        getNotesForFile(fname),
+                    ]);
+                    for (const entry of savedColours) colours[entry.type] = d3.color(entry.colour);
+                    notes = savedNotes[1];
+                } catch (error) {
+                    if (!cancelled) setRequestError(requestErrorMessage(error));
+                }
+                if (cancelled) return;
+                const allMaps = Object.fromEntries(typeNames.map(type => [type, true]));
+                setLineVis(allMaps); setPageVis(allMaps); setCacheVis(allMaps);
+                setExpandedTypes(Object.fromEntries(allData.types.map((type: string) => [type.replace(/\s+/g, ''), false])));
+                setColourOfType(colours); setNotesText(notes);
+                const minTs: number = allData.linesAndStats.minTs;
+                const maxTs: number = allData.linesAndStats.maxTs;
+                setTimeRange({min: minTs, max: maxTs});
+                const bucketSize = Math.max(Math.floor((maxTs - minTs) / initialBuckets), 1);
+                setGetBucketTs(() => (ts: number) => Math.ceil((ts - minTs) / bucketSize));
+                setCurrTs(minTs);
+                setTimestampHz(allData.traceClock?.timestamp_hz ?? null);
+                setLineData(allData.linesAndStats.pts);
+                setStatsData(allData.linesAndStats.stats);
+                setFieldsData(allData.linesAndStats.fields);
+                setCountsData(allData.linesAndStats.counts);
+                const align: {[tp: string]: {size: number; align: number; count: number}[]} = {};
+                for (const entry of allData.linesAndStats.align) (align[entry.type] ??= []).push(entry);
+                setAlignData(align);
+                const perf: PerfMap = {addrs: {}, avgAccesses: 0};
+                const perfEntries = Object.entries(allData.linesAndStats.perf)
+                    .map(([address, counters]) => [Number(address), counters] as const).filter(([address]) => address >= 0);
+                for (const [address, raw] of perfEntries) {
+                    const counters = raw as PerfMap['addrs'][number];
+                    perf.addrs[address] = {...counters, loads: counters.loads || 0, stores: counters.stores || 0};
+                    perf.avgAccesses += (perf.addrs[address].loads + perf.addrs[address].stores) / perfEntries.length;
+                }
+                setPerfData(perf);
+                setPageData(allData.pagesData.page_num_events);
+                setSelection(allData.pagesData.selection ?? null);
+                setClustersData(allData.pagesData.clusters);
+                setSumClusterSizes(allData.pagesData.sum_cluster_sizes);
+                setNumClusters(allData.pagesData.num_clusters);
+                setFeaturesData(allData.pagesData.features);
+                setCacheData(allData.cacheData);
+                setInitialized(true);
+            } catch (error) {
+                if (!cancelled) setRequestError(requestErrorMessage(error));
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
         }
-    }, []);
+        void initialize();
+        return () => { cancelled = true; };
+    }, [fname, initialBuckets]);
 
     return (
         <ThemeProvider theme={theme}>
@@ -731,7 +657,6 @@ function VisPanels() {
                                 disabled={resampling || cacheRequestLoading}
                                 onClick={() => {
                                     if (!resampling && !cacheRequestLoading) {
-                                        const fname = searchParams.get('fname');
                                         setRequestError(null);
                                         setResampling(true);
                                         getData(`get-pages-and-cache-data/${fname}-${pageSizeSetting}-${cacheLineSizeSetting}-${numBucketsSetting}-${clusterAlg}-${maxRunLength}-${maxRunsPerCluster}-${cacheInfoSetting[selCacheName].size}-${cacheInfoSetting[selCacheName].assoc}?page_budget=${pageBudget}&record_budget=${recordBudget}&seed=${selectionSeed}`, pageVis)
@@ -847,6 +772,15 @@ function VisPanels() {
     );
 }
 
+function SelectedTrace() {
+    const params = useSearchParams();
+    const fname = params.get('fname');
+    const requestedBuckets = Number(params.get('buckets'));
+    const initialBuckets = Number.isInteger(requestedBuckets) && requestedBuckets >= 1 && requestedBuckets <= INIT_NUM_BUCKETS
+        ? requestedBuckets : INIT_NUM_BUCKETS;
+    return <VisPanels key={`${fname}:${initialBuckets}`} fname={fname} initialBuckets={initialBuckets} />;
+}
+
 export default function VisPanelsPage() {
-    return <Suspense fallback={<div>Loading trace settings…</div>}><VisPanels /></Suspense>;
+    return <Suspense fallback={<div>Loading trace settings…</div>}><SelectedTrace /></Suspense>;
 }

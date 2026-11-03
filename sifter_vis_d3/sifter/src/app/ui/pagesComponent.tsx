@@ -294,7 +294,7 @@ function HoverableSplitBlock({  event, colourOfType, viewStartAddr, viewSize,
     );
 }
 
-function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData, expandedTypes,
+export function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData, expandedTypes,
                         setExpandedTypes, viewStartAddr, showHot, showHitm, pageVis, perf, currTs,
                         hitmCutoff } :
     {
@@ -324,38 +324,34 @@ function ObjectLayout({ data, colourOfType, viewSize, cacheLineSize, fieldsData,
     // console.log('Here is perf in object layout:');
     // console.log(perf);
 
-    const xScale = d3.scaleLinear().domain([0, cacheLineSize]).range([0, OBJECT_LAYOUT_WIDTH]);
-    const yScaleOrig = d3.scaleLinear().domain([0, Math.floor(viewSize / cacheLineSize)]).range([0, (OBJECT_LAYOUT_HEIGHT / cacheLineSize)*(viewSize / cacheLineSize)]);
-    const [yScale, setYScale] = useState<d3.ScaleLinear<number, number, never>>(() => yScaleOrig);
-    const xAxis = d3.axisTop(xScale)
-                    .tickValues(d3.range(0, cacheLineSize + 1, Math.floor(cacheLineSize / 8))).tickFormat(d3.format('d'));
-    const yAxis = d3.axisLeft(yScale)
-                    .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 8)).tickFormat(d3.format('d'));
-    const yAxisGrid = d3.axisLeft(yScale).tickSize(-OBJECT_LAYOUT_WIDTH)
-                        .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 1)).tickFormat(() => '');
+    const [zoomTransform, setZoomTransform] = useState(d3.zoomIdentity);
+    const xScale = useMemo(() => d3.scaleLinear().domain([0, cacheLineSize])
+        .range([0, OBJECT_LAYOUT_WIDTH]), [cacheLineSize]);
+    const yScaleOrig = useMemo(() => d3.scaleLinear().domain([0, Math.floor(viewSize / cacheLineSize)])
+        .range([0, (OBJECT_LAYOUT_HEIGHT / cacheLineSize) * (viewSize / cacheLineSize)]), [viewSize, cacheLineSize]);
+    const yScale = useMemo(() => zoomTransform.rescaleY(yScaleOrig), [zoomTransform, yScaleOrig]);
 
     useEffect(() => {
-        const curObjSVG = d3.select(objSVG.current!);
-        
-        curObjSVG.select<SVGGElement>('#objectXAxisGroup')
-            .call(xAxis);
-        curObjSVG.select<SVGGElement>('#objectYAxisGroup')
-            .call(yAxis);
-        curObjSVG.select<SVGGElement>('#objectYAxisGridGroup')
-            .call(yAxisGrid);
-    }, [cacheLineSize, viewSize, yAxis]);
+        const svg = d3.select(objSVG.current!);
+        svg.select<SVGGElement>('#objectXAxisGroup').call(d3.axisTop(xScale)
+            .tickValues(d3.range(0, cacheLineSize + 1, Math.max(1, Math.floor(cacheLineSize / 8))))
+            .tickFormat(d3.format('d')));
+        svg.select<SVGGElement>('#objectYAxisGroup').call(d3.axisLeft(yScale)
+            .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 8)).tickFormat(d3.format('d')));
+        svg.select<SVGGElement>('#objectYAxisGridGroup').call(d3.axisLeft(yScale).tickSize(-OBJECT_LAYOUT_WIDTH)
+            .tickValues(d3.range(0, Math.floor(viewSize / cacheLineSize) + 1, 1)).tickFormat(() => ''));
+    }, [cacheLineSize, viewSize, xScale, yScale]);
 
     useEffect(() => {
-        const zoom = d3.zoom<SVGSVGElement, unknown>()
-            .scaleExtent([1, 6])
-            .translateExtent([[0, -OBJECT_LAYOUT_MARGIN], [OBJECT_LAYOUT_WIDTH, (OBJECT_LAYOUT_HEIGHT / cacheLineSize)*(viewSize / cacheLineSize) + OBJECT_LAYOUT_MARGIN]]) // I think the +30 comes from the relative position of the object svg in the css, but not sure
-            .on('zoom', (event) => {
-                setYScale(() => event.transform.rescaleY(yScaleOrig));
-            });
-        d3.select(objSVG.current!)
-            .call(zoom);
-    }, [viewSize]);
-    
+        const svg = d3.select(objSVG.current!);
+        const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([1, 6])
+            .translateExtent([[0, -OBJECT_LAYOUT_MARGIN], [OBJECT_LAYOUT_WIDTH,
+                (OBJECT_LAYOUT_HEIGHT / cacheLineSize) * (viewSize / cacheLineSize) + OBJECT_LAYOUT_MARGIN]])
+            .on('zoom', event => setZoomTransform(event.transform));
+        svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
+        return () => { svg.on('.zoom', null); };
+    }, [viewSize, cacheLineSize, viewStartAddr]);
+
     return (
         <div id='objectLayoutDiv' >
             <svg

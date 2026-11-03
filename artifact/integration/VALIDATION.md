@@ -1,6 +1,7 @@
 # Final-paper integration validation
 
-Accepted implementation: `a816b341`, on `codex/final-paper-integration`, based
+Core acceptance implementation: `a816b341`, followed by the November 2 GUI
+state-update fixes below, on `codex/final-paper-integration`, based
 on published main `89ec644` and CR `884fb19`. The November 2 checks below
 supersede the earlier frontend typecheck and local-kernel limitations.
 
@@ -20,9 +21,7 @@ supersede the earlier frontend typecheck and local-kernel limitations.
   the test snapshot; adding the exact pinned `3c2d1a23` dependency resolved that
   setup error without changing the implementation. Its failed log is preserved.
 - Full TypeScript checking and the Next.js production build pass with no errors.
-  Eight React hook dependency warnings remain and need a focused state-update
-  review; the successful GUI checks do not establish that every omitted
-  dependency is harmless. Repairs include explicit React/D3
+  The follow-up production build has **zero React hook warnings**. Repairs include explicit React/D3
   types, null handling, UTF-8 lint configuration, stable list keys, and shared
   utilities moved out of Next.js page exports. Query parameters have a Suspense
   boundary. Lint and type checking remain enabled.
@@ -45,6 +44,28 @@ confirm small-page backing followed by a 2-MiB huge page after process-local
 MADV_COLLAPSE. The preflight exited and released the lock. No system-wide
 settings or other processes were changed, and no full application was run.
 
+## GUI state-update follow-up
+
+The hook review found real stale-state paths. Existing time curves could keep
+old data, scales and drag handlers could retain old trace/geometry values, and
+histogram bars were only created rather than updated/removed. The time cursor
+also needed to follow externally changed time and the actual final bucket index.
+React now owns time paths/cursor geometry; D3 zoom/drag bindings have explicit
+dependencies and cleanup. Detail zoom resets when the region or geometry changes.
+Histogram joins update, remove and recolour existing bars. Capture-time alignment
+offsets are labelled as recorded statistics instead of being reinterpreted using
+the current simulated cache-line size. Initial requests are scoped to a keyed
+trace instance, ignore late results after unmount, and remain separate from the
+explicit Resample action. Re-clicking a selected geometry option cannot set it
+to null.
+
+All **18** focused browser state-change assertions passed, including same-type
+data replacement, clock/axis changes, empty-data recovery, colour/size changes,
+dragging after replacement and zoom, and detail zoom reset. The five existing
+frontend helper suites pass. See `artifact/tests/FRONTEND_STATE_CHECKS.md` for
+the isolated fixture and replay steps. These GUI changes do not alter selection
+algorithms, logging, saved scientific results or measurement definitions.
+
 ## Saved inputs and GUI
 
 Saved EFRB (16,404 objects) and Valkey (104,913 objects) replay checks establish
@@ -55,7 +76,9 @@ Input hashes remain unchanged; see `saved-replay.json`.
 The production GUI was exercised through an isolated in-app browser:
 
 - EFRB: 37 pages / 2,068 records / 7 represented clusters by default; resampling
-  with seed 2026100900 and a 32-page budget produces 32 / 1,748 / 7.
+  with seed 2026100900 and a 32-page budget produces 32 / 1,748 / 7
+  at the default 64-byte cache-line setting. The hook follow-up also checked
+  128-byte geometry: 32 / 1,748 / 8, with a correctly updated detail axis.
 - Valkey: 116 pages / 8,400 records / 58 represented clusters by default.
 - Time changes, selected-page detail, per-type page/cache visibility and
   off-screen page rows render correctly. Unknown clocks are labelled in ticks.
@@ -78,8 +101,11 @@ was rerun or pooled with a different cohort.
 
 The eleven full study databases still exist remotely (62.3 GiB total); only
 their presence and sizes were checked. No large database was scanned or
-transferred. Public distribution of those inputs and full frozen-study replay
-packaging remain release tasks.
+transferred. These are SQLite file sizes before archive compression. Per the
+author's compact-release decision, the databases remain server-side; the release
+provides compact trial evidence and small runnable examples. Verification of
+saved results is distinct from exact full-study replay, which needs the retained
+inputs and frozen environment.
 
 Fresh full application performance campaigns and large figure captures were
 not repeated for this integration. Figure command/configuration/phase tests

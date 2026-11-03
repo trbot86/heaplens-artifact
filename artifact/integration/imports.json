@@ -18,9 +18,9 @@
       "source": "artifact-sampling-work-20261007/sifter_vis_d3/sifter/src/app/ui/pagesComponent.tsx",
       "source_sha256": "1f871716ac7d2f3e694aad3544d27c7b57b3897487524af27537493cf573ce17",
       "target": "sifter_vis_d3/sifter/src/app/ui/pagesComponent.tsx",
-      "target_sha256": "be95ea69e6bb126016e874c22bdf5be41d7ea56d7384a5eb8e0311fe1cd71ad2",
+      "target_sha256": "ac7fc689deea31dcc2a3eef9ecfe25dd52b120967956b6c2a9409b1d9234e18e",
       "imported_target_sha256": "1f871716ac7d2f3e694aad3544d27c7b57b3897487524af27537493cf573ce17",
-      "post_import_change": "Production frontend type/build repairs; shared client utilities moved out of Next page exports; behavior checked in GUI."
+      "post_import_change": "Production frontend type/build repairs and state-update fixes: explicit detail zoom dependencies, reset on geometry/region change, and scoped D3 cleanup; verified in browser."
     },
     {
       "source": "artifact-sampling-work-20261007/sifter_vis_d3/sifter/src/app/ui/componentStyles.scss",
